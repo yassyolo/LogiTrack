@@ -1,0 +1,11 @@
+# Ignore build files
+bin/
+obj/
+*.dll
+*.exe
+
+# Ignore user-specific files
+*.user
+*.suo
+*.log
+*.vs 
