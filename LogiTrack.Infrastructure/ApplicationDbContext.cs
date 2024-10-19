@@ -27,6 +27,7 @@ namespace LogiTrack.Infrastructure
             builder.ApplyConfiguration(new OfferConfiguration());
             builder.ApplyConfiguration(new RequestConfiguration());
             builder.ApplyConfiguration(new VehicleConfiguration());
+            builder.ApplyConfiguration(new PricesPerSizeConfiguration());
 
             base.OnModelCreating(builder);
         }
@@ -40,5 +41,6 @@ namespace LogiTrack.Infrastructure
         public DbSet<Delivery> Deliveries { get; set; }
         public DbSet<DeliveryTracking> DeliveryTrackings { get; set; }
         public DbSet<Invoice> Invoices { get; set; }
+        public DbSet<PricesPerSize> PricesPerSize { get; set;}
     }
 }

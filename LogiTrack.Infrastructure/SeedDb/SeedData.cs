@@ -38,12 +38,14 @@ namespace LogiTrack.Infrastructure.SeedDb
 
         public Vehicle Vehicle1ForDelivery { get; set; } = null!;
         public Vehicle Vehicle2 { get; set; } = null!;
-        public Vehicle Vehicle3 { get; set; } = null!;
 
         public CashRegister CashRegisterForDriver1 { get; set; } = null!;
         public CashRegister CashRegisterForVehicle1 { get; set; } = null!;
 
         public Invoice InvoiceForOfferForRequest1 { get; set; } = null!;
+
+        public PricesPerSize PricesForVehicle1 { get; set; } = null!;
+        public PricesPerSize PricesForVehicle2 { get; set; } = null!;
 
         public SeedData()
         {
@@ -58,6 +60,7 @@ namespace LogiTrack.Infrastructure.SeedDb
             SeedVehicles();
             SeedDeliveries();      
             SeedCashRegisters();
+            SeedPricesPerSize();
         }
 
         private void SeedUsers()
@@ -132,7 +135,6 @@ namespace LogiTrack.Infrastructure.SeedDb
                 NormalizedName = "SPEDITOR"
             };
         }
-
         private void SeedUserRoles()
         {
             ClientCompanyUserRole = new IdentityUserRole<string>
@@ -169,10 +171,8 @@ namespace LogiTrack.Infrastructure.SeedDb
                 RegistrationStatus = "Approved",
                 ContactPerson = "John Doe",
                 AlternativePhoneNumber = "1234567891",
-                VatNumber = "VAT123456",
                 RegistrationNumber = "REG123456",
                 Industry = "Manufacturing",
-                CompanySize = "Medium",
                 Street = "Sini kamani 28",
                 City = "Sliven",
                 PostalCode = "8800",
@@ -186,17 +186,14 @@ namespace LogiTrack.Infrastructure.SeedDb
                 RegistrationStatus = "Rejected",
                 ContactPerson = "Jane Smith",
                 AlternativePhoneNumber = "9876543210",
-                VatNumber = "VAT654321",
                 RegistrationNumber = "REG654321",
                 Industry = "Fashion",
-                CompanySize = "Large",
                 Street = "Osogovo 5a",
                 City = "Sofia",
                 PostalCode = "1000",
                 Country = "Bulgaria"
             };
         }
-
         private void SeedRequests()
         {
             Request1 = new Request()
@@ -315,7 +312,6 @@ namespace LogiTrack.Infrastructure.SeedDb
                 CreatedAt = DateTime.Now
             };
         }
-
         private void SeedOffers()
         {
             OfferForRequest1 = new Offer
@@ -328,7 +324,6 @@ namespace LogiTrack.Infrastructure.SeedDb
                 Notes = "Confirmed by client"
             };
         }
-
         private void SeedInvoices()
         {
             InvoiceForOfferForRequest1 = new Invoice
@@ -408,24 +403,6 @@ namespace LogiTrack.Infrastructure.SeedDb
                 VehicleStatus = "Available",
                 MaintenanceDue = new DateTime(2025, 01, 15),
             };
-
-            Vehicle3 = new Vehicle
-            {
-                Id = 3,
-                RegistrationNumber = "BG9101SO",
-                VehicleType = "Solo Truck",
-                Length = 7.2,
-                Width = 2.5,
-                Height = 2.5,
-                Volume = 45.0,
-                EuroPalletCapacity = 10,
-                IndustrialPalletCapacity = 8,
-                ArePalletsStackable = false,
-                MaxWeightCapacity = 9_500,
-                FuelConsumptionPer100Km = 27.0,
-                VehicleStatus = "Available",
-                MaintenanceDue = new DateTime(2024, 11, 30),
-            };
         }
         private void SeedDeliveries()
         {
@@ -441,7 +418,6 @@ namespace LogiTrack.Infrastructure.SeedDb
                 ReferenceNumber = "REF-2024-0001"
             };
         }     
-
         private void SeedCashRegisters()
         {
             CashRegisterForDriver1 = new CashRegister
@@ -462,6 +438,29 @@ namespace LogiTrack.Infrastructure.SeedDb
                 Type = "Expense",
                 Amount = 50m,
                 DateSubmitted = DateTime.UtcNow
+            };
+        }
+        public void SeedPricesPerSize()
+        {
+            PricesForVehicle1 = new PricesPerSize
+            {
+                Id = 1,
+                VehicleId = 1, 
+                DomesticPriceForNotSharedTruck = 500m,   
+                DomesticPriceForSharedTruck = 300m,      
+                InternationalPriceForNotSharedTruck = 1000m, 
+                InternationalPriceForSharedTruck = 700m,     
+            };
+
+            
+            PricesForVehicle2 = new PricesPerSize
+            {
+                Id = 2,
+                VehicleId = 2, 
+                DomesticPriceForNotSharedTruck = 550m,
+                DomesticPriceForSharedTruck = 320m,
+                InternationalPriceForNotSharedTruck = 1050m,
+                InternationalPriceForSharedTruck = 750m,
             };
         }
     }

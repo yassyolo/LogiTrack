@@ -97,6 +97,12 @@ namespace LogisticsSystem.Infrastructure.Data.DataModels
         [StringLength(RequestTypeMaxLength)]
         public string Type { get; set; } = string.Empty; //domestic, international
 
+        //TODO: ADD MIGRATION FOR THIS
+        [Required]
+        [Comment("Pickup address")]
+        [StringLength(AddressMaxLength)]
+        public string PickupAddress { get; set; } = string.Empty;
+
         [Required]
         [Comment("Pickup address latitude")]
         [Range(LatitudeMinValue, LatitudeMaxValue)]
@@ -106,6 +112,11 @@ namespace LogisticsSystem.Infrastructure.Data.DataModels
         [Comment("Pickup address longitude")]
         [Range(LongitudeMinValue, LongitudeMaxValue)]
         public double PickupLongitude { get; set; }
+
+        [Required]
+        [Comment("Delivery address")]
+        [StringLength(AddressMaxLength)]
+        public string DeliveryAddress { get; set; } = string.Empty;
 
         [Required]
         [Comment("Delivery address latitude")]
@@ -126,7 +137,6 @@ namespace LogisticsSystem.Infrastructure.Data.DataModels
         [Range(PriceMinValue, PriceMaxValue)]
         public decimal ApproximatePrice { get; set; } //given by the company
 
-        [Required]
         [Comment("Automatically calculated price")]
         [Range(PriceMinValue, PriceMaxValue)]
         public decimal CalculatedPrice { get; set; }
@@ -153,7 +163,6 @@ namespace LogisticsSystem.Infrastructure.Data.DataModels
         [Comment("Offer")]
         [ForeignKey(nameof(OfferId))]
         public Offer? Offer { get; set; }
-
 
         [Required]
         [Comment("Date of creation")]

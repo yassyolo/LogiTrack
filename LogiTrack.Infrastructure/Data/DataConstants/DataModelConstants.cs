@@ -2,7 +2,6 @@
 {
     public static class DataModelConstants
     {
-
         public static class ClientCompany
         {
             public const int CompanyNameMaxLength = 100;
@@ -13,14 +12,10 @@
             public const int ContactPersonMinLength = 0;
             public const int PhoneNumberMaxLength = 10;
             public const int PhoneNumberMinLength = 0;
-            public const int VatNumberMaxLength = 9;
-            public const int VatNumberMinLength = 9;
             public const int RegistrationNumberMaxLength = 9;
             public const int RegistrationNumberMinLength = 9;
             public const int IndustryMaxLength = 100;
             public const int IndustryMinLength = 0;
-            public const int CompanySizeMaxLength = 100;
-            public const int CompanySizeMinLength = 0;
             public const int StreetMaxLength = 100;
             public const int StreetMinLength = 0;
             public const int CityMaxLength = 40;
@@ -67,6 +62,8 @@
             public const double LatitudeMinValue = -90.0;
             public const double LongitudeMaxValue = 180.0;
             public const double LongitudeMinValue = -180.0;
+            public const int AddressMaxLength = 200;    
+            public const int AddressMinLength = 0;
         }
 
         public static class Offer
@@ -141,6 +138,12 @@
             public const double LatitudeMinValue = -90.0;
             public const double LongitudeMaxValue = 180.0;
             public const double LongitudeMinValue = -180.0;
+        }
+
+        public static class PricePerSize
+        {
+            public const double PriceMinValue = 0.0;
+            public const double PriceMaxValue = 100.0;
         }
     }
 }

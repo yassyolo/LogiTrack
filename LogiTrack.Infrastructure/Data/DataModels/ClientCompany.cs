@@ -40,11 +40,6 @@ namespace LogisticsSystem.Infrastructure.Data.DataModels
         public string AlternativePhoneNumber { get; set; } = string.Empty;
 
         [Required]
-        [Comment("Company's vat number")]
-        [StringLength(VatNumberMaxLength)]
-        public string VatNumber { get; set; } = string.Empty;
-
-        [Required]
         [Comment("Company's registration number")]
         [StringLength(RegistrationNumberMaxLength)]
         public string RegistrationNumber { get; set; } = string.Empty;
@@ -53,11 +48,6 @@ namespace LogisticsSystem.Infrastructure.Data.DataModels
         [Comment("Company's industry")]
         [StringLength(IndustryMaxLength)]
         public string Industry { get; set; } = string.Empty;
-
-        [Required]
-        [Comment("Company's size")]
-        [StringLength(CompanySizeMaxLength)]
-        public string CompanySize { get; set; } = string.Empty;
 
         [Required]
         [Comment("Company's address")]
