@@ -1,6 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
-
-namespace LogiTrack.Core.Constants
+﻿namespace LogiTrack.Core.Constants
 {
     public class CargoTypeConstants
     {
