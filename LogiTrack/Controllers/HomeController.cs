@@ -1,32 +1,81 @@
-﻿using LogiTrack.Models;
+﻿using LogiTrack.Core.Contracts;
+using LogiTrack.Core.ViewModels.Home;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics;
+using static LogiTrack.Core.Constants.MessageConstants.ErrorMessages;
 
 namespace LogiTrack.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
+        private readonly ILogger<HomeController> logger;
+        private readonly UserManager<IdentityUser> userManager;
+        private readonly SignInManager<IdentityUser> signInManager;
+        private readonly RoleManager<IdentityRole> roleManager;
+        private readonly IHomeService homeService;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger, UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager, RoleManager<IdentityRole> roleManager, IHomeService homeService)
         {
-            _logger = logger;
+            this.logger = logger;
+            this.userManager = userManager;
+            this.signInManager = signInManager;
+            this.roleManager = roleManager;
+            this.homeService = homeService;
         }
 
-        public IActionResult Index()
+        [HttpGet]
+        public IActionResult Login()
         {
-            return View();
+            var model = new LoginViewModel();
+            return View(model);
         }
 
-        public IActionResult Privacy()
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Login(LoginViewModel model)
         {
-            return View();
-        }
+            if (ModelState.IsValid == false)
+            {
+                return View(model);
+            }
 
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-        }
+            var user = await homeService.GetUserByEmailAsync(model.Email);
+            if (user == null)
+            {
+                ModelState.AddModelError(string.Empty, InvalidEmailErrorMessage);
+                return View(model);
+            }
+            var passwordCheck = await userManager.CheckPasswordAsync(user, model.Password);
+            if (passwordCheck == false)
+            {
+                ModelState.AddModelError(string.Empty, InvalidLoginAttemptErrorMessage);
+                return View(model);
+            }
+            var result = await signInManager.PasswordSignInAsync(user, model.Password, false, false);
+            if (result.Succeeded == false)
+            {
+                ModelState.AddModelError(string.Empty, InvalidLoginAttemptErrorMessage);
+                return View(model);
+            }
+            if(await userManager.IsInRoleAsync(user, "ClientCompany"))
+            {
+                return RedirectToAction("Index", "ClientCompany");
+            }
+            else if (await userManager.IsInRoleAsync(user, "LogisticsCompany"))
+            {
+                return RedirectToAction("Index", "LogisticsCompany");
+            }
+            else if (await userManager.IsInRoleAsync(user, "Secretary"))
+            {
+                return RedirectToAction("Index", "Secretary");
+            }
+            else if (await userManager.IsInRoleAsync(user, "Speditor"))
+            {
+                return RedirectToAction("Index", "Speditor");
+            }
+
+            ModelState.AddModelError(string.Empty, InvalidLoginAttemptErrorMessage);
+            return View(model);
+        }   
     }
 }
