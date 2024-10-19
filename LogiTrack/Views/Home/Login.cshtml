@@ -1,0 +1,38 @@
+﻿@model LogiTrack.Core.ViewModels.Home.LoginViewModel
+
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h2>Login</h2>
+        <form asp-action="Login" asp-controller="Home" method="post">
+            <label asp-for="Email">Email</label>
+			<input asp-for="Email" type="email" placeholder="Email.." required>
+            <span asp-validation-for="Email"></span>
+            <label asp-for="Password">Password</label>
+            <input asp-for="Password" type="password" placeholder="Password.." required>
+            <span asp-validation-for="Password"></span>
+			<button type="submit">Login</button>
+        </form>
+        <a asp-action="ForgotPassoword" asp-controller="Home" class="forgot-password">Forgot Password?</a>
+        <div class="no-account">Don't have an account? <a asp-action="Register" asp-controller="Clients" style="color: #007bff;">Sign up</a></div>
+    </div>
+    <div class="login-video-container">
+        <video controls>
+            <source src="your-video-url.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+    </div>
+</body>
+</html>

@@ -1,0 +1,205 @@
+﻿@model LogiTrack.Core.ViewModels.Clients.MakeRequestViewModel
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Make a Request</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+        input[type="text"], input[type="number"], input[type="date"], input[type="checkbox"], input[type="radio"], textarea {
+            padding: 10px;
+            margin-top: 5px;
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+
+        input[type="checkbox"] {
+            width: auto;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .form-section {
+            margin-top: 20px;
+        }
+
+        .btn {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+            .btn:hover {
+                background-color: #0056b3;
+            }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Make a Request</h1>
+        <form method="post" asp-action="MakeRequest">
+
+            <!-- Cargo Type -->
+            <label for="CargoType">Cargo Type</label>
+            <select id="CargoType" name="CargoType">
+                <option value="standard">Standard</option>
+                <option value="non-standard">Non-standard</option>
+            </select>
+
+            <!-- Standard Cargo (Pallet) Metrics -->
+            <div id="standard-cargo-section" class="form-section hidden">
+                <label for="TypeOfPallet">Type of Pallet</label>
+                <input type="text" id="TypeOfPallet" name="TypeOfPallet">
+
+                <label for="NumberOfPallets">Number of Pallets</label>
+                <input type="number" id="NumberOfPallets" name="NumberOfPallets">
+
+                <label for="PalletLength">Pallet Length (cm)</label>
+                <input type="number" id="PalletLength" name="PalletLength">
+
+                <label for="PalletWidth">Pallet Width (cm)</label>
+                <input type="number" id="PalletWidth" name="PalletWidth">
+
+                <label for="PalletHeight">Pallet Height (cm)</label>
+                <input type="number" id="PalletHeight" name="PalletHeight">
+
+                <label for="PalletVolume">Pallet Volume (m³)</label>
+                <input type="number" id="PalletVolume" name="PalletVolume">
+
+                <label for="WeightOfPallets">Weight of Pallets (kg)</label>
+                <input type="number" id="WeightOfPallets" name="WeightOfPallets">
+
+                <label>
+                    <input type="checkbox" id="PalletsAreStackable" name="PalletsAreStackable">
+                    Are the pallets stackable?
+                </label>
+            </div>
+
+            <!-- Non-standard Cargo Metrics -->
+            <div id="nonstandard-cargo-section" class="form-section hidden">
+                <label for="NumberOfNonStandartGoods">Number of Non-standard Goods</label>
+                <input type="number" id="NumberOfNonStandartGoods" name="NumberOfNonStandartGoods">
+
+                <label for="Length">Length of Goods (cm)</label>
+                <input type="number" id="Length" name="Length">
+
+                <label for="Width">Width of Goods (cm)</label>
+                <input type="number" id="Width" name="Width">
+
+                <label for="Height">Height of Goods (cm)</label>
+                <input type="number" id="Height" name="Height">
+
+                <label for="Volume">Volume of Goods (m³)</label>
+                <input type="number" id="Volume" name="Volume">
+
+                <label for="Weight">Weight of Goods (kg)</label>
+                <input type="number" id="Weight" name="Weight">
+            </div>
+
+            <!-- Type of Goods, Type (Domestic/International), Pickup and Delivery coordinates -->
+            <div class="form-section">
+                <label for="TypeOfGoods">Type of Goods</label>
+                <input type="text" id="TypeOfGoods" name="TypeOfGoods" required>
+
+                <label for="Type">Type (Domestic or International)</label>
+                <input type="text" id="Type" name="Type" required>
+
+                <label for="PickupLatitude">Pickup Latitude</label>
+                <input type="number" id="PickupLatitude" name="PickupLatitude" required>
+
+                <label for="PickupLongitude">Pickup Longitude</label>
+                <input type="number" id="PickupLongitude" name="PickupLongitude" required>
+
+                <label for="DeliveryLatitude">Delivery Latitude</label>
+                <input type="number" id="DeliveryLatitude" name="DeliveryLatitude" required>
+
+                <label for="DeliveryLongitude">Delivery Longitude</label>
+                <input type="number" id="DeliveryLongitude" name="DeliveryLongitude" required>
+
+                <label>
+                    <input type="checkbox" id="SharedTruck" name="SharedTruck" required>
+                    Shared Truck
+                </label>
+
+                <label for="ApproximatePrice">Approximate Price (given by the company)</label>
+                <input type="number" id="ApproximatePrice" name="ApproximatePrice" required>
+
+                <label for="ExpectedDeliveryDate">Expected Delivery Date</label>
+                <input type="date" id="ExpectedDeliveryDate" name="ExpectedDeliveryDate" required>
+
+                <label for="SpecialInstructions">Special Instructions</label>
+                <textarea id="SpecialInstructions" name="SpecialInstructions"></textarea>
+
+                <label>
+                    <input type="checkbox" id="IsRefrigerated" name="IsRefrigerated" required>
+                    Is the cargo refrigerated?
+                </label>
+            </div>
+
+            <button type="submit" class="btn">Submit Request</button>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('CargoType').addEventListener('change', function () {
+            var cargoType = this.value;
+            var standardCargoSection = document.getElementById('standard-cargo-section');
+            var nonStandardCargoSection = document.getElementById('nonstandard-cargo-section');
+
+            if (cargoType === 'standard') {
+                standardCargoSection.classList.remove('hidden');
+                nonStandardCargoSection.classList.add('hidden');
+            } else if (cargoType === 'non-standard') {
+                standardCargoSection.classList.add('hidden');
+                nonStandardCargoSection.classList.remove('hidden');
+            } else {
+                standardCargoSection.classList.add('hidden');
+                nonStandardCargoSection.classList.add('hidden');
+            }
+        });
+    </script>
+</body>
+</html>
+

@@ -1,8 +1,157 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
-}
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile Dropdown and Menu</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .top-strip {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            position: relative;
+        }
+
+        .menu {
+            position: absolute;
+            left: 0;
+            top: 50px; /* Position below the top strip */
+            width: 200px;
+            background-color: white;
+            border-right: 1px solid #ddd;
+            box-shadow: 2px 0 8px rgba(0,0,0,0.2);
+        }
+
+        .menu-item {
+            padding: 10px;
+            color: #333;
+            cursor: pointer;
+        }
+
+            .menu-item:hover {
+                background-color: #f0f0f0;
+            }
+
+        .profile-icon {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .profile-dropdown {
+            display: none;
+            position: absolute;
+            top: 40px;
+            right: 0; /* Align to the right */
+            background-color: white;
+            border: 1px solid #ddd;
+            width: 200px;
+            z-index: 1;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+            .profile-dropdown.visible {
+                display: block;
+            }
+
+            .profile-dropdown p {
+                margin: 10px;
+                color: #333;
+            }
+
+        .sub-menu {
+            display: none;
+            background-color: white;
+            border: 1px solid #ddd;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            z-index: 1;
+        }
+
+            .sub-menu.visible {
+                display: block;
+            }
+
+        .sub-menu-item {
+            padding: 10px;
+            color: #333;
+            cursor: pointer;
+        }
+
+            .sub-menu-item:hover {
+                background-color: #f0f0f0;
+            }
+    </style>
+</head>
+<body>
+    <div class="top-strip">
+        <div class="menu">
+            <div class="menu-item" onclick="toggleSubMenu('quotesSubMenu')">Quotes</div>
+            <div id="quotesSubMenu" class="sub-menu">
+                <div class="sub-menu-item">My Quotes</div>
+                <div class="sub-menu-item">New Quote</div>
+            </div>
+            <div class="menu-item" onclick="toggleSubMenu('bookingSubMenu')">Booking</div>
+            <div id="bookingSubMenu" class="sub-menu">
+                <div class="sub-menu-item">My Booking</div>
+                <div class="sub-menu-item">New Booking</div>
+                <div class="sub-menu-item">Track and Trace</div>
+                <div class="sub-menu-item">Documents</div>
+            </div>
+            <div class="menu-item">Dashboard</div>
+        </div>
+        <div class="profile-icon" onclick="toggleProfileDropdown()">
+            <i class="fas fa-user-circle fa-2x"></i>
+            <div id="profileDropdown" class="profile-dropdown">
+                <p><strong>Profile Details</strong></p>
+                <p>Name: John Doe</p>
+                <p>Email: johndoe@example.com</p>
+                <p>Address: 123 Main St, City, Country</p>
+                <p><strong>Personal Details</strong></p>
+                <p>Phone: +123456789</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleProfileDropdown() {
+            const dropdown = document.getElementById("profileDropdown");
+            dropdown.classList.toggle("visible");
+        }
+
+        function toggleSubMenu(subMenuId) {
+            const subMenu = document.getElementById(subMenuId);
+            subMenu.classList.toggle("visible");
+        }
+
+        // Close the dropdown and submenus if clicked outside
+        window.onclick = function (event) {
+            if (!event.target.matches('.profile-icon') && !event.target.matches('.menu-item')) {
+                const dropdowns = document.getElementsByClassName("profile-dropdown");
+                for (let i = 0; i < dropdowns.length; i++) {
+                    dropdowns[i].classList.remove('visible');
+                }
+                const subMenus = document.getElementsByClassName("sub-menu");
+                for (let i = 0; i < subMenus.length; i++) {
+                    subMenus[i].classList.remove('visible');
+                }
+            }
+        }
+    </script>
+</body>
+</html>
