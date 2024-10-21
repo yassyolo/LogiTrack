@@ -69,6 +69,10 @@ namespace LogisticsSystem.Infrastructure.Data.DataModels
         [StringLength(CountryMaxLength)]
         public string Country { get; set; } = string.Empty;
 
+        [Required]
+        [Comment("Registration created at")]
+        public DateTime CreatedAt { get; set; }
+
         [Comment("Company's requests")]
         public IEnumerable<Request> Requests { get; set; } = new List<Request>();
 

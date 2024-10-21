@@ -176,6 +176,7 @@ namespace LogiTrack.Infrastructure.SeedDb
                 Street = "Sini kamani 28",
                 City = "Sliven",
                 PostalCode = "8800",
+                CreatedAt = DateTime.Now.AddDays(-20),
                 Country = "Bulgaria"
             };
 
@@ -183,7 +184,7 @@ namespace LogiTrack.Infrastructure.SeedDb
             {
                 Id = 2,
                 Name = "Client Company 2",
-                RegistrationStatus = "Rejected",
+                RegistrationStatus = "Pending",
                 ContactPerson = "Jane Smith",
                 AlternativePhoneNumber = "9876543210",
                 RegistrationNumber = "REG654321",
@@ -191,6 +192,7 @@ namespace LogiTrack.Infrastructure.SeedDb
                 Street = "Osogovo 5a",
                 City = "Sofia",
                 PostalCode = "1000",
+                CreatedAt = DateTime.Now.AddDays(-10),
                 Country = "Bulgaria"
             };
         }

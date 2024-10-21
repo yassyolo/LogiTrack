@@ -37,5 +37,8 @@ namespace LogiTrack.Infrastructure.Data.DataModels
         [Comment("Date submitted")]
         [Required]
         public DateTime DateSubmitted { get; set; }
+
+        [Comment("File identifier in Google drive")]
+        public string FileId { get; set; } = string.Empty;
     }
 }
