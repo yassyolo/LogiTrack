@@ -14,5 +14,7 @@
         public const string InvalidPriceErrorMessage = "Invalid price.";
         public const string DeliveryNotFoundErrorMessage = "Delivery not found.";
         public const string InvalidAmountErrorMessage = "Invalid amount.";
+        public const string PasswordsDoNotMatchErrorMessage= "Passwords do not match.";
+        public const string NewPasswordLikeCurrentPasswordErrorMessage = "New password cannot be the same as the current password.";
     }
 }

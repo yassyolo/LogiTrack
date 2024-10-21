@@ -2,7 +2,7 @@
 @{
 	Layout = null;
 }
-<form asp-action="AddCashRegister" method="post" enctype="multipart/form-data">
+<form asp-action="AddCashRegister" asp-route-id=1 method="post" enctype="multipart/form-data">
     <div>
         <label asp-for="DeliveryId"></label>
         <input asp-for="DeliveryId" />

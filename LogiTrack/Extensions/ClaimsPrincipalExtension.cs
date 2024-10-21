@@ -4,7 +4,7 @@ namespace LogiTrack.Extensions
 {
     public static class ClaimsPrincipalExtension
     {
-        public static string GetUserId(this ClaimsPrincipal claimsPrincipal)
+        public static string GetUsername(this ClaimsPrincipal claimsPrincipal)
         {
             return claimsPrincipal.FindFirstValue(ClaimTypes.NameIdentifier);
         }

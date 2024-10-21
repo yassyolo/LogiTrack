@@ -18,12 +18,25 @@ namespace LogiTrack.Core.Services
             this.googleDriveService = googleDriveService;
         }
 
-        public async Task AddCashRegisterForDeliveryAsync(int id, AddCashRegisterViewModel model)
+       
+
+        public async Task AddCashRegisterForDeliveryAsync(int id, AddCashRegisterViewModel model, Microsoft.AspNetCore.Http.IFormFile file)
         {
             var delivery = await repository.All<Delivery>().FirstOrDefaultAsync(x => x.Id == id);
             if (delivery == null)
             {
                 throw new DeliveryNotFoundException();
+            }
+            string fileId = null;
+            if (file != null && file.Length != 0)
+            {
+                var mimeType = file.ContentType;
+                var tempFilePath = Path.GetTempFileName();
+                using (var stream = new FileStream(tempFilePath, FileMode.Create))
+                {
+                    await file.CopyToAsync(stream);
+                }
+                fileId = await googleDriveService.UploadFileAsync(tempFilePath, mimeType, "1hwrv9sZTBKLc6eN7AEr73WodN3lnBGhp");
             }
             var cashRegister = new CashRegister
             {
@@ -31,7 +44,8 @@ namespace LogiTrack.Core.Services
                 Type = model.Type,
                 Amount = model.Amount,
                 Description = model.Description,
-                DateSubmitted = DateTime.UtcNow
+                DateSubmitted = DateTime.UtcNow,
+                FileId = fileId
             };
             await repository.AddAsync(cashRegister);
             await repository.SaveChangesAsync();

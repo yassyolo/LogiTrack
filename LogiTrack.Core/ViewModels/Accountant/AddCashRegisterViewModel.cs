@@ -23,7 +23,7 @@ namespace LogiTrack.Core.ViewModels.Accountant
         public string Type { get; set; } = string.Empty;
 
         [Required(ErrorMessage = RequiredFieldErrorMessage)]
-        [Range(RegisterAmountMinValue, RegisterAmountMinValue, ErrorMessage = InvalidAmountErrorMessage)]
+        //[Range(RegisterAmountMinValue, RegisterAmountMinValue, ErrorMessage = InvalidAmountErrorMessage)]
         public decimal Amount { get; set; }
     }
 }

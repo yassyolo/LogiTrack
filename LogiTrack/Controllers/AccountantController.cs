@@ -41,8 +41,9 @@ namespace LogiTrack.Controllers
             }
         }
         [HttpGet]
-        public async Task<IActionResult> AddCashRegister(int id)
+        public async Task<IActionResult> AddCashRegister()
         {
+            int id = 1;
             if (await deliveryService.DeliveryWithIdExistsAsync(id) == false)
             {
                 return NotFound(DeliveryNotFoundErrorMessage);
@@ -56,20 +57,25 @@ namespace LogiTrack.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AddCashRegister(int id, AddCashRegisterViewModel model)
+        public async Task<IActionResult> AddCashRegister(int id, AddCashRegisterViewModel model, IFormFile file)
         {
+            id = 1;
             if (ModelState.IsValid == false)
             {
                 return View(model);
             }
             try
             {
-                await deliveryService.AddCashRegisterForDeliveryAsync(id, model);
+                await deliveryService.AddCashRegisterForDeliveryAsync(id, model, file);
                 return RedirectToAction(nameof(Index));
             }
             catch (DeliveryNotFoundException ex)
             {
                 return NotFound(ex.Message);
+            }
+            catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
             }
         }
     }

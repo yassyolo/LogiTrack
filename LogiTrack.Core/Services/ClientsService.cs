@@ -19,6 +19,77 @@ namespace LogiTrack.Core.Services
             this.repository = repository;
         }
 
+        public async Task<IdentityUser> ApprovePendingRegistrationForCompanyWithIdAsync(int id)
+        {
+            var company = await repository.All<ClientCompany>().FirstOrDefaultAsync(x => x.Id == id);
+            company.RegistrationStatus = StatusConstants.Approved;
+            await repository.SaveChangesAsync();
+            return await repository.AllReadonly<IdentityUser>().FirstOrDefaultAsync(x => x.Id == company.UserId);
+        }
+
+        public async Task<bool> CompanyWithIdExistsAsync(int id)
+        {
+            return await repository.AllReadonly<ClientCompany>().AnyAsync(x => x.Id == id);
+        }
+
+        public async Task<CompanyDetailsViewModel?> GetCompanyDetailsAsync(string username)
+        {
+           return await repository.AllReadonly<ClientCompany>()
+                .Where(x => x.User.UserName == username)
+                .Select(x => new CompanyDetailsViewModel
+                {
+                    Name = x.Name,
+                    RegistrationNumber = x.RegistrationNumber,
+                    Industry = x.Industry,
+                    Street = x.Street,
+                    City = x.City,
+                    PostalCode = x.PostalCode,
+                    Country = x.Country,
+                    CreatedAt = x.CreatedAt.ToString("dd/MM/yyyy"),
+                })
+                .FirstOrDefaultAsync();
+        }
+
+        public async Task<ContactDetailsViewModel?> GetCompanyContactDetailsAsync(string username)
+        {
+           return await repository.AllReadonly<ClientCompany>()
+                .Where(x => x.User.UserName == username)
+                .Select(x => new ContactDetailsViewModel
+                {
+                    Id = x.Id,
+                    Username = x.User.UserName,
+                    ContactPerson = x.ContactPerson,
+                    AlternativePhoneNumber = x.AlternativePhoneNumber,
+                    PhoneNumber = x.User.PhoneNumber,
+                    Email = x.User.Email
+                })
+                .FirstOrDefaultAsync();
+        }
+
+        public async Task<List<PendingRegistrationsViewModel>?> GetPendingRegistrationsAsync()
+        {
+            return await repository.AllReadonly<ClientCompany>()
+                .Where(x => x.RegistrationStatus == StatusConstants.Pending)
+                .OrderByDescending(x => x.CreatedAt)
+                .Select(x => new PendingRegistrationsViewModel
+                {
+                    Id = x.Id,
+                    Name = x.Name,
+                    ContactPerson = x.ContactPerson,
+                    AlternativePhoneNumber = x.AlternativePhoneNumber,
+                    RegistrationNumber = x.RegistrationNumber,
+                    Industry = x.Industry,
+                    Street = x.Street,
+                    City = x.City,
+                    PostalCode = x.PostalCode,
+                    Country = x.Country,
+                    PhoneNumber = x.User.PhoneNumber,
+                    CreatedAt = x.CreatedAt.ToString("dd/MM/yyyy"),
+                    Email = x.User.Email
+                })              
+                .ToListAsync();
+        }
+
         public async Task MakeRequestAsync(MakeRequestViewModel model, string userEmail)
         {
             var user = await repository.AllReadonly<IdentityUser>().FirstOrDefaultAsync(x => x.Email == userEmail);
@@ -79,7 +150,8 @@ namespace LogiTrack.Core.Services
                 RegistrationNumber = model.RegistrationNumber,
                 RegistrationStatus = StatusConstants.Pending,
                 ContactPerson = model.ContactPerson,
-                UserId = user.Id
+                UserId = user.Id, 
+                CreatedAt = DateTime.Now,
             };
             await repository.AddAsync(client);
             await repository.SaveChangesAsync();
@@ -98,6 +170,13 @@ namespace LogiTrack.Core.Services
             return user;
         }
 
+        public async Task RejectPendingRegistrationForCompanyWithIdAsync(int id)
+        {
+            var company = await repository.All<ClientCompany>().FirstOrDefaultAsync(x => x.Id == id);
+            company.RegistrationStatus = StatusConstants.Rejected;
+            await repository.SaveChangesAsync();
+        }
+
         public async Task<bool> UserWithEmailExistsAsync(string email)
         {
             return await repository.AllReadonly<IdentityUser>().AnyAsync(x => x.Email == email);
@@ -106,6 +185,11 @@ namespace LogiTrack.Core.Services
         public async Task<bool> UserWithPhoneNumberExistsAsync(string phoneNumber)
         {
             return await repository.AllReadonly<IdentityUser>().AnyAsync(x => x.PhoneNumber == phoneNumber);
+        }
+
+        Task<ContactDetailsViewModel?> IClientsService.GetCompanyContactDetailsAsync(string username)
+        {
+            throw new NotImplementedException();
         }
     }
 }
