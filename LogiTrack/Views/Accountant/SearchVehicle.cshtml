@@ -1,0 +1,153 @@
+﻿@model LogiTrack.Core.ViewModels.Accountant.SearchVehicleViewModel
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Vehicle</title>
+    <!-- Include Bootstrap for layout and styling -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        /* Custom styles for layout */
+        body {
+            display: flex;
+            height: 100vh;
+            margin: 0;
+        }
+
+        /* Sidebar menu */
+        #sidebarMenu {
+            width: 30%;
+            background-color: #f8f9fa;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        /* Top menu */
+        #topBar {
+            width: 100%;
+            height: 10%;
+            background-color: #343a40;
+            color: white;
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Main content area */
+        #mainContent {
+            flex-grow: 1;
+            padding: 20px;
+        }
+
+        /* Profile and logout button */
+        .profile-menu {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+            .profile-menu img {
+                border-radius: 50%;
+                width: 40px;
+                height: 40px;
+            }
+
+        .dropdown-menu {
+            position: absolute;
+        }
+
+        /* Search results */
+        #searchResults {
+            margin-top: 20px;
+        }
+
+        .vehicle-details {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar menu (30% vertical menu) -->
+    <nav id="sidebarMenu">
+        <h2>Main Menu</h2>
+        <ul class="list-group">
+            <li class="list-group-item">
+                <a href="#cashRegistersDropdown" data-bs-toggle="collapse" class="dropdown-toggle">Cash Registers</a>
+                <ul class="collapse list-group" id="cashRegistersDropdown">
+                    <li class="list-group-item">Register 1</li>
+                    <li class="list-group-item">Register 2</li>
+                    <li class="list-group-item">Register 3</li>
+                </ul>
+            </li>
+            <li class="list-group-item">
+                <a href="#pricesDropdown" data-bs-toggle="collapse" class="dropdown-toggle">Prices for Trucks</a>
+                <ul class="collapse list-group" id="pricesDropdown">
+                    <li class="list-group-item">Price 1</li>
+                    <li class="list-group-item">Price 2</li>
+                    <li class="list-group-item">Price 3</li>
+                </ul>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- Top bar (10% horizontal menu) -->
+    <header id="topBar" class="bg-dark text-white">
+        <div>
+            <h3>Vehicle Search</h3>
+        </div>
+        <div class="profile-menu">
+            <span>Profile</span>
+            <img src="profile-icon.png" alt="Profile Icon">
+            <a href="#" class="btn btn-light">Logout</a>
+        </div>
+    </header>
+
+    <!-- Main content area (Search and vehicle details) -->
+    <main id="mainContent">
+        <h2>Search Vehicle by Registration Number</h2>
+
+        <!-- Search form -->
+        <form method="get" action="/SearchVehicle">
+            <div class="input-group mb-3">
+                <input type="text" class="form-control" placeholder="Enter registration number" name="SearchTerm" value="@Model.SearchTerm">
+                <button class="btn btn-primary" type="submit">Search</button>
+            </div>
+        </form>
+
+        <!-- Display search results (if any) -->
+        @if (Model.Vehicle != null)
+        {
+            <div id="searchResults">
+                <h3>Vehicle Details</h3>
+                <div class="vehicle-details">
+                    <p><strong>Registration Number:</strong> @Model.Vehicle.RegistrationNumber</p>
+                    <p><strong>Vehicle Type:</strong> @Model.Vehicle.VehicleType</p>
+                    <p><strong>Length:</strong> @Model.Vehicle.Length</p>
+                    <p><strong>Width:</strong> @Model.Vehicle.Width</p>
+                    <p><strong>Height:</strong> @Model.Vehicle.Height</p>
+                    <p><strong>Euro Pallet Capacity:</strong> @Model.Vehicle.EuroPalletCapacity</p>
+                    <p><strong>Industrial Pallet Capacity:</strong> @Model.Vehicle.IndustrialPalletCapacity</p>
+                    <p><strong>Max Weight Capacity:</strong> @Model.Vehicle.MaxWeightCapacity</p>
+                    <p><strong>Fuel Consumption:</strong> @Model.Vehicle.FuelConsumptionPer100Km</p>
+                    <p><strong>Maintenance Due:</strong> @Model.Vehicle.MaintenanceDue</p>
+                    <p><strong>Domestic Price (Not Shared):</strong> @Model.Vehicle.DomesticPriceForNotSharedTruck</p>
+                    <p><strong>Domestic Price (Shared):</strong> @Model.Vehicle.DomesticPriceForSharedTruck</p>
+                    <p><strong>International Price (Not Shared):</strong> @Model.Vehicle.InternationalPriceForNotSharedTruck</p>
+                    <p><strong>International Price (Shared):</strong> @Model.Vehicle.InternationalPriceForSharedTruck</p>
+                </div>
+            </div>
+        }
+    </main>
+
+    <!-- Include Bootstrap JS for dropdown functionality -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+

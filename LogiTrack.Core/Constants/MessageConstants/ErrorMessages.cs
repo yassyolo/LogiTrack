@@ -10,5 +10,9 @@
         public const string PhoneNumberAlreadyExistsErrorMessage = "User with this phone number already exists.";
         public const string UserNotFoundErrorMessage = "User not found.";
         public const string ClientCompanyNotFoundErrorMessage = "Client company not found.";
+        public const string VehicleNotFoundErrorMessage = "Vehicle not found.";
+        public const string InvalidPriceErrorMessage = "Invalid price.";
+        public const string DeliveryNotFoundErrorMessage = "Delivery not found.";
+        public const string InvalidAmountErrorMessage = "Invalid amount.";
     }
 }

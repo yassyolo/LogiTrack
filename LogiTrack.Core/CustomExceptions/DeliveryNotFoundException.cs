@@ -1,9 +1,9 @@
 ﻿using static LogiTrack.Core.Constants.MessageConstants.ErrorMessages;
 namespace LogiTrack.Core.CustomExceptions
 {
-    public class UserNotFoundException : Exception
+    public class DeliveryNotFoundException : Exception
     {
-        public UserNotFoundException() : base(UserNotFoundErrorMessage)
+        public DeliveryNotFoundException() : base(DeliveryNotFoundErrorMessage)
         {
         }
     }

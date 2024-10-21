@@ -1,0 +1,32 @@
+﻿@model LogiTrack.Core.ViewModels.Accountant.AddCashRegisterViewModel
+@{
+	Layout = null;
+}
+<form asp-action="AddCashRegister" method="post" enctype="multipart/form-data">
+    <div>
+        <label asp-for="DeliveryId"></label>
+        <input asp-for="DeliveryId" />
+        <span asp-validation-for="DeliveryId"></span>
+    </div>
+    <div>
+        <label asp-for="Description"></label>
+        <input asp-for="Description" />
+        <span asp-validation-for="Description"></span>
+    </div>
+    <div>
+        <label asp-for="Type"></label>
+        <input asp-for="Type" />
+        <span asp-validation-for="Type"></span>
+    </div>
+    <div>
+        <label asp-for="Amount"></label>
+        <input asp-for="Amount" />
+        <span asp-validation-for="Amount"></span>
+    </div>
+    <div>
+        <label for="file">Upload File:</label>
+        <input type="file" name="file" />
+    </div>
+    <button type="submit">Submit</button>
+</form>
+

@@ -65,9 +65,9 @@ namespace LogiTrack.Controllers
             {
                 return RedirectToAction("Index", "LogisticsCompany");
             }
-            else if (await userManager.IsInRoleAsync(user, "Secretary"))
+            else if (await userManager.IsInRoleAsync(user, "Accountant"))
             {
-                return RedirectToAction("Index", "Secretary");
+                return RedirectToAction("Index", "Accountant");
             }
             else if (await userManager.IsInRoleAsync(user, "Speditor"))
             {
@@ -76,6 +76,13 @@ namespace LogiTrack.Controllers
 
             ModelState.AddModelError(string.Empty, InvalidLoginAttemptErrorMessage);
             return View(model);
-        }   
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Logout()
+        {
+            await signInManager.SignOutAsync();
+            return RedirectToAction(nameof(Login));
+        }
     }
 }

@@ -1,8 +1,9 @@
-﻿namespace LogiTrack.Core.CustomExceptions
+﻿using static LogiTrack.Core.Constants.MessageConstants.ErrorMessages;
+namespace LogiTrack.Core.CustomExceptions
 {
     public class ClientCompanyNotFoundException : Exception
     {
-        public ClientCompanyNotFoundException(string message) : base(message)
+        public ClientCompanyNotFoundException() : base(ClientCompanyNotFoundErrorMessage)
         {
         }
     }

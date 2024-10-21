@@ -24,12 +24,12 @@ namespace LogiTrack.Core.Services
             var user = await repository.AllReadonly<IdentityUser>().FirstOrDefaultAsync(x => x.Email == userEmail);
             if (user == null)
             {
-                throw new UserNotFoundException(UserNotFoundErrorMessage);
+                throw new UserNotFoundException();
             }
             var client = await repository.AllReadonly<ClientCompany>().FirstOrDefaultAsync(x => x.UserId == user.Id);
             if (client == null)
             {
-                throw new ClientCompanyNotFoundException(ClientCompanyNotFoundErrorMessage);
+                throw new ClientCompanyNotFoundException();
             }
             var request = new Request
             {
