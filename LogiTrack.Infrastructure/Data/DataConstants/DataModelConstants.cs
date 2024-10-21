@@ -92,6 +92,10 @@
             public const int VehicleTypeMinLength = 0;
             public const double VolumeMinValue = 0.0;
             public const double VolumeMaxValue = 2000.0;
+            public const double PriceMinValue = 0.0;
+            public const double PriceMaxValue = 20000.0;
+            public const double KilometersMinValue = 0.0;
+            public const double KilometersMaxValue = 1000000.0;
         }
 
         public static class Driver
@@ -144,6 +148,14 @@
         {
             public const double PriceMinValue = 0.0;
             public const double PriceMaxValue = 100.0;
+            public const double QuotientMinValue = 0.0;
+            public const double QuotientMaxValue = 10.0;
+        }
+
+        public static class FuelPrice
+        {
+            public const double PriceMinValue = 0.0;
+            public const double PriceMaxValue = 20.0;
         }
     }
 }

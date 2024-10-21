@@ -9,7 +9,7 @@ namespace LogiTrack.Infrastructure.SeedDb.Configurations
         public void Configure(EntityTypeBuilder<IdentityRole> builder)
         {
             var data = new SeedData();
-            builder.HasData(new IdentityRole[] { data.LogisticsCompanyRole, data.ClientCompanyRole, data.SecretaryRole, data.SpeditorRole });
+            builder.HasData(new IdentityRole[] { data.LogisticsCompanyRole, data.ClientCompanyRole, data.AccountRole, data.SpeditorRole });
         }
     }
 }

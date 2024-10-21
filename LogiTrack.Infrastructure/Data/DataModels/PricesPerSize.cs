@@ -20,6 +20,22 @@ namespace LogiTrack.Infrastructure.Data.DataModels
         [ForeignKey(nameof(VehicleId))]
         public Vehicle Vehicle { get; set; } = null!;
 
+        [Comment("Quotient for domestic not shared truck")]
+        [Range(QuotientMinValue, QuotientMaxValue)]
+        public double QuotientForDomesticNotSharedTruck { get; set; }
+
+        [Comment("Quotient for domestic shared truck")]
+        [Range(QuotientMinValue, QuotientMaxValue)]
+        public double QuotientForDomesticSharedTruck { get; set; }
+
+        [Comment("Quotient for international not shared truck")]
+        [Range(QuotientMinValue, QuotientMaxValue)]
+        public double QuotientForInternationalNotSharedTruck { get; set; }
+
+        [Comment("Quotient for international shared truck")]
+        [Range(QuotientMinValue, QuotientMaxValue)]
+        public double QuotientForInternationalSharedTruck { get; set; }
+
         [Required]
         [Comment("Domestic price for shared truck")]
         [Range(PriceMinValue, PriceMaxValue)]
@@ -39,6 +55,5 @@ namespace LogiTrack.Infrastructure.Data.DataModels
         [Comment("International price for shared truck")]
         [Range(PriceMinValue, PriceMaxValue)]
         public decimal InternationalPriceForSharedTruck { get; set; }
-
     }
 }

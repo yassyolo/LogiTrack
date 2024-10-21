@@ -13,6 +13,12 @@ namespace LogiTrack.Infrastructure.SeedDb.Configurations
                 .HasForeignKey(d => d.VehicleId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            builder.Property(x => x.ContantsExpenses)
+                .HasColumnType("decimal(18,2)");
+
+            builder.Property(x => x.PurchasePrice)
+                .HasColumnType("decimal(18,2)");
+
             var data = new SeedData();
             builder.HasData(new Vehicle[] { data.Vehicle1ForDelivery, data.Vehicle2 });
         }

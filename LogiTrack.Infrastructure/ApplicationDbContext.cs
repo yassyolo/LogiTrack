@@ -28,19 +28,21 @@ namespace LogiTrack.Infrastructure
             builder.ApplyConfiguration(new RequestConfiguration());
             builder.ApplyConfiguration(new VehicleConfiguration());
             builder.ApplyConfiguration(new PricesPerSizeConfiguration());
+            builder.ApplyConfiguration(new FuelPriceConfiguration());
 
             base.OnModelCreating(builder);
         }
 
-        public DbSet<CashRegister> CashRegisters { get; set; }
-        public DbSet<ClientCompany> ClientCompanies { get; set; }
-        public DbSet<Request> Requests { get; set; }
-        public DbSet<Offer> Offers { get; set; }
-        public DbSet<Vehicle> Vehicles { get; set; }
-        public DbSet<Driver> Drivers { get; set; }
-        public DbSet<Delivery> Deliveries { get; set; }
-        public DbSet<DeliveryTracking> DeliveryTrackings { get; set; }
-        public DbSet<Invoice> Invoices { get; set; }
-        public DbSet<PricesPerSize> PricesPerSize { get; set;}
+        public DbSet<CashRegister> CashRegisters { get; set; } = null!;
+        public DbSet<ClientCompany> ClientCompanies { get; set; } = null!;
+        public DbSet<Request> Requests { get; set; } = null!;
+        public DbSet<Offer> Offers { get; set; } = null!;
+        public DbSet<Vehicle> Vehicles { get; set; } = null!;
+        public DbSet<Driver> Drivers { get; set; } = null!;
+        public DbSet<Delivery> Deliveries { get; set; } = null!;
+        public DbSet<DeliveryTracking> DeliveryTrackings { get; set; } = null!;
+        public DbSet<Invoice> Invoices { get; set; } = null!;
+        public DbSet<PricesPerSize> PricesPerSize { get; set; } = null!;
+        public DbSet<FuelPrice> FuelPrices { get; set; } = null!;
     }
 }

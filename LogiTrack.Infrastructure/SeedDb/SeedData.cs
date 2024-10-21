@@ -13,12 +13,12 @@ namespace LogiTrack.Infrastructure.SeedDb
 
         public IdentityRole ClientCompanyRole { get; set; } = null!;
         public IdentityRole LogisticsCompanyRole { get; set; } = null!;
-        public IdentityRole SecretaryRole { get; set; } = null!;
+        public IdentityRole AccountRole { get; set; } = null!;
         public IdentityRole SpeditorRole { get; set; } = null!;
 
         public IdentityUserRole<string> ClientCompanyUserRole { get; set; } = null!;
         public IdentityUserRole<string> LogisticsCompanyUserRole { get; set; } = null!;
-        public IdentityUserRole<string> SecretaryUserRole { get; set; } = null!;
+        public IdentityUserRole<string> AccountantUserRole { get; set; } = null!;
         public IdentityUserRole<string> SpeditorUserRole { get; set; } = null!;
 
         public ClientCompany ClientCompany1 { get; set; } = null!;
@@ -121,11 +121,11 @@ namespace LogiTrack.Infrastructure.SeedDb
                 NormalizedName = "LOGISTICSCOMPANY"
             };
 
-            SecretaryRole = new IdentityRole
+            AccountRole = new IdentityRole
             {
                 Id = "20ddc22c-ca6d-4feb-a688-0f31a430b5eb", 
-                Name = "Secretary",
-                NormalizedName = "SECRETARY"
+                Name = "Accountant",
+                NormalizedName = "ACCOUNTANT"
             };
 
             SpeditorRole = new IdentityRole
@@ -149,7 +149,7 @@ namespace LogiTrack.Infrastructure.SeedDb
                 RoleId = "99027aaa-d346-4dd9-a467-15d74576c080"  
             };
 
-            SecretaryUserRole = new IdentityUserRole<string>
+            AccountantUserRole = new IdentityUserRole<string>
             {
                 UserId = "38ba6810-2800-4ac8-b005-5c27e8248951", 
                 RoleId = "20ddc22c-ca6d-4feb-a688-0f31a430b5eb" 
@@ -383,7 +383,7 @@ namespace LogiTrack.Infrastructure.SeedDb
                 MaxWeightCapacity = 10_000,
                 FuelConsumptionPer100Km = 28.5,
                 VehicleStatus = "Not Available",
-                MaintenanceDue = new DateTime(2024, 12, 1),
+                LastYearMaintenance = new DateTime(2024, 8, 1),
             };
 
             Vehicle2 = new Vehicle
@@ -401,7 +401,7 @@ namespace LogiTrack.Infrastructure.SeedDb
                 MaxWeightCapacity = 24_000,
                 FuelConsumptionPer100Km = 32.0,
                 VehicleStatus = "Available",
-                MaintenanceDue = new DateTime(2025, 01, 15),
+                LastYearMaintenance = new DateTime(2023, 01, 15),
             };
         }
         private void SeedDeliveries()

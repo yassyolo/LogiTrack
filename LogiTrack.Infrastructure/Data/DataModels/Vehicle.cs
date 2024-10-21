@@ -1,7 +1,6 @@
 ﻿using LogiTrack.Infrastructure.Data.DataModels;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 using static LogiTrack.Infrastructure.Data.DataConstants.DataModelConstants.Vehicle;
 
 namespace LogisticsSystem.Infrastructure.Data.DataModels
@@ -46,12 +45,12 @@ namespace LogisticsSystem.Infrastructure.Data.DataModels
         [Required]
         [Comment("Euro pallets capacity")]
         [Range(PalletCapacityMinValue, PalletCapacityMaxValue)]
-        public int? EuroPalletCapacity { get; set; } 
+        public int EuroPalletCapacity { get; set; } 
 
         [Required]
         [Comment("Industrial pallets capacity")]
         [Range(PalletCapacityMinValue, PalletCapacityMaxValue)]
-        public int? IndustrialPalletCapacity { get; set; }
+        public int IndustrialPalletCapacity { get; set; }
 
         [Required]
         [Comment("Are the pallets stackable")]
@@ -74,9 +73,26 @@ namespace LogisticsSystem.Infrastructure.Data.DataModels
 
         [Comment("Maintenance due date")]
         [Required]
-        public DateTime? MaintenanceDue { get; set; }
+        public DateTime LastYearMaintenance { get; set; }
+
+        [Comment("Kilometers driven")]
+        [Range(KilometersMinValue, KilometersMaxValue)]
+        public double KilometersDriven { get; set; }
+
+        [Comment("Kilometers left to change parts")]
+        [Range(KilometersMinValue, KilometersMaxValue)]
+        public double KilometersLeftToChangeParts { get; set; }
 
         [Comment("Vehicle's delivery")]
         public IEnumerable<Delivery> Deliveries { get; set; } = new List<Delivery>();
+
+        [Required]
+        [Comment("Vehicle's purchase price")]
+        [Range(PriceMinValue, PriceMaxValue)]
+        public decimal PurchasePrice { get; set; }
+
+        [Required]
+        [Comment("Vehicle's constant expences")]
+        public decimal ContantsExpenses { get; set; } //given by the accountant(road tax,vignette, salaries, vehicle inspection and maintenance,insurance, ammortization, etc.)
     }
 }
