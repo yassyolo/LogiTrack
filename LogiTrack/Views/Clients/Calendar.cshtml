@@ -1,0 +1,74 @@
+﻿@model List<LogiTrack.Core.ViewModels.Clients.CalendarEventViewModel>
+
+@{
+    ViewBag.Title = "Calendar Events";
+    Layout = null; 
+}
+
+<h2>Calendar Events</h2>
+
+<div id="calendar"></div>
+
+<h3>Event List</h3>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            console.log("Document is ready!"); 
+
+            //var events = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model));
+            var events = [
+                { id: 1, title: 'Event 1', date: '2024-10-23', type: 'Delivered' },
+                { id: 2, title: 'Event 2', date: '2024-10-24', type: 'Pickup' }
+            ];
+            console.log("Serialized Events:", events);
+
+            if (Array.isArray(events) && events.length > 0) {
+                console.log("Events array is populated");
+            } else {
+                console.warn("Events array is empty or not an array");
+            }
+
+            var calendarEl = document.getElementById('calendar');
+            if (calendarEl) {
+                var calendar = new FullCalendar.Calendar(calendarEl, {
+                    initialView: 'dayGridMonth',
+                    headerToolbar: {
+                        left: 'prev,next today',
+                        center: 'title',
+                        right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                    },
+                    events: events.map(function (event) {
+                        return {
+                            id: event.id,
+                            title: event.title,
+                            start: event.date,
+                            backgroundColor: getColor(event.type)
+                        };
+                    })
+                });
+
+                calendar.render();
+            } else {
+                console.error("Calendar element not found");
+            }
+
+            function getColor(type) {
+                switch (type) {
+                    case 'Delivered':
+                        return 'green';
+                    case 'Pickup':
+                        return 'blue';
+                    case 'Paid':
+                        return 'orange';
+                    default:
+                        return 'gray';
+                }
+            }
+        });
+
+    </script>
+}

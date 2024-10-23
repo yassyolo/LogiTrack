@@ -40,7 +40,7 @@
             font-weight: bold;
         }
 
-        input[type="text"], input[type="number"], input[type="date"], input[type="checkbox"], input[type="radio"], textarea {
+        input[type="text"], input[type="number"], input[type="date"], input[type="checkbox"], input[type="radio"], textarea, select {
             padding: 10px;
             margin-top: 5px;
             width: 100%;
@@ -74,108 +74,125 @@
                 background-color: #0056b3;
             }
 
+        .validation-message {
+            color: red;
+            font-size: 0.9em;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Make a Request</h1>
         <form method="post" asp-action="MakeRequest">
-
             <!-- Cargo Type -->
-            <label for="CargoType">Cargo Type</label>
-            <select id="CargoType" name="CargoType">
+            <label asp-for="CargoType">Cargo Type</label>
+            <select asp-for="CargoType" id="CargoType" name="CargoType">
                 <option value="standard">Standard</option>
                 <option value="non-standard">Non-standard</option>
             </select>
+            <span asp-validation-for="CargoType" class="validation-message"></span>
 
             <!-- Standard Cargo (Pallet) Metrics -->
             <div id="standard-cargo-section" class="form-section hidden">
-                <label for="TypeOfPallet">Type of Pallet</label>
-                <input type="text" id="TypeOfPallet" name="TypeOfPallet">
+                <label asp-for="TypeOfPallet">Type of Pallet</label>
+                <input asp-for="TypeOfPallet" type="text">
+                <span asp-validation-for="TypeOfPallet" class="validation-message"></span>
 
-                <label for="NumberOfPallets">Number of Pallets</label>
-                <input type="number" id="NumberOfPallets" name="NumberOfPallets">
+                <label asp-for="NumberOfPallets">Number of Pallets</label>
+                <input asp-for="NumberOfPallets" type="number">
+                <span asp-validation-for="NumberOfPallets" class="validation-message"></span>
 
-                <label for="PalletLength">Pallet Length (cm)</label>
-                <input type="number" id="PalletLength" name="PalletLength">
+                <label asp-for="PalletLength">Pallet Length (cm)</label>
+                <input asp-for="PalletLength" type="number">
+                <span asp-validation-for="PalletLength" class="validation-message"></span>
 
-                <label for="PalletWidth">Pallet Width (cm)</label>
-                <input type="number" id="PalletWidth" name="PalletWidth">
+                <label asp-for="PalletWidth">Pallet Width (cm)</label>
+                <input asp-for="PalletWidth" type="number">
+                <span asp-validation-for="PalletWidth" class="validation-message"></span>
 
-                <label for="PalletHeight">Pallet Height (cm)</label>
-                <input type="number" id="PalletHeight" name="PalletHeight">
+                <label asp-for="PalletHeight">Pallet Height (cm)</label>
+                <input asp-for="PalletHeight" type="number">
+                <span asp-validation-for="PalletHeight" class="validation-message"></span>
 
-                <label for="PalletVolume">Pallet Volume (m³)</label>
-                <input type="number" id="PalletVolume" name="PalletVolume">
+                <label asp-for="PalletVolume">Pallet Volume (m³)</label>
+                <input asp-for="PalletVolume" type="number">
+                <span asp-validation-for="PalletVolume" class="validation-message"></span>
 
-                <label for="WeightOfPallets">Weight of Pallets (kg)</label>
-                <input type="number" id="WeightOfPallets" name="WeightOfPallets">
+                <label asp-for="WeightOfPallets">Weight of Pallets (kg)</label>
+                <input asp-for="WeightOfPallets" type="number">
+                <span asp-validation-for="WeightOfPallets" class="validation-message"></span>
 
-                <label>
-                    <input type="checkbox" id="PalletsAreStackable" name="PalletsAreStackable">
-                    Are the pallets stackable?
-                </label>
+                <label asp-for="PalletsAreStackable"></label>
+                <input asp-for="PalletsAreStackable" type="checkbox" />
+                <span asp-validation-for="PalletsAreStackable" class="text-danger"></span>
+                <span asp-validation-for="PalletsAreStackable" class="validation-message"></span>
             </div>
 
             <!-- Non-standard Cargo Metrics -->
             <div id="nonstandard-cargo-section" class="form-section hidden">
-                <label for="NumberOfNonStandartGoods">Number of Non-standard Goods</label>
-                <input type="number" id="NumberOfNonStandartGoods" name="NumberOfNonStandartGoods">
+                <label asp-for="NumberOfNonStandartGoods">Number of Non-standard Goods</label>
+                <input asp-for="NumberOfNonStandartGoods" type="number">
+                <span asp-validation-for="NumberOfNonStandartGoods" class="validation-message"></span>
 
-                <label for="Length">Length of Goods (cm)</label>
-                <input type="number" id="Length" name="Length">
+                <label asp-for="Length">Length of Goods (cm)</label>
+                <input asp-for="Length" type="number">
+                <span asp-validation-for="Length" class="validation-message"></span>
 
-                <label for="Width">Width of Goods (cm)</label>
-                <input type="number" id="Width" name="Width">
+                <label asp-for="Width">Width of Goods (cm)</label>
+                <input asp-for="Width" type="number">
+                <span asp-validation-for="Width" class="validation-message"></span>
 
-                <label for="Height">Height of Goods (cm)</label>
-                <input type="number" id="Height" name="Height">
+                <label asp-for="Height">Height of Goods (cm)</label>
+                <input asp-for="Height" type="number">
+                <span asp-validation-for="Height" class="validation-message"></span>
 
-                <label for="Volume">Volume of Goods (m³)</label>
-                <input type="number" id="Volume" name="Volume">
+                <label asp-for="Volume">Volume of Goods (m³)</label>
+                <input asp-for="Volume" type="number">
+                <span asp-validation-for="Volume" class="validation-message"></span>
 
-                <label for="Weight">Weight of Goods (kg)</label>
-                <input type="number" id="Weight" name="Weight">
+                <label asp-for="Weight">Weight of Goods (kg)</label>
+                <input asp-for="Weight" type="number">
+                <span asp-validation-for="Weight" class="validation-message"></span>
             </div>
 
             <!-- Type of Goods, Type (Domestic/International), Pickup and Delivery coordinates -->
             <div class="form-section">
-                <label for="TypeOfGoods">Type of Goods</label>
-                <input type="text" id="TypeOfGoods" name="TypeOfGoods" required>
+                <label asp-for="TypeOfGoods">Type of Goods</label>
+                <input asp-for="TypeOfGoods" type="text">
+                <span asp-validation-for="TypeOfGoods" class="validation-message"></span>
 
-                <label for="Type">Type (Domestic or International)</label>
-                <input type="text" id="Type" name="Type" required>
+                <label asp-for="Type">Type (Domestic or International)</label>
+                <input asp-for="Type" type="text">
+                <span asp-validation-for="Type" class="validation-message"></span>
 
-                <label for="PickupLatitude">Pickup Latitude</label>
-                <input type="number" id="PickupLatitude" name="PickupLatitude" required>
+                <label asp-for="PickupAddress">Pickup Address</label>
+                <input asp-for="PickupAddress" type="input">
+                <span asp-validation-for="PickupAddress" class="validation-message"></span>
 
-                <label for="PickupLongitude">Pickup Longitude</label>
-                <input type="number" id="PickupLongitude" name="PickupLongitude" required>
+                <label asp-for="DeliveryAddress">Delivery Address</label>
+                <input asp-for="DeliveryAddress" type="input">
+                <span asp-validation-for="DeliveryAddress" class="validation-message"></span>
 
-                <label for="DeliveryLatitude">Delivery Latitude</label>
-                <input type="number" id="DeliveryLatitude" name="DeliveryLatitude" required>
+                <label asp-for="SharedTruck"></label>
+                <input asp-for="SharedTruck" type="checkbox" />
+                <span asp-validation-for="SharedTruck" class="text-danger"></span>
 
-                <label for="DeliveryLongitude">Delivery Longitude</label>
-                <input type="number" id="DeliveryLongitude" name="DeliveryLongitude" required>
+                <label asp-for="ApproximatePrice">Approximate Price (given by the company)</label>
+                <input asp-for="ApproximatePrice" type="number">
+                <span asp-validation-for="ApproximatePrice" class="validation-message"></span>
 
-                <label>
-                    <input type="checkbox" id="SharedTruck" name="SharedTruck" required>
-                    Shared Truck
-                </label>
+                <label asp-for="ExpectedDeliveryDate">Expected Delivery Date</label>
+                <input asp-for="ExpectedDeliveryDate" type="date">
+                <span asp-validation-for="ExpectedDeliveryDate" class="validation-message"></span>
 
-                <label for="ApproximatePrice">Approximate Price (given by the company)</label>
-                <input type="number" id="ApproximatePrice" name="ApproximatePrice" required>
+                <label asp-for="SpecialInstructions">Special Instructions</label>
+                <textarea asp-for="SpecialInstructions"></textarea>
+                <span asp-validation-for="SpecialInstructions" class="validation-message"></span>
 
-                <label for="ExpectedDeliveryDate">Expected Delivery Date</label>
-                <input type="date" id="ExpectedDeliveryDate" name="ExpectedDeliveryDate" required>
+                <label asp-for="IsRefrigerated"></label>
+                <input asp-for="IsRefrigerated" type="checkbox" />
+                <span asp-validation-for="IsRefrigerated" class="text-danger"></span>
 
-                <label for="SpecialInstructions">Special Instructions</label>
-                <textarea id="SpecialInstructions" name="SpecialInstructions"></textarea>
-
-                <label>
-                    <input type="checkbox" id="IsRefrigerated" name="IsRefrigerated" required>
-                    Is the cargo refrigerated?
-                </label>
             </div>
 
             <button type="submit" class="btn">Submit Request</button>
@@ -202,4 +219,3 @@
     </script>
 </body>
 </html>
-

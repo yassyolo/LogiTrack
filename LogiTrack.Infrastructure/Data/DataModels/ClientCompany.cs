@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using LogiTrack.Infrastructure.Data.DataModels;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -81,5 +82,8 @@ namespace LogisticsSystem.Infrastructure.Data.DataModels
 
         [Comment("Company's invoices")]
         public IEnumerable<Invoice> Invoices { get; set; } = new List<Invoice>();
+
+        [Comment("Company's calendar events")]
+        public IEnumerable<CalendarEvent> CalendarEvents { get; set; } = new List<CalendarEvent>();
     }
 }

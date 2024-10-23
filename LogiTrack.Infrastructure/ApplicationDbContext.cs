@@ -29,6 +29,7 @@ namespace LogiTrack.Infrastructure
             builder.ApplyConfiguration(new VehicleConfiguration());
             builder.ApplyConfiguration(new PricesPerSizeConfiguration());
             builder.ApplyConfiguration(new FuelPriceConfiguration());
+            builder.ApplyConfiguration(new CalendarEventConfiguration());
 
             base.OnModelCreating(builder);
         }
@@ -44,5 +45,6 @@ namespace LogiTrack.Infrastructure
         public DbSet<Invoice> Invoices { get; set; } = null!;
         public DbSet<PricesPerSize> PricesPerSize { get; set; } = null!;
         public DbSet<FuelPrice> FuelPrices { get; set; } = null!;
+        public DbSet<CalendarEvent> CalendarEvents { get; set; } = null!;
     }
 }

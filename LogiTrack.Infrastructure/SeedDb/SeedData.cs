@@ -1,6 +1,7 @@
 ﻿using LogisticsSystem.Infrastructure.Data.DataModels;
 using LogiTrack.Infrastructure.Data.DataModels;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace LogiTrack.Infrastructure.SeedDb
 {
@@ -47,6 +48,10 @@ namespace LogiTrack.Infrastructure.SeedDb
         public PricesPerSize PricesForVehicle1 { get; set; } = null!;
         public PricesPerSize PricesForVehicle2 { get; set; } = null!;
 
+        public CalendarEvent CalendarEvent1 { get; set; } = null!;
+        public CalendarEvent CalendarEvent2 { get; set; } = null!;
+        public CalendarEvent CalendarEvent3 { get; set; } = null!;
+
         public SeedData()
         {
             SeedUsers();
@@ -61,6 +66,7 @@ namespace LogiTrack.Infrastructure.SeedDb
             SeedDeliveries();      
             SeedCashRegisters();
             SeedPricesPerSize();
+            SeedCalendarEvents();
         }
 
         private void SeedUsers()
@@ -463,6 +469,37 @@ namespace LogiTrack.Infrastructure.SeedDb
                 DomesticPriceForSharedTruck = 320m,
                 InternationalPriceForNotSharedTruck = 1050m,
                 InternationalPriceForSharedTruck = 750m,
+            };
+        }
+
+        private void SeedCalendarEvents()
+        {
+            var now = DateTime.UtcNow;
+
+            CalendarEvent1 = new CalendarEvent
+            {
+                Id = 1,
+                EventType = "Delivered",
+                Date = now.AddDays(1), 
+                Title = "Delivered goods",
+                ClientCompanyId = 1
+            };
+
+            CalendarEvent2 = new CalendarEvent
+            {
+                Id = 2,
+                EventType = "Pickup",
+                Date = now.AddDays(-40), 
+                Title = "Picked up goods",
+                ClientCompanyId = 1
+            };
+            CalendarEvent3 = new CalendarEvent
+            {
+                Id = 3,
+                EventType = "Paid",
+                Date = now.AddDays(3), 
+                Title = "Paid delivery",
+                ClientCompanyId = 1
             };
         }
     }

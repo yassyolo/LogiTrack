@@ -157,5 +157,13 @@
             public const double PriceMinValue = 0.0;
             public const double PriceMaxValue = 20.0;
         }
+
+        public static class CalendarEvent
+        {
+            public const int EventTypeMaxLength = 20;
+            public const int EventTypeMinLength = 0;
+            public const int EventTitleMaxLength = 100;
+            public const int EventTitleMinLength = 0;
+        }
     }
 }

@@ -8,6 +8,7 @@ namespace LogiTrack.Infrastructure.Data.DataModels
     [Comment("Delivery Tracking Entity")]
     public class DeliveryTracking
     {
+        //TODO: Add status for delivery
         [Key]
         public int Id { get; set; }
 
