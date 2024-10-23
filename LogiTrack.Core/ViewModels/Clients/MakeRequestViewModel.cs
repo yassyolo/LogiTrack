@@ -42,7 +42,7 @@ namespace LogiTrack.Core.ViewModels.Clients
         public double? WeightOfPallets { get; set; }
 
         [Comment("Are the pallets stackable")]
-        public bool? PalletsAreStackable { get; set; } //only if the truck is not shared
+        public bool PalletsAreStackable { get; set; } //only if the truck is not shared
 
         #endregion
 
@@ -82,24 +82,19 @@ namespace LogiTrack.Core.ViewModels.Clients
         [StringLength(RequestTypeMaxLength)]
         public string Type { get; set; } = string.Empty; //domestic, international
 
-        [Required]
-        [Comment("Pickup address latitude")]
-        [Range(LatitudeMinValue, LatitudeMaxValue)]
-        public double PickupLatitude { get; set; }
+        [Required(ErrorMessage = RequiredFieldErrorMessage)]
+        [StringLength(AddressMaxLength, MinimumLength = AddressMinLength, ErrorMessage = LengthErrorMessage)]
+        public string PickupAddress { get; set; } = string.Empty;
 
-        [Required]
-        [Comment("Pickup address longitude")]
-        [Range(LongitudeMinValue, LongitudeMaxValue)]
+        public double PickupLatitude { get; set; }
         public double PickupLongitude { get; set; }
 
-        [Required]
-        [Comment("Delivery address latitude")]
-        [Range(LatitudeMinValue, LatitudeMaxValue)]
+        [Required(ErrorMessage = RequiredFieldErrorMessage)]
+        [StringLength(AddressMaxLength, MinimumLength = AddressMinLength, ErrorMessage = LengthErrorMessage)]
+        public string DeliveryAddress { get; set; } = string.Empty;
+
         public double DeliveryLatitude { get; set; }
 
-        [Required]
-        [Comment("Delivery address longitude")]
-        [Range(LongitudeMinValue, LongitudeMaxValue)]
         public double DeliveryLongitude { get; set; }
 
         [Required(ErrorMessage = RequiredFieldErrorMessage)]
@@ -114,7 +109,7 @@ namespace LogiTrack.Core.ViewModels.Clients
         public DateTime ExpectedDeliveryDate { get; set; }
 
         [Comment("Special instructions")]
-        [StringLength(SpecialInstructionsMaxLength)]
+        // [StringLength(SpecialInstructionsMaxLength)]
         public string SpecialInstructions { get; set; } = string.Empty;
 
         [Required(ErrorMessage = RequiredFieldErrorMessage)]

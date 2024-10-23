@@ -5,11 +5,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using LogiTrack.Core.Services;
 using LogiTrack.Extensions;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 using LogiTrack.Core.CustomExceptions;
-using Google.Apis.Drive.v3.Data;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http.Metadata;
+using Newtonsoft.Json;
 
 namespace LogiTrack.Controllers
 {
@@ -17,15 +15,39 @@ namespace LogiTrack.Controllers
     {
         private readonly UserManager<IdentityUser> userManager;
         private readonly IClientsService clientsService;
-        public ClientsController(UserManager<IdentityUser> userManager, IClientsService clientsService)
+        private readonly GeocodingService geocodingService;
+
+        public ClientsController(UserManager<IdentityUser> userManager, IClientsService clientsService, GeocodingService geocodingService)
         {
             this.userManager = userManager;
             this.clientsService = clientsService;
+            this.geocodingService = geocodingService;
         }
 
-        public IActionResult Index()
+        [HttpGet]
+        public async Task<IActionResult> Index()
         {
-            return View();
+            var username = User.GetUsername();
+            if (await clientsService.UserWithEmailExistsAsync(username) == false)
+            {
+                return BadRequest(ClientCompanyNotFoundErrorMessage);
+            }
+            var model = await clientsService.GetClientCompanyDashboardAsync(username);
+            return View(model);
+        }
+        [HttpGet]
+        public async Task<IActionResult> Calendar()
+        {
+            var model = await clientsService.GetClientCompanyEventsAsync("clientcompany1");
+            return View(model); 
+        }
+
+        [HttpGet]
+        public async Task<JsonResult> GetCalendarEvents()
+        {
+            var model = await clientsService.GetClientCompanyEventsAsync("clientcompany1");
+            Console.WriteLine($"Retrieved Events: {JsonConvert.SerializeObject(model)}");
+            return Json(model);
         }
 
         [HttpGet]
@@ -81,6 +103,23 @@ namespace LogiTrack.Controllers
             {
                 return View(model);
             }
+            var pickupCoordinates = await geocodingService.GetCoordinates(model.PickupAddress);
+            if (pickupCoordinates == null)
+            {
+                ModelState.AddModelError("PickupAddress", InvalidAddressErrorMessage);
+                return View(model);           
+            }
+            var deliveryCoordinates = await geocodingService.GetCoordinates(model.DeliveryAddress);
+            if (deliveryCoordinates == null)
+            {
+                ModelState.AddModelError("DeliveryAddress", InvalidAddressErrorMessage);
+                return View(model);
+            }
+            model.DeliveryLatitude = deliveryCoordinates.Value.Latitude;
+            model.DeliveryLongitude = deliveryCoordinates.Value.Longtitude;
+            model.PickupLatitude = pickupCoordinates.Value.Latitude;
+            model.PickupLongitude = pickupCoordinates.Value.Longtitude;
+
             var userEmail = User.GetEmail();
             try
             {

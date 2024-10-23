@@ -3,10 +3,12 @@ using LogiTrack.Core.Constants;
 using LogiTrack.Core.Contracts;
 using LogiTrack.Core.CustomExceptions;
 using LogiTrack.Core.ViewModels.Clients;
+using LogiTrack.Infrastructure.Data.DataModels;
 using LogiTrack.Infrastructure.Repository;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using static LogiTrack.Core.Constants.MessageConstants.ErrorMessages;
+using static LogiTrack.Infrastructure.Data.DataConstants.DataModelConstants;
 
 namespace LogiTrack.Core.Services
 {
@@ -21,7 +23,7 @@ namespace LogiTrack.Core.Services
 
         public async Task<IdentityUser> ApprovePendingRegistrationForCompanyWithIdAsync(int id)
         {
-            var company = await repository.All<ClientCompany>().FirstOrDefaultAsync(x => x.Id == id);
+            var company = await repository.All<LogisticsSystem.Infrastructure.Data.DataModels.ClientCompany>().FirstOrDefaultAsync(x => x.Id == id);
             company.RegistrationStatus = StatusConstants.Approved;
             await repository.SaveChangesAsync();
             return await repository.AllReadonly<IdentityUser>().FirstOrDefaultAsync(x => x.Id == company.UserId);
@@ -29,46 +31,46 @@ namespace LogiTrack.Core.Services
 
         public async Task<bool> CompanyWithIdExistsAsync(int id)
         {
-            return await repository.AllReadonly<ClientCompany>().AnyAsync(x => x.Id == id);
+            return await repository.AllReadonly<LogisticsSystem.Infrastructure.Data.DataModels.ClientCompany>().AnyAsync(x => x.Id == id);
         }
 
         public async Task<CompanyDetailsViewModel?> GetCompanyDetailsAsync(string username)
         {
-           return await repository.AllReadonly<ClientCompany>()
-                .Where(x => x.User.UserName == username)
-                .Select(x => new CompanyDetailsViewModel
-                {
-                    Name = x.Name,
-                    RegistrationNumber = x.RegistrationNumber,
-                    Industry = x.Industry,
-                    Street = x.Street,
-                    City = x.City,
-                    PostalCode = x.PostalCode,
-                    Country = x.Country,
-                    CreatedAt = x.CreatedAt.ToString("dd/MM/yyyy"),
-                })
-                .FirstOrDefaultAsync();
+            return await repository.AllReadonly<LogisticsSystem.Infrastructure.Data.DataModels.ClientCompany>()
+                 .Where(x => x.User.UserName == username)
+                 .Select(x => new CompanyDetailsViewModel
+                 {
+                     Name = x.Name,
+                     RegistrationNumber = x.RegistrationNumber,
+                     Industry = x.Industry,
+                     Street = x.Street,
+                     City = x.City,
+                     PostalCode = x.PostalCode,
+                     Country = x.Country,
+                     CreatedAt = x.CreatedAt.ToString("dd/MM/yyyy"),
+                 })
+                 .FirstOrDefaultAsync();
         }
 
         public async Task<ContactDetailsViewModel?> GetCompanyContactDetailsAsync(string username)
         {
-           return await repository.AllReadonly<ClientCompany>()
-                .Where(x => x.User.UserName == username)
-                .Select(x => new ContactDetailsViewModel
-                {
-                    Id = x.Id,
-                    Username = x.User.UserName,
-                    ContactPerson = x.ContactPerson,
-                    AlternativePhoneNumber = x.AlternativePhoneNumber,
-                    PhoneNumber = x.User.PhoneNumber,
-                    Email = x.User.Email
-                })
-                .FirstOrDefaultAsync();
+            return await repository.AllReadonly<LogisticsSystem.Infrastructure.Data.DataModels.ClientCompany>()
+                 .Where(x => x.User.UserName == username)
+                 .Select(x => new ContactDetailsViewModel
+                 {
+                     Id = x.Id,
+                     Username = x.User.UserName,
+                     ContactPerson = x.ContactPerson,
+                     AlternativePhoneNumber = x.AlternativePhoneNumber,
+                     PhoneNumber = x.User.PhoneNumber,
+                     Email = x.User.Email
+                 })
+                 .FirstOrDefaultAsync();
         }
 
         public async Task<List<PendingRegistrationsViewModel>?> GetPendingRegistrationsAsync()
         {
-            return await repository.AllReadonly<ClientCompany>()
+            return await repository.AllReadonly<LogisticsSystem.Infrastructure.Data.DataModels.ClientCompany>()
                 .Where(x => x.RegistrationStatus == StatusConstants.Pending)
                 .OrderByDescending(x => x.CreatedAt)
                 .Select(x => new PendingRegistrationsViewModel
@@ -86,7 +88,7 @@ namespace LogiTrack.Core.Services
                     PhoneNumber = x.User.PhoneNumber,
                     CreatedAt = x.CreatedAt.ToString("dd/MM/yyyy"),
                     Email = x.User.Email
-                })              
+                })
                 .ToListAsync();
         }
 
@@ -97,12 +99,12 @@ namespace LogiTrack.Core.Services
             {
                 throw new UserNotFoundException();
             }
-            var client = await repository.AllReadonly<ClientCompany>().FirstOrDefaultAsync(x => x.UserId == user.Id);
+            var client = await repository.AllReadonly<LogisticsSystem.Infrastructure.Data.DataModels.ClientCompany>().FirstOrDefaultAsync(x => x.UserId == user.Id);
             if (client == null)
             {
                 throw new ClientCompanyNotFoundException();
             }
-            var request = new Request
+            var request = new LogisticsSystem.Infrastructure.Data.DataModels.Request
             {
                 ClientCompanyId = client.Id,
                 ClientCompany = client,
@@ -112,9 +114,9 @@ namespace LogiTrack.Core.Services
                 PalletLength = model.PalletLength,
                 PalletHeight = model.PalletHeight,
                 PalletVolume = model.PalletVolume,
-                PalletWidth = model.PalletWidth,   
+                PalletWidth = model.PalletWidth,
                 WeightOfPallets = model.WeightOfPallets,
-                PalletsAreStackable = model.PalletsAreStackable,       
+                PalletsAreStackable = model.PalletsAreStackable,
                 NumberOfNonStandartGoods = model.NumberOfNonStandartGoods,
                 Length = model.Length,
                 Width = model.Width,
@@ -138,7 +140,7 @@ namespace LogiTrack.Core.Services
 
         public async Task RegisterClientCompanyAsync(RegisterViewModel model, IdentityUser user)
         {
-            var client = new ClientCompany
+            var client = new LogisticsSystem.Infrastructure.Data.DataModels.ClientCompany
             {
                 Name = model.Name,
                 Street = model.Street,
@@ -150,7 +152,7 @@ namespace LogiTrack.Core.Services
                 RegistrationNumber = model.RegistrationNumber,
                 RegistrationStatus = StatusConstants.Pending,
                 ContactPerson = model.ContactPerson,
-                UserId = user.Id, 
+                UserId = user.Id,
                 CreatedAt = DateTime.Now,
             };
             await repository.AddAsync(client);
@@ -158,7 +160,7 @@ namespace LogiTrack.Core.Services
         }
 
         public async Task<IdentityUser> RegisterUserAsync(RegisterViewModel model)
-        { 
+        {
             var user = new IdentityUser
             {
                 UserName = model.Email,
@@ -172,7 +174,7 @@ namespace LogiTrack.Core.Services
 
         public async Task RejectPendingRegistrationForCompanyWithIdAsync(int id)
         {
-            var company = await repository.All<ClientCompany>().FirstOrDefaultAsync(x => x.Id == id);
+            var company = await repository.All<LogisticsSystem.Infrastructure.Data.DataModels.ClientCompany>().FirstOrDefaultAsync(x => x.Id == id);
             company.RegistrationStatus = StatusConstants.Rejected;
             await repository.SaveChangesAsync();
         }
@@ -191,5 +193,59 @@ namespace LogiTrack.Core.Services
         {
             throw new NotImplementedException();
         }
-    }
-}
+
+        public async Task<DashboardViewModel?> GetClientCompanyDashboardAsync(string username)
+        {
+            var company = await repository.AllReadonly<LogisticsSystem.Infrastructure.Data.DataModels.ClientCompany>().FirstOrDefaultAsync(x => x.User.UserName == username);
+            var offers = await repository.AllReadonly<LogisticsSystem.Infrastructure.Data.DataModels.Offer>().Where(x => x.Request.ClientCompanyId == company.Id && x.OfferStatus == StatusConstants.Pending).Take(5)
+                .Select(x => new OfferIndexViewModel
+                {
+                    Id = x.Id,
+                    PickupAddress = x.Request.PickupAddress,
+                    DeliveryAddress = x.Request.DeliveryAddress,
+                    Price = x.FinalPrice.ToString(),
+                }).ToListAsync();
+            var invoices = await repository.AllReadonly<Invoice>().Where(x => x.Offer.Request.ClientCompanyId == company.Id).Take(5)
+                 .Select(x => new InvoiceIndexViewModel
+                 {
+                   Id = x.Id,
+                   Number = x.InvoiceNumber,
+                   Amount = x.Offer.FinalPrice.ToString(),
+                   CreationDate = x.InvoiceDate.ToString("dd/MM/yyyy"),
+                 })
+                .ToListAsync();
+
+            var deliveries = await repository.AllReadonly<Infrastructure.Data.DataModels.Delivery>().Where(x => x.Offer.Request.ClientCompanyId == company.Id).Take(5)
+                .Select(x => new DeliveryTrackingIndexViewModel
+                {
+                   Id = x.Id,
+                   PickupAddress = x.Offer.Request.PickupAddress,
+                   DeliveryAddress = x.Offer.Request.DeliveryAddress,
+                   StatusUpdate = x.Status,
+                }).ToListAsync();
+            var model = new DashboardViewModel
+            {
+                LastFivePendingOffers = offers,
+                LastFiveDeliveries = deliveries,
+                LastFiveInvoices = invoices,
+                RequestsCount = company.Requests.Count(),
+                BookedOffers = await repository.AllReadonly<LogisticsSystem.Infrastructure.Data.DataModels.Offer>().Where(x => x.Request.ClientCompanyId == company.Id && x.OfferStatus == StatusConstants.Approved).CountAsync(),
+                Invoices = await repository.AllReadonly<Invoice>().Where(x => x.Offer.Request.ClientCompanyId == company.Id).CountAsync(),
+                DomesticDeliveries = await repository.AllReadonly<LogiTrack.Infrastructure.Data.DataModels.Delivery>().Where(x => x.Offer.Request.ClientCompanyId == company.Id && x.Offer.Request.Type == RequestTypeConstants.Domestic).CountAsync(),
+                InternationalDeliveries = await repository.AllReadonly<LogiTrack.Infrastructure.Data.DataModels.Delivery>().Where(x => x.Offer.Request.ClientCompanyId == company.Id && x.Offer.Request.Type == RequestTypeConstants.International).CountAsync(),
+            };
+            return model;
+        }
+
+        public async Task<List<CalendarEventViewModel>?> GetClientCompanyEventsAsync(string username)
+        {
+            return await repository.AllReadonly<LogiTrack.Infrastructure.Data.DataModels.CalendarEvent>().Where(x => x.ClientCompany.User.UserName == username)
+                .Select(x => new CalendarEventViewModel()
+                {
+                    Id = x.Id,
+                    Date = x.Date,
+                    Title = x.Title,
+                    Type = x.EventType,
+                }).ToListAsync();
+        }
+}   }

@@ -4,6 +4,7 @@
     {
         public const string RequiredFieldErrorMessage = "{0} is required.";
         public const string InvalidEmailErrorMessage = "Email address is invalid.";
+        public const string InvalidAddressErrorMessage = "Address is invalid.";
         public const string InvalidLoginAttemptErrorMessage = "Invalid login attempt.";
         public const string LengthErrorMessage = "{0} should be between {2} and {1} characters.";
         public const string EmailAlreadyExistsErrorMessage = "User with this email already exists.";

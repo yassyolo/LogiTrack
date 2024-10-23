@@ -1,5 +1,6 @@
 ﻿
 using LogiTrack.Core.ViewModels.Clients;
+using LogiTrack.Infrastructure.Data.DataModels;
 using Microsoft.AspNetCore.Identity;
 
 namespace LogiTrack.Core.Contracts
@@ -8,6 +9,8 @@ namespace LogiTrack.Core.Contracts
     {
         Task<IdentityUser> ApprovePendingRegistrationForCompanyWithIdAsync(int id);
         Task<bool> CompanyWithIdExistsAsync(int id);
+        Task<DashboardViewModel?> GetClientCompanyDashboardAsync(string username);
+        Task<List<CalendarEventViewModel>?> GetClientCompanyEventsAsync(string username);
         Task<ContactDetailsViewModel?> GetCompanyContactDetailsAsync(string username);
         Task<CompanyDetailsViewModel?> GetCompanyDetailsAsync(string username);
         Task<List<PendingRegistrationsViewModel>?> GetPendingRegistrationsAsync();

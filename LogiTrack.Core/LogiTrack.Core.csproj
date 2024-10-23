@@ -30,8 +30,4 @@
     <ProjectReference Include="..\LogiTrack.Infrastructure\LogiTrack.Infrastructure.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="AppData\" />
-  </ItemGroup>
-
 </Project>
