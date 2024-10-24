@@ -1,0 +1,50 @@
+﻿@model LogiTrack.Core.ViewModels.Delivery.AddStatusViewModel
+
+@{
+    ViewBag.Title = "Add Status";
+
+}
+
+<h2>Update Delivery Status</h2>
+
+<form asp-action="AddStatus" method="post">
+    <div class="form-group">
+        <label asp-for="DeliveryId"></label>
+        <input asp-for="DeliveryId" class="form-control" readonly />
+        <span asp-validation-for="DeliveryId" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="StatusUpdate"></label>
+        <input asp-for="StatusUpdate" class="form-control" />
+        <span asp-validation-for="StatusUpdate" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Notes"></label>
+        <textarea asp-for="Notes" class="form-control"></textarea>
+        <span asp-validation-for="Notes" class="text-danger"></span>
+    </div>
+
+    <input type="hidden" id="Latitude" name="Latitude" />
+    <input type="hidden" id="Longitude" name="Longitude" />
+
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function(position) {
+                document.getElementById("Latitude").value = position.coords.latitude;
+                document.getElementById("Longitude").value = position.coords.longitude;
+            }, function(error) {
+                console.error("Geolocation error:", error);
+            });
+        } else {
+            console.warn("Geolocation is not supported by this browser.");
+        }
+    </script>
+}

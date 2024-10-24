@@ -17,5 +17,9 @@
         public const string InvalidAmountErrorMessage = "Invalid amount.";
         public const string PasswordsDoNotMatchErrorMessage= "Passwords do not match.";
         public const string NewPasswordLikeCurrentPasswordErrorMessage = "New password cannot be the same as the current password.";
+        public const string OfferNotFoundErrorMessage = "Offer not found.";
+        public const string CompanyDoesNotHaveOfferErrorMessage = "Company does not have this offer.";
+        public const string DriverNotFoundErrorMessage = "Driver not found.";
+        public const string DriverDoesNotHaveDeliveryErrorMessage = "Driver does not have this delivery.";
     }
 }

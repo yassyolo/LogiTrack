@@ -35,18 +35,12 @@ namespace LogiTrack.Controllers
             var model = await clientsService.GetClientCompanyDashboardAsync(username);
             return View(model);
         }
-        [HttpGet]
-        public async Task<IActionResult> Calendar()
-        {
-            var model = await clientsService.GetClientCompanyEventsAsync("clientcompany1");
-            return View(model); 
-        }
+
 
         [HttpGet]
         public async Task<JsonResult> GetCalendarEvents()
         {
             var model = await clientsService.GetClientCompanyEventsAsync("clientcompany1");
-            Console.WriteLine($"Retrieved Events: {JsonConvert.SerializeObject(model)}");
             return Json(model);
         }
 
@@ -212,6 +206,44 @@ namespace LogiTrack.Controllers
             }
             var model = await clientsService.GetCompanyContactDetailsAsync(username);
             return View(model);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> MyOffers([FromQuery] SearchOffersViewModel query)
+        {
+            var username = User.GetUsername();
+            if (await clientsService.UserWithEmailExistsAsync(username) == false)
+            {
+                return BadRequest(ClientCompanyNotFoundErrorMessage);
+            }
+            var model = await clientsService.GetOffersForCompanyAsync(username, query.DeliveryAddress, query.PickupAddress, query.StartDate, query.EndDate);
+            query.Offers = model;
+            return View(query);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> BookOffer(int id)
+        {
+            var username = User.GetUsername();
+            if (await clientsService.UserWithEmailExistsAsync(username) == false)
+            {
+                return BadRequest(ClientCompanyNotFoundErrorMessage);
+            }
+            if(await clientsService.OfferWithIdExistsAsync(id) == false)
+            {
+                return BadRequest(OfferNotFoundErrorMessage);
+            }
+            if(await clientsService.OfferWithCompanyExistsAsync(id, username) == false)
+            {
+                return Unauthorized(CompanyDoesNotHaveOfferErrorMessage);
+            }
+            await clientsService.BookOfferAsync(id, username);
+            return RedirectToAction(nameof(AprovedOrders));
+        }
+
+        private object AprovedOrders()
+        {
+            throw new NotImplementedException();
         }
     }
 }

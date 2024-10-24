@@ -32,7 +32,7 @@ namespace LogiTrack.Controllers
             {
                 var model = await deliveryService.GetDeliveryByReferenceNumberAsync(query.SearchTerm);
                 query.SearchTerm = model.ReferenceNumber;
-                query.Delivery = model;
+                query.DeliveryIndex = model;
                 return View(query);
             }
             catch(DeliveryNotFoundException ex)

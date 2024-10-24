@@ -248,4 +248,76 @@ namespace LogiTrack.Core.Services
                     Type = x.EventType,
                 }).ToListAsync();
         }
-}   }
+
+        public async Task<List<OfferForSearchViewModel>?> GetOffersForCompanyAsync(string username, string? deliveryAddress = null, string? pickupAddress = null, DateTime? startDate = null, DateTime? endDate = null)
+        {
+            var company = await repository.AllReadonly<LogisticsSystem.Infrastructure.Data.DataModels.ClientCompany>().FirstOrDefaultAsync(x => x.User.UserName == username);
+
+            var offers = await repository.AllReadonly<LogisticsSystem.Infrastructure.Data.DataModels.Offer>().Where(x => x.Request.ClientCompanyId == company.Id && x.OfferStatus == StatusConstants.Approved).ToListAsync();
+
+            if (deliveryAddress != null)
+            {
+                offers = offers.Where(x => x.Request.DeliveryAddress.ToLower().Contains(deliveryAddress.ToLower())).ToList();
+            }
+            if (pickupAddress != null)
+            {
+                offers = offers.Where(x => x.Request.PickupAddress.ToLower().Contains(pickupAddress.ToLower())).ToList();
+            }
+            if (startDate != null)
+            {
+                offers = offers.Where(x => x.OfferDate >= startDate).ToList();
+            }
+            if (endDate != null)
+            {
+                offers = offers.Where(x => x.OfferDate <= endDate).ToList();
+            }
+            var offersToShow = offers.Select(x => new OfferForSearchViewModel
+            {
+                Id = x.Id,
+                PickupAddress = x.Request.PickupAddress,
+                DeliveryAddress = x.Request.DeliveryAddress,
+                NumberOfPallets = x.Request.NumberOfPallets,
+                PalletLength = x.Request.PalletLength.ToString(),
+                PalletWidth = x.Request.PalletWidth.ToString(),
+                PalletHeight = x.Request.PalletHeight.ToString(),
+                NumberOfNonStandartGoods = x.Request.NumberOfNonStandartGoods.ToString(),
+                Length = x.Request.Length.ToString(),
+                Width = x.Request.Width.ToString(),
+                Height = x.Request.Height.ToString(),
+                Volume = x.Request.Volume.ToString(),
+                Weight = x.Request.Weight.ToString(),
+                ExpectedDeliveryDate = x.Request.ExpectedDeliveryDate.ToString(),
+                FinalPrice = x.FinalPrice.ToString(),
+                OfferDate = x.OfferDate.ToString("dd/MM/yyyy"),                
+              }).ToList();
+            return offersToShow;
+        }
+
+        public async Task BookOfferAsync(int id, string username)
+        {
+            var company = await repository.AllReadonly<LogisticsSystem.Infrastructure.Data.DataModels.ClientCompany>().FirstOrDefaultAsync(x => x.User.UserName == username);
+            var offer = await repository.AllReadonly<LogisticsSystem.Infrastructure.Data.DataModels.Offer>().FirstOrDefaultAsync(x => x.Id == id && x.Request.ClientCompanyId == company.Id);
+            offer.OfferStatus = StatusConstants.Approved;
+            await repository.SaveChangesAsync();
+            var invoice = new Invoice()
+            {
+                OfferId = offer.Id,
+                InvoiceNumber = Guid.NewGuid().ToString(),
+                InvoiceDate = DateTime.Now,
+            };
+            await repository.AddAsync(invoice);
+            await repository.SaveChangesAsync();           
+        }
+
+        public async Task<bool> OfferWithIdExistsAsync(int id)
+        {
+            return await repository.AllReadonly<LogisticsSystem.Infrastructure.Data.DataModels.Offer>().AnyAsync(x => x.Id == id);
+        }
+
+        public async Task<bool> OfferWithCompanyExistsAsync(int id, string username)
+        {
+            var company = await repository.AllReadonly<LogisticsSystem.Infrastructure.Data.DataModels.ClientCompany>().FirstOrDefaultAsync(x => x.User.UserName == username);
+
+            return await repository.AllReadonly<LogisticsSystem.Infrastructure.Data.DataModels.Offer>().AnyAsync(x => x.Id == id && x.Request.ClientCompanyId == company.Id);
+        }
+    }   }
