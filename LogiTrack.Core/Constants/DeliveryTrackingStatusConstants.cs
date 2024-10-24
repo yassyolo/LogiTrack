@@ -9,5 +9,6 @@
         public const string InWarehouse = "In Warehouse";
         public const string InTransitToDestination = "In Transit To Destination";
         public const string InTransitToOrigin = "In Transit To Origin";
+
     }
 }

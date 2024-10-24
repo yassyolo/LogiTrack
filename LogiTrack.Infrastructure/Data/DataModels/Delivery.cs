@@ -56,5 +56,7 @@ namespace LogiTrack.Infrastructure.Data.DataModels
 
         [Comment("Delivery cash registers")]
         public IEnumerable<CashRegister> CashRegisters { get; set; } = new List<CashRegister>();
+
+        public int DeliveryStep { get; set; }
     }
 }

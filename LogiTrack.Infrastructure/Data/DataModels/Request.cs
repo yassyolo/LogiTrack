@@ -67,15 +67,15 @@ namespace LogisticsSystem.Infrastructure.Data.DataModels
 
         [Comment("Length of the goods")]
         [Range(GoodsMetricsMinValue, GoodsMetricsMaxValue)]
-        public int? Length { get; set; }
+        public double? Length { get; set; }
 
         [Comment("Width of the goods")]
         [Range(GoodsMetricsMinValue, GoodsMetricsMaxValue)]
-        public int? Width { get; set; }
+        public double? Width { get; set; }
 
         [Comment("Height of the goods")]
         [Range(GoodsMetricsMinValue, GoodsMetricsMaxValue)]
-        public int? Height { get; set; }
+        public double? Height { get; set; }
 
         [Comment("Volume of the goods")]
         [Range(GoodsVolumeMinValue, GoodsVolumeMaxValue)]
@@ -167,5 +167,7 @@ namespace LogisticsSystem.Infrastructure.Data.DataModels
         [Required]
         [Comment("Date of creation")]
         public DateTime CreatedAt { get; set; }
+
+
     }
 }

@@ -31,5 +31,9 @@ namespace LogisticsSystem.Infrastructure.Data.DataModels
         [Comment("Invoice date")]
         [Required]
         public DateTime InvoiceDate { get; set; }
+
+        [Required]
+        [Comment("Invoice description")]
+        public string Description { get; set; } = string.Empty;
     }
 }
