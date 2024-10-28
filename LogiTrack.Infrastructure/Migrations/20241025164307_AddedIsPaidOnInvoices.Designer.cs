@@ -4,6 +4,7 @@ using LogiTrack.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LogiTrack.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241025164307_AddedIsPaidOnInvoices")]
+    partial class AddedIsPaidOnInvoices
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -116,7 +118,7 @@ namespace LogiTrack.Infrastructure.Migrations
                             City = "Sliven",
                             ContactPerson = "John Doe",
                             Country = "Bulgaria",
-                            CreatedAt = new DateTime(2024, 10, 6, 19, 8, 30, 192, DateTimeKind.Local).AddTicks(8953),
+                            CreatedAt = new DateTime(2024, 10, 5, 19, 43, 5, 287, DateTimeKind.Local).AddTicks(5334),
                             Industry = "Manufacturing",
                             Name = "Client Company 1",
                             PostalCode = "8800",
@@ -132,7 +134,7 @@ namespace LogiTrack.Infrastructure.Migrations
                             City = "Sofia",
                             ContactPerson = "Jane Smith",
                             Country = "Bulgaria",
-                            CreatedAt = new DateTime(2024, 10, 16, 19, 8, 30, 192, DateTimeKind.Local).AddTicks(8989),
+                            CreatedAt = new DateTime(2024, 10, 15, 19, 43, 5, 287, DateTimeKind.Local).AddTicks(5382),
                             Industry = "Fashion",
                             Name = "Client Company 2",
                             PostalCode = "1000",
@@ -186,7 +188,7 @@ namespace LogiTrack.Infrastructure.Migrations
                         {
                             Id = 1,
                             Description = "",
-                            InvoiceDate = new DateTime(2024, 10, 26, 16, 8, 30, 748, DateTimeKind.Utc).AddTicks(6886),
+                            InvoiceDate = new DateTime(2024, 10, 25, 16, 43, 6, 40, DateTimeKind.Utc).AddTicks(9347),
                             InvoiceNumber = "INV-2024-0001",
                             IsPaid = false,
                             OfferId = 1
@@ -257,7 +259,7 @@ namespace LogiTrack.Infrastructure.Migrations
                             Id = 1,
                             FinalPrice = 4800m,
                             Notes = "Confirmed by client",
-                            OfferDate = new DateTime(2024, 10, 25, 16, 8, 30, 755, DateTimeKind.Utc).AddTicks(2380),
+                            OfferDate = new DateTime(2024, 10, 24, 16, 43, 6, 45, DateTimeKind.Utc).AddTicks(4643),
                             OfferStatus = "Accepted",
                             RequestId = 1
                         });
@@ -319,9 +321,6 @@ namespace LogiTrack.Infrastructure.Migrations
                     b.Property<bool>("IsRefrigerated")
                         .HasColumnType("bit")
                         .HasComment("Is the cargo refrigerated");
-
-                    b.Property<double>("Kilometers")
-                        .HasColumnType("float");
 
                     b.Property<double?>("Length")
                         .HasColumnType("float")
@@ -438,13 +437,12 @@ namespace LogiTrack.Infrastructure.Migrations
                             CalculatedPrice = 2100.00m,
                             CargoType = "Standard",
                             ClientCompanyId = 1,
-                            CreatedAt = new DateTime(2024, 10, 26, 19, 8, 30, 767, DateTimeKind.Local).AddTicks(7632),
+                            CreatedAt = new DateTime(2024, 10, 25, 19, 43, 6, 54, DateTimeKind.Local).AddTicks(6119),
                             DeliveryAddress = "",
                             DeliveryLatitude = 48.8566,
                             DeliveryLongitude = 2.3521999999999998,
                             ExpectedDeliveryDate = new DateTime(2024, 11, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             IsRefrigerated = true,
-                            Kilometers = 0.0,
                             NumberOfPallets = 10,
                             PalletHeight = 144.0,
                             PalletLength = 120.0,
@@ -469,13 +467,12 @@ namespace LogiTrack.Infrastructure.Migrations
                             CalculatedPrice = 1550.00m,
                             CargoType = "Standard",
                             ClientCompanyId = 1,
-                            CreatedAt = new DateTime(2024, 10, 26, 19, 8, 30, 767, DateTimeKind.Local).AddTicks(7691),
+                            CreatedAt = new DateTime(2024, 10, 25, 19, 43, 6, 54, DateTimeKind.Local).AddTicks(6166),
                             DeliveryAddress = "",
                             DeliveryLatitude = 42.697699999999998,
                             DeliveryLongitude = 23.321899999999999,
                             ExpectedDeliveryDate = new DateTime(2024, 11, 5, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             IsRefrigerated = true,
-                            Kilometers = 0.0,
                             NumberOfPallets = 15,
                             PalletHeight = 160.0,
                             PalletLength = 120.0,
@@ -500,13 +497,12 @@ namespace LogiTrack.Infrastructure.Migrations
                             CalculatedPrice = 1850.00m,
                             CargoType = "Standard",
                             ClientCompanyId = 1,
-                            CreatedAt = new DateTime(2024, 10, 26, 19, 8, 30, 767, DateTimeKind.Local).AddTicks(7708),
+                            CreatedAt = new DateTime(2024, 10, 25, 19, 43, 6, 54, DateTimeKind.Local).AddTicks(6197),
                             DeliveryAddress = "",
                             DeliveryLatitude = 48.208199999999998,
                             DeliveryLongitude = 16.373799999999999,
                             ExpectedDeliveryDate = new DateTime(2024, 11, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             IsRefrigerated = false,
-                            Kilometers = 0.0,
                             NumberOfPallets = 8,
                             PalletHeight = 150.0,
                             PalletLength = 120.0,
@@ -531,13 +527,12 @@ namespace LogiTrack.Infrastructure.Migrations
                             CalculatedPrice = 1750.00m,
                             CargoType = "Standard",
                             ClientCompanyId = 1,
-                            CreatedAt = new DateTime(2024, 10, 26, 19, 8, 30, 767, DateTimeKind.Local).AddTicks(7715),
+                            CreatedAt = new DateTime(2024, 10, 25, 19, 43, 6, 54, DateTimeKind.Local).AddTicks(6202),
                             DeliveryAddress = "",
                             DeliveryLatitude = 43.835599999999999,
                             DeliveryLongitude = 25.965699999999998,
                             ExpectedDeliveryDate = new DateTime(2024, 11, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             IsRefrigerated = false,
-                            Kilometers = 0.0,
                             NumberOfPallets = 12,
                             PalletHeight = 130.0,
                             PalletLength = 120.0,
@@ -733,7 +728,7 @@ namespace LogiTrack.Infrastructure.Migrations
                         {
                             Id = 1,
                             ClientCompanyId = 1,
-                            Date = new DateTime(2024, 10, 27, 16, 8, 30, 788, DateTimeKind.Utc).AddTicks(8065),
+                            Date = new DateTime(2024, 10, 26, 16, 43, 6, 68, DateTimeKind.Utc).AddTicks(6201),
                             EventType = "Delivered",
                             Title = "Delivered goods"
                         },
@@ -741,7 +736,7 @@ namespace LogiTrack.Infrastructure.Migrations
                         {
                             Id = 2,
                             ClientCompanyId = 1,
-                            Date = new DateTime(2024, 9, 16, 16, 8, 30, 788, DateTimeKind.Utc).AddTicks(8065),
+                            Date = new DateTime(2024, 9, 15, 16, 43, 6, 68, DateTimeKind.Utc).AddTicks(6201),
                             EventType = "Pickup",
                             Title = "Picked up goods"
                         },
@@ -749,7 +744,7 @@ namespace LogiTrack.Infrastructure.Migrations
                         {
                             Id = 3,
                             ClientCompanyId = 1,
-                            Date = new DateTime(2024, 10, 29, 16, 8, 30, 788, DateTimeKind.Utc).AddTicks(8065),
+                            Date = new DateTime(2024, 10, 28, 16, 43, 6, 68, DateTimeKind.Utc).AddTicks(6201),
                             EventType = "Paid",
                             Title = "Paid delivery"
                         });
@@ -806,7 +801,7 @@ namespace LogiTrack.Infrastructure.Migrations
                         {
                             Id = 1,
                             Amount = 200m,
-                            DateSubmitted = new DateTime(2024, 10, 26, 16, 8, 30, 185, DateTimeKind.Utc).AddTicks(8610),
+                            DateSubmitted = new DateTime(2024, 10, 25, 16, 43, 5, 280, DateTimeKind.Utc).AddTicks(7280),
                             DeliveryId = 1,
                             Description = "Fuel cost",
                             FileId = "",
@@ -816,7 +811,7 @@ namespace LogiTrack.Infrastructure.Migrations
                         {
                             Id = 2,
                             Amount = 50m,
-                            DateSubmitted = new DateTime(2024, 10, 26, 16, 8, 30, 185, DateTimeKind.Utc).AddTicks(8612),
+                            DateSubmitted = new DateTime(2024, 10, 25, 16, 43, 5, 280, DateTimeKind.Utc).AddTicks(7283),
                             DeliveryId = 1,
                             Description = "Toll fee",
                             FileId = "",
@@ -1017,7 +1012,7 @@ namespace LogiTrack.Infrastructure.Migrations
                             Id = 1,
                             Age = 35,
                             IsAvailable = false,
-                            LicenseExpiryDate = new DateTime(2026, 10, 26, 16, 8, 30, 209, DateTimeKind.Utc).AddTicks(9589),
+                            LicenseExpiryDate = new DateTime(2026, 10, 25, 16, 43, 5, 304, DateTimeKind.Utc).AddTicks(916),
                             LicenseNumber = "DL123456",
                             MonthsOfExperience = 6,
                             Name = "Paul Smith",
@@ -1031,7 +1026,7 @@ namespace LogiTrack.Infrastructure.Migrations
                             Id = 2,
                             Age = 32,
                             IsAvailable = true,
-                            LicenseExpiryDate = new DateTime(2027, 10, 26, 16, 8, 30, 209, DateTimeKind.Utc).AddTicks(9598),
+                            LicenseExpiryDate = new DateTime(2027, 10, 25, 16, 43, 5, 304, DateTimeKind.Utc).AddTicks(937),
                             LicenseNumber = "DL654321",
                             MonthsOfExperience = 4,
                             Name = "Mark Driver",
@@ -1179,28 +1174,28 @@ namespace LogiTrack.Infrastructure.Migrations
                         new
                         {
                             Id = "99027aaa-d346-4dd9-a467-15d74576c080",
-                            ConcurrencyStamp = "a4eba3d7-77cf-41f5-89fd-0bb5385660f4",
+                            ConcurrencyStamp = "5033d770-66e8-4536-a4f2-055f8330493e",
                             Name = "LogisticsCompany",
                             NormalizedName = "LOGISTICSCOMPANY"
                         },
                         new
                         {
                             Id = "5d000e64-c056-419a-950f-1992bd1e910d",
-                            ConcurrencyStamp = "5d84b561-c271-4f0d-8edb-6d468c89683b",
+                            ConcurrencyStamp = "32ce9816-6e0c-48a4-bba0-9cf5a36b8781",
                             Name = "ClientCompany",
                             NormalizedName = "CLIENTCOMPANY"
                         },
                         new
                         {
                             Id = "20ddc22c-ca6d-4feb-a688-0f31a430b5eb",
-                            ConcurrencyStamp = "5d515ac9-6b58-46d1-869a-fed627476247",
+                            ConcurrencyStamp = "4d13e632-fbac-4409-b2d0-93a1de4d50a1",
                             Name = "Accountant",
                             NormalizedName = "ACCOUNTANT"
                         },
                         new
                         {
                             Id = "27609f35-fbc8-4dc4-9d12-7ff2dd400327",
-                            ConcurrencyStamp = "e3288943-0420-4ec7-94dc-f1ec1be38ded",
+                            ConcurrencyStamp = "3c592bd8-614d-44b3-a50c-ed09e3903945",
                             Name = "Speditor",
                             NormalizedName = "SPEDITOR"
                         });
@@ -1300,13 +1295,13 @@ namespace LogiTrack.Infrastructure.Migrations
                         {
                             Id = "6bab54d5-5a88-4128-92d2-4d12ad0baa32",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "d5694746-70ce-4d58-9906-00d236f74842",
+                            ConcurrencyStamp = "a8272c76-00cc-44cb-881e-6ed2495d72dc",
                             Email = "logistics@example.com",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
-                            PasswordHash = "AQAAAAEAACcQAAAAEFHPdvnb5nl3G8asrQGhPvV8XLKha8qhUf1U6RYerEmvvvHD4gT63JeuETfLdFi3hA==",
+                            PasswordHash = "AQAAAAEAACcQAAAAEI/O1bRHbM4NXa0aUNYCL17D0ySnDYSfie+JEIcP6gPzQqP/JnNEJXlCNKYo+aHokA==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "1cb8ab80-d38b-47e8-a63f-c4ea0b2af06b",
+                            SecurityStamp = "c56ed834-9178-43f1-8717-13686abf502f",
                             TwoFactorEnabled = false,
                             UserName = "logistics"
                         },
@@ -1314,14 +1309,14 @@ namespace LogiTrack.Infrastructure.Migrations
                         {
                             Id = "20450cff-816f-49c8-9546-1c603aec0301",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "3648e640-00c2-40fa-9498-dd7f90966dd3",
+                            ConcurrencyStamp = "d1c21c2c-24dd-4e21-a4f7-f6b3eb32de8a",
                             Email = "clientcompany1@example.com",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
-                            PasswordHash = "AQAAAAEAACcQAAAAENDqBfjhuUw7Ash/tteeSDPV51UQ71Ou71QN5+AkA2RG6wbaRoJxhsS/PXBddHGyYg==",
+                            PasswordHash = "AQAAAAEAACcQAAAAEKzxm0CsATeP+3DlrLXHlIymhMRWqAEMClhWopfbo76jVmnBlWxIRzQ8rf9fqLv4YA==",
                             PhoneNumber = "1234567890",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "1b7445e8-b7b5-40a2-aaf6-6ac1e301ce75",
+                            SecurityStamp = "afbb9afa-dded-47eb-a1ae-b52a213eaaca",
                             TwoFactorEnabled = false,
                             UserName = "clientcompany1"
                         },
@@ -1329,13 +1324,13 @@ namespace LogiTrack.Infrastructure.Migrations
                         {
                             Id = "38ba6810-2800-4ac8-b005-5c27e8248951",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "b938a642-9a4c-4b2f-bd26-7c18e66a00bf",
+                            ConcurrencyStamp = "101a74cd-c6bc-43e3-9f79-320bed439e83",
                             Email = "secretary@example.com",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
-                            PasswordHash = "AQAAAAEAACcQAAAAEJIa6BUl3cJfguNI4jMH2Pf1OC+quI14RqziJ8TwjbhWzJd1o8c/tYAYgjXtxqIrFA==",
+                            PasswordHash = "AQAAAAEAACcQAAAAED4WS03K+pBeIEhjzuga0xmLIYK0n2naEtjJMM6Die2tOdFFLHs1qztaxTo+KIZbiA==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "2ef2e736-c279-42bc-bc14-2eae7cc6dbd7",
+                            SecurityStamp = "7018e718-72bf-447a-9e68-011b631ee74a",
                             TwoFactorEnabled = false,
                             UserName = "secretary"
                         },
@@ -1343,13 +1338,13 @@ namespace LogiTrack.Infrastructure.Migrations
                         {
                             Id = "2e8be95a-186e-403b-b4aa-3874750a3563",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "0f54a963-acfd-44e4-98a2-01910e4e0c57",
+                            ConcurrencyStamp = "8131c858-f468-42e0-ad3a-d711edcabd57",
                             Email = "speditor@example.com",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
-                            PasswordHash = "AQAAAAEAACcQAAAAEC3TVcYShlQCO9HOTRFo6cfN2gzDrrpFJ8ii8iT8lf++ghSKtfz+9fiYlzuMubi0xw==",
+                            PasswordHash = "AQAAAAEAACcQAAAAEKv+LWeHK5UZ+tdiXNUl+pouUgGNvk9hjH0mIK1cmgRjdSHDmJOFN2zhx+GOc6/qyQ==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "e8299ac3-b139-467e-860d-aedd90090573",
+                            SecurityStamp = "aebb2a47-06b4-440e-b594-bd04f0c83df5",
                             TwoFactorEnabled = false,
                             UserName = "speditor"
                         });

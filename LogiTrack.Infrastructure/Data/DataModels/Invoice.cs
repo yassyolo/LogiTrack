@@ -35,5 +35,8 @@ namespace LogisticsSystem.Infrastructure.Data.DataModels
         [Required]
         [Comment("Invoice description")]
         public string Description { get; set; } = string.Empty;
+
+        [Comment("Is invoice paid")]
+        public bool IsPaid { get; set; }
     }
 }

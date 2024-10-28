@@ -4,6 +4,8 @@
     {
         public int Id { get; set; }
 
+        public string Date { get; set; } = string.Empty;
+
         public string CreationDate { get; set; } = string.Empty;
 
         public string Number { get; set; } = string.Empty;

@@ -5,6 +5,7 @@ using static LogiTrack.Infrastructure.Data.DataConstants.DataModelConstants.Requ
 
 namespace LogisticsSystem.Infrastructure.Data.DataModels
 {
+    //TODO: add a non-standard goods entity as separate one
     [Comment("Request Entity")]
     public class Request
     {
@@ -168,6 +169,6 @@ namespace LogisticsSystem.Infrastructure.Data.DataModels
         [Comment("Date of creation")]
         public DateTime CreatedAt { get; set; }
 
-
+        public double Kilometers { get; set; }
     }
 }

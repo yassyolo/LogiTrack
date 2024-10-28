@@ -5,6 +5,6 @@ namespace LogiTrack.Core.Contracts
 {
     public interface IAccountantService
     {
-
+        Task<AccountantDashboardViewModel?> GetAccountantIndexAsync();
     }
 }

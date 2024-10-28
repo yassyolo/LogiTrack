@@ -5,9 +5,13 @@ namespace LogiTrack.Core.ViewModels.Accountant
 {
     public class SearchDeliveryViewModel
     {
-        public string SearchTerm { get; set; } = string.Empty;
-        public DeliveryIndexViewModel DeliveryIndex { get; set; } = null!;
-
-        public DeliveryViewModel Delivery { get; set; } = null!;
+        public string? ReferenceNumber { get; set; } 
+        public string? DeliveryAddress { get; set; }
+        public string? PickupAddress { get; set; }
+        public string? SearchTerm { get; set; } 
+        public string? ClientCompanyName { get; set; }
+        public DateTime? StartDate { get; set; }
+        public DateTime? EndDate { get; set; }
+        public List<DeliveryViewModel> Delivery { get; set; } = new List<DeliveryViewModel>();
     }
 }

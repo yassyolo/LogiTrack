@@ -20,7 +20,7 @@ namespace LogiTrack.Core.ViewModels.Delivery
 
         //[StringLength(TrackingNotesMaxLength, MinimumLength = TrackingNotesMinLength, ErrorMessage = LengthErrorMessage)]
         public string? Notes { get; set; }
-        public double Latitude { get; set; }
-        public double Longitude { get; set;}
+        public double? Latitude { get; set; }
+        public double? Longitude { get; set;}
     }
 }

@@ -20,26 +20,48 @@ namespace LogiTrack.Controllers
             this.deliveryService = deliveryService;
         }
 
-        public IActionResult Index()
-        {
-            return View();
-        }
-       
         [HttpGet]
-        public async Task<IActionResult> SearchDelivery([FromQuery] SearchDeliveryViewModel query)
+        public async Task<IActionResult> Dashboard()
         {
-            try
-            {
-                var model = await deliveryService.GetDeliveryByReferenceNumberAsync(query.SearchTerm);
-                query.SearchTerm = model.ReferenceNumber;
-                query.DeliveryIndex = model;
-                return View(query);
-            }
-            catch(DeliveryNotFoundException ex)
-            {
-                return NotFound(ex.Message);
-            }
+            var model = await accountantService.GetAccountantIndexAsync();
+            return View(model);
         }
+
+        [HttpGet]
+        public IActionResult SearchDelivery()
+        {
+            var model = new SearchDeliveryByReferenceNumberViewModel();
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SearchDelivery(SearchDeliveryByReferenceNumberViewModel model)
+        {
+            if (ModelState.IsValid == false)
+            {
+                return View(model);
+            }
+            var deliveryId = await deliveryService.GetDeliveryByReferenceNumberAsync(model.ReferenceNumber);
+            if (deliveryId == null)
+            {
+                TempData["NotFound"] = DeliveryNotFoundErrorMessage;
+                return View(model);
+            }
+            return RedirectToAction(nameof(DeliveryDetails), new { id = deliveryId });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> DeliveryDetails(int id)
+        {
+            if (await deliveryService.DeliveryWithIdExistsAsync(id) == false)
+            {
+                return NotFound(DeliveryNotFoundErrorMessage);
+            }
+            var model = await deliveryService.GetDeliveryDetailsForAccountantAsync(id);
+            return View(model);
+        }
+
         [HttpGet]
         public async Task<IActionResult> AddCashRegister()
         {
@@ -77,6 +99,34 @@ namespace LogiTrack.Controllers
             {
                 return BadRequest(ex.Message);
             }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> SearchCashRegister([FromQuery] SearchCashRegisterViewModel query, int id)
+        {
+            try
+            {
+                var model = await deliveryService.GetCashRegistersForDeliveryAsync(id, query.StartDate, query.EndDate, query.Type);
+                query.CashRegisters = model;
+                return View(query);
+            }
+            catch (DeliveryNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> SearchDeliveries([FromQuery] SearchDeliveryViewModel query)
+        {
+            var username = "speditor";
+            if (await deliveryService.DriverWithUsernameExistsAsync(username) == false)
+            {
+                return BadRequest(DriverNotFoundErrorMessage);
+            }
+            var model = await deliveryService.GetDeliveryForDriverAsync(username, query.ReferenceNumber, query.EndDate, query.StartDate, query.DeliveryAddress, query.PickupAddress, query.ClientCompanyName);
+            query.Delivery = model;
+            return View(query);
         }
     }
 }
