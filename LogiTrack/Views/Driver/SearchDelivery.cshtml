@@ -1,0 +1,191 @@
+﻿@model LogiTrack.Core.ViewModels.Accountant.SearchDeliveryByReferenceNumberViewModel
+
+@{
+    Layout = null;
+}
+   
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Custom Accountant Dashboard</title>
+    <link rel="stylesheet" href="~/css/site.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css">
+
+    <style>
+        .search-delivery{
+			background-color: #fff;
+			padding: 20px;
+			box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .search-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px; 
+        }
+
+        .search-icon {
+            width: 50px; 
+            margin-right: 10px; 
+        }
+
+        .search-title {
+            font-size: 1.5rem; 
+            font-weight: 500; 
+        }
+
+        .search-delivery h3 {
+         margin-top:30px;
+            font-size: 1rem;
+            margin-bottom: 50px;
+        }
+
+        .form-group {
+            margin-bottom: 15px; 
+        }
+
+        .form-control {
+            width: 50%; 
+            padding: 10px; 
+            border: 1px solid #ccc; 
+        }
+
+        .btn-primary {
+            background-color: #1e87f0; 
+            color: white; 
+            border: none;
+            padding: 10px 15px; 
+            border-radius: 5px; 
+            cursor: pointer; 
+            transition: background-color 0.3s;
+        }
+
+            .btn-primary:hover {
+                background-color: #155a8a; 
+            }
+
+        label {
+            display: block;
+            font-size: 14px; 
+            margin-bottom: 5px;
+        }
+
+        input[type="text"],
+        input[type="date"] {
+            width: 40%;
+            border: none; 
+            border-bottom: 2px solid #007bff; 
+            padding: 8px 0; 
+            margin-bottom: 15px;
+        }
+
+            input[type="text"]:focus,
+            input[type="date"]:focus {
+                outline: none;
+                border-bottom-color: #0056b3; 
+            }
+    </style>
+
+</head>
+
+<body>
+    <header class="header">
+        <div class="logo-name">
+            <div class="company-logo">
+                <img src="https://via.placeholder.com/50" alt="Company Logo">
+            </div>
+            <div class="company-name">LogiTrack</div>
+        </div>
+        <div class="profile-dropdown">
+            <button onclick="toggleDropdown()">
+                <i class="bi bi-person-circle"></i>
+                <span class="arrow">&#x25BC;</span> 
+            </button>
+            <div class="profile-dropdown-menu" id="profileDropdown">
+                <a asp-action="DriverDetails" asp-controller="Driver">Personal details</a>
+                <a asp-action="Logout" asp-controller="Home">Logout</a>
+            </div>
+        </div>
+    </header>
+
+    <aside class="sidebar">
+        <ul>
+            <li><a asp-action="Dashboard" asp-controller="Driver"><i class="bi bi-house-door"></i> Dashboard</a></li>
+            <li>
+                <a asp-action="SearchDelivery" asp-controller="Driver"><i class="bi bi-journal"></i> New Delivery</a>
+            </li>
+            <li>
+                <a asp-action="SearchDeliveries" asp-controller="Driver"><i class="bi bi-truck"></i> Delivery <span class="arrow">></span></a>
+                <div class="dropdown-menu">
+                    <ul>
+                        <li><a asp-action="SearchDeliveries" asp-controller="Driver">All</a></li>
+                        <li><a asp-action="NewDeliveries" asp-controller="Driver">Upcoming</a></li>
+                    </ul>
+                </div>
+            </li>
+        </ul>
+    </aside>
+    <div class="main-content">
+        <div class="search-delivery">
+            <div class="search-header">
+                <img src="https://via.placeholder.com/40" alt="Search Icon" class="search-icon">
+                <h2 class="search-title">Search delivery</h2>
+            </div>
+
+            <h3>Search Delivery by reference number</h3>
+
+            <form asp-action="SearchDelivery" asp-controller="Driver" method="post">
+                <div class="form-group">
+                    <label asp-for="ReferenceNumber">Reference number</label>
+                    <input asp-for="ReferenceNumber" type="text" id="ReferenceNumber" class="form-control" placeholder="Please enter"/>
+                    <span asp-for="ReferenceNumber" class="text-danger" id="ReferenceNumberError"></span>
+                </div>
+
+                <button type="submit" class="btn btn-primary"><b>SEARCH</b></button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+       
+        function toggleDropdown() {
+            const dropdown = document.getElementById('profileDropdown');
+            dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+        }
+
+        window.onclick = function (event) {
+            if (!event.target.matches('.profile-dropdown button')) {
+                const dropdowns = document.getElementsByClassName("profile-dropdown-menu");
+                for (let i = 0; i < dropdowns.length; i++) {
+                    const openDropdown = dropdowns[i];
+                    if (openDropdown.style.display === 'block') {
+                        openDropdown.style.display = 'none';
+                    }
+                }
+            }
+        };
+
+        document.querySelectorAll('.sidebar ul li').forEach(item => {
+            item.addEventListener('mouseenter', () => {
+                const dropdownMenu = item.querySelector('.dropdown-menu');
+                if (dropdownMenu) {
+                    dropdownMenu.style.display = 'block';
+                }
+            });
+
+            item.addEventListener('mouseleave', () => {
+                const dropdownMenu = item.querySelector('.dropdown-menu');
+                if (dropdownMenu) {
+                    dropdownMenu.style.display = 'none';
+                }
+            });
+        });
+    </script>
+
+</body>
+
+</html>

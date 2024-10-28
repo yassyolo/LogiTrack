@@ -1,0 +1,368 @@
+﻿@model LogiTrack.Core.ViewModels.Driver.DriverDashboardViewModel
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Driver Dashboard</title>
+    <link rel="stylesheet" href="~/css/site.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css">
+
+    <style>       
+        .cards-container {
+            display: flex;
+            gap:20px;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            display: flex;
+            align-items: center;
+            background-color: white;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            width: calc((100% - 40px) / 3);
+            padding: 10px;
+            height: 90px; 
+        }
+
+        .card-icon {
+            width: 100px;
+            height: 70px; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+            .card-icon img {
+                width: 50px; 
+                height: auto;
+            }
+
+        .card-content {
+            flex-grow: 1; 
+            padding: 0 10px;
+        }
+
+        .card h3 {
+            margin: 0;
+            font-size: 1rem;
+        }
+
+        .card p {
+            margin: 0;
+            font-size: 0.85rem;
+            color: #666;
+        }
+
+        .card-button {
+            background-color: #1e87f0; 
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+            .card-button:hover {
+                background-color: #167ac4;
+            }
+
+        .diagrams {
+            display: flex;
+            gap: 20px;
+        }
+
+        .diagram {
+            background-color: white;
+            padding: 15px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            flex: 1;
+            height: 480px;
+        }
+
+        .diagram-header {
+            display: flex;
+            gap:30px;
+            align-items: center;
+        }
+
+        .see-all {
+            text-decoration: underline;
+            color: #1e87f0;
+            font-size:0.9rem;
+        }
+
+        .delivery {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        .delivery-info {
+            display: flex;
+            align-items: center;
+            font-size: 0.85rem; 
+        }
+
+            .delivery-info p {
+                margin: 0; 
+            }
+
+            .delivery-info .ref-number {
+                font-weight: bold;
+            }
+
+        .addresses {
+            margin-left: 5px;
+            font-size: 0.85rem;
+        }
+
+        .client-company {
+            font-size: 0.85rem; 
+        }
+
+        .road-icon {
+            width: 30px;
+            height: 30px;
+            margin: 0 10px;
+        }
+
+        .addresses {
+            margin-left: 10px;
+        }
+
+        .pickup-address, .delivery-address {
+            margin: 0;
+        }
+
+        .ref-num{
+            text-decoration: none;
+        }
+    </style>
+
+</head>
+
+<body>
+    <header class="header">
+        <div class="logo-name">
+            <div class="company-logo">
+                <img src="https://via.placeholder.com/50" alt="Company Logo">
+            </div>
+            <div class="company-name">LogiTrack</div>
+        </div>
+        <div class="profile-dropdown">
+            <button onclick="toggleDropdown()">
+                <i class="bi bi-person-circle"></i>
+                <span class="arrow">&#x25BC;</span> 
+            </button>
+            <div class="profile-dropdown-menu" id="profileDropdown">
+                <a asp-action="DriverDetails" asp-controller="Driver">Personal details</a>
+                <a asp-action="Logout" asp-controller="Home">Logout</a>
+            </div>
+        </div>
+    </header>
+
+    <aside class="sidebar">
+        <ul>
+            <li><a asp-action="Dashboard" asp-controller="Driver"><i class="bi bi-house-door"></i> Dashboard</a></li>
+            <li>
+                <a asp-action="SearchDelivery" asp-controller="Driver"><i class="bi bi-journal"></i> New Delivery</a>
+            </li>
+            <li>
+                <a asp-action="SearchDeliveries" asp-controller="Driver"><i class="bi bi-truck"></i> Delivery <span class="arrow">></span></a>
+                <div class="dropdown-menu">
+                    <ul>
+                        <li><a asp-action="SearchDeliveries" asp-controller="Driver">Search</a></li>
+                        <li><a asp-action="NewDeliveries" asp-controller="Driver">Upcoming</a></li>
+                    </ul>
+                </div>
+            </li>
+        </ul>
+    </aside>
+    <div class="main-content">
+        <div class="cards-container">
+            <div class="card" id="locationCard">
+                <div class="card-icon">
+                    <img src="https://via.placeholder.com/50" alt="Location Icon">
+                </div>
+                <div class="card-content">
+                    <h3>Current Location</h3>
+                    <p id="location">Fetching location...</p>
+                    <p id="currentTime">Current Time: Fetching...</p>
+                </div>
+                <button class="card-button" onclick="getCurrentLocation()">Refresh</button>
+            </div>
+            <div class="card">
+                <div class="card-icon">
+                    <img src="https://via.placeholder.com/50" alt="Icon 1">
+                </div>
+                <div class="card-content">
+                    <h3>New deliveries</h3>
+                    <p>@Model.NewDeliveriesCount</p>
+                </div>
+                <button class="card-button">See all</button>
+            </div>
+            <div class="card">
+                <div class="card-icon">
+                    <img src="https://via.placeholder.com/50" alt="Icon 2">
+                </div>
+                <div class="card-content">
+                    <h3>Kilometers</h3>
+                    <p>@Model.KilometersDriven</p>
+                </div>
+            </div>
+            
+        </div>
+        <div class="diagrams">
+            <div class="diagram">
+                <div class="diagram-header">
+                    <h3>Deliveries</h3>
+                    <a asp-action="SearchDeliveries" asp-controller="Driver" class="see-all">See All</a>
+                </div>
+                @foreach (var item in Model.Last5Deliveries)
+                {
+                    <div class="delivery">
+                        <div class="delivery-info">
+                            <a asp-action="DeliveryDetails" asp-asp-controller="Driver" asp-route-id="@item.Id"><b>@item.ReferenceNumber</b></a>
+                            <img src="~/dashboard_books_dots.svg" alt="Road" class="road-icon">
+                            <div class="addresses">
+                                <p class="pickup-address"><b>@item.PickupAddress</b></p>
+                                <p class="delivery-address"><b>@item.DeliveryAddress</b></p>
+                            </div>
+                        </div>
+                        <p class="client-company"><b>@item.ClientCompanyName</b></p>
+                    </div>
+                }
+                   </div>        
+
+            <div class="diagram">
+                <div class="diagram-header">
+                    <h3>New Deliveries</h3>
+                    <a asp-action="NewDeliveries" asp-asp-controller="Driver" class="see-all">See All</a>
+                </div>
+                @foreach (var item in Model.NewDeliveries)
+                {
+                    <div class="delivery">
+                        <div class="delivery-info">
+                            <a asp-action="DeliveryDetails" asp-asp-controller="Driver" asp-route-id="@item.Id" class="ref-num"><b>@item.ReferenceNumber</b></a>
+                            <img src="~/dashboard_books_dots.svg" alt="Road" class="road-icon">
+                            <div class="addresses">
+                                <p class="pickup-address"><b>@item.PickupAddress</b></p>
+                                <p class="delivery-address"><b>@item.DeliveryAddress</b></p>
+                            </div>
+                        </div>
+                        <p class="client-company"><b>@item.ClientCompanyName</b></p>
+                    </div>
+                }
+               
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function getCurrentLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(showPosition, showError);
+            } else {
+                document.getElementById('location').textContent = "Geolocation is not supported by this browser.";
+            }
+        }
+
+        function showPosition(position) {
+            const lat = position.coords.latitude;
+            const long = position.coords.longitude;
+            fetchLocation(lat, long);
+        }
+
+        async function fetchLocation(lat, long) {
+            const apiKey = 'test'; 
+            const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${long}&key=${apiKey}`;
+
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+
+                if (data.results && data.results.length > 0) {
+                    const address = data.results[0].formatted_address;
+                    document.getElementById('location').textContent = address;
+                } else {
+                    document.getElementById('location').textContent = "Unable to retrieve location.";
+                }
+            } catch (error) {
+                console.error("Error fetching location:", error);
+                document.getElementById('location').textContent = "Error fetching location.";
+            }
+
+            showCurrentTime();
+        }
+
+        function showCurrentTime() {
+            const now = new Date();
+            const options = { timeZone: 'Europe/Sofia', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
+            const timeString = now.toLocaleTimeString('en-US', options);
+            document.getElementById('currentTime').textContent = `Current Time: ${timeString}`;
+        }
+
+        function showError(error) {
+            switch (error.code) {
+                case error.PERMISSION_DENIED:
+                    document.getElementById('location').textContent = "User denied the request for Geolocation.";
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    document.getElementById('location').textContent = "Location information is unavailable.";
+                    break;
+                case error.TIMEOUT:
+                    document.getElementById('location').textContent = "The request to get user location timed out.";
+                    break;
+                case error.UNKNOWN_ERROR:
+                    document.getElementById('location').textContent = "An unknown error occurred.";
+                    break;
+            }
+        }
+
+        window.onload = getCurrentLocation;
+        function toggleDropdown() {
+            const dropdown = document.getElementById('profileDropdown');
+            dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+        }
+
+        window.onclick = function (event) {
+            if (!event.target.matches('.profile-dropdown button')) {
+                const dropdowns = document.getElementsByClassName("profile-dropdown-menu");
+                for (let i = 0; i < dropdowns.length; i++) {
+                    const openDropdown = dropdowns[i];
+                    if (openDropdown.style.display === 'block') {
+                        openDropdown.style.display = 'none';
+                    }
+                }
+            }
+        };
+
+        document.querySelectorAll('.sidebar ul li').forEach(item => {
+            item.addEventListener('mouseenter', () => {
+                const dropdownMenu = item.querySelector('.dropdown-menu');
+                if (dropdownMenu) {
+                    dropdownMenu.style.display = 'block';
+                }
+            });
+
+            item.addEventListener('mouseleave', () => {
+                const dropdownMenu = item.querySelector('.dropdown-menu');
+                if (dropdownMenu) {
+                    dropdownMenu.style.display = 'none';
+                }
+            });
+        });
+    </script>
+
+</body>
+
+</html>

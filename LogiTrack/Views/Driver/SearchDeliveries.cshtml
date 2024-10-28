@@ -1,0 +1,347 @@
+﻿@model LogiTrack.Core.ViewModels.Accountant.SearchDeliveryViewModel
+@{
+    Layout = null;
+}
+
+   
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Deliveries</title>
+    <link rel="stylesheet" href="~/css/site.css" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css">
+
+    <style>
+        
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+        }
+
+
+        .container {
+            background-color: white;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            width: 100%; 
+            width: 1110px; 
+            margin: auto; 
+        }
+        .search-form{
+            display:flex;
+            gap: 20px;
+            flex-direction:row;
+        }
+
+        .quick-search-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .search-icon {
+            margin-right: 10px;
+        }
+
+        .quick-search-title {
+            font-size: 24px;
+            margin: 0;
+        }
+
+        .search-description {
+            margin-bottom: 20px;
+        }
+
+        .row {
+            display: flex;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+
+        .form-group {
+            flex: 1 1 30%; 
+           
+        }
+
+            .form-group:last-child {
+                margin-right: 0; 
+            }
+
+        label {
+            display: block;
+            font-size: 14px; 
+            margin-bottom: 5px;
+            
+        }
+
+        input[type="text"],
+        input[type="date"] {
+            width: 85%;
+            border: none; 
+            border-bottom: 2px solid #007bff; 
+            padding: 8px 0; 
+            margin-bottom: 15px;
+        }
+
+            input[type="text"]:focus,
+            input[type="date"]:focus {
+                outline: none; 
+                border-bottom-color: #0056b3; 
+            }
+
+        .button-group {
+            display: flex; 
+            margin-top: 90px;
+            flex-direction:row;
+            margin-bottom:30px;
+            gap:10px;
+        }
+
+        .btn {
+            background-color: #007bff; 
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 15px;
+            cursor: pointer;
+            margin-left: 10px; 
+        }
+
+        .btn-clear {
+            background-color: #6c757d; 
+        }
+
+        .btn:hover {
+            opacity: 0.9; 
+        }
+
+        .btn-clear:hover {
+            opacity: 0.8; 
+        }
+
+        .filtered-deliveries-container {
+            background-color: #ffff;
+            margin-top: 20px;
+            box-shadow: 2px 3px 6px rgba(0, 0, 0, 0.1);
+        }
+        .delivery-header {
+            display: flex;
+            justify-content: space-between;
+            background-color: #ffffff;
+            padding: 30px;
+            font-weight: bold;
+            margin-top:35px;
+            font-size: 0.90rem;
+        }
+
+        .delivery-card {
+            background-color: white; 
+            padding: 30px;
+            font-size:0.85rem;
+            display: flex;
+            flex-direction: column; 
+            transition: background-color 0.3s ease;
+            position: relative; 
+        }
+
+            .delivery-card:nth-child(even) {
+                background-color: lightgrey; 
+            }
+
+        .delivery-info {
+            display: flex; 
+            justify-content: space-between;
+            align-items: center;
+            height:5px;
+        }
+
+        .delivery-metrics {
+            display: none; 
+            margin-top:10px;
+            background-color: #f1f8ff; 
+            transition: background-color 0.3s ease;
+            border-top: 1px solid #ddd; 
+        } 
+    </style>
+</head>
+
+<body>
+    <header class="header">
+        <div class="logo-name">
+            <div class="company-logo">
+                <img src="https://via.placeholder.com/50" alt="Company Logo">
+            </div>
+            <div class="company-name">LogiTrack</div>
+        </div>
+        <div class="profile-dropdown">
+            <button onclick="toggleDropdown()">
+                <i class="bi bi-person-circle"></i>
+                <span class="arrow">&#x25BC;</span> 
+            </button>
+            <div class="profile-dropdown-menu" id="profileDropdown">
+                <a asp-action="DriverDetails" asp-controller="Driver">Personal details</a>
+                <a asp-action="Logout" asp-controller="Home">Logout</a>
+            </div>
+        </div>
+    </header>
+
+    <aside class="sidebar">
+        <ul>
+            <li><a asp-action="Dashboard" asp-controller="Driver"><i class="bi bi-house-door"></i> Dashboard</a></li>
+            <li>
+                <a asp-action="SearchDelivery" asp-controller="Driver"><i class="bi bi-journal"></i> New Delivery</a>
+            </li>
+            <li>
+                <a asp-action="SearchDeliveries" asp-controller="Driver"><i class="bi bi-truck"></i> Delivery <span class="arrow">></span></a>
+                <div class="dropdown-menu">
+                    <ul>
+                        <li><a asp-action="SearchDeliveries" asp-controller="Driver">All</a></li>
+                        <li><a asp-action="NewDeliveries" asp-controller="Driver">Upcoming</a></li>
+                    </ul>
+                </div>
+            </li>
+        </ul>
+    </aside>
+    <div class="main-content">
+        <div class="container mt-5">
+            <div class="quick-search-header">
+                <img src="https://via.placeholder.com/40" alt="Quick Search Icon" class="search-icon">
+                <h2 class="quick-search-title">Quick Search</h2>
+            </div>
+            <p class="search-description">Please enter your search criteria:</p>
+
+            <form asp-action="SearchDeliveries" asp-controller="Driver" method="get" class="search-form">
+                <div class="row">
+                    <div class="form-group">
+                        <label asp-for="ReferenceNumber">Reference No</label>
+                        <input type="text" id="ReferenceNumber" asp-for="ReferenceNumber" placeholder="Please enter">
+                        <span asp-validation-for="ReferenceNumber"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="ClientCompanyName">Company name</label>
+                        <input type="text" id="CompanyName" asp-for="ClientCompanyName" placeholder="Please enter">
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="PickupAddress">Pickup Address</label>
+                        <input type="text" id="PickupAddress" asp-for="PickupAddress" placeholder="Please enter">
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="DeliveryAddress">Delivery Address</label>
+                        <input type="text" id="DeliveryAddress" asp-for="DeliveryAddress" placeholder="Please enter">
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="StartDate">Start Date</label>
+                        <input type="date" id="StartDate" asp-for="StartDate" placeholder="Please enter">
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="EndDate">End Date</label>
+                        <input type="date" id="EndDate" asp-for="EndDate">
+                    </div>
+                </div>
+                <div class="button-group">
+                    <button type="submit" class="btn">GO</button>
+                    <button type="reset" class="btn btn-clear">CLEAR</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="filtered-deliveries-container">
+            <form asp-action="SearchDeliveries" asp-controller="Driver" method="get" class="search-form">
+                <div class="form-group">
+                    <label asp-for="SearchTerm">Quick Search by Keyword</label>
+                    <input type="text" id="keyword" asp-for="SearchTerm" placeholder="Enter keyword">
+                    <button type="submit" class="btn">GO</button>
+                </div>
+            </form>
+        <div class="delivery-header">
+            <span>Reference No</span>
+            <span>Pickup Address</span>
+            <span>Delivery Address</span>
+            <span>Client Company</span>
+            <span>Expected Delivery</span>
+        </div>
+        @if (Model.Delivery.Any())
+        {
+            <div class="delivery-list">
+                @foreach (var delivery in Model.Delivery)
+                {
+                    <div class="delivery-card">
+                        <div class="delivery-info">
+                            <span>@delivery.ReferenceNumber</span>
+                            <span>@delivery.PickupAddress</span>
+                            <span>@delivery.DeliveryAddress</span>
+                            <span>@delivery.ClientCompanyName</span>
+                            <span>@delivery.ExpectedDeliveryDate</span>
+                        </div>
+                        <div class="delivery-metrics">
+                            <p><strong>Dimensions:</strong> @delivery.PalletLength x @delivery.PalletWidth x @delivery.PalletHeight</p>
+                            <p><strong>Pallets:</strong> @delivery.NumberOfPallets</p>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <p class="text-center">No deliveries found matching the search criteria.</p>
+        }
+        </div>
+    </div>
+
+    <script>
+       
+        function toggleDropdown() {
+            const dropdown = document.getElementById('profileDropdown');
+            dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+        }
+
+        window.onclick = function (event) {
+            if (!event.target.matches('.profile-dropdown button')) {
+                const dropdowns = document.getElementsByClassName("profile-dropdown-menu");
+                for (let i = 0; i < dropdowns.length; i++) {
+                    const openDropdown = dropdowns[i];
+                    if (openDropdown.style.display === 'block') {
+                        openDropdown.style.display = 'none';
+                    }
+                }
+            }
+        };
+
+        document.querySelectorAll('.sidebar ul li').forEach(item => {
+            item.addEventListener('mouseenter', () => {
+                const dropdownMenu = item.querySelector('.dropdown-menu');
+                if (dropdownMenu) {
+                    dropdownMenu.style.display = 'block';
+                }
+            });
+
+            item.addEventListener('mouseleave', () => {
+                const dropdownMenu = item.querySelector('.dropdown-menu');
+                if (dropdownMenu) {
+                    dropdownMenu.style.display = 'none';
+                }
+            });
+        });
+        document.querySelectorAll('.delivery-card').forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                const metrics = card.querySelector('.delivery-metrics');
+                metrics.style.display = 'flex'; 
+                metrics.style.width = `${card.clientWidth}px`; 
+            });
+
+            card.addEventListener('mouseleave', () => {
+                const metrics = card.querySelector('.delivery-metrics');
+                metrics.style.display = 'none'; 
+            });
+        });
+
+
+    </script>
+
+</body>
+
+</html>
