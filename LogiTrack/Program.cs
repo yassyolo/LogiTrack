@@ -22,6 +22,7 @@ builder.Services.AddScoped<IClientsService, ClientsService>();
 builder.Services.AddScoped<IAccountantService, AccountantService>();
 builder.Services.AddScoped<IVehicleService, VehicleService>();
 builder.Services.AddScoped<IDeliveryService, DeliveryService>();
+builder.Services.AddScoped<IDriverService, DriverService>();
 //TODO: Add password constraints
 builder.Services.AddIdentity<IdentityUser, IdentityRole>(opt =>
 {

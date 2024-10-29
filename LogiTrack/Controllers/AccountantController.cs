@@ -23,7 +23,7 @@ namespace LogiTrack.Controllers
         [HttpGet]
         public async Task<IActionResult> Dashboard()
         {
-            var model = await accountantService.GetAccountantIndexAsync();
+            var model = await accountantService.GetAccountantDashboardAsync();
             return View(model);
         }
 
@@ -63,9 +63,8 @@ namespace LogiTrack.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> AddCashRegister()
+        public async Task<IActionResult> AddCashRegister(int id)
         {
-            int id = 1;
             if (await deliveryService.DeliveryWithIdExistsAsync(id) == false)
             {
                 return NotFound(DeliveryNotFoundErrorMessage);
@@ -102,11 +101,11 @@ namespace LogiTrack.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> SearchCashRegister([FromQuery] SearchCashRegisterViewModel query, int id)
+        public async Task<IActionResult> SearchCashRegisters([FromQuery] SearchCashRegistersViewModel query)
         {
             try
             {
-                var model = await deliveryService.GetCashRegistersForDeliveryAsync(id, query.StartDate, query.EndDate, query.Type);
+                var model = await deliveryService.GetCashRegistersForDeliveryAsync(query.DeliveryReferenceNumber, query.StartDate, query.EndDate, query.Type);
                 query.CashRegisters = model;
                 return View(query);
             }
@@ -119,14 +118,29 @@ namespace LogiTrack.Controllers
         [HttpGet]
         public async Task<IActionResult> SearchDeliveries([FromQuery] SearchDeliveryViewModel query)
         {
-            var username = "speditor";
-            if (await deliveryService.DriverWithUsernameExistsAsync(username) == false)
-            {
-                return BadRequest(DriverNotFoundErrorMessage);
-            }
-            var model = await deliveryService.GetDeliveryForDriverAsync(username, query.ReferenceNumber, query.EndDate, query.StartDate, query.DeliveryAddress, query.PickupAddress, query.ClientCompanyName);
+            var model = await deliveryService.GetDeliveryForAccountantAsync(query.ReferenceNumber, query.EndDate, query.StartDate, query.ClientCompanyName, query.IsPaid);
             query.Delivery = model;
             return View(query);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> MarkAsPaid(int id)
+        {
+            if (await deliveryService.DeliveryWithIdExistsAsync(id) == false)
+            {
+                return NotFound(DeliveryNotFoundErrorMessage);
+            }
+            var model = await accountantService.GetInvoiceForPaymentAsync(id);
+            return View(model);
+        }
+        public async Task<IActionResult> MarkAsPaidSuccessful(int id)
+        {
+            if(await accountantService.InvoiceWithIdExistsAsync(id) == false)
+            {
+                return NotFound(InvoiceNotFoundErrorMessage);
+            }
+            var deliveryId = await accountantService.MarkInvoiceAsPaidAsync(id);
+            return RedirectToAction(nameof(DeliveryDetails), new { id = deliveryId });
         }
     }
 }

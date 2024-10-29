@@ -4,6 +4,6 @@
     {
         public const string Delivered = "Delivered";
         public const string Pickup = "Pickup";
-        public const string Paid = "Paid";
+        public const string InvoicePaid = "Invoice Paid";
     }
 }

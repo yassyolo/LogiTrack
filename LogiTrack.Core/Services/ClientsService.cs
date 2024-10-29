@@ -118,11 +118,6 @@ namespace LogiTrack.Core.Services
                 WeightOfPallets = model.WeightOfPallets,
                 PalletsAreStackable = model.PalletsAreStackable,
                 NumberOfNonStandartGoods = model.NumberOfNonStandartGoods,
-                Length = model.Length,
-                Width = model.Width,
-                Height = model.Height,
-                Volume = model.Volume,
-                Weight = model.Weight,
                 TypeOfGoods = model.TypeOfGoods,
                 Type = model.Type,
                 SharedTruck = model.SharedTruck,
@@ -205,12 +200,12 @@ namespace LogiTrack.Core.Services
                     DeliveryAddress = x.Request.DeliveryAddress,
                     Price = x.FinalPrice.ToString(),
                 }).ToListAsync();
-            var invoices = await repository.AllReadonly<Invoice>().Where(x => x.Offer.Request.ClientCompanyId == company.Id).Take(5)
+            var invoices = await repository.AllReadonly<Invoice>().Where(x => x.Delivery.Offer.Request.ClientCompanyId == company.Id).Take(5)
                  .Select(x => new InvoiceIndexViewModel
                  {
                    Id = x.Id,
                    Number = x.InvoiceNumber,
-                   Amount = x.Offer.FinalPrice.ToString(),
+                   Amount = x.Delivery.Offer.FinalPrice.ToString(),
                    CreationDate = x.InvoiceDate.ToString("dd/MM/yyyy"),
                  })
                 .ToListAsync();
@@ -230,7 +225,7 @@ namespace LogiTrack.Core.Services
                 LastFiveInvoices = invoices,
                 RequestsCount = company.Requests.Count(),
                 BookedOffers = await repository.AllReadonly<LogisticsSystem.Infrastructure.Data.DataModels.Offer>().Where(x => x.Request.ClientCompanyId == company.Id && x.OfferStatus == StatusConstants.Approved).CountAsync(),
-                Invoices = await repository.AllReadonly<Invoice>().Where(x => x.Offer.Request.ClientCompanyId == company.Id).CountAsync(),
+                Invoices = await repository.AllReadonly<Invoice>().Where(x => x.Delivery.Offer.Request.ClientCompanyId == company.Id).CountAsync(),
                 DomesticDeliveries = await repository.AllReadonly<LogiTrack.Infrastructure.Data.DataModels.Delivery>().Where(x => x.Offer.Request.ClientCompanyId == company.Id && x.Offer.Request.Type == RequestTypeConstants.Domestic).CountAsync(),
                 InternationalDeliveries = await repository.AllReadonly<LogiTrack.Infrastructure.Data.DataModels.Delivery>().Where(x => x.Offer.Request.ClientCompanyId == company.Id && x.Offer.Request.Type == RequestTypeConstants.International).CountAsync(),
             };
@@ -281,11 +276,6 @@ namespace LogiTrack.Core.Services
                 PalletWidth = x.Request.PalletWidth.ToString(),
                 PalletHeight = x.Request.PalletHeight.ToString(),
                 NumberOfNonStandartGoods = x.Request.NumberOfNonStandartGoods.ToString(),
-                Length = x.Request.Length.ToString(),
-                Width = x.Request.Width.ToString(),
-                Height = x.Request.Height.ToString(),
-                Volume = x.Request.Volume.ToString(),
-                Weight = x.Request.Weight.ToString(),
                 ExpectedDeliveryDate = x.Request.ExpectedDeliveryDate.ToString(),
                 FinalPrice = x.FinalPrice.ToString(),
                 OfferDate = x.OfferDate.ToString("dd/MM/yyyy"),                
@@ -293,19 +283,20 @@ namespace LogiTrack.Core.Services
             return offersToShow;
         }
 
+        //TODO: Implement this method   
         public async Task BookOfferAsync(int id, string username)
         {
             var company = await repository.AllReadonly<LogisticsSystem.Infrastructure.Data.DataModels.ClientCompany>().FirstOrDefaultAsync(x => x.User.UserName == username);
             var offer = await repository.AllReadonly<LogisticsSystem.Infrastructure.Data.DataModels.Offer>().FirstOrDefaultAsync(x => x.Id == id && x.Request.ClientCompanyId == company.Id);
             offer.OfferStatus = StatusConstants.Approved;
             await repository.SaveChangesAsync();
-            var invoice = new Invoice()
+            /*var invoice = new Invoice()
             {
-                OfferId = offer.Id,
+                Delivery = id,
                 InvoiceNumber = Guid.NewGuid().ToString(),
                 InvoiceDate = DateTime.Now,
             };
-            await repository.AddAsync(invoice);
+            await repository.AddAsync(invoice);*/
             await repository.SaveChangesAsync();           
         }
 

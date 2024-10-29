@@ -21,5 +21,8 @@
         public const string CompanyDoesNotHaveOfferErrorMessage = "Company does not have this offer.";
         public const string DriverNotFoundErrorMessage = "Driver not found.";
         public const string DriverDoesNotHaveDeliveryErrorMessage = "Driver does not have this delivery.";
+        public const string LicenseExpirationErrorMessage = "Your driver's license will expire soon.";
+        public const string InvalidCoordinatesErrorMessage = "Invalid coordinates.";
+        public const string InvoiceNotFoundErrorMessage = "Invoice not found.";
     }
 }
