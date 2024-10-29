@@ -1,50 +1,191 @@
 ﻿@model LogiTrack.Core.ViewModels.Delivery.AddStatusViewModel
 
 @{
-    ViewBag.Title = "Add Status";
-
+    Layout = null;
 }
 
-<h2>Update Delivery Status</h2>
 
-<form asp-action="AddStatus" method="post">
-    <div class="form-group">
-        <label asp-for="DeliveryId"></label>
-        <input asp-for="DeliveryId" class="form-control" readonly />
-        <span asp-validation-for="DeliveryId" class="text-danger"></span>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Driver Dashboard</title>
+    <link rel="stylesheet" href="~/css/site.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css">
+    <script src="~/js/site.js"></script>
+    <style>
+        .add-status {
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            font-weight: 500;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-control {
+            width: 50%;
+            padding: 10px;
+            border: 1px solid #ccc;
+        }
+
+        .btn-primary {
+            background-color: #1e87f0;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+            .btn-primary:hover {
+                background-color: #155a8a;
+            }
+
+        label {
+            display: block;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        input[type="text"],
+        input[type="date"] {
+            width: 40%;
+            border: none;
+            border-bottom: 2px solid #007bff;
+            padding: 8px 0;
+            margin-bottom: 15px;
+        }
+
+            input[type="text"]:focus,
+            input[type="date"]:focus {
+                outline: none;
+                border-bottom-color: #0056b3;
+            }
+
+        .add-status-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .add-status-icon {
+            width: 50px;
+            margin-right: 10px;
+        }
+
+        .add-status-title {
+            font-size: 1.5rem;
+            font-weight: 500;
+        }
+
+        .add-status-delivery h3 {
+            margin-top: 30px;
+            font-size: 1rem;
+            margin-bottom: 50px;
+        }
+    </style>
+
+</head>
+
+<body>
+    <header class="header">
+        <div class="logo-name">
+            <div class="company-logo">
+                <img src="https://via.placeholder.com/50" alt="Company Logo">
+            </div>
+            <div class="company-name">LogiTrack</div>
+        </div>
+        <div class="profile-dropdown">
+            <button onclick="toggleDropdown()">
+                <i class="bi bi-person-circle"></i>
+                <span class="arrow">&#x25BC;</span>
+            </button>
+            <div class="profile-dropdown-menu" id="profileDropdown">
+                <a asp-action="Details" asp-controller="Driver">Personal details</a>
+                <a asp-action="LicenseDetails" asp-controller="Driver">License</a>
+                <a asp-action="Logout" asp-controller="Home">Logout</a>
+            </div>
+        </div>
+    </header>
+    <aside class="sidebar">
+        <ul>
+            <li><a asp-action="Dashboard" asp-controller="Driver"><i class="bi bi-house-door"></i> Dashboard</a></li>
+            <li>
+                <a asp-action="SearchDelivery" asp-controller="Driver"><i class="bi bi-journal"></i> New Delivery</a>
+            </li>
+            <li>
+                <a asp-action="SearchDeliveries" asp-controller="Driver"><i class="bi bi-truck"></i> Delivery <span class="arrow">></span></a>
+                <div class="dropdown-menu">
+                    <ul>
+                        <li><a asp-action="SearchDeliveries" asp-controller="Driver">Search</a></li>
+                        <li><a asp-action="NewDeliveries" asp-controller="Driver">Upcoming</a></li>
+                    </ul>
+                </div>
+            </li>
+        </ul>
+    </aside>
+    <div class="main-content">
+        <div class="add-status">
+            <div class="add-status-header">
+                <img src="https://via.placeholder.com/150" alt="Delivery Status" class="add-status-icon"> <!-- Add your image here -->
+                <h2 class="add-status-title">Delivery Status</h2>
+            </div>
+            <h3>Update the status of the delivery!</h3>
+        <form asp-action="AddStatus"asp-controller="Driver" asp-route-id="@Model.DeliveryId" method="post">
+
+                <div class="form-group">
+                    <label asp-for="StatusUpdate">Status</label>
+                    <select asp-for="StatusUpdate" class="form-control">
+                        <option value="">Select Status</option>
+                        <option value="In Transit">In Transit</option>
+                        <option value="Delivered">Delivered</option>
+                        <option value="In Customs">In Customs</option>
+                        <option value="In Warehouse">In Warehouse</option>
+                        <option value="Collected">Collected</option>
+                    </select>
+                    <span asp-validation-for="StatusUpdate" class="text-danger"></span>
+                </div>
+
+            <div class="form-group">
+                <label asp-for="Notes"></label>
+                <input asp-for="Notes" class="form-control"></input>
+                <span asp-validation-for="Notes" class="text-danger"></span>
+            </div>
+
+            <input type="hidden" id="Latitude" name="Latitude" />
+            <input type="hidden" id="Longitude" name="Longitude" />
+
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+        </div>
     </div>
-
-    <div class="form-group">
-        <label asp-for="StatusUpdate"></label>
-        <input asp-for="StatusUpdate" class="form-control" />
-        <span asp-validation-for="StatusUpdate" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="Notes"></label>
-        <textarea asp-for="Notes" class="form-control"></textarea>
-        <span asp-validation-for="Notes" class="text-danger"></span>
-    </div>
-
-    <input type="hidden" id="Latitude" name="Latitude" />
-    <input type="hidden" id="Longitude" name="Longitude" />
-
-    <button type="submit" class="btn btn-primary">Submit</button>
-</form>
-
-@section Scripts {
-    <partial name="_ValidationScriptsPartial" />
-
     <script>
         if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(function(position) {
+            navigator.geolocation.getCurrentPosition(function (position) {
                 document.getElementById("Latitude").value = position.coords.latitude;
                 document.getElementById("Longitude").value = position.coords.longitude;
-            }, function(error) {
+            }, function (error) {
                 console.error("Geolocation error:", error);
             });
         } else {
             console.warn("Geolocation is not supported by this browser.");
         }
     </script>
-}
+</body>
+
+   
+
+</html>
+
+

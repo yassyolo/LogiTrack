@@ -1,8 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using LogiTrack.Core.ViewModels.Driver;
 
-namespace LogiTrack.Core.ViewModels
+namespace LogiTrack.Core.ViewModels.Driver
 {
     public class DeliveryForDriverViewModel
     {
@@ -19,11 +20,6 @@ namespace LogiTrack.Core.ViewModels
         public string? WeightOfPallets { get; set; }
         public bool? PalletsAreStackable { get; set; } //only if the truck is not shared
         public string? NumberOfNonStandartGoods { get; set; }
-        public string? Length { get; set; }
-        public string? Width { get; set; }
-        public string? Height { get; set; }
-        public string? Volume { get; set; }
-        public string? Weight { get; set; }
         public string TypeOfGoods { get; set; } = string.Empty;
         public string PickupAddress { get; set; } = string.Empty;
         public string PickupLatitude { get; set; } = string.Empty;
@@ -36,8 +32,9 @@ namespace LogiTrack.Core.ViewModels
         public string SpecialInstructions { get; set; } = string.Empty;
         public bool IsRefrigerated { get; set; }
         public string ReferenceNumber { get; set; } = string.Empty;
-
         public string RegistrationNumber { get; set; } = string.Empty;
         public string VehicleType { get; set; } = string.Empty;
+        public IEnumerable<DeliveryTrackingViewModel> DeliveryTrackings { get; set; } = new List<DeliveryTrackingViewModel>();
+        public IEnumerable<NonStandardCargosViewModel> NonStandardCargos { get; set; } = new List<NonStandardCargosViewModel>();
     }
 }

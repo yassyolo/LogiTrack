@@ -1,7 +1,9 @@
-﻿@model LogiTrack.Core.ViewModels.Driver.DriverDashboardViewModel
+﻿@model LogiTrack.Core.ViewModels.Accountant.AccountantDashboardViewModel
 @{
     Layout = null;
 }
+
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -146,6 +148,33 @@
         .ref-num{
             text-decoration: none;
         }
+
+        .paid-button {
+            background-color: #28a745; 
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 5px 10px;
+            cursor: default;
+            font-size: 0.85rem;
+        }
+
+        .invoice-header, .invoice {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 50px;
+font-size: 0.85rem;
+        }
+
+        .paid-button {
+            background-color: #28a745; 
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 5px 10px;
+            cursor: default;
+            font-size: 0.85rem;
+        }
     </style>
 
 </head>
@@ -164,27 +193,27 @@
                 <span class="arrow">&#x25BC;</span> 
             </button>
             <div class="profile-dropdown-menu" id="profileDropdown">
-                <a asp-action="Details" asp-controller="Driver">Personal details</a>
-                <a asp-action="LicenseDetails" asp-controller="Driver">License</a>
                 <a asp-action="Logout" asp-controller="Home">Logout</a>
             </div>
         </div>
     </header>
-
     <aside class="sidebar">
         <ul>
-            <li><a asp-action="Dashboard" asp-controller="Driver"><i class="bi bi-house-door"></i> Dashboard</a></li>
+            <li><a asp-action="Dashboard" asp-controller="Accountant"><i class="bi bi-house-door"></i> Dashboard</a></li>
             <li>
-                <a asp-action="SearchDelivery" asp-controller="Driver"><i class="bi bi-journal"></i> New Delivery</a>
+                <a asp-action="SearchDeliveries" asp-controller="Accountant"><i class="bi bi-truck"></i> Deliveries</a>
             </li>
             <li>
-                <a asp-action="SearchDeliveries" asp-controller="Driver"><i class="bi bi-truck"></i> Delivery <span class="arrow">></span></a>
+                <a asp-action="SearchCashRegisters" asp-controller="Accountant"><i class="bi bi-money"></i> Cash registers <span class="arrow">></span></a>
                 <div class="dropdown-menu">
                     <ul>
-                        <li><a asp-action="SearchDeliveries" asp-controller="Driver">Search</a></li>
-                        <li><a asp-action="NewDeliveries" asp-controller="Driver">Upcoming</a></li>
+                        <li><a asp-action="SearchDelivery" asp-controller="Accountant">New</a></li>
+                        <li><a asp-action="SearchCashRegisters" asp-controller="Accountant">Search</a></li>
                     </ul>
                 </div>
+            </li>
+            <li>
+                <a asp-action="SearchInvoices" asp-controller="Accountant"><i class="bi bi-money"></i> Invoices</a>
             </li>
         </ul>
     </aside>
@@ -195,19 +224,18 @@
                     <img src="https://via.placeholder.com/50" alt="Location Icon">
                 </div>
                 <div class="card-content">
-                    <h3>Current Location</h3>
-                    <p id="location">Fetching location...</p>
-                    <p id="currentTime">Current Time: Fetching...</p>
+                   <h3>New deliveries</h3>
+                   <p>@Model.NewFinishedDeliveriesFromLastWeek</p>
                 </div>
-                <button class="card-button" onclick="getCurrentLocation()">Refresh</button>
+                <p class="card-button">From last week</p>
             </div>
             <div class="card">
                 <div class="card-icon">
                     <img src="https://via.placeholder.com/50" alt="Icon 1">
                 </div>
                 <div class="card-content">
-                    <h3>New deliveries</h3>
-                    <p>@Model.NewDeliveriesCount</p>
+                            <h3>Unpaid deliveries</h3>
+                            <p>@Model.NotPaidDeliveriesCount</p>
                 </div>
                 <button class="card-button">See all</button>
             </div>
@@ -216,9 +244,10 @@
                     <img src="https://via.placeholder.com/50" alt="Icon 2">
                 </div>
                 <div class="card-content">
-                    <h3>Kilometers</h3>
-                    <p>@Model.KilometersDriven</p>
+                            <h3>Invoices</h3>
+                            <p>@Model.InvoicesCountFromLastMonth</p>
                 </div>
+                <p class="card-button">From last month</p>
             </div>
             
         </div>
@@ -226,9 +255,9 @@
             <div class="diagram">
                 <div class="diagram-header">
                     <h3>Deliveries</h3>
-                    <a asp-action="SearchDeliveries" asp-controller="Driver" class="see-all">See All</a>
+                                <a asp-action="NewDeliveries" asp-controller="Accountant" class="see-all">See All</a>
                 </div>
-                @foreach (var item in Model.LastDeliveries)
+                 @foreach (var item in Model.Last5NewDeliveries)
                 {
                     <div class="delivery">
                         <div class="delivery-info">
@@ -240,97 +269,36 @@
                             </div>
                         </div>
                         <p class="client-company"><b>@item.ClientCompanyName</b></p>
+                        <button class="paid-button" style="display:@(item.IsPaid == true ? "inline-block" : "none")">Paid</button>
                     </div>
                 }
-                   </div>        
+                  </div>
 
-            <div class="diagram">
-                <div class="diagram-header">
-                    <h3>New Deliveries</h3>
-                    <a asp-action="NewDeliveries" asp-asp-controller="Driver" class="see-all">See All</a>
-                </div>
-                @foreach (var item in Model.NewDeliveries)
-                {
-                    <div class="delivery">
-                        <div class="delivery-info">
-                            <a asp-action="DeliveryDetails" asp-asp-controller="Driver" asp-route-id="@item.Id" class="ref-num"><b>@item.ReferenceNumber</b></a>
-                            <img src="~/dashboard_books_dots.svg" alt="Road" class="road-icon">
-                            <div class="addresses">
-                                <p class="pickup-address"><b>@item.PickupAddress</b></p>
-                                <p class="delivery-address"><b>@item.DeliveryAddress</b></p>
-                            </div>
-                        </div>
-                        <p class="client-company"><b>@item.ClientCompanyName</b></p>
+                <div class="diagram">
+                    <div class="diagram-header">
+                        <h3>Invoices</h3>
+                        <a asp-action="Invoices" asp-controller="Accountant" class="see-all">See All</a>
+                        <h3>Due amount:</h3>
+                        <p>@Model.DueAmountForDeliveries</p>
                     </div>
-                }
-               
-            </div>
+                    <div class="invoice-header">
+                        <p><b>Invoice No</b></p>
+                        <p><b>Current Date</b></p>
+                        <p><b>Creation Date</b></p>
+                        <p><b>Amount</b></p>
+                    </div>
+                    @foreach (var invoice in Model.Last5NotPaidInvoices)
+                    {
+                        <div class="invoice">
+                            <p>@invoice.Number</p>
+                            <p>@DateTime.Now.ToShortDateString()</p>
+                            <p>@invoice.CreationDate</p>
+                            <p>@invoice.Amount</p>                           
+                        </div>
+                    }
+                </div>
         </div>
     </div>
-
-    <script>
-        async function getCurrentLocation() {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(showPosition, showError);
-            } else {
-                document.getElementById('location').textContent = "Geolocation is not supported by this browser.";
-            }
-        }
-
-        function showPosition(position) {
-            const lat = position.coords.latitude;
-            const long = position.coords.longitude;
-            fetchLocation(lat, long);
-        }
-
-        async function fetchLocation(lat, long) {
-            const apiKey = 'AIzaSyDfA3_DsCdEYZeSpUwLBSenw1Gyp1VGIp4';
-            const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${long}&key=${apiKey}`;
-
-            try {
-                const response = await fetch(url);
-                const data = await response.json();
-
-                if (data.results && data.results.length > 0) {
-                    const address = data.results[0].formatted_address;
-                    document.getElementById('location').textContent = address;
-                } else {
-                    document.getElementById('location').textContent = "Unable to retrieve location.";
-                }
-            } catch (error) {
-                console.error("Error fetching location:", error);
-                document.getElementById('location').textContent = "Error fetching location.";
-            }
-
-            showCurrentTime();
-        }
-
-        function showCurrentTime() {
-            const now = new Date();
-            const options = { timeZone: 'Europe/Sofia', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
-            const timeString = now.toLocaleTimeString('en-US', options);
-            document.getElementById('currentTime').textContent = `Current Time: ${timeString}`;
-        }
-
-        function showError(error) {
-            switch (error.code) {
-                case error.PERMISSION_DENIED:
-                    document.getElementById('location').textContent = "User denied the request for Geolocation.";
-                    break;
-                case error.POSITION_UNAVAILABLE:
-                    document.getElementById('location').textContent = "Location information is unavailable.";
-                    break;
-                case error.TIMEOUT:
-                    document.getElementById('location').textContent = "The request to get user location timed out.";
-                    break;
-                case error.UNKNOWN_ERROR:
-                    document.getElementById('location').textContent = "An unknown error occurred.";
-                    break;
-            }
-        }
-
-        window.onload = getCurrentLocation;
-    </script>
 
 </body>
 

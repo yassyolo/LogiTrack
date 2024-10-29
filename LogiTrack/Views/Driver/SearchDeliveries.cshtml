@@ -1,4 +1,4 @@
-﻿@model LogiTrack.Core.ViewModels.Accountant.SearchDeliveryViewModel
+﻿@model LogiTrack.Core.ViewModels.Driver.SearchDeliveryForDriverViewModel
 @{
     Layout = null;
 }
@@ -13,7 +13,7 @@
     <link rel="stylesheet" href="~/css/site.css" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500&display=swap">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css">
-
+    <script src="~/js/site.js"></script>
     <style>
         
 
@@ -183,7 +183,8 @@
                 <span class="arrow">&#x25BC;</span> 
             </button>
             <div class="profile-dropdown-menu" id="profileDropdown">
-                <a asp-action="DriverDetails" asp-controller="Driver">Personal details</a>
+                <a asp-action="Details" asp-controller="Driver">Personal details</a>
+                <a asp-action="LicenseDetails" asp-controller="Driver">License</a>
                 <a asp-action="Logout" asp-controller="Home">Logout</a>
             </div>
         </div>
@@ -221,10 +222,7 @@
                         <input type="text" id="ReferenceNumber" asp-for="ReferenceNumber" placeholder="Please enter">
                         <span asp-validation-for="ReferenceNumber"></span>
                     </div>
-                    <div class="form-group">
-                        <label asp-for="ClientCompanyName">Company name</label>
-                        <input type="text" id="CompanyName" asp-for="ClientCompanyName" placeholder="Please enter">
-                    </div>
+                  
                     <div class="form-group">
                         <label asp-for="PickupAddress">Pickup Address</label>
                         <input type="text" id="PickupAddress" asp-for="PickupAddress" placeholder="Please enter">
@@ -240,6 +238,10 @@
                     <div class="form-group">
                         <label asp-for="EndDate">End Date</label>
                         <input type="date" id="EndDate" asp-for="EndDate">
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="IsNew">New</label>
+                        <input type="checkbox" id="IsNew" asp-for="IsNew" placeholder="Please enter">
                     </div>
                 </div>
                 <div class="button-group">
@@ -264,10 +266,10 @@
             <span>Client Company</span>
             <span>Expected Delivery</span>
         </div>
-        @if (Model.Delivery.Any())
+        @if (Model.Deliveries.Any())
         {
             <div class="delivery-list">
-                @foreach (var delivery in Model.Delivery)
+                @foreach (var delivery in Model.Deliveries)
                 {
                     <div class="delivery-card">
                         <div class="delivery-info">
@@ -293,39 +295,6 @@
     </div>
 
     <script>
-       
-        function toggleDropdown() {
-            const dropdown = document.getElementById('profileDropdown');
-            dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
-        }
-
-        window.onclick = function (event) {
-            if (!event.target.matches('.profile-dropdown button')) {
-                const dropdowns = document.getElementsByClassName("profile-dropdown-menu");
-                for (let i = 0; i < dropdowns.length; i++) {
-                    const openDropdown = dropdowns[i];
-                    if (openDropdown.style.display === 'block') {
-                        openDropdown.style.display = 'none';
-                    }
-                }
-            }
-        };
-
-        document.querySelectorAll('.sidebar ul li').forEach(item => {
-            item.addEventListener('mouseenter', () => {
-                const dropdownMenu = item.querySelector('.dropdown-menu');
-                if (dropdownMenu) {
-                    dropdownMenu.style.display = 'block';
-                }
-            });
-
-            item.addEventListener('mouseleave', () => {
-                const dropdownMenu = item.querySelector('.dropdown-menu');
-                if (dropdownMenu) {
-                    dropdownMenu.style.display = 'none';
-                }
-            });
-        });
         document.querySelectorAll('.delivery-card').forEach(card => {
             card.addEventListener('mouseenter', () => {
                 const metrics = card.querySelector('.delivery-metrics');

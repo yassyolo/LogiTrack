@@ -39,5 +39,6 @@ namespace LogiTrack.Core.ViewModels.Delivery
         public string SpecialInstructions { get; set; } = string.Empty;
         public bool IsRefrigerated { get; set; }
         public string ReferenceNumber { get; set; } = string.Empty;
+       public bool IsPaid { get; set; }
     }
 }
