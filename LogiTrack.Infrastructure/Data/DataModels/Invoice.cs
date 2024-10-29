@@ -1,12 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
+﻿using LogiTrack.Infrastructure.Data.DataModels;
+using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static LogiTrack.Infrastructure.Data.DataConstants.DataModelConstants;
 
 namespace LogisticsSystem.Infrastructure.Data.DataModels
 {
@@ -17,12 +12,12 @@ namespace LogisticsSystem.Infrastructure.Data.DataModels
         [Comment("Invoice identifier")]
         public int Id { get; set; }
 
-        [Comment("Offer identifier")]
-        public int OfferId { get; set; }
+        [Comment("Delivery identifier")]
+        public int DeliveryId { get; set; }
 
-        [Comment("Offer")]
-        [ForeignKey(nameof(OfferId))]
-        public Offer Offer { get; set; } = null!;
+        [Comment("Delivery")]
+        [ForeignKey(nameof(DeliveryId))]
+        public Delivery Delivery { get; set; } = null!;
 
         [Comment("Invoice number")]
         [Required]

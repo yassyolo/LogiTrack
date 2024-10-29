@@ -48,5 +48,7 @@ namespace LogiTrack.Infrastructure.Data.DataModels
         [Required]
         [Range(LongitudeMinValue, LongitudeMaxValue)]
         public double Longitude { get; set; }
+
+        public string Address { get; set; } = string.Empty;
     }
 }

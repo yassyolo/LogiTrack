@@ -49,6 +49,7 @@ namespace LogiTrack.Infrastructure.Data.DataModels
 
         [Comment("Delivery reference number")]
         [Required]
+        [StringLength(ReferenceNumberMaxLength)]
         public string ReferenceNumber { get; set; } = string.Empty; 
 
         [Comment("Delivery trackings")]
@@ -58,5 +59,15 @@ namespace LogiTrack.Infrastructure.Data.DataModels
         public IEnumerable<CashRegister> CashRegisters { get; set; } = new List<CashRegister>();
 
         public int DeliveryStep { get; set; }
+
+        //make it nullable
+        public DateTime ActualDeliveryDate { get; set; }
+
+        [Comment("Invoice")]
+        [ForeignKey(nameof(InvoiceId))]
+        public Invoice? Invoice { get; set; } = null;
+
+        [Comment("Invoice identifier")]
+        public int? InvoiceId { get; set; }
     }
 }

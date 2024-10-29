@@ -1,11 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using LogiTrack.Infrastructure.Data.DataModels;
+using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using static LogiTrack.Infrastructure.Data.DataConstants.DataModelConstants.Request;
 
 namespace LogisticsSystem.Infrastructure.Data.DataModels
 {
-    //TODO: add a non-standard goods entity as separate one
     [Comment("Request Entity")]
     public class Request
     {
@@ -26,7 +26,6 @@ namespace LogisticsSystem.Infrastructure.Data.DataModels
         [StringLength(CargoTypeMaxLength)]
         public string CargoType { get; set; } = string.Empty; //standard , not standard
 
-        #region Standart Cargo(Pallet) Metrics
         [Comment("Type of pallet")]
         [StringLength(TypeOfPalletMaxLength)]
         public string? TypeOfPallet { get; set; } = string.Empty; //euro, industrial
@@ -58,35 +57,10 @@ namespace LogisticsSystem.Infrastructure.Data.DataModels
         [Comment("Are the pallets stackable")]
         public bool? PalletsAreStackable { get; set; } //only if the truck is not shared
 
-        #endregion
-
-        #region Non-standard Cargo Metrics
 
         [Comment("Number of non-standart goods")]
         [Range(NumberOfNonStandartGoodsMinValue, NumberOfNonStandartGoodsMaxValue)]
         public int? NumberOfNonStandartGoods { get; set; }
-
-        [Comment("Length of the goods")]
-        [Range(GoodsMetricsMinValue, GoodsMetricsMaxValue)]
-        public double? Length { get; set; }
-
-        [Comment("Width of the goods")]
-        [Range(GoodsMetricsMinValue, GoodsMetricsMaxValue)]
-        public double? Width { get; set; }
-
-        [Comment("Height of the goods")]
-        [Range(GoodsMetricsMinValue, GoodsMetricsMaxValue)]
-        public double? Height { get; set; }
-
-        [Comment("Volume of the goods")]
-        [Range(GoodsVolumeMinValue, GoodsVolumeMaxValue)]
-        public double? Volume { get; set; }
-
-        [Comment("Weight of the goods")]
-        [Range(GoodsWeightMinValue, GoodsWeightMaxValue)]
-        public double? Weight { get; set; }
-
-        #endregion
 
         [Required]
         [Comment("Type of goods")]
@@ -170,5 +144,7 @@ namespace LogisticsSystem.Infrastructure.Data.DataModels
         public DateTime CreatedAt { get; set; }
 
         public double Kilometers { get; set; }
+
+        public IEnumerable<NonStandardCargo>? NonStandardCargos { get; set; } = new List<NonStandardCargo>();
     }
 }

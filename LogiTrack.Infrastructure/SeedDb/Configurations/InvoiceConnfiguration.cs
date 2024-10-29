@@ -8,7 +8,7 @@ namespace LogiTrack.Infrastructure.SeedDb.Configurations
     {
         public void Configure(EntityTypeBuilder<Invoice> builder)
         {
-            builder.HasOne(x => x.Offer)
+            builder.HasOne(x => x.Delivery)
                 .WithOne(x => x.Invoice)
                 .HasForeignKey<Invoice>(x => x.Id)
                 .OnDelete(DeleteBehavior.Restrict);

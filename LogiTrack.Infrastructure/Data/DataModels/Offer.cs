@@ -38,13 +38,6 @@ namespace LogisticsSystem.Infrastructure.Data.DataModels
         [StringLength(NotesMaxLength)]
         public string? Notes { get; set; }
 
-        [Comment("Invoice")]
-        [ForeignKey(nameof(InvoiceId))]
-        public Invoice? Invoice { get; set; } = null;
-
-        [Comment("Invoice identifier")]
-        public int? InvoiceId { get; set; }
-
         [Comment("Delivery identifier")]
         public int? DeliveryId { get; set; }
 

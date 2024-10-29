@@ -121,6 +121,8 @@
             public const int DeliveryStatusMinLength = 0;
             public const double DeliveryPriceMinValue = 0.0;
             public const double DeliveryPriceMaxValue = 200000.0;
+            public const int ReferenceNumberMaxLength = 20;
+            public const int ReferenceNumberMinLength = 0;
         }
 
         public static class CashRegister

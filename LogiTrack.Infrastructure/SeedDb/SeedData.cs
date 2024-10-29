@@ -332,16 +332,6 @@ namespace LogiTrack.Infrastructure.SeedDb
                 Notes = "Confirmed by client"
             };
         }
-        private void SeedInvoices()
-        {
-            InvoiceForOfferForRequest1 = new Invoice
-            {
-                Id = 1,
-                OfferId = OfferForRequest1.Id,
-                InvoiceNumber = "INV-2024-0001",
-                InvoiceDate = DateTime.UtcNow
-            };
-        }
         private void SeedDrivers()
         {
             Driver1ForDelivery = new Driver
@@ -425,7 +415,17 @@ namespace LogiTrack.Infrastructure.SeedDb
                 Profit = 4300m,
                 ReferenceNumber = "REF-2024-0001"
             };
-        }     
+        }
+        private void SeedInvoices()
+        {
+            InvoiceForOfferForRequest1 = new Invoice
+            {
+                Id = 1,
+                DeliveryId = 1,
+                InvoiceNumber = "INV-2024-0001",
+                InvoiceDate = DateTime.UtcNow
+            };
+        }
         private void SeedCashRegisters()
         {
             CashRegisterForDriver1 = new CashRegister
