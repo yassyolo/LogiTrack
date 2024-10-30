@@ -3,6 +3,7 @@ using LogiTrack.Core.ViewModels.Home;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using static LogiTrack.Core.Constants.MessageConstants.ErrorMessages;
+using static LogiTrack.Core.Constants.UserRolesConstants;
 
 namespace LogiTrack.Controllers
 {
@@ -57,21 +58,25 @@ namespace LogiTrack.Controllers
                 ModelState.AddModelError(string.Empty, InvalidLoginAttemptErrorMessage);
                 return View(model);
             }
-            if(await userManager.IsInRoleAsync(user, "ClientCompany"))
+            if(await userManager.IsInRoleAsync(user, ClientCompany))
             {
-                return RedirectToAction("Index", "ClientCompany");
+                return RedirectToAction("Dashboard", "Clients");
             }
-            else if (await userManager.IsInRoleAsync(user, "LogisticsCompany"))
+            else if (await userManager.IsInRoleAsync(user, Logistics))
             {
-                return RedirectToAction("Index", "LogisticsCompany");
+                return RedirectToAction("Dashboard", "Logistics");
             }
-            else if (await userManager.IsInRoleAsync(user, "Accountant"))
+            else if (await userManager.IsInRoleAsync(user, Accountant))
             {
-                return RedirectToAction("Index", "Accountant");
+                return RedirectToAction("Dashboard", "Accountant");
             }
-            else if (await userManager.IsInRoleAsync(user, "Speditor"))
+            else if (await userManager.IsInRoleAsync(user, Speditor))
             {
-                return RedirectToAction("Index", "Speditor");
+                return RedirectToAction("Dashboard", "Speditor");
+            }
+            else if (await userManager.IsInRoleAsync(user, Driver))
+            {
+                return RedirectToAction("Dashboard", "Driver");
             }
 
             ModelState.AddModelError(string.Empty, InvalidLoginAttemptErrorMessage);

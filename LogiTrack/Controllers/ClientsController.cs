@@ -1,6 +1,7 @@
 ﻿using LogiTrack.Core.Contracts;
 using LogiTrack.Core.ViewModels.Clients;
 using static LogiTrack.Core.Constants.MessageConstants.ErrorMessages;
+using static LogiTrack.Core.Constants.UserRolesConstants;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using LogiTrack.Core.Services;
@@ -8,6 +9,7 @@ using LogiTrack.Extensions;
 using LogiTrack.Core.CustomExceptions;
 using Microsoft.AspNetCore.Authorization;
 using Newtonsoft.Json;
+using LogiTrack.Core.ViewModels.Accountant;
 
 namespace LogiTrack.Controllers
 {
@@ -25,14 +27,14 @@ namespace LogiTrack.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Dashboard()
         {
-            var username = User.GetUsername();
+            /*var username = User.GetUsername();
             if (await clientsService.UserWithEmailExistsAsync(username) == false)
             {
                 return BadRequest(ClientCompanyNotFoundErrorMessage);
-            }
-            var model = await clientsService.GetClientCompanyDashboardAsync(username);
+            }*/
+            var model = await clientsService.GetClientCompanyDashboardAsync("clientcompany1");
             return View(model);
         }
 
@@ -70,7 +72,7 @@ namespace LogiTrack.Controllers
                 return View(model);
             }
             var user = await clientsService.RegisterUserAsync(model);
-            await userManager.AddToRoleAsync(user, "ClientCompany");
+            await userManager.AddToRoleAsync(user, ClientCompany);
             await clientsService.RegisterClientCompanyAsync(model, user);
 
             return RedirectToAction(nameof(SuccessfullRegistration));
@@ -114,15 +116,11 @@ namespace LogiTrack.Controllers
             model.PickupLatitude = pickupCoordinates.Value.Latitude;
             model.PickupLongitude = pickupCoordinates.Value.Longtitude;
 
-            var userEmail = User.GetEmail();
+           // var userEmail = User.GetEmail();
             try
             {
-                await clientsService.MakeRequestAsync(model, userEmail);
+                await clientsService.MakeRequestAsync(model, "clientcompany1@example.com");
                 return RedirectToAction(nameof(MyRequests));
-            }
-            catch (UserNotFoundException ex)
-            {
-                return NotFound(ex.Message);
             }
             catch (ClientCompanyNotFoundException ex)
             {
@@ -130,9 +128,18 @@ namespace LogiTrack.Controllers
             }
         }
 
-        public async Task<IActionResult> MyRequests()
+        [HttpGet]
+        public async Task<IActionResult> MyRequests([FromQuery] SearchRequestsViewModel query)
         {
-            return View();
+            var companyUsername = User.GetUsername();
+            if (await clientsService.UserWithEmailExistsAsync(companyUsername) == false)
+            {
+                return BadRequest(ClientCompanyNotFoundErrorMessage);
+            }
+
+            var model = await clientsService.GetRequestsForCompanyAsync(companyUsername, query.StartDate, query.EndDate, query.PickupAddress, query.DeliveryAddress, query.IsApproved);
+            query.Requests = model;
+            return View(query);
         }
 
         [HttpGet]

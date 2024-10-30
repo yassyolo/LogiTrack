@@ -94,12 +94,7 @@ namespace LogiTrack.Core.Services
 
         public async Task MakeRequestAsync(MakeRequestViewModel model, string userEmail)
         {
-            var user = await repository.AllReadonly<IdentityUser>().FirstOrDefaultAsync(x => x.Email == userEmail);
-            if (user == null)
-            {
-                throw new UserNotFoundException();
-            }
-            var client = await repository.AllReadonly<LogisticsSystem.Infrastructure.Data.DataModels.ClientCompany>().FirstOrDefaultAsync(x => x.UserId == user.Id);
+            var client = await repository.AllReadonly<LogisticsSystem.Infrastructure.Data.DataModels.ClientCompany>().FirstOrDefaultAsync(x => x.User.Email == userEmail);
             if (client == null)
             {
                 throw new ClientCompanyNotFoundException();
@@ -107,16 +102,7 @@ namespace LogiTrack.Core.Services
             var request = new LogisticsSystem.Infrastructure.Data.DataModels.Request
             {
                 ClientCompanyId = client.Id,
-                ClientCompany = client,
                 CargoType = model.CargoType,
-                TypeOfPallet = model.TypeOfPallet,
-                NumberOfPallets = model.NumberOfPallets,
-                PalletLength = model.PalletLength,
-                PalletHeight = model.PalletHeight,
-                PalletVolume = model.PalletVolume,
-                PalletWidth = model.PalletWidth,
-                WeightOfPallets = model.WeightOfPallets,
-                PalletsAreStackable = model.PalletsAreStackable,
                 NumberOfNonStandartGoods = model.NumberOfNonStandartGoods,
                 TypeOfGoods = model.TypeOfGoods,
                 Type = model.Type,
@@ -126,10 +112,54 @@ namespace LogiTrack.Core.Services
                 SpecialInstructions = model.SpecialInstructions,
                 IsRefrigerated = model.IsRefrigerated,
                 Status = StatusConstants.Pending,
-                CreatedAt = DateTime.Now
+                CreatedAt = DateTime.Now,
+                PickupAddress = model.PickupAddress,
+                PickupLatitude = model.PickupLatitude,
+                PickupLongitude = model.PickupLongitude,
+                DeliveryAddress = model.DeliveryAddress,
+                DeliveryLatitude = model.DeliveryLatitude,
+                DeliveryLongitude = model.DeliveryLongitude,
+                Kilometers = CalculateDistance(model.PickupLatitude, model.PickupLongitude, model.DeliveryLatitude, model.DeliveryLongitude),
             };
-
             await repository.AddAsync(request);
+
+            if (model.PalletLength != null)
+            {
+                var standartCargo = new StandartCargo
+                {
+                    TypeOfPallet = model.TypeOfPallet,
+                    NumberOfPallets = model.NumberOfPallets,
+                    PalletLength = model.PalletLength,
+                    PalletHeight = model.PalletHeight,
+                    PalletWidth = model.PalletWidth,
+                    RequestId = request.Id,
+                    WeightOfPallets = model.WeightOfPallets,
+                    PalletsAreStackable = model.PalletsAreStackable,
+                    PalletVolume = model.PalletLength * model.PalletWidth * model.PalletHeight / 1000000.0
+                };
+                await repository.AddAsync(standartCargo);
+                request.StandartCargoId = standartCargo.Id;
+            }
+        
+            if (model.Length != null && model.Length.Length > 0)
+            {
+                for (int i = 0; i < model.Length.Length; i++)
+                {
+                    var nonStandardCargo = new NonStandardCargo
+                    {
+                        RequestId = request.Id,
+                        Description = model.Description[i], 
+                        Length = model.Length[i],
+                        Width = model.Width[i],
+                        Height = model.Height[i],
+                        Weight = model.Weight[i]
+                    };
+                    nonStandardCargo.Volume = nonStandardCargo.Length * nonStandardCargo.Width * nonStandardCargo.Height / 1000000.0;
+
+                    await repository.AddAsync(nonStandardCargo);
+                }
+            }
+         
             await repository.SaveChangesAsync();
         }
 
@@ -189,11 +219,11 @@ namespace LogiTrack.Core.Services
             throw new NotImplementedException();
         }
 
-        public async Task<DashboardViewModel?> GetClientCompanyDashboardAsync(string username)
+        public async Task<ClientsDashboardViewModel?> GetClientCompanyDashboardAsync(string username)
         {
             var company = await repository.AllReadonly<LogisticsSystem.Infrastructure.Data.DataModels.ClientCompany>().FirstOrDefaultAsync(x => x.User.UserName == username);
             var offers = await repository.AllReadonly<LogisticsSystem.Infrastructure.Data.DataModels.Offer>().Where(x => x.Request.ClientCompanyId == company.Id && x.OfferStatus == StatusConstants.Pending).Take(5)
-                .Select(x => new OfferIndexViewModel
+                .Select(x => new OfferForDashboardViewModel
                 {
                     Id = x.Id,
                     PickupAddress = x.Request.PickupAddress,
@@ -201,33 +231,40 @@ namespace LogiTrack.Core.Services
                     Price = x.FinalPrice.ToString(),
                 }).ToListAsync();
             var invoices = await repository.AllReadonly<Invoice>().Where(x => x.Delivery.Offer.Request.ClientCompanyId == company.Id).Take(5)
-                 .Select(x => new InvoiceIndexViewModel
+                 .Select(x => new InvoiceForDashboardViewModel
                  {
                    Id = x.Id,
-                   Number = x.InvoiceNumber,
+                   Date = DateTime.Now.ToString("dd-MM-yyyy"),
+                   InvoiceNumber = x.InvoiceNumber,
                    Amount = x.Delivery.Offer.FinalPrice.ToString(),
-                   CreationDate = x.InvoiceDate.ToString("dd/MM/yyyy"),
+                   CreationDate = x.InvoiceDate.ToString("dd-MM-yyyy"),
+                   IsPaid = x.IsPaid
                  })
                 .ToListAsync();
 
             var deliveries = await repository.AllReadonly<Infrastructure.Data.DataModels.Delivery>().Where(x => x.Offer.Request.ClientCompanyId == company.Id).Take(5)
-                .Select(x => new DeliveryTrackingIndexViewModel
+                .Select(x => new DeliveryTrackingForDashboardViewModel
                 {
-                   Id = x.Id,
+                   ReferenceNumber = x.ReferenceNumber,
+                   DeliveryStep = x.DeliveryStep,
                    PickupAddress = x.Offer.Request.PickupAddress,
                    DeliveryAddress = x.Offer.Request.DeliveryAddress,
                    StatusUpdate = x.Status,
                 }).ToListAsync();
-            var model = new DashboardViewModel
+            var model = new ClientsDashboardViewModel
             {
                 LastFivePendingOffers = offers,
                 LastFiveDeliveries = deliveries,
                 LastFiveInvoices = invoices,
-                RequestsCount = company.Requests.Count(),
-                BookedOffers = await repository.AllReadonly<LogisticsSystem.Infrastructure.Data.DataModels.Offer>().Where(x => x.Request.ClientCompanyId == company.Id && x.OfferStatus == StatusConstants.Approved).CountAsync(),
-                Invoices = await repository.AllReadonly<Invoice>().Where(x => x.Delivery.Offer.Request.ClientCompanyId == company.Id).CountAsync(),
-                DomesticDeliveries = await repository.AllReadonly<LogiTrack.Infrastructure.Data.DataModels.Delivery>().Where(x => x.Offer.Request.ClientCompanyId == company.Id && x.Offer.Request.Type == RequestTypeConstants.Domestic).CountAsync(),
-                InternationalDeliveries = await repository.AllReadonly<LogiTrack.Infrastructure.Data.DataModels.Delivery>().Where(x => x.Offer.Request.ClientCompanyId == company.Id && x.Offer.Request.Type == RequestTypeConstants.International).CountAsync(),
+                DueAmountForDeliveries =  await repository.AllReadonly<Invoice>().Where(x => x.Delivery.Offer.Request.ClientCompanyId == company.Id && x.IsPaid == false).SumAsync(x => x.Delivery.Offer.Request.CalculatedPrice),
+                RequestsCount = await repository.AllReadonly<LogisticsSystem.Infrastructure.Data.DataModels.Request>().Where(x => x.ClientCompanyId == company.Id).CountAsync(),
+                RequestsLastMonthCount = await repository.AllReadonly<LogisticsSystem.Infrastructure.Data.DataModels.Request>().Where(x => x.ClientCompanyId == company.Id && x.CreatedAt.Month == DateTime.Now.Month - 1).CountAsync(),
+                BookedOffersCount = await repository.AllReadonly<LogisticsSystem.Infrastructure.Data.DataModels.Offer>().Where(x => x.Request.ClientCompanyId == company.Id && x.OfferStatus == StatusConstants.Approved).CountAsync(),
+                BookedOffersLastMonthCount = await repository.AllReadonly<LogisticsSystem.Infrastructure.Data.DataModels.Offer>().Where(x => x.Request.ClientCompanyId == company.Id && x.OfferStatus == StatusConstants.Approved && x.OfferDate.Month == DateTime.Now.Month - 1).CountAsync(),
+                InvoicesCount = await repository.AllReadonly<Invoice>().Where(x => x.Delivery.Offer.Request.ClientCompanyId == company.Id).CountAsync(),
+                InvoiceLastMonthCount = await repository.AllReadonly<Invoice>().Where(x => x.Delivery.Offer.Request.ClientCompanyId == company.Id && x.InvoiceDate.Month == DateTime.Now.Month - 1).CountAsync(),
+                DomesticDeliveriesCount = await repository.AllReadonly<LogiTrack.Infrastructure.Data.DataModels.Delivery>().Where(x => x.Offer.Request.ClientCompanyId == company.Id && x.Offer.Request.Type == RequestTypeConstants.Domestic).CountAsync(),
+                InternationalDeliveriesCount = await repository.AllReadonly<LogiTrack.Infrastructure.Data.DataModels.Delivery>().Where(x => x.Offer.Request.ClientCompanyId == company.Id && x.Offer.Request.Type == RequestTypeConstants.International).CountAsync(),
             };
             return model;
         }
@@ -271,10 +308,10 @@ namespace LogiTrack.Core.Services
                 Id = x.Id,
                 PickupAddress = x.Request.PickupAddress,
                 DeliveryAddress = x.Request.DeliveryAddress,
-                NumberOfPallets = x.Request.NumberOfPallets,
+                /*NumberOfPallets = x.Request.NumberOfPallets,
                 PalletLength = x.Request.PalletLength.ToString(),
                 PalletWidth = x.Request.PalletWidth.ToString(),
-                PalletHeight = x.Request.PalletHeight.ToString(),
+                PalletHeight = x.Request.PalletHeight.ToString(),*/
                 NumberOfNonStandartGoods = x.Request.NumberOfNonStandartGoods.ToString(),
                 ExpectedDeliveryDate = x.Request.ExpectedDeliveryDate.ToString(),
                 FinalPrice = x.FinalPrice.ToString(),
@@ -311,4 +348,61 @@ namespace LogiTrack.Core.Services
 
             return await repository.AllReadonly<LogisticsSystem.Infrastructure.Data.DataModels.Offer>().AnyAsync(x => x.Id == id && x.Request.ClientCompanyId == company.Id);
         }
-    }   }
+
+        public double CalculateDistance(double pickupLatitude, double pickupLongitude, double deliveryLatitude, double deliveryLongitude)
+        {
+            const double R = 6371.0; 
+            double lat1 = pickupLatitude * (Math.PI / 180.0);
+            double lon1 = pickupLongitude * (Math.PI / 180.0);
+            double lat2 = deliveryLatitude * (Math.PI / 180.0);
+            double lon2 = deliveryLongitude * (Math.PI / 180.0);
+
+            double dLat = lat2 - lat1;
+            double dLon = lon2 - lon1;
+
+            double a = Math.Sin(dLat / 2) * Math.Sin(dLat / 2) + Math.Cos(lat1) * Math.Cos(lat2) *Math.Sin(dLon / 2) * Math.Sin(dLon / 2);
+
+            double c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
+
+            double distance = R * c; 
+
+            return distance;
+        }
+
+        public async Task<IEnumerable<RequestsForSearchViewModel>> GetRequestsForCompanyAsync(string companyUsername, DateTime? startDate = null, DateTime? endDate = null, string? pickupAddress = null, string? deliveryAddress = null, bool? isApproved = null)
+        {
+            var requests = await repository.AllReadonly<LogisticsSystem.Infrastructure.Data.DataModels.Request>().Where(x => x.ClientCompany.User.UserName == companyUsername).ToListAsync();
+            if (startDate != null)
+            {
+                requests = requests.Where(x => x.CreatedAt >= startDate).ToList();
+            }
+            if (endDate != null)
+            {
+                requests = requests.Where(x => x.CreatedAt <= endDate).ToList();
+            }
+            if (pickupAddress != null)
+            {
+                requests = requests.Where(x => x.PickupAddress.ToLower().Contains(pickupAddress.ToLower())).ToList();
+            }
+            if (deliveryAddress != null)
+            {
+                requests = requests.Where(x => x.DeliveryAddress.ToLower().Contains(deliveryAddress.ToLower())).ToList();
+            }
+            if (isApproved != null)
+            {
+                requests = requests.Where(x => x.Status == StatusConstants.Approved).ToList();
+            }
+            return requests.Select(x => new RequestsForSearchViewModel
+            {
+                PickupAddress = x.PickupAddress,
+                DeliveryAddress = x.DeliveryAddress,
+                ExpectedDeliveryDate = x.ExpectedDeliveryDate.ToString(),
+                CreationDate = x.CreatedAt.ToString("dd/MM/yyyy"),
+                Approved = x.Status == StatusConstants.Approved,
+                /*NumberOfItems = x.NumberOfPallets.ToString(),
+                Weight = x.WeightOfPallets.ToString(),
+                Volume = x.PalletVolume.ToString()*/
+            });
+
+        }
+}   }

@@ -33,12 +33,12 @@ namespace LogiTrack.Core.Services
                 DueAmountForDeliveries = repository.AllReadonly<Invoice>().Where(x => x.IsPaid == false).Sum(x => x.Delivery.Offer.FinalPrice).ToString()
             };
             model.Last5NotPaidInvoices = await repository.All<Invoice>().Where(x => x.IsPaid == false).OrderByDescending(x => x.InvoiceDate).Take(5)
-                .Select(x => new InvoiceIndexViewModel
+                .Select(x => new InvoiceForDashboardViewModel
                 {
                     Id = x.Id,
                     CreationDate = x.InvoiceDate.ToString("dd-MM-yyyy"),
                     Date = DateTime.Now.ToString("dd-MM-yyyy"),
-                    Number = x.InvoiceNumber,
+                    InvoiceNumber = x.InvoiceNumber,
                     Amount = x.Delivery.Offer.FinalPrice.ToString(),
                 }).ToListAsync();
             model.Last5NewDeliveries = await repository.All<Delivery>().Where(x => x.DeliveryStep == 4).OrderByDescending(x => x.ActualDeliveryDate).Take(5)

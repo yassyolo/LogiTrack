@@ -80,7 +80,7 @@ namespace LogiTrack.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddCashRegister(int id, AddCashRegisterViewModel model, IFormFile file)
         {
-            id = 1;
+ 
             if (ModelState.IsValid == false)
             {
                 return View(model);
@@ -88,7 +88,7 @@ namespace LogiTrack.Controllers
             try
             {
                 await deliveryService.AddCashRegisterForDeliveryAsync(id, model, file);
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(DeliveryDetails), new { id = id });
             }
             catch (DeliveryNotFoundException ex)
             {
