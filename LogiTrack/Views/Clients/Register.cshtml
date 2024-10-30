@@ -3,6 +3,7 @@
 @{
     Layout = null;
 }
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,124 +12,181 @@
     <title>Register Page</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
+        /* Base styling */
         body, html {
-            height: 100%;
             margin: 0;
-            font-family: Arial, sans-serif;
-        }
-
-        .video-background {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
+            padding: 0;
             height: 100%;
-            z-index: -1;
-            overflow: hidden;
-        }
-
-            .video-background video {
-                width: 100%;
-                height: 100%;
-                object-fit: cover;
-            }
-
-        .form-container {
+            font-family: Arial, sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
+        }
+
+        .login-video-container {
+            display: flex;
+            width: 100%;
             height: 100vh;
-            background-color: rgba(0, 0, 0, 0.5);
         }
 
-        .form-content {
-            background-color: white;
-            padding: 30px;
-            border-radius: 10px;
-            width: 400px;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+        .login-form-container {
+            width: 40%;
+            display: flex;
+            flex-direction: column;
+            background-color: #fff;
+            padding-left: 35px;
+            padding-top: 35px;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
         }
 
-        h2 {
-            text-align: center;
+        .login-form-container h2 {
+            font-size: 24px;
+            margin: 0;
+            color: #333;
             margin-bottom: 20px;
         }
 
-        input[type="text"], input[type="email"], input[type="tel"] {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 15px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
+        .login-form-container h3 {
+            margin-top: 10px;
+            font-size: 18px;
+            color: #666;
         }
 
-        .submit-btn {
+        form {
+            width: 90%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-size: 10px;
+            margin-top: 15px;
+            color: #333;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="tel"], 
+        input[type="input"] {
             width: 100%;
+            border: none;
+            border-bottom: 2px solid #007bff;
+            padding: 8px 0;
+            margin-bottom: 15px;
+        }
+
+        input[type="text"]:focus,
+            input[type="input"],
+        input[type="email"]:focus,
+        input[type="tel"]:focus {
+            outline: none;
+            border-bottom-color: #0056b3;
+        }
+
+        button[type="submit"] {
+            margin-top: 20px;
             padding: 10px;
             background-color: #007bff;
-            color: white;
+            color: #fff;
             border: none;
             border-radius: 5px;
             cursor: pointer;
-            font-size: 16px;
         }
 
-            .submit-btn:hover {
-                background-color: #0056b3;
-            }
+        .no-account {
+            margin-top: 20px;
+        }
+
+        .no-account a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        .video-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #f0f0f0;
+            overflow: hidden;
+        }
+
+        .video-container video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .inline-fields {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+        }
     </style>
 </head>
 <body>
-    <!-- Video Background -->
-    <div class="video-background">
-        <video autoplay loop muted>
-            <source src="your-video-url.mp4" type="video/mp4">
-            Your browser does not support the video tag.
-        </video>
-    </div>
-
-    <!-- Form Container -->
-    <div class="form-container">
-        <div class="form-content">
-            <h2>Register</h2>
+    <div class="login-video-container">
+        <div class="login-form-container">
+            <h2>LogiTrack</h2>
+            <h3>Resgister your company at LogiTrack</h3>
             <form asp-action="Register" asp-controller="Clients" method="post">
                 <label asp-for="Name">Company name</label>
                 <input asp-for="Name" type="input" placeholder="Full company name.." required>
                 <span asp-validation-for="Name"></span>
+
                 <label asp-for="ContactPerson">Person for contact</label>
                 <input asp-for="ContactPerson" type="input" placeholder="Person for contact.." required>
                 <span asp-validation-for="ContactPerson"></span>
+
                 <label asp-for="Email">Email</label>
                 <input asp-for="Email" type="email" placeholder="Email.." required>
                 <span asp-validation-for="Email"></span>
+
                 <label asp-for="PhoneNumber">Phone number</label>
-                <input asp-for="PhoneNumber" type="input" placeholder="Phone number.." required>
+                <div class="inline-fields">
+                    <input asp-for="PhoneNumber" type="input" placeholder="Phone number.." required>
+                    <input asp-for="AlternativePhoneNumber" type="input" placeholder="Alternative phone number.." required>
+                </div>
                 <span asp-validation-for="PhoneNumber"></span>
-                <label asp-for="AlternativePhoneNumber">Alternative phone number</label>
-                <input asp-for="AlternativePhoneNumber" type="input" placeholder="Alternative phone number.." required>
                 <span asp-validation-for="AlternativePhoneNumber"></span>
+
                 <label asp-for="RegistrationNumber">Registration number</label>
                 <input asp-for="RegistrationNumber" type="input" placeholder="Registration number.." required>
                 <span asp-validation-for="RegistrationNumber"></span>
+
                 <label asp-for="Industry">Industry</label>
                 <input asp-for="Industry" type="input" placeholder="Industry.." required>
                 <span asp-validation-for="Industry"></span>
+
                 <label asp-for="Street">Street</label>
-                <input asp-for="Street" type="input" placeholder="Street.." required>
+                <div class="inline-fields">
+                    <input asp-for="Street" type="input" placeholder="Street.." required>
+                    <input asp-for="PostalCode" type="input" placeholder="Postal code.." required>
+                </div>
                 <span asp-validation-for="Street"></span>
-                <label asp-for="City">City</label>
-                <input asp-for="City" type="input" placeholder="City.." required>
-                <span asp-validation-for="City"></span>
-                <label asp-for="PostalCode">Postal code</label>
-                <input asp-for="PostalCode" type="input" placeholder="Postal code.." required>
                 <span asp-validation-for="PostalCode"></span>
-                <label asp-for="Country">Country</label>
-                <input asp-for="Country" type="input" placeholder="Country.." required>
+
+                <label asp-for="City">City</label>
+                <div class="inline-fields">
+                    <input asp-for="City" type="input" placeholder="City.." required>
+                    <input asp-for="Country" type="input" placeholder="Country.." required>
+                </div>
+                <span asp-validation-for="City"></span>
                 <span asp-validation-for="Country"></span>
-                <button type="submit" class="submit-btn">Register</button>
+
+                <button type="submit">Register</button>
             </form>
+        </div>
+        <div class="video-container">
+            <video autoplay loop muted>
+                <source src="your-video-url.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
         </div>
     </div>
 </body>
 </html>
+
+
+
 

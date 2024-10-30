@@ -22,6 +22,8 @@ namespace LogiTrack.Core.ViewModels.Accountant
         [StringLength(RegisterTypeMaxLength, MinimumLength = RegisterTypeMinLength, ErrorMessage = LengthErrorMessage)]
         public string Type { get; set; } = string.Empty;
 
+        public string? CustomType { get; set; } = string.Empty;
+
         [Required(ErrorMessage = RequiredFieldErrorMessage)]
         //[Range(RegisterAmountMinValue, RegisterAmountMinValue, ErrorMessage = InvalidAmountErrorMessage)]
         public decimal Amount { get; set; }

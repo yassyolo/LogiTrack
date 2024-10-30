@@ -17,8 +17,9 @@
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css">
-       
-    <script src="~/js/site.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+        <script src="~/js/site.js"></script>
+
         <style>
             .body{
                 background-color:#f4f4f4;
@@ -254,6 +255,22 @@
             font-size: 24px;
             margin: 0;
         }
+
+        .file-icon {
+            color: #007bff; /* Custom color for the icon */
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+        }
+
+            .file-icon i {
+                font-size: 1.2em;
+                margin-right: 5px;
+            }
+
+            .file-icon:hover {
+                color: #0056b3; /* Darker shade for hover effect */
+            }
         </style>
 
     </head>
@@ -388,12 +405,19 @@
                         <div class="cell">Date</div>
                         <div class="cell">Description</div>
                         <div class="cell">Status</div>
+                        <div class="cell">File</div>
+                        <div class="cell">Action</div>
                     </div>
                     <div class="table-row">
                         <div class="cell">@Model.Invoice.Number</div>
                         <div class="cell">@Model.Invoice.Date</div>
                         <div class="cell">@Model.Invoice.Description</div>
                         <div class="cell">@Model.Invoice.IsPaid</div>
+                        <div class="cell">
+                            <a href="@Model.Invoice.FileUrl" target="_blank" class="file-icon" title="View or Download File">
+                                <i class="fas fa-file-download"></i> See
+                            </a>
+                        </div>
                         <div class="cell">
                             @if (!Model.Invoice.IsPaid)
                             {
@@ -406,12 +430,13 @@
                 <!-- Cash Registers Section -->
                 <div id="cashRegistersSection" class="section d-none cash-registers">
                     <div class="title">Cash Registers</div>
-                    <a asp-action="AddCashRegister" asp-controller="Accountant" asp-route-id="@Model.Id" class="btn btn-primary">Mark as Paid</a>
+                    <a asp-action="AddCashRegister" asp-controller="Accountant" asp-route-id="@Model.Id" class="btn btn-primary">Add</a>
                     <div class="table-row table-header">
                         <div class="cell">Date</div>
                         <div class="cell">Description</div>
                         <div class="cell">Type</div>
                         <div class="cell">Amount</div>
+                        <div class="cell">File</div>
                     </div>
                     @foreach (var cashRegister in Model.CashRegisters)
                     {
@@ -420,6 +445,12 @@
                             <div class="cell">@cashRegister.Description</div>
                             <div class="cell">@cashRegister.Type</div>
                             <div class="cell">@cashRegister.Amount</div>
+                            <div class="cell">
+                                <a href="@cashRegister.FileUrl" target="_blank" class="file-icon" title="View or Download File">
+                                    <i class="fas fa-file-download"></i> See
+                                </a>
+                            </div>
+
                         </div>
                     }
                 </div>
@@ -430,7 +461,7 @@
 
         <script>
         $(document).ready(function () {
-$('#infoBtn').click(function () {
+            $('#infoBtn').click(function () {
 				showSection('#infoSection');
 			});
             $('#vehicleBtn').click(function () {

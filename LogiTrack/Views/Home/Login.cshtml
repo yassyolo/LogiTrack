@@ -3,6 +3,7 @@
 @{
     Layout = null;
 }
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,28 +12,153 @@
     <title>Login Page</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
+        /* Base styling */
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .login-video-container {
+            display: flex;
+            width: 100%;
+            height: 100vh;
+        }
+
+        .login-form-container {
+            width: 32%;
+            display: flex;
+            flex-direction: column;
+            background-color: #fff;
+            padding-left: 35px;
+            padding-top: 35px;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+        }
+        .login-form-container h2 {
+            font-size: 24px;
+            margin: 0;
+            color: #333;
+            margin-bottom: 240px;
+        }
+        .login-form-container h3 {
+            margin-top: 10px;
+            font-size: 18px;
+            color: #666;
+        }
+        form {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        label {
+            font-size: 10px;
+            margin-top: 15px;
+            color: #333;
+        }
+
+        input[type="email"],
+        input[type="password"] {
+            width: 85%;
+            border: none;
+            border-bottom: 2px solid #007bff;
+            padding: 8px 0;
+            margin-bottom: 15px;
+        }
+
+            input[type="email"]:focus,
+            input[type="password"]:focus {
+                outline: none;
+                border-bottom-color: #0056b3;
+            }
+
+        .password-container {
+            position: relative;
+        }
+        .password-toggle {
+            position: absolute;
+            top: 50%;
+            right: 10px;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #888;
+        }
+        button[type="submit"] {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 55px;
+        }
+        .no-account {
+            margin-top: 20px;
+        }
+        .no-account a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        .video-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #f0f0f0;
+            overflow: hidden;
+        }
+        .video-container video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
     </style>
 </head>
 <body>
-    <div class="login-container">
-        <h2>Login</h2>
-        <form asp-action="Login" asp-controller="Home" method="post">
-            <label asp-for="Email">Email</label>
-			<input asp-for="Email" type="email" placeholder="Email.." required>
-            <span asp-validation-for="Email"></span>
-            <label asp-for="Password">Password</label>
-            <input asp-for="Password" type="password" placeholder="Password.." required>
-            <span asp-validation-for="Password"></span>
-			<button type="submit">Login</button>
-        </form>
-        <a asp-action="ForgotPassoword" asp-controller="Home" class="forgot-password">Forgot Password?</a>
-        <div class="no-account">Don't have an account? <a asp-action="Register" asp-controller="Clients" style="color: #007bff;">Sign up</a></div>
-    </div>
     <div class="login-video-container">
-        <video controls>
-            <source src="your-video-url.mp4" type="video/mp4">
-            Your browser does not support the video tag.
-        </video>
+        <div class="login-form-container">
+            <h2>LogiTrack</h2>
+            <h3>Login LogiTrack</h3>
+            <form asp-action="Login" asp-controller="Home" method="post">
+                <label asp-for="Email">Email</label>
+                <input asp-for="Email" type="email" placeholder="Please enter" required>
+                <span asp-validation-for="Email"></span>
+                
+                <label asp-for="Password">Password</label>
+                <div class="password-container">
+                    <input asp-for="Password" type="password" placeholder="Please enter" required>
+                    <i class="fas fa-eye password-toggle"></i>
+                </div>
+                <span asp-validation-for="Password"></span>
+
+                <button type="submit">Login</button>
+            </form>
+            <div class="no-account">Don't have an account? <a asp-action="Register" asp-controller="Clients">Register</a></div>
+        </div>
+        <div class="video-container">
+            <video autoplay loop muted>
+                <source src="your-video-url.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+        </div>
     </div>
+
+    <script>
+        document.querySelector('.password-toggle').addEventListener('click', function() {
+            const passwordInput = document.querySelector('input[type="password"]');
+            if (passwordInput.type === "password") {
+                passwordInput.type = "text";
+                this.classList.replace("fa-eye", "fa-eye-slash");
+            } else {
+                passwordInput.type = "password";
+                this.classList.replace("fa-eye-slash", "fa-eye");
+            }
+        });
+    </script>
 </body>
 </html>

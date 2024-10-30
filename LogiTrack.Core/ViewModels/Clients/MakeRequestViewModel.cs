@@ -12,7 +12,6 @@ namespace LogiTrack.Core.ViewModels.Clients
         [StringLength(CargoTypeMaxLength, MinimumLength = CargoTypeMinLength, ErrorMessage = LengthErrorMessage)]
         public string CargoType { get; set; } = string.Empty; //standard , not standard
 
-        #region Standart Cargo(Pallet) Metrics
         [Comment("Type of pallet")]
         [StringLength(TypeOfPalletMaxLength)]
         public string? TypeOfPallet { get; set; } = string.Empty; //euro, industrial
@@ -29,13 +28,7 @@ namespace LogiTrack.Core.ViewModels.Clients
         [Range(PalletMetricsValue, PalletMetricsMaxValue)]
         public double? PalletWidth { get; set; }
 
-        [Comment("Pallet height")]
-        [Range(PalletMetricsValue, PalletMetricsMaxValue)]
         public double? PalletHeight { get; set; }
-
-        [Comment("Pallet volume")]
-        [Range(PalletVolumeMinValue, PalletVolumeMaxValue)]
-        public double? PalletVolume { get; set; }
 
         [Comment("Weight of pallets")]
         [Range(PalletWeightMinValue, PalletWeightMaxValue)]
@@ -44,35 +37,7 @@ namespace LogiTrack.Core.ViewModels.Clients
         [Comment("Are the pallets stackable")]
         public bool PalletsAreStackable { get; set; } //only if the truck is not shared
 
-        #endregion
-
-        #region Non-standard Cargo Metrics
-
-        [Comment("Number of non-standart goods")]
-        [Range(NumberOfNonStandartGoodsMinValue, NumberOfNonStandartGoodsMaxValue)]
         public int? NumberOfNonStandartGoods { get; set; }
-
-        [Comment("Length of the goods")]
-        [Range(GoodsMetricsMinValue, GoodsMetricsMaxValue)]
-        public int? Length { get; set; }
-
-        [Comment("Width of the goods")]
-        [Range(GoodsMetricsMinValue, GoodsMetricsMaxValue)]
-        public int? Width { get; set; }
-
-        [Comment("Height of the goods")]
-        [Range(GoodsMetricsMinValue, GoodsMetricsMaxValue)]
-        public int? Height { get; set; }
-
-        [Comment("Volume of the goods")]
-        [Range(GoodsVolumeMinValue, GoodsVolumeMaxValue)]
-        public double? Volume { get; set; }
-
-        [Comment("Weight of the goods")]
-        [Range(GoodsWeightMinValue, GoodsWeightMaxValue)]
-        public double? Weight { get; set; }
-
-        #endregion
 
         [Required(ErrorMessage = RequiredFieldErrorMessage)]
         [StringLength(TypeOfGoodsMaxLength)]
@@ -115,5 +80,12 @@ namespace LogiTrack.Core.ViewModels.Clients
         [Required(ErrorMessage = RequiredFieldErrorMessage)]
         [Comment("Is the cargo refrigerated")]
         public bool IsRefrigerated { get; set; }
+        public int[]? Length { get; set; } = Array.Empty<int>();
+
+        public int[]? Width { get; set; } = Array.Empty<int>();
+
+        public int[]? Height { get; set; } = Array.Empty<int>();
+        public string[]? Description { get; set; } = Array.Empty<string>();
+        public double[]? Weight { get; set; } = Array.Empty<double>();
     }
 }

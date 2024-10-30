@@ -13,76 +13,84 @@
     <link rel="stylesheet" href="~/css/site.css" />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css">
+    <script src="~/js/site.js"></script>
     <style>
-        .form-container {
-            background-color: #fff;
-            padding: 20px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            width: 50%;
-            margin: auto;
-            border-radius: 8px;
-        }
-
-        .form-header {
+        .search-header {
             display: flex;
             align-items: center;
             margin-bottom: 20px;
         }
 
-        .form-icon {
-            width: 40px;
+        .search-icon {
+            width: 50px;
             margin-right: 10px;
         }
 
-        .form-title {
+        .search-title {
             font-size: 1.5rem;
             font-weight: 500;
-            color: #1e87f0;
+        }
+
+        .search-delivery h3 {
+            margin-top: 30px;
+            font-size: 1rem;
+            margin-bottom: 50px;
         }
 
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
+
+        .form-control {
+            width: 50%;
+            padding: 10px;
+            border: 1px solid #ccc;
+        }
+
+        .btn-primary {
+            background-color: #1e87f0;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+            .btn-primary:hover {
+                background-color: #155a8a;
+            }
 
         label {
             display: block;
             font-size: 14px;
             margin-bottom: 5px;
-            color: #333;
         }
 
-        input[type="text"], input[type="file"] {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-
-        input[type="text"]:focus {
-            outline: none;
-            border-color: #1e87f0;
-        }
-
-        .btn-submit {
-            background-color: #1e87f0;
-            color: white;
+        input[type="text"],
+        input[type="date"] {
+            width: 40%;
             border: none;
-            padding: 12px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: background-color 0.3s;
-            width: 100%;
-            font-size: 16px;
+            border-bottom: 2px solid #007bff;
+            padding: 8px 0;
+            margin-bottom: 15px;
         }
 
-        .btn-submit:hover {
-            background-color: #155a8a;
-        }
+            input[type="text"]:focus,
+            input[type="date"]:focus {
+                outline: none;
+                border-bottom-color: #0056b3;
+            }
 
         .validation-message {
             color: red;
             font-size: 12px;
+        }
+
+        .search-delivery {
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
     </style>
 </head>
@@ -125,10 +133,11 @@
             </li>
         </ul>
     </aside>
-    <div class="form-container">
-        <div class="form-header">
-            <img src="https://via.placeholder.com/40" alt="Form Icon" class="form-icon">
-            <h2 class="form-title">Add Cash Register Entry</h2>
+    <div class="main-content">
+       <div class="search-delivery">
+            <div class="search-header">
+                <img src="https://via.placeholder.com/40" alt="Form Icon" class="search-icon">
+                <h2 class="search-title">Add Cash Register Entry</h2>
         </div>
 
         <form asp-action="AddCashRegister" asp-route-id="@Model.DeliveryId" method="post" enctype="multipart/form-data">
@@ -137,11 +146,20 @@
                 <input asp-for="Description" type="text" />
                 <span asp-validation-for="Description" class="validation-message"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="Type"></label>
-                <input asp-for="Type" type="text" />
-                <span asp-validation-for="Type" class="validation-message"></span>
-            </div>
+                <div class="form-group">
+                    <label asp-for="Type"></label>
+                    <select asp-for="Type" id="Type" onchange="toggleCustomType()">
+                        <option value="Vehicle Expenses">Vehicle Expenses</option>
+                        <option value="Driver Expenses">Driver Expenses</option>
+                        <option value="Other Expenses">Other Expenses</option>
+                    </select>
+                    <span asp-validation-for="Type" class="validation-message"></span>
+                </div>
+
+                <div class="form-group" id="customTypeGroup" style="display:none;">
+                    <label asp-for="CustomType">Specify Type:</label>
+                    <input type="text" id="customType" asp-for="CustomType" />
+                </div>
             <div class="form-group">
                 <label asp-for="Amount"></label>
                 <input asp-for="Amount" type="text" />
@@ -151,9 +169,22 @@
                 <label for="file">Upload File:</label>
                 <input type="file" name="file" />
             </div>
-            <button type="submit" class="btn-submit">Submit</button>
+            <button type="submit" class="btn-primary">Submit</button>
         </form>
+       </div>
     </div>
+    <script>
+        function toggleCustomType() {
+            const typeSelect = document.getElementById('Type');
+            const customTypeGroup = document.getElementById('customTypeGroup');
+
+            if (typeSelect.value === 'Other Expenses') {
+                customTypeGroup.style.display = 'block';
+            } else {
+                customTypeGroup.style.display = 'none';
+            }
+        }
+    </script>
 </body>
 </html>
 

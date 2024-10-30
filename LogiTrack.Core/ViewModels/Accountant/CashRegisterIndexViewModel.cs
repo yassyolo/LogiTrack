@@ -12,5 +12,7 @@ namespace LogiTrack.Core.ViewModels.Accountant
         public string Type { get; set; } = string.Empty;
         public string Amount { get; set; } = string.Empty;
         public string DateSubmitted { get; set; } = string.Empty;
+        public string FileUrl { get; set; } = string.Empty;
+        public string FileId { get; set; } = string.Empty;
     }
 }

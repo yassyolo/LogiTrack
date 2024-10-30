@@ -7,5 +7,7 @@
         public bool IsPaid { get; set; }
         public string Amount { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
+        public string FileUrl { get; set; } = string.Empty;
+        public string FileId { get; set; } = string.Empty;
     }
 }

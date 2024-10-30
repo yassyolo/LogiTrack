@@ -3,8 +3,6 @@
     Layout = null;
 }
 
-
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -290,7 +288,7 @@ font-size: 0.85rem;
                     @foreach (var invoice in Model.Last5NotPaidInvoices)
                     {
                         <div class="invoice">
-                            <p>@invoice.Number</p>
+                            <p>@invoice.InvoiceNumber</p>
                             <p>@DateTime.Now.ToShortDateString()</p>
                             <p>@invoice.CreationDate</p>
                             <p>@invoice.Amount</p>                           

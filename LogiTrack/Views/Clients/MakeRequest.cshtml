@@ -3,219 +3,303 @@
     Layout = null;
 }
 
+
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Make a Request</title>
+    <title>Driver Dashboard</title>
+    <link rel="stylesheet" href="~/css/site.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css">
+    <script src="~/js/site.js"></script>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            margin: 0;
-            padding: 0;
-        }
-
-        .container {
-            max-width: 800px;
-            margin: 50px auto;
+        .search-delivery {
+            background-color: #fff;
             padding: 20px;
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
 
-        h1 {
-            color: #333;
-        }
-
-        form {
+        .search-header {
             display: flex;
-            flex-direction: column;
+            align-items: center;
+            margin-bottom: 20px;
         }
 
-        label {
-            margin-top: 10px;
-            font-weight: bold;
+        .search-icon {
+            width: 50px;
+            margin-right: 10px;
         }
 
-        input[type="text"], input[type="number"], input[type="date"], input[type="checkbox"], input[type="radio"], textarea, select {
+        .search-title {
+            font-size: 1.5rem;
+            font-weight: 500;
+        }
+
+        .search-delivery h3 {
+            margin-top: 30px;
+            font-size: 1rem;
+            margin-bottom: 50px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-control {
+            width: 50%;
             padding: 10px;
-            margin-top: 5px;
-            width: 100%;
-            max-width: 100%;
-            box-sizing: border-box;
+            border: 1px solid #ccc;
         }
 
-        input[type="checkbox"] {
-            width: auto;
-        }
-
-        .hidden {
-            display: none;
-        }
-
-        .form-section {
-            margin-top: 20px;
-        }
-
-        .btn {
-            margin-top: 20px;
-            padding: 10px 20px;
-            background-color: #007bff;
+        .btn-primary {
+            background-color: #1e87f0;
             color: white;
             border: none;
-            border-radius: 4px;
+            padding: 10px 15px;
+            border-radius: 5px;
             cursor: pointer;
+            transition: background-color 0.3s;
         }
 
-            .btn:hover {
-                background-color: #0056b3;
+            .btn-primary:hover {
+                background-color: #155a8a;
             }
 
-        .validation-message {
-            color: red;
-            font-size: 0.9em;
+        label {
+            display: block;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        input[type="text"],
+        input[type="date"] {
+            width: 40%;
+            border: none;
+            border-bottom: 2px solid #007bff;
+            padding: 8px 0;
+            margin-bottom: 15px;
+        }
+
+            input[type="text"]:focus,
+            input[type="date"]:focus {
+                outline: none;
+                border-bottom-color: #0056b3;
+            }
+
+        .row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
         }
     </style>
+
 </head>
+
 <body>
-    <div class="container">
-        <h1>Make a Request</h1>
-        <form method="post" asp-action="MakeRequest">
-            <!-- Cargo Type -->
-            <label asp-for="CargoType">Cargo Type</label>
-            <select asp-for="CargoType" id="CargoType" name="CargoType">
-                <option value="standard">Standard</option>
-                <option value="non-standard">Non-standard</option>
-            </select>
-            <span asp-validation-for="CargoType" class="validation-message"></span>
-
-            <!-- Standard Cargo (Pallet) Metrics -->
-            <div id="standard-cargo-section" class="form-section hidden">
-                <label asp-for="TypeOfPallet">Type of Pallet</label>
-                <input asp-for="TypeOfPallet" type="text">
-                <span asp-validation-for="TypeOfPallet" class="validation-message"></span>
-
-                <label asp-for="NumberOfPallets">Number of Pallets</label>
-                <input asp-for="NumberOfPallets" type="number">
-                <span asp-validation-for="NumberOfPallets" class="validation-message"></span>
-
-                <label asp-for="PalletLength">Pallet Length (cm)</label>
-                <input asp-for="PalletLength" type="number">
-                <span asp-validation-for="PalletLength" class="validation-message"></span>
-
-                <label asp-for="PalletWidth">Pallet Width (cm)</label>
-                <input asp-for="PalletWidth" type="number">
-                <span asp-validation-for="PalletWidth" class="validation-message"></span>
-
-                <label asp-for="PalletHeight">Pallet Height (cm)</label>
-                <input asp-for="PalletHeight" type="number">
-                <span asp-validation-for="PalletHeight" class="validation-message"></span>
-
-                <label asp-for="PalletVolume">Pallet Volume (m³)</label>
-                <input asp-for="PalletVolume" type="number">
-                <span asp-validation-for="PalletVolume" class="validation-message"></span>
-
-                <label asp-for="WeightOfPallets">Weight of Pallets (kg)</label>
-                <input asp-for="WeightOfPallets" type="number">
-                <span asp-validation-for="WeightOfPallets" class="validation-message"></span>
-
-                <label asp-for="PalletsAreStackable"></label>
-                <input asp-for="PalletsAreStackable" type="checkbox" />
-                <span asp-validation-for="PalletsAreStackable" class="text-danger"></span>
-                <span asp-validation-for="PalletsAreStackable" class="validation-message"></span>
+    <header class="header">
+        <div class="logo-name">
+            <div class="company-logo">
+                <img src="https://via.placeholder.com/50" alt="Company Logo">
+            </div>
+            <div class="company-name">LogiTrack</div>
+        </div>
+        <div class="profile-dropdown">
+            <button onclick="toggleDropdown()">
+                <i class="bi bi-person-circle"></i>
+                <span class="arrow">&#x25BC;</span>
+            </button>
+            <div class="profile-dropdown-menu" id="profileDropdown">
+                <a asp-action="CompanyDetails" asp-controller="Clients">Company details</a>
+                <a asp-action="CompanyContactDetails" asp-controller="Clients">Contact details</a>
+                <a asp-action="Logout" asp-controller="Home">Logout</a>
+            </div>
+        </div>
+    </header>
+    <aside class="sidebar">
+        <ul>
+            <li><a asp-action="Dashboard" asp-controller="Clients"><i class="bi bi-house-door"></i> Dashboard</a></li>
+            <li>
+                <a asp-action="MyRequests" asp-controller="Clients"><i class="bi bi-money"></i> Requests <span class="arrow">></span></a>
+                <div class="dropdown-menu">
+                    <ul>
+                        <li><a asp-action="MakeRequest" asp-controller="Clients">New</a></li>
+                        <li><a asp-action="MyRequests" asp-controller="Clients">Search</a></li>
+                    </ul>
+                </div>
+            </li>
+            <li>
+                <a asp-action="MyOffers" asp-controller="Clients"><i class="bi bi-money"></i> Offers <span class="arrow">></span></a>
+                <div class="dropdown-menu">
+                    <ul>
+                        <li><a asp-action="SearchOffer" asp-controller="Clients">Book</a></li>
+                        <li><a asp-action="SearchOffers" asp-controller="Clients">Search</a></li>
+                    </ul>
+                </div>
+            </li>
+            <li>
+                <a asp-action="MyDeliveries" asp-controller="Clients"><i class="bi bi-money"></i> Deliveries <span class="arrow">></span></a>
+                <div class="dropdown-menu">
+                    <ul>
+                        <li><a asp-action="SearchDelivery" asp-controller="Clients">Track</a></li>
+                        <li><a asp-action="MyDeliveries" asp-controller="Clients">Search</a></li>
+                    </ul>
+                </div>
+            </li>
+            <li>
+                <a asp-action="MyInvoices" asp-controller="Clients"><i class="bi bi-money"></i> Invoices <span class="arrow">></span></a>
+            </li>
+        </ul>
+    </aside>
+    <div class="main-content">
+        <div class="search-delivery">
+            <div class="search-header">
+                <img src="https://via.placeholder.com/40" alt="Search Icon" class="search-icon">
+                <h2 class="search-title">New request</h2>
             </div>
 
-            <!-- Non-standard Cargo Metrics -->
-            <div id="nonstandard-cargo-section" class="form-section hidden">
-                <label asp-for="NumberOfNonStandartGoods">Number of Non-standard Goods</label>
-                <input asp-for="NumberOfNonStandartGoods" type="number">
-                <span asp-validation-for="NumberOfNonStandartGoods" class="validation-message"></span>
+            <h3>Make request now!</h3>
 
-                <label asp-for="Length">Length of Goods (cm)</label>
-                <input asp-for="Length" type="number">
-                <span asp-validation-for="Length" class="validation-message"></span>
 
-                <label asp-for="Width">Width of Goods (cm)</label>
-                <input asp-for="Width" type="number">
-                <span asp-validation-for="Width" class="validation-message"></span>
+            <form method="post" asp-action="MakeRequest">
+                <div>
+                    <label>Cargo Type</label>
+                    <select asp-for="CargoType" class="form-control" onchange="toggleCargoFields()">
+                        <option value="Standard">Standard</option>
+                        <option value="Non-Standard">Non-Standard</option>
+                    </select>
+                </div>
 
-                <label asp-for="Height">Height of Goods (cm)</label>
-                <input asp-for="Height" type="number">
-                <span asp-validation-for="Height" class="validation-message"></span>
+                <!-- Standard Cargo Fields -->
+                <div id="standardFields" style="display: none;">
+                   
+                    <label>Type of Pallet</label>
+                    <input type="text" asp-for="TypeOfPallet" class="form-control" />
+                    <div class="row">
 
-                <label asp-for="Volume">Volume of Goods (m³)</label>
-                <input asp-for="Volume" type="number">
-                <span asp-validation-for="Volume" class="validation-message"></span>
+                    <label>Number of Pallets</label>
+                    <input type="text" asp-for="NumberOfPallets" class="form-control" />
 
-                <label asp-for="Weight">Weight of Goods (kg)</label>
-                <input asp-for="Weight" type="number">
-                <span asp-validation-for="Weight" class="validation-message"></span>
-            </div>
+                    <label>Pallet Length (cm)</label>
+                    <input type="text" asp-for="PalletLength" class="form-control" />
 
-            <!-- Type of Goods, Type (Domestic/International), Pickup and Delivery coordinates -->
-            <div class="form-section">
-                <label asp-for="TypeOfGoods">Type of Goods</label>
-                <input asp-for="TypeOfGoods" type="text">
-                <span asp-validation-for="TypeOfGoods" class="validation-message"></span>
+                    <label>Pallet Width (cm)</label>
+                    <input type="text" asp-for="PalletWidth" class="form-control" />
 
-                <label asp-for="Type">Type (Domestic or International)</label>
-                <input asp-for="Type" type="text">
-                <span asp-validation-for="Type" class="validation-message"></span>
+                    <label>Pallet Height (cm)</label>
+                    <input type="text" asp-for="PalletHeight" class="form-control" />
+                    </div>
 
-                <label asp-for="PickupAddress">Pickup Address</label>
-                <input asp-for="PickupAddress" type="input">
-                <span asp-validation-for="PickupAddress" class="validation-message"></span>
+                    <label>Weight of Pallets</label>
+                    <input type="text" asp-for="WeightOfPallets" class="form-control" />
 
-                <label asp-for="DeliveryAddress">Delivery Address</label>
-                <input asp-for="DeliveryAddress" type="input">
-                <span asp-validation-for="DeliveryAddress" class="validation-message"></span>
+                    <label>Are the Pallets Stackable?</label>
+                    <input type="checkbox" asp-for="PalletsAreStackable" />
+                    
+                </div>
 
-                <label asp-for="SharedTruck"></label>
-                <input asp-for="SharedTruck" type="checkbox" />
-                <span asp-validation-for="SharedTruck" class="text-danger"></span>
+                <!-- Non-Standard Cargo Fields -->
+                <div id="nonStandardFields" style="display: none;">
+                    <h3>Non-Standard Cargo Items</h3>
 
-                <label asp-for="ApproximatePrice">Approximate Price (given by the company)</label>
-                <input asp-for="ApproximatePrice" type="number">
-                <span asp-validation-for="ApproximatePrice" class="validation-message"></span>
+                    @for (int i = 0; i < Model.Length?.Length; i++)
+                    {
+                        <div>
+                            <label>Length (cm)</label>
+                            <input type="text" name="Length[@i]" value="@Model.Length[i]" class="form-control" />
 
-                <label asp-for="ExpectedDeliveryDate">Expected Delivery Date</label>
-                <input asp-for="ExpectedDeliveryDate" type="date">
-                <span asp-validation-for="ExpectedDeliveryDate" class="validation-message"></span>
+                            <label>Width (cm)</label>
+                            <input type="text" name="Width[@i]" value="@Model.Width[i]" class="form-control" />
 
-                <label asp-for="SpecialInstructions">Special Instructions</label>
-                <textarea asp-for="SpecialInstructions"></textarea>
-                <span asp-validation-for="SpecialInstructions" class="validation-message"></span>
+                            <label>Height (cm)</label>
+                            <input type="text" name="Height[@i]" value="@Model.Height[i]" class="form-control" />
 
-                <label asp-for="IsRefrigerated"></label>
-                <input asp-for="IsRefrigerated" type="checkbox" />
-                <span asp-validation-for="IsRefrigerated" class="text-danger"></span>
+                            <label>Description</label>
+                            <input type="text" name="Description[@i]" value="@Model.Description[i]" class="form-control" />
 
-            </div>
+                            <label>Weight</label>
+                            <input type="text" name="Weight[@i]" value="@Model.Weight[i]" class="form-control" />
+                        </div>
+                    }
+                    <button type="button" onclick="addCargoItem()">Add Another Cargo Item</button>
+                </div>
 
-            <button type="submit" class="btn">Submit Request</button>
-        </form>
+                <!-- Common Fields -->
+                <label>Type of Goods</label>
+                <input type="text" asp-for="TypeOfGoods" class="form-control" />
+
+                <label>Request Type</label>
+                <select asp-for="Type" class="form-control">
+                    <option value="Domestic">Domestic</option>
+                    <option value="International">International</option>
+                </select>
+
+                <label>Pickup Address</label>
+                <input type="text" asp-for="PickupAddress" class="form-control" />
+
+                <label>Delivery Address</label>
+                <input type="text" asp-for="DeliveryAddress" class="form-control" />
+
+                <div class="row">
+                    <label>Shared Truck</label>
+                    <input type="checkbox" asp-for="SharedTruck" />
+                    <label>Is the Cargo Refrigerated?</label>
+                    <input type="checkbox" asp-for="IsRefrigerated" />
+                </div>
+                
+
+                <label>Approximate Price</label>
+                <input type="number" asp-for="ApproximatePrice" class="form-control" />
+
+                <label>Expected Delivery Date</label>
+                <input type="date" asp-for="ExpectedDeliveryDate" class="form-control" />
+
+                <label>Special Instructions</label>
+                <textarea asp-for="SpecialInstructions" class="form-control"></textarea>
+
+                
+
+                <button type="submit">Submit Request</button>
+            </form>
+        </div>
     </div>
-
     <script>
-        document.getElementById('CargoType').addEventListener('change', function () {
-            var cargoType = this.value;
-            var standardCargoSection = document.getElementById('standard-cargo-section');
-            var nonStandardCargoSection = document.getElementById('nonstandard-cargo-section');
+        function toggleCargoFields() {
+            var cargoType = document.querySelector('select[name="CargoType"]').value;
+            document.getElementById('standardFields').style.display = cargoType === 'Standard' ? 'block' : 'none';
+            document.getElementById('nonStandardFields').style.display = cargoType === 'Non-Standard' ? 'block' : 'none';
+        }
 
-            if (cargoType === 'standard') {
-                standardCargoSection.classList.remove('hidden');
-                nonStandardCargoSection.classList.add('hidden');
-            } else if (cargoType === 'non-standard') {
-                standardCargoSection.classList.add('hidden');
-                nonStandardCargoSection.classList.remove('hidden');
-            } else {
-                standardCargoSection.classList.add('hidden');
-                nonStandardCargoSection.classList.add('hidden');
-            }
+        function addCargoItem() {
+            var container = document.getElementById('nonStandardFields');
+            var itemCount = container.querySelectorAll('input[name^="Length"]').length;
+
+            var div = document.createElement('div');
+            div.innerHTML = `
+                    <label>Length (cm)</label>
+                    <input type="number" name="Length[${itemCount}]" class="form-control" />
+
+                    <label>Width (cm)</label>
+                    <input type="number" name="Width[${itemCount}]" class="form-control" />
+
+                    <label>Height (cm)</label>
+                    <input type="number" name="Height[${itemCount}]" class="form-control" />
+
+                    <label>Description</label>
+                    <input type="text" name="Description[${itemCount}]" class="form-control" />
+
+                    <label>Weight</label>
+                    <input type="number" name="Weight[${itemCount}]" class="form-control" />
+                `;
+            container.appendChild(div);
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            toggleCargoFields();
         });
     </script>
 </body>
+
 </html>

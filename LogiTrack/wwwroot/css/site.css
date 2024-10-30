@@ -29,9 +29,10 @@ body {
     justify-content: space-between;
     align-items: center;
     background-color: #1e87f0;
+    box-shadow: 2px 0px 5px rgba(0, 0, 0, 0.1);
     padding: 5px 20px;
     color: white;
-    height: 60px;
+    height: 50px;
 }
 
     .header .logo-name {
@@ -91,7 +92,7 @@ body {
         }
 
 .sidebar {
-    margin-top: 70px;
+    margin-top: 60px;
     width: 220px;
     background-color: #fff;
     height: calc(100vh - 60px);
@@ -144,5 +145,5 @@ body {
 
 .main-content {
     margin-left: 250px;
-    padding: 40px;
+    padding: 25px;
 }
