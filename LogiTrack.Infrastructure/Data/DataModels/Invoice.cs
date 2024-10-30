@@ -33,5 +33,8 @@ namespace LogisticsSystem.Infrastructure.Data.DataModels
 
         [Comment("Is invoice paid")]
         public bool IsPaid { get; set; }
+
+        [Comment("File identifier in Google drive")]
+        public string FileId { get; set; } = string.Empty;
     }
 }

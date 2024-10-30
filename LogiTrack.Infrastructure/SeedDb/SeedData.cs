@@ -11,46 +11,48 @@ namespace LogiTrack.Infrastructure.SeedDb
         public IdentityUser LogiticsCompanyUser { get; set; } = null!;
         public IdentityUser SecretaryUser { get; set; } = null!;
         public IdentityUser SpeditorUser { get; set; } = null!;
+        public IdentityUser DriverUser { get; set; } = null!;
 
         public IdentityRole ClientCompanyRole { get; set; } = null!;
         public IdentityRole LogisticsCompanyRole { get; set; } = null!;
         public IdentityRole AccountRole { get; set; } = null!;
         public IdentityRole SpeditorRole { get; set; } = null!;
+        public IdentityRole DriverRole { get; set; } = null!;
 
         public IdentityUserRole<string> ClientCompanyUserRole { get; set; } = null!;
         public IdentityUserRole<string> LogisticsCompanyUserRole { get; set; } = null!;
         public IdentityUserRole<string> AccountantUserRole { get; set; } = null!;
         public IdentityUserRole<string> SpeditorUserRole { get; set; } = null!;
+        public IdentityUserRole<string> DriverUserRole { get; set; } = null!;
 
         public ClientCompany ClientCompany1 { get; set; } = null!;
         public ClientCompany ClientCompany2 { get; set; } = null!;
 
-        public Request Request1 { get; set; } = null!;
+        /*public Request Request1 { get; set; } = null!;
         public Request Request2 { get; set; } = null!;
         public Request Request3 { get; set; } = null!;
         public Request Request4 { get; set; } = null!;
 
         public Offer OfferForRequest1 { get; set; } = null!;
 
-        public Delivery DeliveryForOfferForRequest1 { get; set; } = null!;
+        public Delivery DeliveryForOfferForRequest1 { get; set; } = null!;*/
 
-        public Driver Driver1ForDelivery { get; set; } = null!;
-        public Driver Driver2 { get; set; } = null!;
+        public Driver Driver1 { get; set; } = null!;
+        //public Driver Driver2 { get; set; } = null!;
 
-        public Vehicle Vehicle1ForDelivery { get; set; } = null!;
+        /*public Vehicle Vehicle1ForDelivery { get; set; } = null!;
         public Vehicle Vehicle2 { get; set; } = null!;
 
-        public CashRegister CashRegisterForDriver1 { get; set; } = null!;
+        /*public CashRegister CashRegisterForDriver1 { get; set; } = null!;
         public CashRegister CashRegisterForVehicle1 { get; set; } = null!;
 
         public Invoice InvoiceForOfferForRequest1 { get; set; } = null!;
-
         public PricesPerSize PricesForVehicle1 { get; set; } = null!;
         public PricesPerSize PricesForVehicle2 { get; set; } = null!;
 
         public CalendarEvent CalendarEvent1 { get; set; } = null!;
         public CalendarEvent CalendarEvent2 { get; set; } = null!;
-        public CalendarEvent CalendarEvent3 { get; set; } = null!;
+        public CalendarEvent CalendarEvent3 { get; set; } = null!;*/
 
         public SeedData()
         {
@@ -58,15 +60,15 @@ namespace LogiTrack.Infrastructure.SeedDb
             SeedRoles();
             SeedUserRoles();
             SeedClientCompanies();
-            SeedRequests();
+           /* SeedRequests();
             SeedOffers();
-            SeedInvoices();
+            SeedInvoices();*/
             SeedDrivers();
-            SeedVehicles();
-            SeedDeliveries();      
+           // SeedVehicles();
+           /* SeedDeliveries();      
             SeedCashRegisters();
             SeedPricesPerSize();
-            SeedCalendarEvents();
+            SeedCalendarEvents();*/
         }
 
         private void SeedUsers()
@@ -109,6 +111,15 @@ namespace LogiTrack.Infrastructure.SeedDb
                 EmailConfirmed = true
             };
             SpeditorUser.PasswordHash = hasher.HashPassword(SpeditorUser, "speditor");
+
+            DriverUser = new IdentityUser
+            {
+                UserName = "driver",
+                Email = "driver@example.com",
+                Id = "f3b3b3b3-3b3b-3b3b-3b3b-3b3b3b3b3b3b",
+                EmailConfirmed = true
+            };
+            DriverUser.PasswordHash = hasher.HashPassword(DriverUser, "driver");
         }
 
         private void SeedRoles()
@@ -140,6 +151,12 @@ namespace LogiTrack.Infrastructure.SeedDb
                 Name = "Speditor",
                 NormalizedName = "SPEDITOR"
             };
+            DriverRole = new IdentityRole
+            {
+                Id = "350868c0-bf0f-4f70-b4c9-155351bc6429",
+                Name = "Driver",
+                NormalizedName = "DRIVER"
+            };
         }
         private void SeedUserRoles()
         {
@@ -165,6 +182,12 @@ namespace LogiTrack.Infrastructure.SeedDb
             {
                 UserId = "2e8be95a-186e-403b-b4aa-3874750a3563", 
                 RoleId = "27609f35-fbc8-4dc4-9d12-7ff2dd400327"  
+            };
+
+            DriverUserRole = new IdentityUserRole<string>
+            {
+                UserId = "f3b3b3b3-3b3b-3b3b-3b3b-3b3b3b3b3b3b",
+                RoleId = "350868c0-bf0f-4f70-b4c9-155351bc6429"
             };
         }
         private void SeedClientCompanies()
@@ -202,7 +225,7 @@ namespace LogiTrack.Infrastructure.SeedDb
                 Country = "Bulgaria"
             };
         }
-        private void SeedRequests()
+        /*private void SeedRequests()
         {
             Request1 = new Request()
             {
@@ -331,16 +354,16 @@ namespace LogiTrack.Infrastructure.SeedDb
                 OfferDate = DateTime.UtcNow.AddDays(-1),
                 Notes = "Confirmed by client"
             };
-        }
+        }*/
         private void SeedDrivers()
         {
-            Driver1ForDelivery = new Driver
+            Driver1 = new Driver
             {
                 Id = 1,
                 Name = "Paul Smith",
                 LicenseNumber = "DL123456",
                 LicenseExpiryDate = DateTime.UtcNow.AddYears(2),
-                UserId = SpeditorUser.Id,
+                UserId = DriverUser.Id,
                 Salary = 3000m,
                 Age = 35,
                 YearOfExperience = 10,
@@ -349,7 +372,7 @@ namespace LogiTrack.Infrastructure.SeedDb
                 Preferrences = "Long-distance deliveries"
             };
 
-            Driver2 = new Driver
+            /*Driver2 = new Driver
             {
                 Id = 2,
                 Name = "Mark Driver",
@@ -362,9 +385,9 @@ namespace LogiTrack.Infrastructure.SeedDb
                 MonthsOfExperience = 4,
                 IsAvailable = true,
                 Preferrences = "Short-distance deliveries"
-            };
+            };*/
         }
-        private void SeedVehicles()
+        /*private void SeedVehicles()
         {
             Vehicle1ForDelivery = new Vehicle
             {
@@ -402,7 +425,7 @@ namespace LogiTrack.Infrastructure.SeedDb
                 LastYearMaintenance = new DateTime(2023, 01, 15),
             };
         }
-        private void SeedDeliveries()
+       /* private void SeedDeliveries()
         {
             DeliveryForOfferForRequest1 = new Delivery
             {
@@ -447,8 +470,8 @@ namespace LogiTrack.Infrastructure.SeedDb
                 Amount = 50m,
                 DateSubmitted = DateTime.UtcNow
             };
-        }
-        public void SeedPricesPerSize()
+        }*/
+        /*public void SeedPricesPerSize()
         {
             PricesForVehicle1 = new PricesPerSize
             {
@@ -470,7 +493,7 @@ namespace LogiTrack.Infrastructure.SeedDb
                 InternationalPriceForNotSharedTruck = 1050m,
                 InternationalPriceForSharedTruck = 750m,
             };
-        }
+        
 
         private void SeedCalendarEvents()
         {
@@ -501,6 +524,6 @@ namespace LogiTrack.Infrastructure.SeedDb
                 Title = "Paid delivery",
                 ClientCompanyId = 1
             };
-        }
+        }*/
     }
 }

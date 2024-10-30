@@ -23,8 +23,8 @@ namespace LogiTrack.Infrastructure.SeedDb.Configurations
             builder.Property(x => x.ApproximatePrice)
                 .HasColumnType("decimal(18,2)");
 
-            var data = new SeedData();
-            builder.HasData(new Request[] { data.Request1, data.Request2, data.Request3, data.Request4 });
+            /*var data = new SeedData();
+            builder.HasData(new Request[] { data.Request1, data.Request2, data.Request3, data.Request4 });*/
         }
     }
 }

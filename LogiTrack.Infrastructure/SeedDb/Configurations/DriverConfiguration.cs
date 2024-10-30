@@ -22,7 +22,7 @@ namespace LogiTrack.Infrastructure.SeedDb.Configurations
               .HasColumnType("decimal(18,2)");
 
             var data = new SeedData();
-            builder.HasData(new Driver[] { data.Driver1ForDelivery, data.Driver2 });
+            builder.HasData(new Driver[] { data.Driver1});
         }
     }
 }

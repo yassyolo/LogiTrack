@@ -26,37 +26,6 @@ namespace LogisticsSystem.Infrastructure.Data.DataModels
         [StringLength(CargoTypeMaxLength)]
         public string CargoType { get; set; } = string.Empty; //standard , not standard
 
-        [Comment("Type of pallet")]
-        [StringLength(TypeOfPalletMaxLength)]
-        public string? TypeOfPallet { get; set; } = string.Empty; //euro, industrial
-
-        [Comment("Number of pallets")]
-        [Range(NumberOfPalletsMinValue, NumberOfPalletsMaxValue)]
-        public int? NumberOfPallets { get; set; }
-
-        [Comment("Pallet length")]
-        [Range(PalletMetricsValue, PalletMetricsMaxValue)]
-        public double? PalletLength { get; set; } //in cm
-
-        [Comment("Pallet width")]
-        [Range(PalletMetricsValue, PalletMetricsMaxValue)]
-        public double? PalletWidth { get; set; }
-
-        [Comment("Pallet height")]
-        [Range(PalletMetricsValue, PalletMetricsMaxValue)]
-        public double? PalletHeight { get; set; }
-
-        [Comment("Pallet volume")]
-        [Range(PalletVolumeMinValue, PalletVolumeMaxValue)]
-        public double? PalletVolume { get; set; }
-
-        [Comment("Weight of pallets")]
-        [Range(PalletWeightMinValue, PalletWeightMaxValue)]
-        public double? WeightOfPallets { get; set; } 
-
-        [Comment("Are the pallets stackable")]
-        public bool? PalletsAreStackable { get; set; } //only if the truck is not shared
-
 
         [Comment("Number of non-standart goods")]
         [Range(NumberOfNonStandartGoodsMinValue, NumberOfNonStandartGoodsMaxValue)]
@@ -146,5 +115,15 @@ namespace LogisticsSystem.Infrastructure.Data.DataModels
         public double Kilometers { get; set; }
 
         public IEnumerable<NonStandardCargo>? NonStandardCargos { get; set; } = new List<NonStandardCargo>();
+
+        [Comment("Standart cargo identifier")]
+        public int StandartCargoId { get; set; }
+
+        [Comment("Standart cargo")]
+        [ForeignKey(nameof(StandartCargoId))]
+        public StandartCargo? StandartCargo { get; set; }
+
+        public double TotalWeight { get; set; }
+        public double TotalVolume { get; set; }
     }
 }

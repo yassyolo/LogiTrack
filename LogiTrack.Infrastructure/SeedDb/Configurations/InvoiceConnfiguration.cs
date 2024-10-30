@@ -15,8 +15,8 @@ namespace LogiTrack.Infrastructure.SeedDb.Configurations
 
            builder.Ignore("ClientCompanyId");
 
-            var data = new SeedData();
-            builder.HasData(new Invoice[] { data.InvoiceForOfferForRequest1 });
+            /*var data = new SeedData();
+            builder.HasData(new Invoice[] { data.InvoiceForOfferForRequest1 });*/
         }
     }
 }
