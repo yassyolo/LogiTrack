@@ -19,18 +19,25 @@ namespace LogiTrack.Core.Services
             var url = $"https://maps.googleapis.com/maps/api/geocode/json?address={Uri.EscapeDataString(address)}&key={googleMapsApiKey}";
 
             var response = await httpClient.GetFromJsonAsync<GeocodingResponse>(url);
-            Console.WriteLine($"Response: {JsonSerializer.Serialize(response)}");
-
-            if (response?.Status != "OK")
-            {
-                Console.WriteLine($"Geocoding API error: {response?.Status}");
-                return null;
-            }
 
             if (response?.Results?.Any() == true)
             {
                 var location = response.Results.First().Geometry.Location;
                 return (location.Latitude, location.Longitude);
+            }
+
+            return null;
+        }
+
+        public async Task<string?> GetAddress(double latitude, double longitude)
+        {
+            var url = $"https://maps.googleapis.com/maps/api/geocode/json?latlng={latitude},{longitude}&key={googleMapsApiKey}";
+
+            var response = await httpClient.GetFromJsonAsync<GeocodingResponse>(url);
+
+            if (response?.Results?.Any() == true)
+            {
+                return response.Results.First().FormattedAddress;
             }
 
             return null;

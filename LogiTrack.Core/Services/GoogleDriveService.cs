@@ -8,11 +8,11 @@ namespace LogiTrack.Core.Services
     public class GoogleDriveService : IGoogleDriveService
     {
         private readonly string serviceAccountJson = @"{
- test
+test
 }";
 
 
-        public async Task<DriveService> GetDriveServiceAsync()
+        public DriveService GetDriveServiceAsync()
         {
             GoogleCredential credentials = GoogleCredential.FromJson(serviceAccountJson)
                                                            .CreateScoped(DriveService.Scope.DriveFile);
@@ -24,9 +24,9 @@ namespace LogiTrack.Core.Services
             });
         }
 
-        public async Task<string> UploadFileAsync(string filePath, string mimeType, string folderId = null)
+        public async Task<string> UploadFileAsync(string filePath, string mimeType, string? folderId = null)
         {
-            var driveService = await GetDriveServiceAsync();
+            var driveService = GetDriveServiceAsync();
 
             var fileMetadata = new Google.Apis.Drive.v3.Data.File
             {
@@ -55,13 +55,23 @@ namespace LogiTrack.Core.Services
 
         public async Task<IList<Google.Apis.Drive.v3.Data.File>> ListFilesAsync(int pageSize = 10)
         {
-            var driveService = await GetDriveServiceAsync();
+            var driveService = GetDriveServiceAsync();
             var request = driveService.Files.List();
             request.PageSize = pageSize;
             request.Fields = "nextPageToken, files(id, name)";
 
             var result = await request.ExecuteAsync();
             return result.Files;
+        }
+
+        public async Task<string> GetFileUrlAsync(string fileId)
+        {
+            var driveService = GetDriveServiceAsync();    
+            var request = driveService.Files.Get(fileId);
+            request.Fields = "webViewLink, webContentLink";
+
+            var file = await request.ExecuteAsync();
+            return file.WebViewLink ?? file.WebContentLink;
         }
     }
 }
