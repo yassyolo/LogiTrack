@@ -30,7 +30,7 @@ namespace LogiTrack.Controllers
             {
                 return BadRequest(DriverNotFoundErrorMessage);
             }*/
-            var model = await deliveryService.GetDriverDashboardAsync("speditor");
+            var model = await deliveryService.GetDriverDashboardAsync("driver1@example.com");
             return View(model);
         }
 
@@ -63,7 +63,7 @@ namespace LogiTrack.Controllers
                 return View(model);
             }
 
-            if (await driverService.DriverHasDeliveryAsync("speditor", deliveryId) == false)
+            if (await driverService.DriverHasDeliveryAsync("driver1@example.com", deliveryId) == false)
             {
                 TempData["NotAuthorize"] = DriverDoesNotHaveDeliveryErrorMessage;
                 return View(model);
@@ -104,7 +104,7 @@ namespace LogiTrack.Controllers
             }
 
             //var username = User.GetUsername();
-            var username = "speditor";
+            var username = "driver1@example.com";
             if (await deliveryService.DriverWithUsernameExistsAsync(username) == false)
             {
                 return BadRequest(DriverNotFoundErrorMessage);
@@ -142,7 +142,7 @@ namespace LogiTrack.Controllers
                 return View(model);
             }
             //var username = User.GetUsername();
-            var username = "speditor";
+            var username = "driver1@example.com";
             await deliveryService.AddStatusForDeliveryAsync(id, model, username, address);
             return RedirectToAction(nameof(DeliveryDetails), new { id = id });
         }
@@ -150,7 +150,7 @@ namespace LogiTrack.Controllers
         [HttpGet]
         public async Task<IActionResult> SearchDeliveries([FromQuery] SearchDeliveryForDriverViewModel query)
         {
-            var username = "speditor";
+            var username = "driver1@example.com";
             if (await driverService.DriverWithUsernameExistsAsync(username) == false)
             {
                 return BadRequest(DriverNotFoundErrorMessage);
@@ -165,7 +165,7 @@ namespace LogiTrack.Controllers
         [HttpGet]
         public async Task<IActionResult> Details()
         {
-            var username = "speditor";
+            var username = "driver1@example.com";
             if (await deliveryService.DriverWithUsernameExistsAsync(username) == false)
             {
                 return BadRequest(DriverNotFoundErrorMessage);
@@ -177,7 +177,7 @@ namespace LogiTrack.Controllers
         [HttpGet]
         public async Task<IActionResult> LicenseDetails()
         {
-            var username = "speditor";
+            var username = "driver1@example.com";
             if (await deliveryService.DriverWithUsernameExistsAsync(username) == false)
             {
                 return BadRequest(DriverNotFoundErrorMessage);

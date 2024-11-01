@@ -195,7 +195,7 @@ namespace LogiTrack.Core.Services
                 Profit = delivery.Profit.ToString(),
                 ReferenceNumber = delivery.ReferenceNumber,
                 DriverName = delivery.Driver.Name,
-                ActualDeliveryDate = delivery.ActualDeliveryDate.ToString("dd-MM-yyyy"),
+                ActualDeliveryDate = delivery.ActualDeliveryDate.ToString(),
                 VehicleType = delivery.Vehicle.VehicleType,
                 RegistrationNumber = delivery.Vehicle.RegistrationNumber,
                 Age = delivery.Driver.Age.ToString(),
@@ -253,22 +253,25 @@ namespace LogiTrack.Core.Services
                 .Include(x => x.Driver)
                 .Include(x => x.Offer)
                 .ThenInclude(x => x.Request)
+                .ThenInclude(x => x.StandartCargo)
+                .Include(x => x.Offer)
+                .ThenInclude(x => x.Request)
                 .ThenInclude(x => x.ClientCompany)
                 .FirstOrDefaultAsync();
             var model =  new DeliveryForDriverViewModel
             {
-                Id = delivery.Id,
+                Id = delivery?.Id ?? throw new DeliveryNotFoundException(),
                 ClientCompanyName = delivery.Offer.Request.ClientCompany.Name,
                 CargoType = delivery.Offer.Request.CargoType,
-                TypeOfPallet = delivery.Offer.Request.StandartCargo.TypeOfPallet,
-                NumberOfPallets = delivery.Offer.Request.StandartCargo.NumberOfPallets.ToString(),
-                PalletLength = delivery.Offer.Request.StandartCargo.PalletLength.ToString(),
-                PalletWidth = delivery.Offer.Request.StandartCargo.PalletWidth.ToString(),
-                PalletHeight = delivery.Offer.Request.StandartCargo.PalletHeight.ToString(),
-                PalletVolume = delivery.Offer.Request.StandartCargo.PalletVolume.ToString(),
-                WeightOfPallets = delivery.Offer.Request.StandartCargo.WeightOfPallets.ToString(),
-                PalletsAreStackable = delivery.Offer.Request.StandartCargo.PalletsAreStackable,
-                NumberOfNonStandartGoods = delivery.Offer.Request.NumberOfNonStandartGoods.ToString(),
+                TypeOfPallet = delivery.Offer.Request.StandartCargo?.TypeOfPallet.ToString() ?? "0",
+                NumberOfPallets = delivery.Offer.Request.StandartCargo?.NumberOfPallets.ToString() ?? "0",
+                PalletLength = delivery.Offer.Request.StandartCargo?.PalletLength.ToString() ?? "0",
+                PalletWidth = delivery.Offer.Request.StandartCargo?.PalletWidth.ToString() ?? "0",
+                PalletHeight = delivery.Offer.Request.StandartCargo?.PalletHeight.ToString() ?? "0",
+                PalletVolume = delivery.Offer.Request.StandartCargo?.PalletVolume.ToString() ?? "0",
+                WeightOfPallets = delivery.Offer.Request.StandartCargo?.WeightOfPallets.ToString() ?? "0",
+                PalletsAreStackable = delivery.Offer.Request.StandartCargo?.PalletsAreStackable,
+                NumberOfNonStandartGoods = delivery.Offer.Request.NumberOfNonStandartGoods.ToString() ?? "0",
                 TypeOfGoods = delivery.Offer.Request.TypeOfGoods,
                 PickupAddress = delivery.Offer.Request.PickupAddress,
                 PickupLatitude = delivery.Offer.Request.PickupLatitude.ToString(),
@@ -346,15 +349,10 @@ namespace LogiTrack.Core.Services
                 ClientCompanyId = x.Offer.Request.ClientCompanyId,
                 ClientCompanyName = x.Offer.Request.ClientCompany.Name,
                 CargoType = x.Offer.Request.CargoType,
-                TypeOfPallet = x.Offer.Request.StandartCargo.TypeOfPallet,
-                NumberOfPallets = x.Offer.Request.StandartCargo.NumberOfPallets,
-                PalletLength = x.Offer.Request.StandartCargo.PalletLength.ToString(),
-                PalletWidth = x.Offer.Request.StandartCargo.PalletWidth.ToString(),
-                PalletHeight = x.Offer.Request.StandartCargo.PalletHeight.ToString(),
-                PalletVolume = x.Offer.Request.StandartCargo.PalletVolume.ToString(),
-                WeightOfPallets = x.Offer.Request.StandartCargo.WeightOfPallets.ToString(),
-                PalletsAreStackable = x.Offer.Request.StandartCargo.PalletsAreStackable,
-                NumberOfNonStandartGoods = x.Offer.Request.NumberOfNonStandartGoods,
+                TotalCargos = (x.Offer.Request.StandartCargo?.NumberOfPallets ?? 0) + (x.Offer.Request.NumberOfNonStandartGoods ?? 0),
+                TotalVolume = x.Offer.Request.TotalVolume.ToString(),
+                TotalWeight = x.Offer.Request.TotalWeight.ToString(),
+                NumberOfNonStandartGoods = x.Offer.Request.NumberOfNonStandartGoods.ToString(),
                 TypeOfGoods = x.Offer.Request.TypeOfGoods,
                 PickupAddress = x.Offer.Request.PickupAddress,
                 DeliveryAddress = x.Offer.Request.DeliveryAddress,
@@ -363,16 +361,19 @@ namespace LogiTrack.Core.Services
                 SpecialInstructions = x.Offer.Request.SpecialInstructions,
                 IsRefrigerated = x.Offer.Request.IsRefrigerated,
                 ReferenceNumber = x.ReferenceNumber,
-                //IsPaid = x.Offer.Invoice.IsPaid
+                IsPaid = x.Invoice?.IsPaid ?? false
             }).ToList();
             return deliveriesToShow;
         }
 
-        public async Task<List<DeliveryViewModel>?> GetDeliveriesForDriverAsync(string username, string referenceNumber = null, DateTime? endDate = null, DateTime? startDate = null, string? deliveryAddress = null, string? pickupAddress = null, bool? isNew = null)
+        public async Task<List<DeliveryViewModel>?> GetDeliveriesForDriverAsync(string username, string? referenceNumber = null, DateTime? endDate = null, DateTime? startDate = null, string? deliveryAddress = null, string? pickupAddress = null, bool? isNew = null)
         {
             var deliveries = await repository.AllReadonly<Infrastructure.Data.DataModels.Delivery>()
                 .Include(x => x.Vehicle)
                 .Include(x => x.Driver)
+                .Include(x => x.Offer)
+                .ThenInclude(x => x.Request)
+                .ThenInclude(x => x.StandartCargo)
                 .Include(x => x.Offer)
                 .ThenInclude(x => x.Request)
                 .ThenInclude(x => x.ClientCompany)
@@ -411,15 +412,9 @@ namespace LogiTrack.Core.Services
                 ClientCompanyId = x.Offer.Request.ClientCompanyId,
                 ClientCompanyName = x.Offer.Request.ClientCompany.Name,
                 CargoType = x.Offer.Request.CargoType,
-                TypeOfPallet = x.Offer.Request.StandartCargo.TypeOfPallet,
-                NumberOfPallets = x.Offer.Request.StandartCargo.NumberOfPallets,
-                PalletLength = x.Offer.Request.StandartCargo.PalletLength.ToString(),
-                PalletWidth = x.Offer.Request.StandartCargo.PalletWidth.ToString(),
-                PalletHeight = x.Offer.Request.StandartCargo.PalletHeight.ToString(),
-                PalletVolume = x.Offer.Request.StandartCargo.PalletVolume.ToString(),
-                WeightOfPallets = x.Offer.Request.StandartCargo.WeightOfPallets.ToString(),
-                PalletsAreStackable = x.Offer.Request.StandartCargo.PalletsAreStackable,
-                NumberOfNonStandartGoods = x.Offer.Request.NumberOfNonStandartGoods,
+                TotalCargos = (x.Offer.Request.StandartCargo?.NumberOfPallets ?? 0) + (x.Offer.Request.NumberOfNonStandartGoods ?? 0),
+                TotalVolume = x.Offer.Request.TotalVolume.ToString(),
+                TotalWeight = x.Offer.Request.TotalWeight.ToString(),
                 TypeOfGoods = x.Offer.Request.TypeOfGoods,
                 PickupAddress = x.Offer.Request.PickupAddress,
                 DeliveryAddress = x.Offer.Request.DeliveryAddress,
@@ -427,14 +422,15 @@ namespace LogiTrack.Core.Services
                 ExpectedDeliveryDate = x.Offer.Request.ExpectedDeliveryDate.ToString("dd/MM/yyyy"),
                 SpecialInstructions = x.Offer.Request.SpecialInstructions,
                 IsRefrigerated = x.Offer.Request.IsRefrigerated,
-                ReferenceNumber = x.ReferenceNumber
+                ReferenceNumber = x.ReferenceNumber,
+                IsNew = x.DeliveryStep == 1 ? true : false
             }).ToList();
             return deliveriesToShow;
         }
 
-        public async Task<DeliveryViewModel> GetDeliveryForDriverByReferenceNumberAsync(string searchTerm)
+        public async Task<DeliveryViewModel> GetDeliveryForDriverByReferenceNumberAsync(string referenceNumber)
         {
-            return await repository.AllReadonly<Infrastructure.Data.DataModels.Delivery>().Where(x => x.ReferenceNumber == searchTerm)
+            return await repository.AllReadonly<Infrastructure.Data.DataModels.Delivery>().Where(x => x.ReferenceNumber.ToLower() == referenceNumber.ToLower())
                 .Include(x => x.Vehicle)
                 .Include(x => x.Driver)
                 .Include(x => x.Offer)
@@ -446,14 +442,14 @@ namespace LogiTrack.Core.Services
                     ClientCompanyName = x.Offer.Request.ClientCompany.Name,
                     CargoType = x.Offer.Request.CargoType,
                     TypeOfPallet = x.Offer.Request.StandartCargo.TypeOfPallet,
-                    NumberOfPallets = x.Offer.Request.StandartCargo.NumberOfPallets,
+                    NumberOfPallets = x.Offer.Request.StandartCargo.NumberOfPallets.ToString(),
                     PalletLength = x.Offer.Request.StandartCargo.PalletLength.ToString(),
                     PalletWidth = x.Offer.Request.StandartCargo.PalletWidth.ToString(),
                     PalletHeight = x.Offer.Request.StandartCargo.PalletHeight.ToString(),
                     PalletVolume = x.Offer.Request.StandartCargo.PalletVolume.ToString(),
                     WeightOfPallets = x.Offer.Request.StandartCargo.WeightOfPallets.ToString(),
                     PalletsAreStackable = x.Offer.Request.StandartCargo.PalletsAreStackable,
-                    NumberOfNonStandartGoods = x.Offer.Request.NumberOfNonStandartGoods,
+                    NumberOfNonStandartGoods = x.Offer.Request.NumberOfNonStandartGoods.ToString(),
                     TypeOfGoods = x.Offer.Request.TypeOfGoods,
                     PickupAddress = x.Offer.Request.PickupAddress,
                     DeliveryAddress = x.Offer.Request.DeliveryAddress,
@@ -492,15 +488,15 @@ namespace LogiTrack.Core.Services
                 ClientCompanyId = x.Offer.Request.ClientCompanyId,
                 ClientCompanyName = x.Offer.Request.ClientCompany.Name,
                 CargoType = x.Offer.Request.CargoType,
-                TypeOfPallet = x.Offer.Request.StandartCargo.TypeOfPallet,
-                NumberOfPallets = x.Offer.Request.StandartCargo.NumberOfPallets,
-                PalletLength = x.Offer.Request.StandartCargo.PalletLength.ToString(),
-                PalletWidth = x.Offer.Request.StandartCargo.PalletWidth.ToString(),
-                PalletHeight = x.Offer.Request.StandartCargo.PalletHeight.ToString(),
-                PalletVolume = x.Offer.Request.StandartCargo.PalletVolume.ToString(),
-                WeightOfPallets = x.Offer.Request.StandartCargo.WeightOfPallets.ToString(),
-                PalletsAreStackable = x.Offer.Request.StandartCargo.PalletsAreStackable,
-                NumberOfNonStandartGoods = x.Offer.Request.NumberOfNonStandartGoods,
+                TypeOfPallet = x.Offer.Request.StandartCargo?.TypeOfPallet ?? "0",
+                NumberOfPallets = x.Offer.Request.StandartCargo?.NumberOfPallets.ToString() ?? "0",
+                PalletLength = x.Offer.Request.StandartCargo?.PalletLength.ToString() ?? "0",
+                PalletWidth = x.Offer.Request.StandartCargo?.PalletWidth.ToString() ?? "0",
+                PalletHeight = x.Offer.Request.StandartCargo?.PalletHeight.ToString() ?? "0",
+                PalletVolume = x.Offer.Request.StandartCargo?.PalletVolume.ToString() ?? "0",
+                WeightOfPallets = x.Offer.Request.StandartCargo?.WeightOfPallets.ToString() ?? "0",
+                PalletsAreStackable = x.Offer.Request.StandartCargo?.PalletsAreStackable ?? false,
+                NumberOfNonStandartGoods = x.Offer.Request.NumberOfNonStandartGoods.ToString(),
                 TypeOfGoods = x.Offer.Request.TypeOfGoods,
                 PickupAddress = x.Offer.Request.PickupAddress,
                 DeliveryAddress = x.Offer.Request.DeliveryAddress,
@@ -519,6 +515,7 @@ namespace LogiTrack.Core.Services
             var model = new DriverDashboardViewModel()
             {
                 KilometersDriven = await repository.AllReadonly<Infrastructure.Data.DataModels.Delivery>().Where(x => x.DriverId == driver.Id).SumAsync(x => x.Offer.Request.Kilometers),
+                KilometersDrivenlastMonth = await repository.AllReadonly<Infrastructure.Data.DataModels.Delivery>().Where(x => x.DriverId == driver.Id && x.Offer.Request.ExpectedDeliveryDate.Month == DateTime.Now.Month - 1).SumAsync(x => x.Offer.Request.Kilometers),
                 NewDeliveriesCount = await repository.AllReadonly<Infrastructure.Data.DataModels.Delivery>().Where(x => x.DeliveryStep == 1).CountAsync()
             };
             model.LastDeliveries = await repository.AllReadonly<Infrastructure.Data.DataModels.Delivery>().Where(x => x.DriverId == driver.Id).OrderByDescending(x => x.Offer.OfferDate).Take(5)
@@ -586,14 +583,14 @@ namespace LogiTrack.Core.Services
                 ClientCompanyName = x.Offer.Request.ClientCompany.Name,
                 CargoType = x.Offer.Request.CargoType,
                 TypeOfPallet = x.Offer.Request.StandartCargo.TypeOfPallet,
-                NumberOfPallets = x.Offer.Request.StandartCargo.NumberOfPallets,
+                NumberOfPallets = x.Offer.Request.StandartCargo.NumberOfPallets.ToString(),
                 PalletLength = x.Offer.Request.StandartCargo.PalletLength.ToString(),
                 PalletWidth = x.Offer.Request.StandartCargo.PalletWidth.ToString(),
                 PalletHeight = x.Offer.Request.StandartCargo.PalletHeight.ToString(),
                 PalletVolume = x.Offer.Request.StandartCargo.PalletVolume.ToString(),
                 WeightOfPallets = x.Offer.Request.StandartCargo.WeightOfPallets.ToString(),
                 PalletsAreStackable = x.Offer.Request.StandartCargo.PalletsAreStackable,
-                NumberOfNonStandartGoods = x.Offer.Request.NumberOfNonStandartGoods,
+                NumberOfNonStandartGoods = x.Offer.Request.NumberOfNonStandartGoods.ToString(),
                 TypeOfGoods = x.Offer.Request.TypeOfGoods,
                 PickupAddress = x.Offer.Request.PickupAddress,
                 DeliveryAddress = x.Offer.Request.DeliveryAddress,
@@ -606,5 +603,44 @@ namespace LogiTrack.Core.Services
             return deliveriesToShow;
         }
 
+        public async Task<List<DeliveryViewModel>> GetDeliveriesForAccountantBySearchtermAsync(string? searchTerm = null)
+        {
+            var deliveries = await repository.AllReadonly<Infrastructure.Data.DataModels.Delivery>()
+              .Include(x => x.Vehicle)
+              .Include(x => x.Driver)
+              .Include(x => x.Offer)
+              .ThenInclude(x => x.Request)
+              .ThenInclude(x => x.ClientCompany)
+              .ToListAsync();
+            if (string.IsNullOrEmpty(searchTerm) == false)
+            {
+                deliveries = deliveries.Where(x => x.Offer.Request.ClientCompany.Name.ToLower().Contains(searchTerm.ToLower()) 
+                               || x.Offer.Request.DeliveryAddress.ToLower().Contains(searchTerm.ToLower()) 
+                               ||x.Offer.Request.PickupAddress.ToLower().Contains(searchTerm.ToLower()) 
+                               ||x.ReferenceNumber.ToLower().Contains(searchTerm.ToLower())).ToList();
+            }
+            var deliveriesToShow = deliveries.Select(x => new DeliveryViewModel
+            {
+                Id = x.Id,
+                RequestId = x.Offer.RequestId,
+                ClientCompanyId = x.Offer.Request.ClientCompanyId,
+                ClientCompanyName = x.Offer.Request.ClientCompany.Name,
+                CargoType = x.Offer.Request.CargoType,
+                TotalCargos = (x.Offer.Request.StandartCargo?.NumberOfPallets ?? 0) + (x.Offer.Request.NumberOfNonStandartGoods ?? 0),
+                TotalVolume = x.Offer.Request.TotalVolume.ToString(),
+                TotalWeight = x.Offer.Request.TotalWeight.ToString(),
+                NumberOfNonStandartGoods = x.Offer.Request.NumberOfNonStandartGoods.ToString(),
+                TypeOfGoods = x.Offer.Request.TypeOfGoods,
+                PickupAddress = x.Offer.Request.PickupAddress,
+                DeliveryAddress = x.Offer.Request.DeliveryAddress,
+                SharedTruck = x.Offer.Request.SharedTruck,
+                ExpectedDeliveryDate = x.Offer.Request.ExpectedDeliveryDate.ToString("dd/MM/yyyy"),
+                SpecialInstructions = x.Offer.Request.SpecialInstructions,
+                IsRefrigerated = x.Offer.Request.IsRefrigerated,
+                ReferenceNumber = x.ReferenceNumber,
+                IsPaid = x.Invoice?.IsPaid ?? false
+            }).ToList();
+            return deliveriesToShow;
+        }
     }
 }

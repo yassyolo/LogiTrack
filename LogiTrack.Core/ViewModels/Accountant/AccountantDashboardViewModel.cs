@@ -6,6 +6,7 @@ namespace LogiTrack.Core.ViewModels.Accountant
     {
         public int NewFinishedDeliveriesFromLastWeek { get; set; }
         public int NotPaidDeliveriesCount { get; set; }
+        public int InvoicesCount { get; set; }
         public int InvoicesCountFromLastMonth { get; set; }
         public string DueAmountForDeliveries { get; set; } = string.Empty;
         public List<InvoiceForDashboardViewModel> Last5NotPaidInvoices { get; set; } = new List<InvoiceForDashboardViewModel>();

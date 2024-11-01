@@ -14,6 +14,6 @@ namespace LogiTrack.Core.ViewModels.Accountant
         public bool? IsPaid { get; set; }
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
-        public List<DeliveryViewModel> Delivery { get; set; } = new List<DeliveryViewModel>();
+        public List<DeliveryViewModel> Deliveries { get; set; } = new List<DeliveryViewModel>();
     }
 }

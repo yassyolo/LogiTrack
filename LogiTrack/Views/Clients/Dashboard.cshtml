@@ -32,18 +32,20 @@ Layout = null;
         }
 
         .card-icon {
-            width: 100px;
-            height: 70px;
+            margin-left: 10px;
+            width: 60px;
+            height: 60px;
+            border-radius: 3px;
             display: flex;
             align-items: center;
             justify-content: center;
+            margin-right: 20px;
         }
 
             .card-icon img {
-                width: 55px;
+                width: 50px;
                 height: auto;
             }
-
         .card-content {
             flex-grow: 1;
             padding: 0 10px;
@@ -280,7 +282,7 @@ flex-direction:row;
                 </div>
                 <div class="card-content">
                     <h3>Requests</h3>
-                    <p>@Model.RequestsCount</p>
+                    <p><b>@Model.RequestsCount</b></p>
                 </div>
                 <div class="card-button-info">
                 <a asp-action="MakeRequest" asp-controller="Clients" class="card-button">+ NEW</a>
@@ -293,7 +295,7 @@ flex-direction:row;
                 </div>
                 <div class="card-content">
                     <h3>Offers</h3>
-                    <p>@Model.BookedOffersCount</p>
+                    <p><b>@Model.BookedOffersCount</b></p>
                 </div>
                 <div class="card-button-info">
                     <a asp-action="SearchOffer" asp-controller="Clients" class="card-button">+ BOOK</a>
@@ -308,7 +310,7 @@ flex-direction:row;
                 </div>
                 <div class="card-content">
                     <h3>Invoices</h3>
-                    <p>@Model.InvoicesCount</p>
+                    <p><b>@Model.InvoicesCount</b></p>
                 </div>
                 <div class="card-button-info">
                 <a asp-action="MyInvoices" asp-controller="Clients" class="card-button">+ ALL</a>

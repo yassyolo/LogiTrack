@@ -10,26 +10,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Driver Dashboard</title>
     <link rel="stylesheet" href="~/css/site.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css">
     <script src="~/js/site.js"></script>
     <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+        }
+
         .license-container {
-            width: 400px;
+            width: 800px;
             background-color: #ffffff;
-            padding: 20px;
-            margin: 0 auto;
-            box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
-            font-family: 'Poppins', sans-serif;
+            box-shadow: 0 0 25px 1px #0000000f !important;
+            display: block;
         }
 
         .license-title {
-            font-size: 24px;
+            font-size: 23px;
             font-weight: 700;
-            color: #333;
-            text-align: center;
+            color: #000;
             margin-bottom: 10px;
+            padding:20px;
+            
         }
 
         .divider-line {
@@ -40,10 +42,10 @@
 
         .general-details {
             font-size: 18px;
-            color: #666;
+            color: #00aa87;
             font-weight: 600;
-            margin-bottom: 15px;
-            text-align: center;
+            margin-bottom: 25px;
+
         }
 
         .license-row {
@@ -52,21 +54,22 @@
             font-size: 16px;
             color: #333;
             padding: 10px 0;
-            border-bottom: 1px solid #e9f2ff;
+            margin-left: 10px;
         }
 
-        .license-expiry {
-            color: #ff4d4d;
-            font-weight: bold;
-            text-align: center;
-            margin-top: 15px;
-        }
+            .license-row span {
+                color: black;
+                font-size: 15px;
+                flex: 1; 
+            }
 
-        .license-ok {
-            color: #4CAF50;
-            font-weight: bold;
-            text-align: center;
-            margin-top: 15px;
+                .license-row span:first-child {
+                    width: 150px; 
+                    font-weight: bold;
+                }
+       
+        .details-info {
+            padding: 20px;
         }
     </style>
 
@@ -100,13 +103,7 @@
                 <a asp-action="SearchDelivery" asp-controller="Driver"><i class="bi bi-journal"></i> New Delivery</a>
             </li>
             <li>
-                <a asp-action="SearchDeliveries" asp-controller="Driver"><i class="bi bi-truck"></i> Delivery <span class="arrow">></span></a>
-                <div class="dropdown-menu">
-                    <ul>
-                        <li><a asp-action="SearchDeliveries" asp-controller="Driver">Search</a></li>
-                        <li><a asp-action="NewDeliveries" asp-controller="Driver">Upcoming</a></li>
-                    </ul>
-                </div>
+                <a asp-action="SearchDeliveries" asp-controller="Driver"><i class="bi bi-truck"></i> Delivery</a>
             </li>
         </ul>
     </aside>
@@ -114,36 +111,32 @@
         <div class="license-container">
             <div class="license-title">Driver Details</div>
             <div class="divider-line"></div>
-            <div class="general-details">General Information</div>
-
-            <div class="license-row">
-                <span>Name:</span>
-                <span>@Model.Name</span>
-            </div>
-
-            <div class="license-row">
-                <span>Username:</span>
-                <span>@Model.Username</span>
-            </div>
-
-            <div class="license-row">
-                <span>Age:</span>
-                <span>@Model.Age</span>
-            </div>
-
-            <div class="license-row">
-                <span>Salary:</span>
-                <span>$@Model.Salary / month</span>
-            </div>
-
-            <div class="license-row">
-                <span>Experience:</span>
-                <span>@Model.YearOfExperience years, @Model.MonthsOfExperience months</span>
-            </div>
-
-            <div class="license-row">
-                <span>Preferences:</span>
-                <span>@Model.Preferrences</span>
+            <div class="details-info">
+                <div class="general-details">General Information</div>
+                <div class="license-row">
+                    <span><b>Name</b></span>
+                    <span>@Model.Name</span>
+                </div>
+                <div class="license-row">
+                    <span><b>Username</b></span>
+                    <span>@Model.Username</span>
+                </div>
+                <div class="license-row">
+                    <span><b>Age</b></span>
+                    <span>@Model.Age</span>
+                </div>
+                <div class="license-row">
+                    <span><b>Salary</b></span>
+                    <span>$@Model.Salary / month</span>
+                </div>
+                <div class="license-row">
+                    <span><b>Experience</b></span>
+                    <span>@Model.YearOfExperience years, @Model.MonthsOfExperience months</span>
+                </div>
+                <div class="license-row">
+                    <span><b>Preferences</b></span>
+                    <span>@Model.Preferrences</span>
+                </div>
             </div>
         </div>
     </div>

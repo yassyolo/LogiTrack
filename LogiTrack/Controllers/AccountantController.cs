@@ -119,7 +119,9 @@ namespace LogiTrack.Controllers
         public async Task<IActionResult> SearchDeliveries([FromQuery] SearchDeliveryViewModel query)
         {
             var model = await deliveryService.GetDeliveryForAccountantAsync(query.ReferenceNumber, query.EndDate, query.StartDate, query.ClientCompanyName, query.IsPaid);
-            query.Delivery = model;
+            query.Deliveries = model;
+            model = await deliveryService.GetDeliveriesForAccountantBySearchtermAsync(query.SearchTerm);
+            query.Deliveries = model;
             return View(query);
         }
 

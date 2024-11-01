@@ -29,6 +29,7 @@ namespace LogiTrack.Core.Services
             {
                 NewFinishedDeliveriesFromLastWeek = await repository.All<Delivery>().CountAsync(x => x.Status == DeliveryStatusConstants.Delivered && x.ActualDeliveryDate > DateTime.Now.AddDays(-7)),
                 NotPaidDeliveriesCount = await repository.All<Invoice>().CountAsync(x => x.Delivery.Status == DeliveryStatusConstants.Delivered && x.IsPaid == false),
+                InvoicesCount = await repository.All<Invoice>().CountAsync(),
                 InvoicesCountFromLastMonth = await repository.All<Invoice>().Where(x => x.InvoiceDate > DateTime.Now.AddDays(-31)).CountAsync(),
                 DueAmountForDeliveries = repository.AllReadonly<Invoice>().Where(x => x.IsPaid == false).Sum(x => x.Delivery.Offer.FinalPrice).ToString()
             };

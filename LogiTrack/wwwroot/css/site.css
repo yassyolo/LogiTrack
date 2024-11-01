@@ -13,12 +13,18 @@ html {
   position: relative;
   min-height: 100%;
 }
-
+@font-face {
+    font-family: 'Roboto';
+    src: url('path/to/Roboto-Regular.woff2') format('woff2'), url('path/to/Roboto-Regular.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
 body {
   margin-bottom: 60px;
 }
 body {
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Roboto', sans-serif;
+    letter-spacing: 0.4px;
     margin: 0;
     padding: 0;
     background-color: #f4f4f4;
@@ -28,7 +34,8 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: #1e87f0;
+    background-color: #00aa87;
+    
     box-shadow: 2px 0px 5px rgba(0, 0, 0, 0.1);
     padding: 5px 20px;
     color: white;
