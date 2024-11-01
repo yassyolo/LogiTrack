@@ -10,6 +10,8 @@ namespace LogiTrack.Infrastructure.SeedDb.Configurations
         {
             builder.Property(x => x.Price)
                .HasColumnType("decimal(18,2)");
+            var data = new SeedData();
+            builder.HasData(new FuelPrice[] { data.FuelPrice1, data.FuelPrice2});
         }
     }
 }

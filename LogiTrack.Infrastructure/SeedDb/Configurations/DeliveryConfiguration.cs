@@ -45,8 +45,8 @@ namespace LogiTrack.Infrastructure.SeedDb.Configurations
             builder.HasIndex(x => x.VehicleId)
               .HasDatabaseName("IX_Delivery_VehicleId");
 
-            /*var data = new SeedData();
-            builder.HasData(new Delivery[] { data.DeliveryForOfferForRequest1 });*/
+            var data = new SeedData();
+            builder.HasData(new Delivery[] { data.Delivery1, data.Delivery2, data.Delivery3, data.Delivery4, data.Delivery5 });
         }
     }
 }

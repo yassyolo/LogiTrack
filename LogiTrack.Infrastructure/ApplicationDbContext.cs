@@ -20,18 +20,18 @@ namespace LogiTrack.Infrastructure
             builder.ApplyConfiguration(new IdentityUserRolesConfiguration());
             builder.ApplyConfiguration(new CashRegisterConfiguration());
             builder.ApplyConfiguration(new ClientCompanyConfiguration());
-            builder.ApplyConfiguration(new DeliveryConfiguration());
-            builder.ApplyConfiguration(new DeliveryTrackingConfiguration());
-            builder.ApplyConfiguration(new DriverConfiguration());
             builder.ApplyConfiguration(new InvoiceConnfiguration());
-            builder.ApplyConfiguration(new OfferConfiguration());
+            builder.ApplyConfiguration(new OfferConfiguration());                      
             builder.ApplyConfiguration(new RequestConfiguration());
+            builder.ApplyConfiguration(new StandartCargoConfiguration());
+            builder.ApplyConfiguration(new NonStandardCargoConfiguration());
+            builder.ApplyConfiguration(new DriverConfiguration());
+            builder.ApplyConfiguration(new DeliveryConfiguration());
             builder.ApplyConfiguration(new VehicleConfiguration());
+            builder.ApplyConfiguration(new DeliveryTrackingConfiguration());
             builder.ApplyConfiguration(new PricesPerSizeConfiguration());
             builder.ApplyConfiguration(new FuelPriceConfiguration());
             builder.ApplyConfiguration(new CalendarEventConfiguration());
-            builder.ApplyConfiguration(new NonStandardCargoConfiguration());
-            builder.ApplyConfiguration(new StandartCargoConfiguration());
 
             base.OnModelCreating(builder);
         }

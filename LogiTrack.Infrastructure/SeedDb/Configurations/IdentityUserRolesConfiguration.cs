@@ -9,7 +9,7 @@ namespace LogiTrack.Infrastructure.SeedDb.Configurations
         public void Configure(EntityTypeBuilder<IdentityUserRole<string>> builder)
         {
             var seedData = new SeedData();
-            builder.HasData(new IdentityUserRole<string>[] { seedData.LogisticsCompanyUserRole, seedData.ClientCompanyUserRole, seedData.AccountantUserRole, seedData.SpeditorUserRole, seedData.DriverUserRole });
+            builder.HasData(new IdentityUserRole<string>[] { seedData.LogisticsCompanyUserRole, seedData.ClientCompanyUserRole, seedData.AccountantUserRole, seedData.SpeditorUserRole, seedData.Driver1UserRole, seedData.Driver2UserRole });
         }
     }
 }

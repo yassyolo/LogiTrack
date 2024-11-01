@@ -61,7 +61,7 @@ namespace LogiTrack.Infrastructure.Data.DataModels
         public int DeliveryStep { get; set; }
 
         //make it nullable
-        public DateTime ActualDeliveryDate { get; set; }
+        public DateTime? ActualDeliveryDate { get; set; }
 
         [Comment("Invoice")]
         [ForeignKey(nameof(InvoiceId))]

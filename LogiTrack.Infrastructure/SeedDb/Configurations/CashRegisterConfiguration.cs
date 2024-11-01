@@ -16,8 +16,8 @@ namespace LogiTrack.Infrastructure.SeedDb.Configurations
             builder.Property(x => x.Amount)
               .HasColumnType("decimal(18,2)");
 
-            /*var data = new SeedData();
-            builder.HasData(new CashRegister[] {data.CashRegisterForDriver1, data.CashRegisterForVehicle1});*/
+            var data = new SeedData();
+            builder.HasData(new CashRegister[] {data.CashRegister1, data.CashRegister2, data.CashRegister3 , data.CashRegister4 , data.CashRegister5 , data.CashRegister6 });
         }
     }
 }
