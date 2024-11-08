@@ -48,56 +48,11 @@ namespace LogiTrack.Core.Services
                     Id = x.Id,
                     ReferenceNumber = x.ReferenceNumber,
                     ClientCompanyName = x.Offer.Request.ClientCompany.Name,
-                    DeliveryAddress = x.Offer.Request.DeliveryAddress,
-                    PickupAddress  = x.Offer.Request.PickupAddress,
+                    DeliveryAddress = $"{x.Offer.Request.DeliveryAddress.Street},{x.Offer.Request.DeliveryAddress.City}, {x.Offer.Request.DeliveryAddress.County} ",
+                    PickupAddress  = $"{x.Offer.Request.PickupAddress.Street},{x.Offer.Request.PickupAddress.City}, {x.Offer.Request.PickupAddress.County} "
                 }).ToListAsync();
            
             return model;
-        }
-
-        public async Task<MarkAsPaidInvoiceViewModel?> GetInvoiceForPaymentAsync(int deliveryId)
-        {
-            var model = await repository.All<Invoice>().Include(x => x.Delivery).ThenInclude(x => x.Offer)
-                .ThenInclude(x => x.Request).ThenInclude(x => x.ClientCompany).Where(x => x.DeliveryId == deliveryId )
-                .Select(x => new MarkAsPaidInvoiceViewModel
-                {
-                    InvoiceId = x.Id,
-                    DeliveryId = x.Delivery.Id,
-                    InvoiceNumber = x.InvoiceNumber,
-                    Amount = x.Delivery.Offer.FinalPrice.ToString(),
-                    ClientName = x.Delivery.Offer.Request.ClientCompany.Name,
-                    ClientRegistrationNumber = x.Delivery.Offer.Request.ClientCompany.RegistrationNumber,
-                    InvoiceDate = x.InvoiceDate.ToString("dd-MM-yyyy"),
-                    Today = DateTime.Now.ToString("dd-MM-yyyy"),
-                }).FirstOrDefaultAsync();
-            return model;
-        }
-
-        public async Task<bool> InvoiceWithIdExistsAsync(int invoiceId)
-        {
-            return await repository.AllReadonly<Invoice>().AnyAsync(x => x.Id == invoiceId);
-        }
-
-        public async Task<int> MarkInvoiceAsPaidAsync(int id)
-        {
-            var invoice = await repository.All<Invoice>().Include(x => x.Delivery).ThenInclude(x => x.Offer)
-                .ThenInclude(x => x.Request).ThenInclude(x => x.ClientCompany).FirstOrDefaultAsync(x => x.Id == id);
-            if (invoice == null)
-            {
-                throw new ArgumentException(InvoiceNotFoundErrorMessage);
-            }
-            invoice.IsPaid = true;
-            await repository.SaveChangesAsync();
-            var calendarEvent = new CalendarEvent
-            {
-                EventType = EventTypesConstants.InvoicePaid,
-                Date = DateTime.Now,
-                Title = $"Delivery {invoice.Delivery.ReferenceNumber} paid",
-                ClientCompanyId = invoice.Delivery.Offer.Request.ClientCompany.Id
-            };
-            await repository.AddAsync(calendarEvent);
-            await repository.SaveChangesAsync();
-            return invoice.DeliveryId;
         }
 
     }

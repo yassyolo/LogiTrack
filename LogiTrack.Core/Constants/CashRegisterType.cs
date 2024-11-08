@@ -2,8 +2,8 @@
 {
     public class CashRegisterType
     {
-        public const string VehicleExpenses = "Vehicle Expenses";
-        public const string DriverExpenses = "Driver Expenses";
-        public const string OtherExpenses = "Other Expenses";
+        public const string Vehicle = "Vehicle";
+        public const string Driver = "Driver";
+        public const string Other = "Other";
     }
 }

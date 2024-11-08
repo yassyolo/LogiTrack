@@ -24,5 +24,8 @@
         public const string LicenseExpirationErrorMessage = "Your driver's license will expire soon.";
         public const string InvalidCoordinatesErrorMessage = "Invalid coordinates.";
         public const string InvoiceNotFoundErrorMessage = "Invoice not found.";
+        public const string RequestNotFoundErrorMessage = "Request not found.";
+        public const string CompanyDoesNotHaveDeliveryErrorMessage = "Company does not have this delivery.";
+        public const string CompanyDoesNotHaveRequestErrorMessage = "Company does not have this request.";
     }
 }
