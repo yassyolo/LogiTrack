@@ -1,10 +1,16 @@
-﻿namespace LogiTrack.Core.ViewModels.Driver
+﻿using LogiTrack.Core.ViewModels.Accountant;
+using LogiTrack.Core.ViewModels.Driver;
+
+namespace LogiTrack.Core.ViewModels.Clients
 {
-    public class DeliveryForDriverViewModel
+    public class DeliveryDetailsForClientViewModel
     {
         public int Id { get; set; }
         public int DeliveryStep { get; set; }
-        public string ClientCompanyName { get; set; } = string.Empty;
+        public string? Comment { get; set; } 
+        public int RatingStars { get; set; }
+        public bool HasRated { get; set; }
+        public string ActualDeliveryDate { get; set; } = string.Empty;
         public string CargoType { get; set; } = string.Empty; //standard , not standard
         public string? TypeOfPallet { get; set; } = string.Empty; //euro, industrial
         public string? NumberOfPallets { get; set; }
@@ -35,7 +41,12 @@
         public string ReferenceNumber { get; set; } = string.Empty;
         public string RegistrationNumber { get; set; } = string.Empty;
         public string VehicleType { get; set; } = string.Empty;
+        public string FinalPrice { get; set; } = string.Empty;
+        public string OfferDate { get; set; } = string.Empty;
+        public string ApproximatePrice { get; set; } = string.Empty;
+        public string DaysTillPayment { get; set; } = string.Empty;
         public IEnumerable<DeliveryTrackingViewModel> DeliveryTrackings { get; set; } = new List<DeliveryTrackingViewModel>();
         public IEnumerable<NonStandardCargosViewModel> NonStandardCargos { get; set; } = new List<NonStandardCargosViewModel>();
+        public InvoiceForDeliveryViewModel Invoice { get; set; } = new InvoiceForDeliveryViewModel();
     }
 }

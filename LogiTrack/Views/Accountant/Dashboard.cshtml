@@ -126,12 +126,6 @@
                 letter-spacing: revert;
             }
 
-        .due-amount {
-            margin-left: 50px;
-            font-size: 0.9rem;
-            color: #00aa87;
-        }
-
         .see-all {
             text-decoration: underline;
             color: #707070;
@@ -140,7 +134,7 @@
 
         .delivery {
             display: flex;
-            gap: 100px;
+            gap: 70px;
             align-items: center;
             margin-top: 10px;
             margin-bottom: 15px;
@@ -212,21 +206,21 @@
         }
 
         .invoice-header {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 60px;
+            display: flex;
+            flex-direction: row;
+            gap: 70px;
             font-size: 0.85rem;
             white-space: nowrap;
-            margin-left: 30px;
+            margin-left: 15px;
         }
 
         .invoice {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 80px;
+            display: flex;
+            flex-direction: row;
+            gap: 82px;
             font-size: 0.85rem;
             white-space: nowrap;
-            margin-left: 10px;
+            margin-left: 20px;
         }
 
         .paid-button {
@@ -300,7 +294,7 @@
                     <p>@Model.NotPaidDeliveriesCount</p>
                 </div>
                 <div class="card-button-info">
-                    <a asp-action="SearchInvoices" asp-controller="Accountant" class="card-button">See all</a>
+                    <a asp-action="SearchDeliveries" asp-controller="Accountant" class="card-button">See all</a>
                 </div>
             </div>
             <div class="card">
@@ -320,13 +314,13 @@
             <div class="diagram">
                 <div class="diagram-header">
                     <h3>Deliveries</h3>
-                    <a asp-action="NewDeliveries" asp-controller="Accountant" class="see-all">See All</a>
+                    <a asp-action="SearchDeliveries" asp-controller="Accountant" class="see-all">See all</a>
                 </div>
                 @foreach (var item in Model.Last5NewDeliveries)
                 {
                     <div class="delivery">
                         <div class="delivery-info">
-                            <a asp-action="DeliveryDetails" asp-controller="Driver" asp-route-id="@item.Id" class="ref-num">@item.ReferenceNumber</a>
+                            <a asp-action="DeliveryDetails" asp-controller="Accountant" asp-route-id="@item.Id" class="ref-num">@item.ReferenceNumber</a>
                             <img src="~/dashboard_books_dots.svg" alt="Road" class="road-icon">
                             <div class="addresses">
                                 <p class="pickup-address">@item.PickupAddress</p>
@@ -342,15 +336,16 @@
             <div class="diagram">
                 <div class="diagram-header">
                     <h3>Invoices</h3>
-                    <a asp-action="Invoices" asp-controller="Accountant" class="see-all">See All</a>
-                    <h4 class="due-amount">Due amount:</h4>
+                    <a asp-action="SearchInvoices" asp-controller="Accountant" class="see-all">See All</a>
+                    <h4 class="due-amount" style="color: #00aa87;">Due amount:</h4>
                     <p style="font-size:0.9rem;">@Model.DueAmountForDeliveries</p>
                 </div>
                 <div class="invoice-header">
                     <p><b>Invoice No</b></p>
                     <p><b>Current Date</b></p>
-                    <p><b>Creation Date</b></p>
+                    <p><b>Invoice Date</b></p>
                     <p><b>Amount</b></p>
+
                 </div>
                 @foreach (var invoice in Model.Last5NotPaidInvoices)
                 {
@@ -364,8 +359,6 @@
             </div>
         </div>
     </div>
-    </div>
-
 
 </body>
 

@@ -1,8 +1,9 @@
 ﻿@model LogiTrack.Core.ViewModels.Accountant.SearchDeliveryByReferenceNumberViewModel
+
 @{
     Layout = null;
 }
-   
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -52,27 +53,6 @@
             margin-bottom: 15px;
         }
 
-        label {
-            display: block;
-            font-size: 13px;
-            margin-bottom: 5px;
-            font-weight: 200;
-        }
-
-        input[type="text"] {
-            width: 25%;
-            border: none;
-            border-bottom: 1.4px solid grey;
-            padding: 8px 0;
-            margin-bottom: 15px;
-        }
-
-            input[type="text"]:focus {
-                outline: none;
-                border-bottom-color: #00aa87;
-            }
-
-
         .form-control {
             width: 50%;
             padding: 10px;
@@ -93,6 +73,28 @@
             .btn-primary:hover {
                 background-color: #00aa87;
                 box-shadow: 0 3px 1px -2px #0003, 0 2px 2px 0 #00000024, 0 1px 5px 0 #0000001f;
+            }
+
+        label {
+            display: block;
+            font-size: 13px;
+            margin-bottom: 5px;
+            font-weight: 200;
+        }
+
+        input[type="text"],
+        input[type="date"] {
+            width: 25%;
+            border: none;
+            border-bottom: 1.4px solid grey;
+            padding: 8px 0;
+            margin-bottom: 15px;
+        }
+
+            input[type="text"]:focus,
+            input[type="date"]:focus {
+                outline: none;
+                border-bottom-color: #00aa87;
             }
 
         .alert {
@@ -125,27 +127,44 @@
                 <span class="arrow">&#x25BC;</span>
             </button>
             <div class="profile-dropdown-menu" id="profileDropdown">
+                <a asp-action="CompanyDetails" asp-controller="Clients">Company details</a>
+                <a asp-action="CompanyContactDetails" asp-controller="Clients">Contact details</a>
                 <a asp-action="Logout" asp-controller="Home">Logout</a>
             </div>
         </div>
     </header>
     <aside class="sidebar">
         <ul>
-            <li><a asp-action="Dashboard" asp-controller="Accountant"><i class="bi bi-house-door"></i> Dashboard</a></li>
+            <li><a asp-action="Dashboard" asp-controller="Clients"><i class="bi bi-house-door"></i> Dashboard</a></li>
             <li>
-                <a asp-action="SearchDeliveries" asp-controller="Accountant"><i class="bi bi-truck"></i> Deliveries</a>
-            </li>
-            <li>
-                <a asp-action="SearchCashRegisters" asp-controller="Accountant"><i class="bi bi-money"></i> Cash registers <span class="arrow">></span></a>
+                <a asp-action="MyRequests" asp-controller="Clients"><i class="bi bi-money"></i> Requests <span class="arrow">></span></a>
                 <div class="dropdown-menu">
                     <ul>
-                        <li><a asp-action="SearchDelivery" asp-controller="Accountant">New</a></li>
-                        <li><a asp-action="SearchCashRegisters" asp-controller="Accountant">Search</a></li>
+                        <li><a asp-action="MakeRequest" asp-controller="Clients">New</a></li>
+                        <li><a asp-action="MyRequests" asp-controller="Clients">Search</a></li>
                     </ul>
                 </div>
             </li>
             <li>
-                <a asp-action="SearchInvoices" asp-controller="Accountant"><i class="bi bi-money"></i> Invoices</a>
+                <a asp-action="MyOffers" asp-controller="Clients"><i class="bi bi-money"></i> Offers <span class="arrow">></span></a>
+                <div class="dropdown-menu">
+                    <ul>
+                        <li><a asp-action="HaveOffer" asp-controller="Clients">Book</a></li>
+                        <li><a asp-action="MyOffers" asp-controller="Clients">Search</a></li>
+                    </ul>
+                </div>
+            </li>
+            <li>
+                <a asp-action="MyDeliveries" asp-controller="Clients"><i class="bi bi-money"></i> Deliveries <span class="arrow">></span></a>
+                <div class="dropdown-menu">
+                    <ul>
+                        <li><a asp-action="SearchDelivery" asp-controller="Clients">Track</a></li>
+                        <li><a asp-action="MyDeliveries" asp-controller="Clients">Search</a></li>
+                    </ul>
+                </div>
+            </li>
+            <li>
+                <a asp-action="MyInvoices" asp-controller="Clients"><i class="bi bi-money"></i> Invoices <span class="arrow">></span></a>
             </li>
         </ul>
     </aside>
@@ -165,7 +184,14 @@
                 </div>
             }
 
-            <form asp-action="SearchDelivery" asp-controller="Accountant" method="post">
+            @if (TempData["NotAuthorize"] != null)
+            {
+                <div class="alert alert-danger">
+                    You are not authorized to view this delivery!
+                </div>
+            }
+
+            <form asp-action="SearchDelivery" asp-controller="Clients" method="post">
                 <div class="form-group">
                     <label asp-for="ReferenceNumber"><b>Reference number</b></label>
                     <input asp-for="ReferenceNumber" type="text" id="ReferenceNumber" class="form-control" placeholder="Please enter" />
@@ -177,8 +203,6 @@
         </div>
     </div>
 
- </body>
+</body>
 
 </html>
-
-

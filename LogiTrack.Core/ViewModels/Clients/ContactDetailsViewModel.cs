@@ -1,9 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.ComponentModel.DataAnnotations;
-
-namespace LogiTrack.Core.ViewModels.Clients
+﻿namespace LogiTrack.Core.ViewModels.Clients
 {
     public class ContactDetailsViewModel
     {

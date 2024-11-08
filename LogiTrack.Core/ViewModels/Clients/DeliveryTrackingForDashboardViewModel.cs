@@ -2,6 +2,7 @@
 {
     public class DeliveryTrackingForDashboardViewModel
     {
+        public int Id { get; set; }
         public string ReferenceNumber { get; set; } = string.Empty;
         public int DeliveryStep { get; set; }
         public string PickupAddress { get; set; } = string.Empty;

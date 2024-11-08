@@ -1,23 +1,18 @@
-﻿@model LogiTrack.Core.ViewModels.Accountant.SearchCashRegistersViewModel
+﻿@model LogiTrack.Core.ViewModels.Accountant.SearchInvoicesViewModel
 @{
     Layout = null;
 }
-
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Driver Dashboard</title>
+    <title>Search Deliveries</title>
     <link rel="stylesheet" href="~/css/site.css" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="~/js/site.js"></script>
     <style>
-
         body {
             font-family: 'Roboto', sans-serif;
         }
@@ -27,7 +22,7 @@
             padding: 20px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             width: 96.5%;
-
+            margin: auto;
         }
 
         .quick-search-header {
@@ -82,7 +77,7 @@
 
         input[type="text"],
         input[type="date"] {
-            width: 80%;
+            width: 70%;
             border: none;
             border-bottom: 1px solid grey;
             padding: 8px 0;
@@ -97,7 +92,7 @@
 
         .button-group {
             display: flex;
-            margin-top: 45px;
+            margin-top: 105px;
             flex-direction: row;
             margin-bottom: 30px;
             gap: 7px;
@@ -119,6 +114,7 @@
             .btn:hover {
                 opacity: 0.9;
             }
+
         .btn-clear {
             width: 80px;
             text-align: center;
@@ -138,7 +134,7 @@
                 opacity: 0.8;
             }
 
-        .filtered-item-container {
+        .filtered-items-container {
             background-color: #ffff;
             margin-top: 20px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
@@ -188,29 +184,13 @@
             height: 5px;
         }
 
-        .file-icon {
-            color: #007bff;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-        }
-
-            .file-icon i {
-                font-size: 1.2em;
-                margin-right: 5px;
-            }
-
-            .file-icon:hover {
-                color: #0056b3;
-            }
-
         .no-found {
             padding: 15px;
             color: #00aa87;
             text-align: center;
         }
-    </style>
 
+    </style>
 </head>
 
 <body>
@@ -227,10 +207,12 @@
                 <span class="arrow">&#x25BC;</span>
             </button>
             <div class="profile-dropdown-menu" id="profileDropdown">
+                <a asp-action="DriverDetails" asp-controller="Driver">Personal details</a>
                 <a asp-action="Logout" asp-controller="Home">Logout</a>
             </div>
         </div>
     </header>
+
     <aside class="sidebar">
         <ul>
             <li><a asp-action="Dashboard" asp-controller="Accountant"><i class="bi bi-house-door"></i> Dashboard</a></li>
@@ -259,7 +241,7 @@
             </div>
             <p class="search-description">Please enter your search criteria</p>
 
-            <form asp-action="SearchCashRegisters" asp-controller="Accountant" method="get" class="search-form">
+            <form asp-action="SearchInvoices" asp-controller="Accountant" method="get" class="search-form">
                 <div class="row">
                     <div class="form-group">
                         <label asp-for="DeliveryReferenceNumber"><b>Ref No</b></label>
@@ -279,26 +261,19 @@
                         <input type="date" id="EndDate" class="flatpickr" asp-for="EndDate" placeholder="Please enter">
                     </div>
                     <div class="form-group">
-                        <label asp-for="Type">Type</label>
-                        <input asp-for="Type" placeholder="Please enter or select" list="typeOptions" class="form-control" />
-                        <datalist id="typeOptions">
-                            <option value="Vehicle"></option>
-                            <option value="Driver"></option>
-                            <option value="Other"></option>
-                        </datalist>
+                        <label asp-for="IsPaid"><b>Paid</b></label>
+                        <input type="checkbox" id="IsPaid" asp-for="IsPaid">
                     </div>
                 </div>
- 
                 <div class="button-group">
-                    <div class="button-group">
-                        <button type="submit" class="btn"><b>GO</b></button>
-                        <a asp-action="SearchCashRegisters" asp-action="Accountant" type="reset" class="btn btn-clear"><b>CLEAR</b></a>
-                    </div>
+                    <button type="submit" class="btn"><b>GO</b></button>
+                    <a asp-action="SearchInvoices" asp-action="Accountant" type="reset" class="btn btn-clear"><b>CLEAR</b></a>
                 </div>
             </form>
         </div>
-            <div class="filtered-items-container">
-            <form asp-action="SearchCashRegisters" asp-controller="Accountant" method="get" class="quick-search-form">
+
+        <div class="filtered-items-container">
+            <form asp-action="SearchDeliveries" asp-controller="Accountant" method="get" class="quick-search-form">
                 <div class="form-group">
                     <input type="text" id="keyword" asp-for="SearchTerm" placeholder="Enter keyword">
                     <button type="submit">
@@ -309,42 +284,50 @@
                 </div>
             </form>
             <div class="item-header">
-                    <span>Date</span>
-                    <span>Delivery Ref No</span>
-                    <span>Type</span>
-                    <span>Description</span>
-                    <span>Amount</span>
+                <span>Invoice No</span>
+                <span>Date</span>
+                <span>Amount</span>
+                <span>Paid</span>
                 <span>File</span>
-                </div>
-                @if (Model.CashRegisters.Any())
-                {
-                    @foreach (var cashRegister in Model.CashRegisters)
+            </div>
+            @if (Model.Invoices.Any())
+            {
+                <div class="delivery-list">
+                    @foreach (var invoice in Model.Invoices)
                     {
-                        <div class="item-card">                          
+                        <div class="item-card">
                             <div class="item-info">
-                                <span>@cashRegister.DateSubmitted</span>
-                                <span>@cashRegister.DeliveryReferenceNumber</span>
-                                <span>@cashRegister.Type</span>
-                                <span class="description">@cashRegister.Description</span>
-                                <span>@cashRegister.Amount</span>
-                            <div class="cell">
-                                <a href="@cashRegister.FileUrl" target="_blank" class="file-icon" title="View or Download File">
-                                    <i class="fas fa-file-download"></i> See
-                                </a>
-                            </div>
-                                
+                                <a asp-action="DeliveryDetails" asp-controller="Accountant" asp-route-id="@invoice.DeliveryId" style="text-decoration:none; color:inherit;"><span>@invoice.Number</span></a>
+                                <span>@invoice.Date</span>
+                                <span>@invoice.Amount</span>
+                                <span>
+                                    @if (invoice.IsPaid)
+                                    {
+                                        <p style="color: #00aa87;">Yes</p>
+                                    }
+                                    else
+                                    {
+                                        <p style="color: #00aa87;">No</p>
+                                    }
+                                </span>
+                                <span>
+                                    <a href="@invoice.FileUrl" target="_blank" class="file-icon" title="View or Download File">
+                                        <i class="fas fa-file-download"></i> See
+                                    </a>
+                                </span>
+
                             </div>
                         </div>
                     }
-                    
-                }
-                else
-                {
-                    <p class="no-found">No cash registers found matching the search criteria.</p>
-                }
-            </div>
-        
+                </div>
+            }
+            else
+            {
+                <p class="no-found">No invoices found matching the search criteria.</p>
+            }
+        </div>
     </div>
+
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             flatpickr(".flatpickr", {
@@ -352,6 +335,7 @@
             });
         });
     </script>
+
 </body>
 
 </html>

@@ -1,7 +1,8 @@
 ﻿namespace LogiTrack.Core.ViewModels.Accountant
 {
-    public class InvoiceFordeliveryViewModel
+    public class InvoiceForDeliveryViewModel
     {
+        public int DeliveryId { get; set; }
         public string? Number { get; set; }
         public string Date { get; set; } = string.Empty;
         public bool IsPaid { get; set; }

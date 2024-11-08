@@ -1,0 +1,196 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Custom Accountant Dashboard</title>
+    <link rel="stylesheet" href="~/css/site.css" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css">
+    <script src="~/js/site.js"></script>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+        }
+
+        .search-delivery {
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            width: 800px;
+        }
+
+        .search-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .search-icon {
+            width: 40px;
+            margin-right: 10px;
+        }
+
+        .search-title {
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        .have-offer-buttons {
+            display: flex;
+            margin-top: 15px;
+            flex-direction: row;
+            margin-bottom: 30px;
+            gap: 7px;
+            align-content: center;
+            justify-content : center;
+        }
+
+        .btn {
+            background-color: #00aa87;
+            width: 110px;
+            height: 35px;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            padding: 10px 15px;
+            cursor: pointer;
+            margin-left: 50px;
+            box-shadow: 0 3px 1px -2px #0003, 0 2px 2px 0 #00000024, 0 1px 5px 0 #0000001f;
+        }
+
+        .btn-clear {
+            width: 80px;
+            text-align: center;
+            height: 15px;
+            text-decoration: none;
+            background-color: white;
+            color: #00aa87;
+            border: 1px solid #00aa87;
+            border-radius: 3px;
+            padding: 10px 15px;
+            cursor: pointer;
+            margin-left: 50px;
+            font-size: 13px;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+        }
+
+        .btn-clear:hover {
+            opacity: 0.8;
+        }
+
+        .have-offer{
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+        }
+        h4{
+            color: #00aa87;
+        }
+
+        .have-offer-img{
+			width: 220px;
+            height: 280px;
+			margin-bottom: 20px;
+        }
+
+        .button-text p{
+			font-size: 13px;
+			color: #333;
+        }
+    </style>
+
+</head>
+
+<body>
+    <header class="header">
+        <div class="logo-name">
+            <div class="company-logo">
+                <img src="https://via.placeholder.com/50" alt="Company Logo">
+            </div>
+            <div class="company-name">LogiTrack</div>
+        </div>
+        <div class="profile-dropdown">
+            <button onclick="toggleDropdown()">
+                <i class="bi bi-person-circle"></i>
+                <span class="arrow">&#x25BC;</span>
+            </button>
+            <div class="profile-dropdown-menu" id="profileDropdown">
+                <a asp-action="CompanyDetails" asp-controller="Clients">Company details</a>
+                <a asp-action="CompanyContactDetails" asp-controller="Clients">Contact details</a>
+                <a asp-action="Logout" asp-controller="Home">Logout</a>
+            </div>
+        </div>
+    </header>
+    <aside class="sidebar">
+        <ul>
+            <li><a asp-action="Dashboard" asp-controller="Clients"><i class="bi bi-house-door"></i> Dashboard</a></li>
+            <li>
+                <a asp-action="MyRequests" asp-controller="Clients"><i class="bi bi-money"></i> Requests <span class="arrow">></span></a>
+                <div class="dropdown-menu">
+                    <ul>
+                        <li><a asp-action="MakeRequest" asp-controller="Clients">New</a></li>
+                        <li><a asp-action="MyRequests" asp-controller="Clients">Search</a></li>
+                    </ul>
+                </div>
+            </li>
+            <li>
+                <a asp-action="MyOffers" asp-controller="Clients"><i class="bi bi-money"></i> Offers <span class="arrow">></span></a>
+                <div class="dropdown-menu">
+                    <ul>
+                        <li><a asp-action="HaveOffer" asp-controller="Clients">Book</a></li>
+                        <li><a asp-action="MyOffers" asp-controller="Clients">Search</a></li>
+                    </ul>
+                </div>
+            </li>
+            <li>
+                <a asp-action="MyDeliveries" asp-controller="Clients"><i class="bi bi-money"></i> Deliveries <span class="arrow">></span></a>
+                <div class="dropdown-menu">
+                    <ul>
+                        <li><a asp-action="SearchDelivery" asp-controller="Clients">Track</a></li>
+                        <li><a asp-action="MyDeliveries" asp-controller="Clients">Search</a></li>
+                    </ul>
+                </div>
+            </li>
+            <li>
+                <a asp-action="MyInvoices" asp-controller="Clients"><i class="bi bi-money"></i> Invoices <span class="arrow">></span></a>
+            </li>
+        </ul>
+    </aside>
+    <div class="main-content">
+        <div class="search-delivery">
+            <div class="search-header">
+                <img src="https://via.placeholder.com/40" alt="Search Icon" class="search-icon">
+                <h2 class="search-title"><b>Book</b></h2>
+            </div>
+            <div class="have-offer">
+            <h4>Do you have offer?</h4>
+                <img src="https://via.placeholder.com/40" alt="Search Icon" class="have-offer-img">
+                <div class="have-offer-buttons">
+                    <div class="button-text">
+                        <a asp-action="SearchOffer" asp-controller="Clients" class="btn">YES</a>
+                        <p>Yes, I will enter offer number</p>
+                    </div>
+                    <div class="button-text">
+                        <a asp-action="MakeRequest" asp-controller="Clients" class="btn btn-clear">NO</a>
+                        <p>No, I will make new request</p>
+                    </div>
+                </div>
+            </div>
+
+           
+        </div>
+    </div>
+
+</body>
+
+</html>

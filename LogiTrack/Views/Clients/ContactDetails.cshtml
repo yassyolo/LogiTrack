@@ -1,0 +1,146 @@
+﻿@model LogiTrack.Core.ViewModels.Clients.ContactDetailsViewModel
+
+@{
+	Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Driver Dashboard</title>
+    <link rel="stylesheet" href="~/css/site.css" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css">
+    <script src="~/js/site.js"></script>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+        }
+
+        .license-container {
+            width: 800px;
+            background-color: #ffffff;
+            box-shadow: 0 0 25px 1px #0000000f !important;
+            display: block;
+        }
+
+        .license-title {
+            font-size: 23px;
+            font-weight: 700;
+            color: #000;
+            margin-bottom: 10px;
+            padding:20px;
+            
+        }
+
+        .divider-line {
+            height: 1px;
+            background-color: #e0e0e0;
+            margin: 10px 0;
+        }
+
+        .general-details {
+            font-size: 18px;
+            color: #00aa87;
+            font-weight: 600;
+            margin-bottom: 25px;
+
+        }
+
+        .license-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 16px;
+            color: #333;
+            padding: 10px 0;
+            margin-left: 10px;
+        }
+
+            .license-row span {
+                color: black;
+                font-size: 15px;
+                flex: 1; 
+            }
+
+                .license-row span:first-child {
+                    width: 150px; 
+                    font-weight: bold;
+                }
+       
+        .details-info {
+            padding: 20px;
+        }
+    </style>
+
+</head>
+
+<body>
+    <header class="header">
+        <div class="logo-name">
+            <div class="company-logo">
+                <img src="https://via.placeholder.com/50" alt="Company Logo">
+            </div>
+            <div class="company-name">LogiTrack</div>
+        </div>
+        <div class="profile-dropdown">
+            <button onclick="toggleDropdown()">
+                <i class="bi bi-person-circle"></i>
+                <span class="arrow">&#x25BC;</span>
+            </button>
+            <div class="profile-dropdown-menu" id="profileDropdown">
+                <a asp-action="Details" asp-controller="Driver">Personal details</a>
+                <a asp-action="LicenseDetails" asp-controller="Driver">License</a>
+                <a asp-action="Logout" asp-controller="Home">Logout</a>
+            </div>
+        </div>
+    </header>
+
+    <aside class="sidebar">
+        <ul>
+            <li><a asp-action="Dashboard" asp-controller="Driver"><i class="bi bi-house-door"></i> Dashboard</a></li>
+            <li>
+                <a asp-action="SearchDelivery" asp-controller="Driver"><i class="bi bi-journal"></i> New Delivery</a>
+            </li>
+            <li>
+                <a asp-action="SearchDeliveries" asp-controller="Driver"><i class="bi bi-truck"></i> Delivery</a>
+            </li>
+        </ul>
+    </aside>
+    <div class="main-content">
+        <div class="license-container">
+            <div class="license-title">Contact details</div>
+            <div class="divider-line"></div>
+            <div class="details-info">
+                <div class="general-details">User Information</div>
+                <div class="license-row">
+                    <span><b>Username</b></span>
+                    <span>@Model.Username</span>
+                </div>
+                <div class="license-row">
+                    <span><b>Email</b></span>
+                    <span>@Model.Email</span>
+                </div>
+                
+                <div class="general-details">Contact information</div>
+                <div class="license-row">
+                    <span><b>Contact person</b></span>
+                    <span>@Model.ContactPerson</span>
+                </div>
+                <div class="license-row">
+                    <span><b>Phone number</b></span>
+                    <span>@Model.PhoneNumber</span>
+                </div>
+                <div class="license-row">
+                    <span><b>Alternative phone number</b></span>
+                    <span>@Model.AlternativePhoneNumber</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>
+

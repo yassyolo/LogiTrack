@@ -13,6 +13,9 @@ Layout = null;
     <link rel="stylesheet" href="~/css/site.css" />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
     <script src="~/js/site.js"></script>
     <style>
         .cards-container {
@@ -214,6 +217,7 @@ Layout = null;
         .delivery-tracking{
             display:flex;
 flex-direction:row;
+margin-bottom: 15px;
         }
     </style>
 
@@ -234,7 +238,7 @@ flex-direction:row;
             </button>
             <div class="profile-dropdown-menu" id="profileDropdown">
                 <a asp-action="CompanyDetails" asp-controller="Clients">Company details</a>
-                <a asp-action="CompanyContactDetails" asp-controller="Clients">Contact details</a>
+                <a asp-action="ContactDetails" asp-controller="Clients">Contact details</a>
                 <a asp-action="Logout" asp-controller="Home">Logout</a>
             </div>
         </div>
@@ -255,8 +259,8 @@ flex-direction:row;
                 <a asp-action="MyOffers" asp-controller="Clients"><i class="bi bi-money"></i> Offers <span class="arrow">></span></a>
                 <div class="dropdown-menu">
                     <ul>
-                        <li><a asp-action="SearchOffer" asp-controller="Clients">Book</a></li>
-                        <li><a asp-action="SearchOffers" asp-controller="Clients">Search</a></li>
+                        <li><a asp-action="HaveOffer" asp-controller="Clients">Book</a></li>
+                        <li><a asp-action="MyOffers" asp-controller="Clients">Search</a></li>
                     </ul>
                 </div>
             </li>
@@ -329,7 +333,7 @@ flex-direction:row;
                 {
                     <div class="delivery">
                         <div class="delivery-info">
-                            <a asp-action="DeliveryDetails" asp-asp-controller="Driver" asp-route-id="@item.Id"></a>
+                            <a asp-action="DeliveryDetails" asp-controller="Clients" asp-route-id="@item.Id"></a>
                             <img src="~/dashboard_books_dots.svg" alt="Road" class="road-icon">
                             <div class="addresses">
                                 <p class="pickup-address"><b>@item.PickupAddress</b></p>
@@ -347,13 +351,12 @@ flex-direction:row;
                     <a asp-action="MyDeliveries" asp-controller="Clients" class="see-all">See All</a>
                 </div>
 
-                @foreach (var item in Model.LastFiveDeliveries) // Assuming you have this in your model
+                @foreach (var item in Model.LastFiveDeliveries) 
                 {
                     <div class="delivery-tracking">
-                    <!-- Reference Number Display -->
-                    <a asp-action="DeliveryDetails" asp-asp-controller="Clients" asp-route-id="@item.ReferenceNumber">@item.ReferenceNumber</a>
+ 
+                    <a asp-action="DeliveryDetails" asp-controller="Clients" asp-route-id="@item.Id">@item.ReferenceNumber</a>
 
-                    <!-- Delivery Info Section -->
                     <div class="delivery-info">
                         <a asp-action="DeliveryDetails" asp-controller="Driver" ></a>
                         <img src="~/dashboard_books_dots.svg" alt="Road" class="road-icon">
@@ -363,7 +366,6 @@ flex-direction:row;
                         </div>
                     </div>
 
-                    <!-- Horizontal Tracking Line with 4 Connected Dots -->
                     <div class="tracking-line">
                         <div class="dot" style="background-color: @(item.DeliveryStep >= 1 ? "green" : "gray")"></div>
                         <div class="line" style="background-color: @(item.DeliveryStep >= 2 ? "green" : "gray")"></div>
@@ -401,9 +403,65 @@ flex-direction:row;
                     </div>
                 }
             </div>
+            <div class="diagram" >
+                <div id="calendar"></div>
+                <div id="event-details"></div>
+            </div>
         </div>
     </div>
+    <script>
+        $(document).ready(function () {
+            $.ajax({
+                url: '/Clients/GetCalendarEvents',  // Ensure this path matches your controller route
+                type: 'GET',
+                success: function (events) {
+                    var calendarEl = document.getElementById('calendar');
+                    var calendar = new FullCalendar.Calendar(calendarEl, {
+                        initialView: 'dayGridMonth',
+                        headerToolbar: {
+                            left: 'prev,next today',
+                            center: 'title',
+                            right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                        },
+                        events: events.map(function (event) {
+                            return {
+                                id: event.id,
+                                title: event.title,
+                                start: event.date.split("T")[0],  // Trim off the time part for day-based events
+                                backgroundColor: getColor(event.type)
+                            };
+                        }),
+                        dateClick: function (info) {
+                            var dateEvents = events.filter(event => event.date.split("T")[0] === info.dateStr);
+                            if (dateEvents.length > 0) {
+                                $('#event-details').html('<h3>Events on ' + info.dateStr + ':</h3><ul>' +
+                                    dateEvents.map(e => '<li>' + e.title + '</li>').join('') +
+                                    '</ul>');
+                            } else {
+                                $('#event-details').html('<h3>No events on ' + info.dateStr + '.</h3>');
+                            }
+                        }
+                    });
 
+                    calendar.render();
+                }
+            });
+
+            function getColor(type) {
+                switch (type) {
+                    case 'Delivered':
+                        return 'green';
+                    case 'Pickup':
+                        return 'blue';
+                    case 'Paid':
+                        return 'orange';
+                    default:
+                        return 'gray';
+                }
+            }
+        });
+
+    </script>
 </body>
 
 </html>

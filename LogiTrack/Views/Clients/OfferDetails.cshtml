@@ -1,0 +1,235 @@
+﻿@model LogiTrack.Core.ViewModels.Clients.OfferDetailsViewModel
+@{
+    Layout = null;
+}
+
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Driver Dashboard</title>
+    <link rel="stylesheet" href="~/css/site.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css">
+    <script src="~/js/site.js"></script>
+    <style>
+        .delivery-details-container {
+            width: 85%;
+        }
+
+        .card {
+            box-shadow: 0 0 25px 1px #0000000f !important;
+            padding: 17px;
+            background-color: white;
+        }
+
+        .details-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+
+        .delivery-image {
+            width: 50px;
+            height: auto;
+            margin-right: 20px;
+        }
+
+        .details-header h2 {
+            font-size: 19px;
+            margin: 0;
+        }
+
+    </style>
+
+</head>
+
+<body>
+    <header class="header">
+        <div class="logo-name">
+            <div class="company-logo">
+                <img src="https://via.placeholder.com/50" alt="Company Logo">
+            </div>
+            <div class="company-name">LogiTrack</div>
+        </div>
+        <div class="profile-dropdown">
+            <button onclick="toggleDropdown()">
+                <i class="bi bi-person-circle"></i>
+                <span class="arrow">&#x25BC;</span>
+            </button>
+            <div class="profile-dropdown-menu" id="profileDropdown">
+                <a asp-action="CompanyDetails" asp-controller="Clients">Company details</a>
+                <a asp-action="CompanyContactDetails" asp-controller="Clients">Contact details</a>
+                <a asp-action="Logout" asp-controller="Home">Logout</a>
+            </div>
+        </div>
+    </header>
+    <aside class="sidebar">
+        <ul>
+            <li><a asp-action="Dashboard" asp-controller="Clients"><i class="bi bi-house-door"></i> Dashboard</a></li>
+            <li>
+                <a asp-action="MyRequests" asp-controller="Clients"><i class="bi bi-money"></i> Requests <span class="arrow">></span></a>
+                <div class="dropdown-menu">
+                    <ul>
+                        <li><a asp-action="MakeRequest" asp-controller="Clients">New</a></li>
+                        <li><a asp-action="MyRequests" asp-controller="Clients">Search</a></li>
+                    </ul>
+                </div>
+            </li>
+            <li>
+                <a asp-action="MyOffers" asp-controller="Clients"><i class="bi bi-money"></i> Offers <span class="arrow">></span></a>
+                <div class="dropdown-menu">
+                    <ul>
+                        <li><a asp-action="HaveOffer" asp-controller="Clients">Book</a></li>
+                        <li><a asp-action="MyOffers" asp-controller="Clients">Search</a></li>
+                    </ul>
+                </div>
+            </li>
+            <li>
+                <a asp-action="MyDeliveries" asp-controller="Clients"><i class="bi bi-money"></i> Deliveries <span class="arrow">></span></a>
+                <div class="dropdown-menu">
+                    <ul>
+                        <li><a asp-action="SearchDelivery" asp-controller="Clients">Track</a></li>
+                        <li><a asp-action="MyDeliveries" asp-controller="Clients">Search</a></li>
+                    </ul>
+                </div>
+            </li>
+            <li>
+                <a asp-action="MyInvoices" asp-controller="Clients"><i class="bi bi-money"></i> Invoices <span class="arrow">></span></a>
+            </li>
+        </ul>
+    </aside>
+    <div class="main-content">
+        <div class="delivery-details-container">
+            <div class="card">
+                <div class="details-header">
+                    <img src="https://via.placeholder.com/100" alt="Delivery Image" class="delivery-image">
+                    <h2><b> //TODO</b></h2>
+                    <div class="request-details-column">
+                        <div class="header-image-div">
+                            <div class="header-image">
+                                <img src="https: //via.placeholder.com/30" alt="" />
+                            </div>
+                            <h5 class="header">Shipping details</h5>
+                        </div>
+                        <div class="title-details">
+                            <h5 class="title">Expected delivery date:</h5>
+                            <p>@Model.ExpectedDeliveryDate</p>
+                        </div>
+                        <div class="adress-details">
+                            <div class="dot-line">
+								<div class="dot"></div>
+								<div class="line">
+                                <div class="dot"></div>
+                            </div>
+                        <div class="title-details">
+                            <h5 class="title">Origin:</h5>
+                            <p>@Model.PickupAddress</p>
+                        </div>
+                        <div class="title-details">
+                            <h5 class="title">Destination:</h5>
+                            <p>@Model.DeliveryAddress</p>
+                        </div>
+                        </div>
+                    </div>
+                </div>
+                    <div class="request-details-column">
+                        <div class="header-image-div">
+                            <div class="header-image">
+                                <img src="https: //via.placeholder.com/30" alt="" />
+                            </div>
+                            <h5 class="header">Metrics</h5>
+                        </div>
+                        <div class="title-details">
+                            <h5 class="title">Pack:</h5>
+                            @if(Model.PalletsCount != string.Empty)
+                            {
+                                <p>@Model.PalletsCount X @Model.CargoType</p>
+                                <p>@Model.PalletsLength X @Model.PalletsWidth X @Model.PalletsHeight</p>
+                            }
+                            else
+							{
+                                <p>@Model.NumberOfNonStandartGoods</p>
+								foreach (var item in Model.NonStandardCargo)
+                                {
+                                    <p>@item.Length X @item.Width X @item.Height</p>
+                                }
+							}
+                            
+                        </div>
+                        <div class="title-details">
+                            <h5 class="title">Total weight:</h5>
+                            <p>@Model.TotalWeight</p>
+                        </div>
+                        <div class="title-details">
+                            <h5 class="title">Total volume:</h5>
+                            <p>@Model.TotalVolume</p>
+                        </div>
+                        <div class="title-details">
+                            <h5 class="title">Refrigerated:</h5>
+                            <p>@Model.IsRefrigerated</p>
+                        </div>
+                        <div class="title-details">
+                            <h5 class="title">Shared Truck:</h5>
+                            <p>@Model.SharedTruck</p>
+                        </div>
+                    </div>
+                    <div class="request-details-column">
+                        <div class="header-image-div">
+                            <div class="header-image">
+                                <img src="https: //via.placeholder.com/30" alt="" />
+                            </div>
+                            <h5 class="header">Info</h5>
+                        </div>
+                        <div class="title-details">
+                            <h5 class="title">Created on:</h5>
+                            <p>@Model.CreatedAt</p>
+                        </div>
+                        <div class="title-details">
+                            <h5 class="title">Special instructions:</h5>
+                            <p>@Model.SpecialInstructions</p>
+                        </div>
+                        <div class="title-details">
+                            <h5 class="title">Given price:</h5>
+                            <p>@Model.ApproximatePrice</p>
+                        </div>
+                        <div class="title-details">
+                            <h5 class="title">Status:</h5>
+                            <p>@Model.Status</p>
+                        </div>
+                    </div>
+                    <div class="request-details-column">
+                        <div class="header-image-div">
+                            <div class="header-image">
+                                <img src="https: //via.placeholder.com/30" alt="" />
+                            </div>
+                            <h5 class="header">Offer</h5>
+                        </div>
+                        <div class="title-details">
+                            <h5 class="title">Created on:</h5>
+                            <p>@Model.OfferDate</p>
+                        </div>
+                        <div class="title-details">
+                            <h5 class="title">Status:</h5>
+                            <p>@Model.OfferStatus</p>
+                        </div>
+                        <div class="title-details">
+                            <h5 class="title">Given price:</h5>
+                            <p>@Model.FinalPrice</p>
+                        </div>
+                        <div class="title-details">
+                            <h5 class="title">Status:</h5>
+                            <p>@Model.Status</p>
+                        </div>
+                    </div>
+            </div>
+        </div>
+    </div>
+
+
+</body>
+
+</html>

@@ -13,47 +13,72 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Driver Dashboard</title>
     <link rel="stylesheet" href="~/css/site.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css">
     <script src="~/js/site.js"></script>
     <style>       
         .confirmation-container {
-            max-width: 500px;
-            margin: 50px auto;
+            width: 900px;
             padding: 20px;
-            background-color: #f4f4f4;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            background-color: white;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
             text-align: center;
+        }
+        .confirmation-container h2{
+            color: #00aa87;
+font-size: 1.5rem;
+margin-bottom: 50px;
         }
 
         .confirmation-message {
             font-size: 1.1rem;
             margin-bottom: 20px;
+            width: 45%;
+            margin-left: 250px;
         }
 
         .confirmation-buttons {
             display: flex;
             gap: 20px;
             justify-content: center;
+            margin-top: 60px;
         }
 
         .btn {
-            padding: 8px 15px;
+            background-color: #00aa87;
+            width: 110px;
+            height: 35px;
+            color: white;
             border: none;
+            border-radius: 3px;
+            padding: 10px 15px;
             cursor: pointer;
-            font-size: 1rem;
+            margin-left: 10px;
+            box-shadow: 0 3px 1px -2px #0003, 0 2px 2px 0 #00000024, 0 1px 5px 0 #0000001f;
         }
 
-        .btn-confirm {
-            background-color: #4CAF50;
-            color: white;
+            .btn:hover {
+                opacity: 0.9;
+            }
+
+        .btn-clear {
+            width: 80px;
+            text-align: center;
+            height: 15px;
+            text-decoration: none;
+            background-color: white;
+            color: #00aa87;
+            border: 1px solid #00aa87;
+            border-radius: 3px;
+            padding: 10px 15px;
+            cursor: pointer;
+            margin-left: 10px;
+            font-size: 13px;
         }
 
-        .btn-cancel {
-            background-color: #f44336;
-            color: white;
-        }
+            .btn-clear:hover {
+                opacity: 0.8;
+            }
     </style>
 
 </head>
@@ -98,19 +123,19 @@
     </aside>
     <div class="main-content">
         <div class="confirmation-container">
-            <h2>Confirm Payment</h2>
+            <h2>Confirm payment for delivery</h2>
             <p class="confirmation-message">
-                Do you want to mark Invoice <strong>@Model.InvoiceNumber</strong> for client
-                <strong>@Model.ClientName</strong> (Reg. Number: <strong>@Model.ClientRegistrationNumber</strong>)
+                Do you want to mark invoice with No: <strong>@Model.InvoiceNumber</strong> for client:
+                <strong>'@Model.ClientName'</strong> (Reg. No: <strong>@Model.ClientRegistrationNumber</strong>)
                 issued on <strong>@Model.InvoiceDate</strong> with amount <strong>@Model.Amount</strong> as paid?
             </p>
 
             <div class="confirmation-buttons">
                 <form asp-action="MarkAsPaidSuccessful" asp-controller="Accountant" asp-route-id="@Model.InvoiceId" method="post">
                     
-                    <button type="submit" class="btn btn-confirm">Yes, Mark as Paid</button>
+                    <button type="submit" class="btn">CONFIRM</button>
                 </form>
-                <a asp-action="DeliveryDetails" asp-controller="Accountant" asp-route-id="@Model.DeliveryId" class="btn btn-cancel">Cancel</a>
+                <a asp-action="DeliveryDetails" asp-controller="Accountant" asp-route-id="@Model.DeliveryId" class="btn-clear">CANCEL</a>
             </div>
         </div>
     </div>
