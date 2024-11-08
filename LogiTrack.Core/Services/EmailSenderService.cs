@@ -1,36 +1,31 @@
 ﻿using LogiTrack.Core.Contracts;
 using MailKit.Net.Smtp;
+using Microsoft.Extensions.Configuration;
 using MimeKit;
+using SendGrid;
+using SendGrid.Helpers.Mail;
+using System.Net.Mail;
 
 
 namespace LogiTrack.Core.Services
 {
     public class EmailSenderService : IEmailSenderService
     {
-        private readonly string smtpServer = "smtp.gmail.com";
-        private readonly int port = 587;
-        private readonly string username = "infiniabank@gmail.com";
-        private readonly string password = "lhna tdvn dacn nqud";
+        private readonly string _apiKey;
 
-        public async Task SendEmailAsync(string toEmail, string subject, string body)
+        public EmailSenderService(IConfiguration configuration)
         {
-            var emailMessage = new MimeMessage();
-            emailMessage.From.Add(new MailboxAddress("Infinia Bank", username));
-            emailMessage.To.Add(new MailboxAddress("", toEmail));
-            emailMessage.Subject = subject;
+            _apiKey = configuration["SendGrid:ApiKey"];
+        }
 
-            var bodyBuilder = new BodyBuilder { HtmlBody = body };
-            emailMessage.Body = bodyBuilder.ToMessageBody();
+        public async Task SendEmailAsync(string toEmail, string subject, string message)
+        {
+            var client = new SendGridClient(_apiKey);
+            var from = new EmailAddress("no-reply@logitrack.com", "LogiTrack");
+            var to = new EmailAddress(toEmail);
+            var emailMessage = MailHelper.CreateSingleEmail(from, to, subject, message, message);
 
-            using (var client = new SmtpClient())
-            {
-                client.ServerCertificateValidationCallback = (s, c, h, e) => true;
-
-                await client.ConnectAsync(smtpServer, port, MailKit.Security.SecureSocketOptions.StartTls);
-                await client.AuthenticateAsync(username, password);
-                await client.SendAsync(emailMessage);
-                await client.DisconnectAsync(true);
-            }
+            await client.SendEmailAsync(emailMessage);
         }
     }
 }
