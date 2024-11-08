@@ -23,6 +23,17 @@ namespace LogiTrack.Infrastructure.SeedDb.Configurations
             builder.Property(x => x.ApproximatePrice)
                 .HasColumnType("decimal(18,2)");
 
+            builder.HasOne(x => x.PickupAddress)
+                .WithOne()
+                .HasForeignKey<Request>(x => x.PickupAddressId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.HasOne(x => x.DeliveryAddress)
+                .WithOne()
+                .HasForeignKey<Request>(x => x.DeliveryAddressId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+
             var data = new SeedData();
             builder.HasData(new Request[] { data.Request1, data.Request2, data.Request3, data.Request4, data.Request5 });
         }

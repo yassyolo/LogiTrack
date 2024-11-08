@@ -41,36 +41,19 @@ namespace LogisticsSystem.Infrastructure.Data.DataModels
         [StringLength(RequestTypeMaxLength)]
         public string Type { get; set; } = string.Empty; //domestic, international
 
-        //TODO: ADD MIGRATION FOR THIS
         [Required]
-        [Comment("Pickup address")]
-        [StringLength(AddressMaxLength)]
-        public string PickupAddress { get; set; } = string.Empty;
+        [Comment("Pickup address identifier")]
+        public int PickupAddressId { get; set; }
+
+        [ForeignKey(nameof(PickupAddressId))]
+        public Address PickupAddress { get; set; } = null!;
 
         [Required]
-        [Comment("Pickup address latitude")]
-        [Range(LatitudeMinValue, LatitudeMaxValue)]
-        public double PickupLatitude { get; set; }
+        [Comment("Delivery address identifier")]
+        public int DeliveryAddressId { get; set; }
 
-        [Required]
-        [Comment("Pickup address longitude")]
-        [Range(LongitudeMinValue, LongitudeMaxValue)]
-        public double PickupLongitude { get; set; }
-
-        [Required]
-        [Comment("Delivery address")]
-        [StringLength(AddressMaxLength)]
-        public string DeliveryAddress { get; set; } = string.Empty;
-
-        [Required]
-        [Comment("Delivery address latitude")]
-        [Range(LatitudeMinValue, LatitudeMaxValue)]
-        public double DeliveryLatitude { get; set; }
-
-        [Required]
-        [Comment("Delivery address longitude")]
-        [Range(LongitudeMinValue, LongitudeMaxValue)]
-        public double DeliveryLongitude { get; set; }
+        [ForeignKey(nameof(DeliveryAddressId))]
+        public Address DeliveryAddress { get; set; } = null!;
 
         [Required]
         [Comment("Will the vehicle be shared or no")]

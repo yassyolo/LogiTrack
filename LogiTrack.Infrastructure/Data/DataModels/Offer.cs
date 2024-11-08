@@ -44,5 +44,7 @@ namespace LogisticsSystem.Infrastructure.Data.DataModels
         [Comment("Delivery")]
         [ForeignKey(nameof(DeliveryId))]
         public Delivery? Delivery { get; set; } = null;
+
+        public string OfferNumber { get; set; } = string.Empty;
     }
 }

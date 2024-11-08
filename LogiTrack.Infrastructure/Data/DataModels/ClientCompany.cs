@@ -51,24 +51,14 @@ namespace LogisticsSystem.Infrastructure.Data.DataModels
         public string Industry { get; set; } = string.Empty;
 
         [Required]
-        [Comment("Company's address")]
-        [StringLength(StreetMaxLength)]
-        public string Street { get; set; } = string.Empty;
+        [Comment("Address of the company identifier")]
+        public int AddressId { get; set; }
 
-        [Required]
-        [Comment("Company's city")]
-        [StringLength(CityMaxLength)]
-        public string City { get; set; } = string.Empty;
+        [ForeignKey(nameof(AddressId))]
+        [Comment("Address of the company")]
+        public Address Address { get; set; } = null!;
 
-        [Required]
-        [Comment("Company's postal code")]
-        [StringLength(PostalCodeMaxLength)]
-        public string PostalCode { get; set; } = string.Empty;
-
-        [Required]
-        [Comment("Company's country")]
-        [StringLength(CountryMaxLength)]
-        public string Country { get; set; } = string.Empty;
+        public string EmailAddress { get; set; }  = string.Empty;
 
         [Required]
         [Comment("Registration created at")]

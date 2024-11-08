@@ -27,6 +27,18 @@ namespace LogiTrack.Infrastructure.SeedDb
         public IdentityUserRole<string> Driver1UserRole { get; set; } = null!;
         public IdentityUserRole<string> Driver2UserRole { get; set; } = null!;
 
+        public Address Address1 { get; set; } = null!;
+        public Address Address2 { get; set; } = null!;
+        public Address Address3 { get; set; } = null!;
+        public Address Address4 { get; set; } = null!;
+        public Address Address5 { get; set; } = null!;
+        public Address Address6 { get; set; } = null!;
+        public Address Address7 { get; set; } = null!;
+        public Address Address8 { get; set; } = null!;
+        public Address Address9 { get; set; } = null!;
+        public Address Address10 { get; set; } = null!;
+        public Address Address11 { get; set; } = null!;
+        public Address Address12 { get; set; } = null!;
         public ClientCompany ClientCompany1 { get; set; } = null!;
         public ClientCompany ClientCompany2 { get; set; } = null!;
         public StandartCargo StandartCargo1 { get; set; } = null!;
@@ -92,8 +104,8 @@ namespace LogiTrack.Infrastructure.SeedDb
             SeedUsers();
             SeedRoles();
             SeedUserRoles();
-            SeedClientCompanies();
-                    
+            SeedAddresses();
+            SeedClientCompanies();                   
             SeedRequests();
             SeedStandartCargos();
             SeedNonStandartCargos();
@@ -244,6 +256,21 @@ namespace LogiTrack.Infrastructure.SeedDb
                 RoleId = "350868c0-bf0f-4f70-b4c9-155351bc6429"
             };
         }
+        private void SeedAddresses()
+        {
+            Address1 = new Address { Id = 1, Street = "123 Main St", County = "Central", City = "Metropolis", PostalCode = "10001" };
+            Address2 = new Address { Id = 2, Street = "456 Side St", County = "Westside", City = "Gotham", PostalCode = "10002" };
+            Address3 = new Address { Id = 3, Street = "789 Elm St", County = "Northside", City = "Star City" };
+            Address4 = new Address { Id = 4, Street = "101 Pine St", County = "Eastville", City = "Central City" };
+            Address5 = new Address { Id = 5, Street = "202 Maple St", County = "Southend", City = "Smallville" };
+            Address6 = new Address { Id = 6, Street = "303 Oak St", County = "Old Town", City = "Bludhaven" };
+            Address7 = new Address { Id = 7, Street = "404 Birch St", County = "Downtown", City = "Coast City" };
+            Address8 = new Address { Id = 8, Street = "505 Cedar St", County = "West End", City = "National City" };
+            Address9 = new Address { Id = 9, Street = "606 Cherry St", County = "Upper Hill", City = "Ivy Town" };
+            Address10 = new Address { Id = 10, Street = "707 Aspen St", County = "Harborview", City = "Gateway City" };
+            Address11 = new Address { Id = 11, Street = "808 Willow St", County = "Lakeside", City = "Opal City" };
+            Address12 = new Address { Id = 12, Street = "909 Fir St", County = "Midtown", City = "Fawcett City" };
+        }
         private void SeedClientCompanies()
         {
             ClientCompany1 = new ClientCompany
@@ -256,11 +283,8 @@ namespace LogiTrack.Infrastructure.SeedDb
                 AlternativePhoneNumber = "1234567891",
                 RegistrationNumber = "REG123456",
                 Industry = "Manufacturing",
-                Street = "Sini kamani 28",
-                City = "Sliven",
-                PostalCode = "8800",
+                AddressId = 1,
                 CreatedAt = DateTime.Now.AddDays(-20),
-                Country = "Bulgaria"
             };
 
             ClientCompany2 = new ClientCompany
@@ -272,11 +296,9 @@ namespace LogiTrack.Infrastructure.SeedDb
                 AlternativePhoneNumber = "9876543210",
                 RegistrationNumber = "REG654321",
                 Industry = "Fashion",
-                Street = "Osogovo 5a",
-                City = "Sofia",
-                PostalCode = "1000",
+                EmailAddress = "yyotova@tu-sofia.bg",
+                AddressId = 2,
                 CreatedAt = DateTime.Now.AddDays(-10),
-                Country = "Bulgaria"
             };
         }
        
@@ -289,12 +311,8 @@ namespace LogiTrack.Infrastructure.SeedDb
                 CargoType = "Standard",
                 TypeOfGoods = "Electronics",
                 Type = "Domestic",
-                PickupAddress = "123 Pickup St.",
-                PickupLatitude = 42.6977,
-                PickupLongitude = 23.3219,
-                DeliveryAddress = "456 Delivery St.",
-                DeliveryLatitude = 42.6977,
-                DeliveryLongitude = 23.3219,
+                PickupAddressId = 3,              
+                DeliveryAddressId = 4,
                 SharedTruck = false,
                 ApproximatePrice = 500,
                 CalculatedPrice = 450,
@@ -316,12 +334,8 @@ namespace LogiTrack.Infrastructure.SeedDb
             CargoType = "Standard",
             TypeOfGoods = "Furniture",
             Type = "International",
-            PickupAddress = "789 Pickup Ave.",
-            PickupLatitude = 40.7128,
-            PickupLongitude = -74.0060,
-            DeliveryAddress = "123 Delivery Ave.",
-            DeliveryLatitude = 41.8781,
-            DeliveryLongitude = -87.6298,
+            PickupAddressId = 5,
+            DeliveryAddressId = 6,
             SharedTruck = true,
             ApproximatePrice = 1200,
             CalculatedPrice = 1150,
@@ -343,12 +357,8 @@ namespace LogiTrack.Infrastructure.SeedDb
             CargoType = "Non-Standard",
             TypeOfGoods = "Machinery",
             Type = "Domestic",
-            PickupAddress = "15 Industrial Blvd.",
-            PickupLatitude = 34.0522,
-            PickupLongitude = -118.2437,
-            DeliveryAddress = "25 Factory Rd.",
-            DeliveryLatitude = 36.7783,
-            DeliveryLongitude = -119.4179,
+            PickupAddressId = 7,
+            DeliveryAddressId = 8,
             SharedTruck = false,
             ApproximatePrice = 2000,
             CalculatedPrice = 1900,
@@ -369,12 +379,8 @@ namespace LogiTrack.Infrastructure.SeedDb
             CargoType = "Standard",
             TypeOfGoods = "Textiles",
             Type = "Domestic",
-            PickupAddress = "Market Square 9",
-            PickupLatitude = 33.7490,
-            PickupLongitude = -84.3880,
-            DeliveryAddress = "Warehouse 23",
-            DeliveryLatitude = 34.7465,
-            DeliveryLongitude = -92.2896,
+            PickupAddressId = 9,
+            DeliveryAddressId = 10,
             SharedTruck = true,
             ApproximatePrice = 350,
             CalculatedPrice = 340,
@@ -396,12 +402,8 @@ namespace LogiTrack.Infrastructure.SeedDb
             CargoType = "Standard",
             TypeOfGoods = "Books",
             Type = "International",
-            PickupAddress = "Library Lane",
-            PickupLatitude = 40.7128,
-            PickupLongitude = -74.0060,
-            DeliveryAddress = "Learning Center",
-            DeliveryLatitude = 38.9072,
-            DeliveryLongitude = -77.0369,
+            PickupAddressId = 11,
+            DeliveryAddressId = 12,
             SharedTruck = false,
             ApproximatePrice = 220,
             CalculatedPrice = 210,

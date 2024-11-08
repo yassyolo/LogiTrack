@@ -18,6 +18,7 @@ namespace LogiTrack.Infrastructure
             builder.ApplyConfiguration(new IdentityUserConfiguration());
             builder.ApplyConfiguration(new IdentityRolesConfiguration());
             builder.ApplyConfiguration(new IdentityUserRolesConfiguration());
+            builder.ApplyConfiguration(new AddressConfiguration());
             builder.ApplyConfiguration(new CashRegisterConfiguration());
             builder.ApplyConfiguration(new ClientCompanyConfiguration());
             builder.ApplyConfiguration(new InvoiceConnfiguration());
@@ -32,6 +33,7 @@ namespace LogiTrack.Infrastructure
             builder.ApplyConfiguration(new PricesPerSizeConfiguration());
             builder.ApplyConfiguration(new FuelPriceConfiguration());
             builder.ApplyConfiguration(new CalendarEventConfiguration());
+            builder.ApplyConfiguration(new RatingConfiguration());
 
             base.OnModelCreating(builder);
         }
@@ -50,5 +52,7 @@ namespace LogiTrack.Infrastructure
         public DbSet<CalendarEvent> CalendarEvents { get; set; } = null!;
         public DbSet<NonStandardCargo> NonStandardCargos { get; set; } = null!;
         public DbSet<StandartCargo> StandartCargos { get; set; } = null!;
+        public DbSet<Address> Addresses { get; set; } = null!;
+        public DbSet<Rating> Ratings { get; set; } = null!;
     }
 }
