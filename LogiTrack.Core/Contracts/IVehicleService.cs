@@ -1,5 +1,6 @@
 ﻿
 using LogiTrack.Core.ViewModels.Accountant;
+using LogiTrack.Core.ViewModels.Vehicle;
 
 namespace LogiTrack.Core.Contracts
 {

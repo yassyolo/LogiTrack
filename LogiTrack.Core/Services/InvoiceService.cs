@@ -6,6 +6,7 @@ using static LogiTrack.Core.Constants.MessageConstants.ErrorMessages;
 using LogiTrack.Infrastructure.Repository;
 using Microsoft.EntityFrameworkCore;
 using LogiTrack.Infrastructure.Data.DataModels;
+using LogiTrack.Core.ViewModels.Invoice;
 
 namespace LogiTrack.Core.Services
 {
@@ -36,7 +37,7 @@ namespace LogiTrack.Core.Services
             return model;
         }
 
-        public async Task<List<ViewModels.Accountant.InvoiceForDeliveryViewModel>> GetInvoicesAsync(string? deliveryReferenceNumber = null, DateTime? startDate = null, DateTime? endDate = null, string? companyName = null, bool? isPaid = null)
+        public async Task<List<InvoiceForDeliveryViewModel>> GetInvoicesAsync(string? deliveryReferenceNumber = null, DateTime? startDate = null, DateTime? endDate = null, string? companyName = null, bool? isPaid = null)
         {
             var invoices = await repository.All<Invoice>().Include(x => x.Delivery).ThenInclude(x => x.Offer)
                 .ThenInclude(x => x.Request).ThenInclude(x => x.ClientCompany).ToListAsync();
@@ -62,7 +63,7 @@ namespace LogiTrack.Core.Services
                 invoices = invoices.Where(x => x.IsPaid == isPaid).ToList();
             }
             //TODO: add files
-            return invoices.Select(x => new ViewModels.Accountant.InvoiceForDeliveryViewModel
+            return invoices.Select(x => new InvoiceForDeliveryViewModel
             {
                 DeliveryId = x.DeliveryId,
                 Number = x.InvoiceNumber,
@@ -103,7 +104,7 @@ namespace LogiTrack.Core.Services
                 invoices = invoices.Where(x => x.IsPaid == isPaid).ToList();
             }
             //TODO: add files
-            return invoices.Select(x => new ViewModels.Accountant.InvoiceForDeliveryViewModel
+            return invoices.Select(x => new InvoiceForDeliveryViewModel
             {
                 DeliveryId = x.DeliveryId,
                 Number = x.InvoiceNumber,

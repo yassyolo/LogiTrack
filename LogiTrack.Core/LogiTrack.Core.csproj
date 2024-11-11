@@ -24,10 +24,15 @@
     <PackageReference Include="Microsoft.Extensions.Identity.Core" Version="6.0.35" />
     <PackageReference Include="MimeKit" Version="4.8.0" />
     <PackageReference Include="NETCore.MailKit" Version="2.1.0" />
+    <PackageReference Include="SendGrid" Version="9.29.3" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\LogiTrack.Infrastructure\LogiTrack.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="ViewModels\Logistics\" />
   </ItemGroup>
 
 </Project>

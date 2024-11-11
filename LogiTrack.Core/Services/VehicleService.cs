@@ -2,6 +2,7 @@
 using LogiTrack.Core.Contracts;
 using LogiTrack.Core.CustomExceptions;
 using LogiTrack.Core.ViewModels.Accountant;
+using LogiTrack.Core.ViewModels.Vehicle;
 using LogiTrack.Infrastructure.Data.DataModels;
 using LogiTrack.Infrastructure.Repository;
 using Microsoft.EntityFrameworkCore;

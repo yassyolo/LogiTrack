@@ -1,4 +1,5 @@
 ﻿using LogiTrack.Core.ViewModels.Accountant;
+using LogiTrack.Core.ViewModels.CashRegister;
 
 namespace LogiTrack.Core.Contracts
 {

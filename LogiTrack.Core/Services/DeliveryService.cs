@@ -2,9 +2,11 @@
 using LogiTrack.Core.Contracts;
 using LogiTrack.Core.CustomExceptions;
 using LogiTrack.Core.ViewModels.Accountant;
+using LogiTrack.Core.ViewModels.CashRegister;
 using LogiTrack.Core.ViewModels.Clients;
 using LogiTrack.Core.ViewModels.Delivery;
 using LogiTrack.Core.ViewModels.Driver;
+using LogiTrack.Core.ViewModels.Invoice;
 using LogiTrack.Infrastructure.Data.DataModels;
 using LogiTrack.Infrastructure.Repository;
 using Microsoft.EntityFrameworkCore;
@@ -26,7 +28,7 @@ namespace LogiTrack.Core.Services
             return await repository.AllReadonly<Infrastructure.Data.DataModels.Delivery>().AnyAsync(x => x.Id == deliveryId);
         }
 
-        public async Task<int> GetDeliveryByReferenceNumberAsync(string referenceNumber)
+        public async Task<int> GetDeliveryByReferenceNumberForAccountantAsync(string referenceNumber)
         {
             return await repository.AllReadonly<Infrastructure.Data.DataModels.Delivery>().Where(x => x.ReferenceNumber == referenceNumber).Select(x => x.Id).FirstOrDefaultAsync();
         }
@@ -532,7 +534,7 @@ namespace LogiTrack.Core.Services
             return await repository.AllReadonly<Infrastructure.Data.DataModels.Delivery>().AnyAsync(x => x.Id == deliveryId && x.Offer.Request.ClientCompany.User.UserName == username);
         }
 
-        public async Task<DeliveryDetailsForClientViewModel?> GetDeliveryDetailsForCompanyAsync(int id)
+        public async Task<DeliveryForClientViewModel?> GetDeliveryDetailsForCompanyAsync(int id)
         {
             var delivery = await repository.AllReadonly<Infrastructure.Data.DataModels.Delivery>().Where(x => x.Id == id)
                .Include(x => x.Vehicle)
@@ -550,7 +552,7 @@ namespace LogiTrack.Core.Services
                 .ThenInclude(x => x.Request)
                 .ThenInclude(x => x.DeliveryAddress)
                .FirstOrDefaultAsync();
-            var model = new DeliveryDetailsForClientViewModel
+            var model = new DeliveryForClientViewModel
             {
                 Id = delivery?.Id ?? throw new DeliveryNotFoundException(),
                 HasRated = await repository.AllReadonly<Rating>().AnyAsync(x => x.DeliveryId == delivery.Id),
@@ -649,7 +651,7 @@ namespace LogiTrack.Core.Services
             await repository.SaveChangesAsync();
         }
 
-        public async Task<List<DeliveryForMyDeliveriesViewModel>?> GetDeliveriesForClientAsync(string username, string? referenceNumber, DateTime? endDate, DateTime? startDate, decimal? minPrice, decimal? maxPrice, bool isDelivered, bool isPaid)
+        public async Task<List<DeliveryForClientsDeliveriesViewModel>?> GetDeliveriesForClientAsync(string username, string? referenceNumber, DateTime? endDate, DateTime? startDate, decimal? minPrice, decimal? maxPrice, bool isDelivered, bool isPaid)
         {
             var deliveries = await repository.AllReadonly<Infrastructure.Data.DataModels.Delivery>()
                 .Include(x => x.Vehicle)
@@ -694,7 +696,7 @@ namespace LogiTrack.Core.Services
             {
                 deliveries = deliveries.Where(x => x.Offer.FinalPrice <= maxPrice).ToList();
             }
-            var model = deliveries.Select(x => new DeliveryForMyDeliveriesViewModel()
+            var model = deliveries.Select(x => new DeliveryForClientsDeliveriesViewModel()
             {
                 Id = x.Id,
                 ReferenceNumber = x.ReferenceNumber,
@@ -712,7 +714,7 @@ namespace LogiTrack.Core.Services
             return model;
         }
 
-        public async Task<List<DeliveryForMyDeliveriesViewModel>?> GetDeliveriesForClientBySearchtermAsync(string username, string? searchTerm)
+        public async Task<List<DeliveryForClientsDeliveriesViewModel>?> GetDeliveriesForClientBySearchtermAsync(string username, string? searchTerm)
         {
             var deliveries = await repository.AllReadonly<Infrastructure.Data.DataModels.Delivery>()
                 .Include(x => x.Vehicle)
@@ -740,7 +742,7 @@ namespace LogiTrack.Core.Services
                 || x.ReferenceNumber.ToLower().Contains(searchTerm.ToLower())
                 || x.Offer.FinalPrice == decimal.Parse(searchTerm)).ToList();
             }
-            var model = deliveries.Select(x => new DeliveryForMyDeliveriesViewModel()
+            var model = deliveries.Select(x => new DeliveryForClientsDeliveriesViewModel()
             {
                 Id = x.Id,
                 ReferenceNumber = x.ReferenceNumber,

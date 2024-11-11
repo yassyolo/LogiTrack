@@ -1,6 +1,7 @@
 ﻿using LogiTrack.Core.Contracts;
 using LogiTrack.Core.CustomExceptions;
 using LogiTrack.Core.ViewModels.Accountant;
+using LogiTrack.Core.ViewModels.CashRegister;
 using LogiTrack.Infrastructure.Repository;
 using Microsoft.EntityFrameworkCore;
 

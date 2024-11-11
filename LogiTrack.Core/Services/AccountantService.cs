@@ -11,6 +11,8 @@ using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 using static LogiTrack.Core.Constants.MessageConstants.ErrorMessages;
+using LogiTrack.Core.ViewModels.Invoice;
+using LogiTrack.Core.ViewModels.Delivery;
 
 namespace LogiTrack.Core.Services
 {
