@@ -1,4 +1,4 @@
-﻿@model LogiTrack.Core.ViewModels.Clients.SearchOffersViewModel
+﻿@model LogiTrack.Core.ViewModels.Offer.SearchOffersViewModel
 @{
     Layout = null;
 }
@@ -24,7 +24,7 @@
         .container {
             background-color: white;
             padding: 20px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 0 25px 1px #0000000f !important;
             width: 96.5%;
             margin: auto;
         }
@@ -115,6 +115,9 @@
             box-shadow: 0 3px 1px -2px #0003, 0 2px 2px 0 #00000024, 0 1px 5px 0 #0000001f;
         }
 
+            .btn:hover {
+                opacity: 0.9;
+            }
         .btn-clear {
             width: 80px;
             text-align: center;
@@ -130,18 +133,14 @@
             font-size: 13px;
         }
 
-        .btn:hover {
-            opacity: 0.9;
-        }
-
-        .btn-clear:hover {
-            opacity: 0.8;
-        }
+            .btn-clear:hover {
+                opacity: 0.8;
+            }
 
         .filtered-deliveries-container {
             background-color: #ffff;
             margin-top: 20px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 0 25px 1px #0000000f !important;
         }
 
         .quick-search-form {
@@ -153,7 +152,7 @@
                 width: 55%;
             }
 
-        .delivery-header {
+        .offer-header {
             display: flex;
             justify-content: space-between;
             background-color: #ffffff;
@@ -163,7 +162,7 @@
             width: 90%;
         }
 
-        .delivery-card {
+        .item-card {
             background-color: white;
             font-size: 0.80rem;
             display: flex;
@@ -173,11 +172,11 @@
             overflow: hidden;
         }
 
-            .delivery-card:nth-child(even) {
+            .item-card:nth-child(even) {
                 background-color: #F5F5F7;
             }
 
-        .delivery-info {
+        .item-info {
             display: flex;
             width: 90%;
             justify-content: space-between;
@@ -188,25 +187,25 @@
             height: 5px;
         }
 
-        .delivery-metrics {
+        .item-metrics {
             display: none;
             margin-top: 10px;
-            background-color: #f1f8ff;
-            width: 100%;
+            justify-content: space-between;
+            width: 90%;
             transition: background-color 0.3s ease;
         }
 
-            .delivery-metrics p {
-                margin-left: 210px;
+            .item-metrics p {
+                margin-right: 30px;
             }
 
-        .delivery-card:hover .delivery-metrics {
+        .item-card:hover .item-metrics {
             display: flex;
             background-color: #54C392;
             opacity: 1;
         }
 
-        .delivery-card:hover {
+        .item-card:hover {
             background-color: #73EC8B;
             opacity: 90%;
         }
@@ -228,7 +227,7 @@
             </button>
             <div class="profile-dropdown-menu" id="profileDropdown">
                 <a asp-action="CompanyDetails" asp-controller="Clients">Company details</a>
-                <a asp-action="CompanyContactDetails" asp-controller="Clients">Contact details</a>
+                <a asp-action="ContactDetails" asp-controller="Clients">Contact details</a>
                 <a asp-action="Logout" asp-controller="Home">Logout</a>
             </div>
         </div>
@@ -318,40 +317,40 @@
                     </button>
                 </div>
             </form>
-            <div class="delivery-header">
+            <div class="offer-header">
                 <span>Offer No</span>
                 <span>Offer date</span>
                 <span>Expected Date</span>
                 <span>Price</span>               
                 <span>Status</span>
-                <span>BOOK</span>
+                <span>Book</span>
             </div>
             @if (Model.Offers.Any())
             {
                 <div class="delivery-list">
-                    @foreach (var delivery in Model.Offers)
+                    @foreach (var offer in Model.Offers)
                     {
-                        <a asp-action="RequestDetails" asp-controller="Clients" asp-route-id="@delivery.Id" style="text-decoration: none; color: inherit;">
-                            <div class="delivery-card">
-                                <div class="delivery-info">
-                                    <span>@delivery.OfferNumber</span>
-                                    <span>@delivery.OfferDate</span>
-                                    <span>@delivery.ExpectedDeliveryDate</span>
-                                    <span>@delivery.FinalPrice</span>
-                                    <span>@(delivery.Booked == false ? "Approved" : "No")</span>
+                        <a asp-action="OfferDetails" asp-controller="Clients" asp-route-id="@offer.Id" style="text-decoration: none; color: inherit;">
+                            <div class="item-card">
+                                <div class="item-info">
+                                    <span>@offer.OfferNumber</span>
+                                    <span>@offer.OfferDate</span>
+                                    <span>@offer.ExpectedDeliveryDate</span>
+                                    <span>@offer.FinalPrice</span>
+                                    <span>@(offer.Booked == false ? "Approved" : "No")</span>
                                     <span>
-                                        @if (delivery.Booked == false)
+                                        @if (offer.Booked == false)
                                         {
                                             <i class="bi bi-check-circle-fill" style="color: #00aa87;">BOOK</i>
                                         }
                                     </span>
                                 </div>
-                                <div class="delivery-metrics">
-                                    <span><b>Origin: </b>@delivery.PickupAddress</span>
-                                    <span><b>DEstination: </b>@delivery.DeliveryAddress</span>
-                                    <p><b>Packs:</b> @delivery.TotalItems</p>
-                                    <p><b>Weight:</b> @delivery.TotalWeight</p>
-                                    <p><b>Volume:</b> @delivery.TotalVolume</p>
+                                <div class="item-metrics">
+                                    <p><b>Origin: </b>@offer.PickupAddress</p>
+                                    <p><b>Destination: </b>@offer.DeliveryAddress</p>
+                                    <p><b>Packs:</b> @offer.TotalItems</p>
+                                    <p><b>Weight:</b> @offer.TotalWeight</p>
+                                    <p><b>Volume:</b> @offer.TotalVolume</p>
                                 </div>
                             </div>
                         </a>
@@ -360,16 +359,27 @@
             }
             else
             {
-                <p class="text-center">No deliveries found matching the search criteria.</p>
+                <p class="text-center">No offers found matching the search criteria.</p>
             }
         </div>
     </div>
 
     <script>
+        document.querySelectorAll('.item-card').forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                const metrics = card.querySelector('.item-metrics');
+                metrics.style.display = 'flex';
+                metrics.style.width = `${card.clientWidth}px`;
+            });
 
+            card.addEventListener('mouseleave', () => {
+                const metrics = card.querySelector('.item-metrics');
+                metrics.style.display = 'none';
+            });
+        });
         document.addEventListener('DOMContentLoaded', function () {
             flatpickr(".flatpickr", {
-                dateFormat: "d/M/yy",
+                dateFormat: "Y-m-d",
             });
         });
 

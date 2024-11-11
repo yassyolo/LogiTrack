@@ -1,4 +1,4 @@
-﻿@model LogiTrack.Core.ViewModels.Clients.SearchRequestsViewModel
+﻿@model LogiTrack.Core.ViewModels.Request.SearchRequestsViewModel
 @{
     Layout = null;
 }
@@ -24,7 +24,7 @@
         .container {
             background-color: white;
             padding: 20px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 0 25px 1px #0000000f !important;
             width: 96.5%;
             margin: auto;
         }
@@ -115,6 +115,10 @@
             box-shadow: 0 3px 1px -2px #0003, 0 2px 2px 0 #00000024, 0 1px 5px 0 #0000001f;
         }
 
+            .btn:hover {
+                opacity: 0.9;
+            }
+
         .btn-clear {
             width: 80px;
             text-align: center;
@@ -130,18 +134,14 @@
             font-size: 13px;
         }
 
-        .btn:hover {
-            opacity: 0.9;
-        }
-
-        .btn-clear:hover {
-            opacity: 0.8;
-        }
+            .btn-clear:hover {
+                opacity: 0.8;
+            }       
 
         .filtered-deliveries-container {
             background-color: #ffff;
             margin-top: 20px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 0 25px 1px #0000000f !important;
         }
 
         .quick-search-form {
@@ -210,6 +210,12 @@
             background-color: #73EC8B;
             opacity: 90%;
         }
+
+        .no-found {
+            padding: 15px;
+            color: #00aa87;
+            text-align: center;
+        }
     </style>
 </head>
 
@@ -228,7 +234,7 @@
             </button>
             <div class="profile-dropdown-menu" id="profileDropdown">
                 <a asp-action="CompanyDetails" asp-controller="Clients">Company details</a>
-                <a asp-action="CompanyContactDetails" asp-controller="Clients">Contact details</a>
+                <a asp-action="ContactDetails" asp-controller="Clients">Contact details</a>
                 <a asp-action="Logout" asp-controller="Home">Logout</a>
             </div>
         </div>
@@ -357,19 +363,17 @@
             }
             else
             {
-                <p class="text-center">No deliveries found matching the search criteria.</p>
+                <p class="no-found">No requests found matching the search criteria.</p>
             }
         </div>
     </div>
 
     <script>
-
         document.addEventListener('DOMContentLoaded', function () {
             flatpickr(".flatpickr", {
-                dateFormat: "d/M/yy", // Specify the desired date format
+                dateFormat: "Y-m-d",
             });
         });
-
     </script>
 
 </body>

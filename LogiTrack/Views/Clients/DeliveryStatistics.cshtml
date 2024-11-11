@@ -1,0 +1,187 @@
+﻿@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Driver Dashboard</title>
+    <link rel="stylesheet" href="~/css/site.css" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script src="~/js/site.js"></script>
+    <style>
+        .chart-container {
+            background-color:white;
+            width: 800px;
+        }
+        .chart-container{
+            width: 50%;
+        }
+    </style>
+
+</head>
+
+<body>
+    <header class="header">
+        <div class="logo-name">
+            <div class="company-logo">
+                <img src="https://via.placeholder.com/50" alt="Company Logo">
+            </div>
+            <div class="company-name">LogiTrack</div>
+        </div>
+        <div class="profile-dropdown">
+            <button onclick="toggleDropdown()">
+                <i class="bi bi-person-circle"></i>
+                <span class="arrow">&#x25BC;</span>
+            </button>
+            <div class="profile-dropdown-menu" id="profileDropdown">
+                <a asp-action="CompanyDetails" asp-controller="Clients">Company details</a>
+                <a asp-action="ContactDetails" asp-controller="Clients">Contact details</a>
+                <a asp-action="Logout" asp-controller="Home">Logout</a>
+            </div>
+        </div>
+    </header>
+    <aside class="sidebar">
+        <ul>
+            <li><a asp-action="Dashboard" asp-controller="Clients"><i class="bi bi-house-door"></i> Dashboard</a></li>
+            <li>
+                <a asp-action="MyRequests" asp-controller="Clients"><i class="bi bi-money"></i> Requests <span class="arrow">></span></a>
+                <div class="dropdown-menu">
+                    <ul>
+                        <li><a asp-action="MakeRequest" asp-controller="Clients">New</a></li>
+                        <li><a asp-action="MyRequests" asp-controller="Clients">Search</a></li>
+                    </ul>
+                </div>
+            </li>
+            <li>
+                <a asp-action="MyOffers" asp-controller="Clients"><i class="bi bi-money"></i> Offers <span class="arrow">></span></a>
+                <div class="dropdown-menu">
+                    <ul>
+                        <li><a asp-action="HaveOffer" asp-controller="Clients">Book</a></li>
+                        <li><a asp-action="MyOffers" asp-controller="Clients">Search</a></li>
+                    </ul>
+                </div>
+            </li>
+            <li>
+                <a asp-action="MyDeliveries" asp-controller="Clients"><i class="bi bi-money"></i> Deliveries <span class="arrow">></span></a>
+                <div class="dropdown-menu">
+                    <ul>
+                        <li><a asp-action="SearchDelivery" asp-controller="Clients">Track</a></li>
+                        <li><a asp-action="MyDeliveries" asp-controller="Clients">Search</a></li>
+                    </ul>
+                </div>
+            </li>
+            <li>
+                <a asp-action="MyInvoices" asp-controller="Clients"><i class="bi bi-money"></i> Invoices <span class="arrow">></span></a>
+            </li>
+        </ul>
+    </aside>
+    <div class="main-content">
+        <div class="chart-container">
+        <canvas id="deliveryChart" width="400" height="400" class="chart"></canvas>
+            <canvas id="monthlyDeliveryChart"></canvas>
+
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        async function fetchDeliveryCounts() {
+            try {
+                const response = await fetch('/Clients/GetDeliveryTypes');
+                const data = await response.json();
+
+                const domesticCount = data.domestic ?? 0;
+                const internationalCount = data.international ?? 0;
+
+                const ctx = document.getElementById('deliveryChart').getContext('2d');
+                const deliveryChart = new Chart(ctx, {
+                    type: 'pie',
+                    data: {
+                        labels: ['Domestic', 'International'],
+                        datasets: [{
+                            label: 'Deliveries',
+                            data: [domesticCount, internationalCount],
+                            backgroundColor: ['#00aa87', '#e74c3c'],
+                            hoverOffset: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                            }
+                        }
+                    }
+                });
+
+            } catch (error) {
+                console.error('Error fetching delivery counts:', error);
+            }
+        }
+        async function fetchMonthlyDeliveries() {
+            try {
+                const response = await fetch('/Clients/GetDeliveryCounts');
+                const data = await response.json();
+
+                console.log('Fetched data:', data);
+
+                // Create the Chart.js bar chart
+                const ctx = document.getElementById('monthlyDeliveryChart').getContext('2d');
+                const monthlyDeliveryChart = new Chart(ctx, {
+                    type: 'bar', // Change to 'bar' for bar chart
+                    data: {
+                        labels: data.months, // Array of month names
+                        datasets: [{
+                            label: 'Deliveries per Month',
+                            data: data.deliveries, // Array of delivery counts
+                            backgroundColor: '#3498db',
+                            borderColor: '#2980b9',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    stepSize: 1
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false 
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function (tooltipItem) {
+                                        return 'Deliveries: ' + tooltipItem.raw;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+
+            } catch (error) {
+                console.error('Error fetching monthly deliveries:', error);
+            }
+        }
+        fetchMonthlyDeliveries();
+
+        fetchDeliveryCounts();
+    </script>
+</body>
+
+</html>
+
+

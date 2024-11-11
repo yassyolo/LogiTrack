@@ -1,7 +1,6 @@
-﻿@model LogiTrack.Core.ViewModels.Clients.ContactDetailsViewModel
-
+﻿@model LogiTrack.Core.ViewModels.Clients.NewCompanyDetailsForLogisticsViewModel
 @{
-	Layout = null;
+    Layout = null;
 }
 <!DOCTYPE html>
 <html lang="en">
@@ -19,20 +18,19 @@
             font-family: 'Roboto', sans-serif;
         }
 
-        .contact-container {
+        .license-container {
             width: 800px;
             background-color: #ffffff;
             box-shadow: 0 0 25px 1px #0000000f !important;
             display: block;
         }
 
-        .contact-title {
+        .license-title {
             font-size: 23px;
             font-weight: 700;
             color: #000;
             margin-bottom: 10px;
-            padding:20px;
-            margin-top: 10px;
+            padding: 20px;
         }
 
         .divider-line {
@@ -46,10 +44,9 @@
             color: #00aa87;
             font-weight: 600;
             margin-bottom: 25px;
-
         }
 
-        .contact-row {
+        .license-row {
             display: flex;
             justify-content: space-between;
             font-size: 16px;
@@ -58,20 +55,46 @@
             margin-left: 10px;
         }
 
-            .contact-row span {
+            .license-row span {
                 color: black;
                 font-size: 15px;
-                flex: 1; 
+                flex: 1;
             }
 
-                .contact-row span:first-child {
-                    width: 150px; 
+                .license-row span:first-child {
+                    width: 150px;
                     font-weight: bold;
                 }
-       
+
         .details-info {
             padding: 20px;
         }
+
+        .title-button{
+			display:flex;
+			justify-content:space-between;
+			margin-bottom:10px;
+			flex-direction : row;
+			width: 90%;
+        }
+
+        .btn {
+            background-color: #00aa87;
+            height: 15px;
+            text-decoration: none;
+            margin-top:15px;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            padding: 10px 15px;
+            cursor: pointer;
+            margin-left: 10px;
+            box-shadow: 0 3px 1px -2px #0003, 0 2px 2px 0 #00000024, 0 1px 5px 0 #0000001f;
+        }
+
+            .btn:hover {
+                opacity: 0.9;
+            }
     </style>
 
 </head>
@@ -90,15 +113,25 @@
                 <span class="arrow">&#x25BC;</span>
             </button>
             <div class="profile-dropdown-menu" id="profileDropdown">
-                <a asp-action="CompanyDetails" asp-controller="Clients">Company details</a>
-                <a asp-action="ContactDetails" asp-controller="Clients">Contact details</a>
+                <a asp-action="Details" asp-controller="Driver">Personal details</a>
+                <a asp-action="LicenseDetails" asp-controller="Driver">License</a>
                 <a asp-action="Logout" asp-controller="Home">Logout</a>
             </div>
         </div>
     </header>
+
     <aside class="sidebar">
         <ul>
-            <li><a asp-action="Dashboard" asp-controller="Clients"><i class="bi bi-house-door"></i> Dashboard</a></li>
+            <li><a asp-action="Dashboard" asp-controller="Logistics"><i class="bi bi-house-door"></i> Dashboard</a></li>
+            <li>
+                <a href="#"><i class="bi bi-money"></i> Clients <span class="arrow">></span></a>
+                <div class="dropdown-menu">
+                    <ul>
+                        <li><a asp-action="GetPendingRegistrations" asp-controller="Logistics">New regsitration</a></li>
+                        <li><a asp-action="ClientsRegister" asp-controller="Logistics">Clients Register</a></li>
+                    </ul>
+                </div>
+            </li>
             <li>
                 <a asp-action="MyRequests" asp-controller="Clients"><i class="bi bi-money"></i> Requests <span class="arrow">></span></a>
                 <div class="dropdown-menu">
@@ -132,34 +165,63 @@
         </ul>
     </aside>
     <div class="main-content">
-        <div class="contact-container">
-            <div class="contact-title">Contact details</div>
+        <div class="license-container">
+            <div class="title-button">
+            <div class="license-title">Company details</div>
+            <a asp-action="ApprovePendingRegistration" class="btn" asp-controller="Clients" asp-route-id="@Model.Id">APPROVE</a>
+            </div>
             <div class="divider-line"></div>
             <div class="details-info">
-                <div class="general-details">User Information</div>
-                <div class="contact-row">
-                    <span><b>Username</b></span>
-                    <span>@Model.Username</span>
+                <div class="general-details">General Information</div>
+                <div class="license-row">
+                    <span><b>Name</b></span>
+                    <span>@Model.Name</span>
                 </div>
-                <div class="contact-row">
+                <div class="license-row">
+                    <span><b>Registration number</b></span>
+                    <span>@Model.RegistrationNumber</span>
+                </div>
+                <div class="license-row">
+                    <span><b>Industry</b></span>
+                    <span>@Model.Industry</span>
+                </div>
+                <div class="divider-line"></div>
+                <div class="general-details">Address</div>
+                <div class="license-row">
+                    <span><b>City</b></span>
+                    <span>@Model.City, @Model.PostalCode</span>
+                </div>
+                <div class="license-row">
+                    <span><b>Country</b></span>
+                    <span>@Model.Country</span>
+                </div>
+                <div class="license-row">
+                    <span><b>Street</b></span>
+                    <span>@Model.Street</span>
+                </div>
+            </div>
+            <div class="divider-line"></div>
+            <div class="details-info">
+                <div class="general-details">Contact Information</div>
+                <div class="license-row">
                     <span><b>Email</b></span>
                     <span>@Model.Email</span>
                 </div>
                 <div class="divider-line"></div>
-
                 <div class="general-details">Contact information</div>
-                <div class="contact-row">
+                <div class="license-row">
                     <span><b>Contact person</b></span>
                     <span>@Model.ContactPerson</span>
                 </div>
-                <div class="contact-row">
+                <div class="license-row">
                     <span><b>Phone number</b></span>
                     <span>@Model.PhoneNumber</span>
                 </div>
-                <div class="contact-row">
+                <div class="license-row">
                     <span><b>Alternative phone number</b></span>
                     <span>@Model.AlternativePhoneNumber</span>
                 </div>
+
             </div>
         </div>
     </div>

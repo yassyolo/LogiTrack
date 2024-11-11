@@ -1,4 +1,4 @@
-﻿@model LogiTrack.Core.ViewModels.Clients.MyInvoicesViewModel
+﻿@model LogiTrack.Core.ViewModels.Invoice.ClientsInvoicesViewModel
 @{
     Layout = null;
 }
@@ -23,7 +23,7 @@
         .container {
             background-color: white;
             padding: 20px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 0 25px 1px #0000000f !important;
             width: 96.5%;
             margin: auto;
         }
@@ -114,6 +114,10 @@
             box-shadow: 0 3px 1px -2px #0003, 0 2px 2px 0 #00000024, 0 1px 5px 0 #0000001f;
         }
 
+            .btn:hover {
+                opacity: 0.9;
+            }
+
         .btn-clear {
             width: 80px;
             text-align: center;
@@ -129,15 +133,11 @@
             font-size: 13px;
         }
 
-        .btn:hover {
-            opacity: 0.9;
-        }
+            .btn-clear:hover {
+                opacity: 0.8;
+            }
 
-        .btn-clear:hover {
-            opacity: 0.8;
-        }
-
-        .filtered-deliveries-container {
+        .filtered-items-container {
             background-color: #ffff;
             margin-top: 20px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
@@ -152,7 +152,7 @@
                 width: 55%;
             }
 
-        .delivery-header {
+        .item-header {
             display: flex;
             justify-content: space-between;
             background-color: #ffffff;
@@ -162,7 +162,7 @@
             width: 90%;
         }
 
-        .delivery-card {
+        .item-card {
             background-color: white;
             font-size: 0.80rem;
             display: flex;
@@ -172,11 +172,11 @@
             overflow: hidden;
         }
 
-            .delivery-card:nth-child(even) {
+            .item-card:nth-child(even) {
                 background-color: #F5F5F7;
             }
 
-        .delivery-info {
+        .item-info {
             display: flex;
             width: 90%;
             justify-content: space-between;
@@ -210,29 +210,44 @@
                 <span class="arrow">&#x25BC;</span>
             </button>
             <div class="profile-dropdown-menu" id="profileDropdown">
-                <a asp-action="DriverDetails" asp-controller="Driver">Personal details</a>
+                <a asp-action="CompanyDetails" asp-controller="Clients">Company details</a>
+                <a asp-action="ContactDetails" asp-controller="Clients">Contact details</a>
                 <a asp-action="Logout" asp-controller="Home">Logout</a>
             </div>
         </div>
     </header>
-
     <aside class="sidebar">
         <ul>
-            <li><a asp-action="Dashboard" asp-controller="Accountant"><i class="bi bi-house-door"></i> Dashboard</a></li>
+            <li><a asp-action="Dashboard" asp-controller="Clients"><i class="bi bi-house-door"></i> Dashboard</a></li>
             <li>
-                <a asp-action="SearchDeliveries" asp-controller="Accountant"><i class="bi bi-truck"></i> Deliveries</a>
-            </li>
-            <li>
-                <a asp-action="SearchCashRegisters" asp-controller="Accountant"><i class="bi bi-money"></i> Cash registers <span class="arrow">></span></a>
+                <a asp-action="MyRequests" asp-controller="Clients"><i class="bi bi-money"></i> Requests <span class="arrow">></span></a>
                 <div class="dropdown-menu">
                     <ul>
-                        <li><a asp-action="SearchDelivery" asp-controller="Accountant">New cash register</a></li>
-                        <li><a asp-action="SearchCashRegisters" asp-controller="Accountant">Search</a></li>
+                        <li><a asp-action="MakeRequest" asp-controller="Clients">New</a></li>
+                        <li><a asp-action="MyRequests" asp-controller="Clients">Search</a></li>
                     </ul>
                 </div>
             </li>
             <li>
-                <a asp-action="SearchInvoices" asp-controller="Accountant"><i class="bi bi-money"></i> Invoices</a>
+                <a asp-action="MyOffers" asp-controller="Clients"><i class="bi bi-money"></i> Offers <span class="arrow">></span></a>
+                <div class="dropdown-menu">
+                    <ul>
+                        <li><a asp-action="HaveOffer" asp-controller="Clients">Book</a></li>
+                        <li><a asp-action="MyOffers" asp-controller="Clients">Search</a></li>
+                    </ul>
+                </div>
+            </li>
+            <li>
+                <a asp-action="MyDeliveries" asp-controller="Clients"><i class="bi bi-money"></i> Deliveries <span class="arrow">></span></a>
+                <div class="dropdown-menu">
+                    <ul>
+                        <li><a asp-action="SearchDelivery" asp-controller="Clients">Track</a></li>
+                        <li><a asp-action="MyDeliveries" asp-controller="Clients">Search</a></li>
+                    </ul>
+                </div>
+            </li>
+            <li>
+                <a asp-action="MyInvoices" asp-controller="Clients"><i class="bi bi-money"></i> Invoices <span class="arrow">></span></a>
             </li>
         </ul>
     </aside>
@@ -240,7 +255,7 @@
         <div class="container mt-5">
             <div class="quick-search-header">
                 <img src="https://via.placeholder.com/40" alt="Quick Search Icon" class="search-icon">
-                <h2 class="quick-search-title">Quick Search</h2>
+                <h2 class="quick-search-title">My invoices</h2>
             </div>
             <p class="search-description">Please enter your search criteria</p>
 
@@ -274,13 +289,13 @@
                 </div>
                 <div class="button-group">
                     <button type="submit" class="btn"><b>GO</b></button>
-                    <a asp-action="SearchInvoices" asp-action="Accountant" type="reset" class="btn btn-clear"><b>CLEAR</b></a>
+                    <a asp-action="MyInvoices" asp-action="Clients" type="reset" class="btn btn-clear"><b>CLEAR</b></a>
                 </div>
             </form>
         </div>
 
-        <div class="filtered-deliveries-container">
-            <form asp-action="SearchDeliveries" asp-controller="Accountant" method="get" class="quick-search-form">
+        <div class="filtered-items-container">
+            <form asp-action="MyDeliveries" asp-controller="Clients" method="get" class="quick-search-form">
                 <div class="form-group">
                     <input type="text" id="keyword" asp-for="SearchTerm" placeholder="Enter keyword">
                     <button type="submit">
@@ -290,7 +305,7 @@
                     </button>
                 </div>
             </form>
-            <div class="delivery-header">
+            <div class="item-header">
                 <span> Invoice No</span>
                 <span>Date</span>
                 <span>Amount</span>
@@ -299,29 +314,29 @@
             </div>
             @if (Model.Invoices.Any())
             {
-                <div class="delivery-list">
+                <div class="item-list">
                     @foreach (var delivery in Model.Invoices)
                     {
-                        <div class="delivery-card">
-                            <div class="delivery-info">
+                        <div class="item-card">
+                            <div class="item-info">
                                 <a asp-action="DeliveryDetails" asp-controller="Accountant" asp-route-id="@delivery.DeliveryId" style="text-decoration:none; color:inherit;"><span>@delivery.Number</span></a>
                                 <span>@delivery.Date</span>
                                 <span>@delivery.Amount</span>
                                 <span>
                                     @if (delivery.IsPaid)
                                     {
-                                        <p style="color: #00aa87;">Yes</p>
+                                        <i class="bi bi-check-circle-fill" style="color: #00aa87;">BOOK</i>
                                     }
                                     else
                                     {
                                         <p style="color: #00aa87;">No</p>
                                     }
                                 </span>
-                                <div class="cell">
+                                <span>
                                     <a href="@delivery.FileUrl" target="_blank" class="file-icon" title="View or Download File">
                                         <i class="fas fa-file-download"></i> See
                                     </a>
-                                </div>
+                                </span>
 
                             </div>
                         </div>
@@ -336,18 +351,6 @@
     </div>
 
     <script>
-        document.querySelectorAll('.delivery-card').forEach(card => {
-            card.addEventListener('mouseenter', () => {
-                const metrics = card.querySelector('.delivery-metrics');
-                metrics.style.display = 'flex';
-                metrics.style.width = `${card.clientWidth}px`;
-            });
-
-            card.addEventListener('mouseleave', () => {
-                const metrics = card.querySelector('.delivery-metrics');
-                metrics.style.display = 'none';
-            });
-        });
         document.addEventListener('DOMContentLoaded', function () {
             flatpickr(".flatpickr", {
                 dateFormat: "Y-m-d",

@@ -1,6 +1,6 @@
 ﻿@model LogiTrack.Core.ViewModels.Clients.ClientsDashboardViewModel
 @{
-Layout = null;
+    Layout = null;
 }
 
 <!DOCTYPE html>
@@ -28,22 +28,11 @@ Layout = null;
             display: flex;
             align-items: center;
             background-color: white;
-            box-shadow: 0 0 25px 1px #0000000f !important;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
             width: calc((100% - 40px) / 3);
             padding: 10px;
             height: 90px;
         }
-
-            .card h3 {
-                margin: 0;
-                font-size: 1.1rem;
-            }
-
-            .card p {
-                margin: 0;
-                font-size: 1.12rem;
-                color: #666;
-            }
 
         .card-icon {
             margin-left: 10px;
@@ -64,6 +53,17 @@ Layout = null;
         .card-content {
             flex-grow: 1;
             padding: 0 10px;
+        }
+
+        .card h3 {
+            margin: 0;
+            font-size: 1.1rem;
+        }
+
+        .card p {
+            margin: 0;
+            font-size: 1.12rem;
+            color: #666;
         }
 
         .card-button {
@@ -102,16 +102,10 @@ Layout = null;
             align-items: center;
         }
 
-            .diagram-header h3 {
-                font-size: 1.1rem;
-                color: #00aa87;
-                letter-spacing: revert;
-            }
-
         .see-all {
             text-decoration: underline;
-            color: #707070;
-            font-size: 14px;
+            color: #1e87f0;
+            font-size: 0.9rem;
         }
 
         .delivery {
@@ -135,21 +129,9 @@ Layout = null;
                 font-weight: bold;
             }
 
-        .delivery-tracking {
-            display: flex;
-            flex-direction: row;
-            margin-bottom: 15px;
-        }
-
         .addresses {
-            margin-left: 10px;
+            margin-left: 5px;
             font-size: 0.85rem;
-            width: 80%;
-            flex-wrap: wrap;
-        }
-
-        .pickup-address, .delivery-address {
-            margin: 0;
         }
 
         .client-company {
@@ -162,17 +144,24 @@ Layout = null;
             margin: 0 10px;
         }
 
+        .addresses {
+            margin-left: 10px;
+        }
+
+        .pickup-address, .delivery-address {
+            margin: 0;
+        }
+
         .ref-num {
             text-decoration: none;
-            color: black;
-            text-rendering: optimizelegibility;
         }
 
         .paid-button {
             background-color: #28a745;
             color: white;
             border: none;
-            border-radius: 50%;
+            border-radius: 5px;
+            padding: 5px 10px;
             cursor: default;
             font-size: 0.85rem;
         }
@@ -181,6 +170,16 @@ Layout = null;
             display: grid;
             grid-template-columns: repeat(5, 1fr);
             gap: 50px;
+            font-size: 0.85rem;
+        }
+
+        .paid-button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 5px 10px;
+            cursor: default;
             font-size: 0.85rem;
         }
 
@@ -200,8 +199,7 @@ Layout = null;
             align-items: center;
             margin-top: 10px;
             width: 30%;
-            margin-left: 35px;
-           
+            margin-left: 15px;
         }
 
         .dot {
@@ -213,6 +211,12 @@ Layout = null;
         .line {
             flex: 1;
             height: 3px;
+        }
+
+        .delivery-tracking {
+            display: flex;
+            flex-direction: row;
+            margin-bottom: 15px;
         }
     </style>
 
@@ -232,15 +236,24 @@ Layout = null;
                 <span class="arrow">&#x25BC;</span>
             </button>
             <div class="profile-dropdown-menu" id="profileDropdown">
-                <a asp-action="CompanyDetails" asp-controller="Clients">Company details</a>
-                <a asp-action="ContactDetails" asp-controller="Clients">Contact details</a>
+                <a asp-action="CompanyDetails" asp-controller="Logistics">Company details</a>
+
                 <a asp-action="Logout" asp-controller="Home">Logout</a>
             </div>
         </div>
     </header>
     <aside class="sidebar">
         <ul>
-            <li><a asp-action="Dashboard" asp-controller="Clients"><i class="bi bi-house-door"></i> Dashboard</a></li>
+            <li><a asp-action="Dashboard" asp-controller="Logistics"><i class="bi bi-house-door"></i> Dashboard</a></li>
+            <li>
+                <a href="#"><i class="bi bi-money"></i> Clients <span class="arrow">></span></a>
+                <div class="dropdown-menu">
+                    <ul>
+                        <li><a asp-action="GetPendingRegistrations" asp-controller="Clients">New regsitration</a></li>
+                        <li><a asp-action="ClientsRegister" asp-controller="Clients">Clients Register</a></li>
+                    </ul>
+                </div>
+            </li>
             <li>
                 <a asp-action="MyRequests" asp-controller="Clients"><i class="bi bi-money"></i> Requests <span class="arrow">></span></a>
                 <div class="dropdown-menu">
@@ -328,7 +341,7 @@ Layout = null;
                 {
                     <div class="delivery">
                         <div class="delivery-info">
-                            <a asp-action="DeliveryDetails" asp-controller="Clients" asp-route-id="@item.Id" class="ref-num"></a>
+                            <a asp-action="DeliveryDetails" asp-controller="Clients" asp-route-id="@item.Id"></a>
                             <img src="~/dashboard_books_dots.svg" alt="Road" class="road-icon">
                             <div class="addresses">
                                 <p class="pickup-address"><b>@item.PickupAddress</b></p>
@@ -350,25 +363,25 @@ Layout = null;
                 {
                     <div class="delivery-tracking">
 
-                        <a asp-action="DeliveryDetails" asp-controller="Clients" asp-route-id="@item.Id" class="ref-num">@item.ReferenceNumber</a>
+                        <a asp-action="DeliveryDetails" asp-controller="Clients" asp-route-id="@item.Id">@item.ReferenceNumber</a>
 
                         <div class="delivery-info">
                             <a asp-action="DeliveryDetails" asp-controller="Driver"></a>
                             <img src="~/dashboard_books_dots.svg" alt="Road" class="road-icon">
                             <div class="addresses">
-                                <p class="pickup-address"><b>@item.PickupAddress</b></p>
-                                <p class="delivery-address"><b>@item.DeliveryAddress</b></p>
+                                <p class="pickup-address"><b>PickupAddress</b></p>
+                                <p class="delivery-address"><b>DeliveryAddress</b></p>
                             </div>
                         </div>
 
                         <div class="tracking-line">
-                            <div class="dot" style="background-color: @(item.DeliveryStep >= 1 ? "#00aa87" : "gray")"></div>
-                            <div class="line" style="background-color: @(item.DeliveryStep >= 2 ? "#00aa87" : "gray")"></div>
-                            <div class="dot" style="background-color: @(item.DeliveryStep >= 2 ? "#00aa87" : "gray")"></div>
-                            <div class="line" style="background-color: @(item.DeliveryStep >= 3 ? "#00aa87" : "gray")"></div>
-                            <div class="dot" style="background-color: @(item.DeliveryStep >= 3 ? "#00aa87" : "gray")"></div>
-                            <div class="line" style="background-color: @(item.DeliveryStep >= 4 ? "#00aa87" : "gray")"></div>
-                            <div class="dot" style="background-color: @(item.DeliveryStep >= 4 ? "#00aa87" : "gray")"></div>
+                            <div class="dot" style="background-color: @(item.DeliveryStep >= 1 ? "green" : "gray")"></div>
+                            <div class="line" style="background-color: @(item.DeliveryStep >= 2 ? "green" : "gray")"></div>
+                            <div class="dot" style="background-color: @(item.DeliveryStep >= 2 ? "green" : "gray")"></div>
+                            <div class="line" style="background-color: @(item.DeliveryStep >= 3 ? "green" : "gray")"></div>
+                            <div class="dot" style="background-color: @(item.DeliveryStep >= 3 ? "green" : "gray")"></div>
+                            <div class="line" style="background-color: @(item.DeliveryStep >= 4 ? "green" : "gray")"></div>
+                            <div class="dot" style="background-color: @(item.DeliveryStep >= 4 ? "green" : "gray")"></div>
                         </div>
                     </div>
                 }
@@ -391,11 +404,10 @@ Layout = null;
                 {
                     <div class="invoice">
                         <p>@invoice.InvoiceNumber</p>
-                        <p>@invoice.Date</p>
+                        <p>@DateTime.Now.ToShortDateString()</p>
                         <p>@invoice.CreationDate</p>
                         <p>@invoice.Amount</p>
-                        <i class="bi bi-check-circle-fill" style="color: #00aa87;"></i>
-
+                        <button class="paid-button" style="display:@(invoice.IsPaid == true ? "inline-block" : "none")">Paid</button>
                     </div>
                 }
             </div>
@@ -408,7 +420,7 @@ Layout = null;
     <script>
         $(document).ready(function () {
             $.ajax({
-                url: '/Clients/GetCalendarEvents',
+                url: '/Clients/GetCalendarEvents',  // Ensure this path matches your controller route
                 type: 'GET',
                 success: function (events) {
                     var calendarEl = document.getElementById('calendar');
@@ -423,7 +435,7 @@ Layout = null;
                             return {
                                 id: event.id,
                                 title: event.title,
-                                start: event.date.split("T")[0],
+                                start: event.date.split("T")[0],  // Trim off the time part for day-based events
                                 backgroundColor: getColor(event.type)
                             };
                         }),

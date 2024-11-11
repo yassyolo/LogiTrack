@@ -1,4 +1,4 @@
-﻿@model LogiTrack.Core.ViewModels.Clients.RequestDetailsViewModel
+﻿@model LogiTrack.Core.ViewModels.Request.RequestViewModel
 @{
     Layout = null;
 }
@@ -12,11 +12,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Driver Dashboard</title>
     <link rel="stylesheet" href="~/css/site.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css">
     <script src="~/js/site.js"></script>
     <style>
-        .delivery-details-container {
+        .details-container {
             width: 85%;
         }
 
@@ -32,7 +32,7 @@
             margin-bottom: 40px;
         }
 
-        .delivery-image {
+        .image {
             width: 50px;
             height: auto;
             margin-right: 20px;
@@ -64,30 +64,53 @@
             flex-wrap: wrap;
             flex-direction: row;
             padding: 10px;
-            gap: 50px;
+            justify-content: space-between;
         }
 
-        .road-icon{
-			width: 20px;
-			margin-right: 10px;
+        .road-icon {
+            width: 20px;
+            margin-right: 10px;
             height: 40px;
         }
 
-        .request-details-column p{
-            color: darkslategrey;
-            font-size: 0.9rem;
+        .request-details-column {
+            width: 30%;
+            margin-bottom: 20px;
         }
 
-        .dot-line{
-			display: flex;
-			align-items: center;
+            .request-details-column p {
+                color: darkslategrey;
+                font-size: 0.9rem;
+            }
+
+        .dot-line {
+            display: flex;
+            align-items: center;
         }
 
-        .adress-div{
-			display: flex;
-			flex-direction: column;
+        .adress-div {
+            display: flex;
+            flex-direction: column;
             flex-wrap: wrap;
             width: 120px;
+        }
+
+        .common-metrics {
+            display: flex;
+            flex-direction: row;
+            gap: 30px;
+        }
+
+        .title-details i {
+            margin-left: 30px;
+        }
+
+        .title {
+            margin: 0;
+        }
+
+        .title-details {
+            margin-bottom: 10px;
         }
 
     </style>
@@ -109,7 +132,7 @@
             </button>
             <div class="profile-dropdown-menu" id="profileDropdown">
                 <a asp-action="CompanyDetails" asp-controller="Clients">Company details</a>
-                <a asp-action="CompanyContactDetails" asp-controller="Clients">Contact details</a>
+                <a asp-action="ContactDetails" asp-controller="Clients">Contact details</a>
                 <a asp-action="Logout" asp-controller="Home">Logout</a>
             </div>
         </div>
@@ -150,105 +173,116 @@
         </ul>
     </aside>
     <div class="main-content">
-        <div class="delivery-details-container">
+        <div class="details-container">
             <div class="card">
                 <div class="details-header">
-                    <img src="https://via.placeholder.com/100" alt="Delivery Image" class="delivery-image">
+                    <img src="https://via.placeholder.com/100" alt="Delivery Image" class="image">
                     <h2><b> //TODO</b></h2>
                 </div>
                 <div class="card-contents">
-                <div class="request-details-column">
-                    <div class="header-image-div">
-                        <div class="header-image">
-                            <img src="https://via.placeholder.com/100" alt="" class="image-div" />
+                    <div class="request-details-column">
+                        <div class="header-image-div">
+                            <div class="header-image">
+                                <img src="https://via.placeholder.com/100" alt="" class="image-div" />
+                            </div>
+                            <h5>Reguest details</h5>
                         </div>
-                        <h5>Shipping details</h5>
-                    </div>
-                    <div class="title-details">
-                        <h5 class="title">Expected delivery date:</h5>
-                        <p>@Model.ExpectedDeliveryDate</p>
-                    </div>
-                    <div class="adress-details">
-                        <div class="dot-line">
-                            <img src="~/dashboard_books_dots.svg" alt="Road" class="road-icon">
-                            <div class="adress-div">
-                            <div class="title-details">
-                                <h5 class="title">Origin:</h5>
-                                <p>@Model.PickupAddress</p>
-                            </div>
-                            <div class="title-details">
-                                <h5 class="title">Destination:</h5>
-                                <p>@Model.DeliveryAddress</p>
-                            </div>
+                        <div class="title-details">
+                            <h5 class="title">Expected delivery date</h5>
+                            <p>@Model.ExpectedDeliveryDate</p>
+                        </div>
+                        <div class="adress-details">
+                            <div class="dot-line">
+                                <img src="~/dashboard_books_dots.svg" alt="Road" class="road-icon">
+                                <div class="adress-div">
+                                    <div class="title-details">
+                                        <h5 class="title">Origin</h5>
+                                        <p>@Model.PickupAddress</p>
+                                    </div>
+                                    <div class="title-details">
+                                        <h5 class="title">Destination</h5>
+                                        <p>@Model.DeliveryAddress</p>
+                                    </div>
                                 </div>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="request-details-column">
-                    <div class="header-image-div">
-                        <div class="header-image">
-                            <img src="https://via.placeholder.com/100" alt="" class="image-div" />
+                    <div class="request-details-column">
+                        <div class="header-image-div">
+                            <div class="header-image">
+                                <img src="https://via.placeholder.com/100" alt="" class="image-div" />
+                            </div>
+                            <h5>Metrics</h5>
                         </div>
-                        <h5>Metrics</h5>
-                    </div>
-                    <div class="title-details">
-                        <h5 class="title">Pack:</h5>
-                        @if (Model.PalletsCount != string.Empty)
-                        {
-                            <p>@Model.PalletsCount X @Model.CargoType</p>
-                            <p>@Model.PalletsLength X @Model.PalletsWidth X @Model.PalletsHeight</p>
-                        }
-                        else
-                        {
-                            <p>@Model.NumberOfNonStandartGoods</p>
-                            foreach (var item in Model.NonStandardCargo)
+                        <div class="title-details">
+                            <h5 class="title">Pack</h5>
+                            @if (Model.PalletsCount != string.Empty)
                             {
-                                <p>@item.Length X @item.Width X @item.Height</p>
+                                <p>@Model.PalletsCount X @Model.CargoType</p>
+                                <p>@Model.PalletsLength X @Model.PalletsWidth X @Model.PalletsHeight</p>
                             }
-                        }
+                            else
+                            {
+                                <p>@Model.NumberOfNonStandartGoods</p>
+                                foreach (var item in Model.NonStandardCargo)
+                                {
+                                    <p>@item.Length X @item.Width X @item.Height</p>
+                                }
+                            }
 
-                    </div>
-                    <div class="title-details">
-                        <h5 class="title">Total weight:</h5>
-                        <p>@Model.TotalWeight</p>
-                    </div>
-                    <div class="title-details">
-                        <h5 class="title">Total volume:</h5>
-                        <p>@Model.TotalVolume</p>
-                    </div>
-                    <div class="title-details">
-                        <h5 class="title">Refrigerated:</h5>
-                        <p>@Model.IsRefrigerated</p>
-                    </div>
-                    <div class="title-details">
-                        <h5 class="title">Shared Truck:</h5>
-                        <p>@Model.SharedTruck</p>
-                    </div>
-                </div>
-                <div class="request-details-column">
-                    <div class="header-image-div">
-                        <div class="header-image">
-                            <img src="https://via.placeholder.com/100" alt="" class="image-div" />
                         </div>
-                        <h5>Info</h5>
+                        <div class="title-details">
+                            <h5 class="title">Total weight</h5>
+                            <p>@Model.TotalWeight m3</p>
+                        </div>
+                        <div class="title-details">
+                            <h5 class="title">Total volume</h5>
+                            <p>@Model.TotalVolume kg</p>
+                        </div>
+                        <div class="common-metrics">
+                            <div class="title-details">
+                                <h5 class="title">Refrigerated:</h5>
+                                @if (Model.IsRefrigerated)
+                                {
+                                    <i class="bi bi-check-circle-fill" style="color: #00aa87;"></i>
+
+                                }
+
+                            </div>
+                            <div class="title-details">
+                                <h5 class="title">Shared Truck:</h5>
+                                @if (Model.SharedTruck)
+                                {
+                                    <i class="bi bi-check-circle-fill" style="color: #00aa87;"></i>
+
+                                }
+                            </div>
+                        </div>
                     </div>
-                    <div class="title-details">
-                        <h5 class="title">Created on:</h5>
-                        <p>@Model.CreatedAt</p>
+                    <div class="request-details-column">
+                        <div class="header-image-div">
+                            <div class="header-image">
+                                <img src="https://via.placeholder.com/100" alt="" class="image-div" />
+                            </div>
+                            <h5>Info</h5>
+                        </div>
+                        <div class="title-details">
+                            <h5 class="title">Created on:</h5>
+                            <p>@Model.CreatedAt</p>
+                        </div>
+                        <div class="title-details">
+                            <h5 class="title">Special instructions:</h5>
+                            <p>@Model.SpecialInstructions</p>
+                        </div>
+                        <div class="title-details">
+                            <h5 class="title">Given price:</h5>
+                            <p>@Model.ApproximatePrice</p>
+                        </div>
+                        <div class="title-details">
+                            <h5 class="title">Status:</h5>
+                            <p>@Model.Status</p>
+                        </div>
                     </div>
-                    <div class="title-details">
-                        <h5 class="title">Special instructions:</h5>
-                        <p>@Model.SpecialInstructions</p>
-                    </div>
-                    <div class="title-details">
-                        <h5 class="title">Given price:</h5>
-                        <p>@Model.ApproximatePrice</p>
-                    </div>
-                    <div class="title-details">
-                        <h5 class="title">Status:</h5>
-                        <p>@Model.Status</p>
-                    </div>
-                </div>
                 </div>
             </div>
         </div>

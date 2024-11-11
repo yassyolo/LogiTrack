@@ -1,7 +1,9 @@
-﻿@model LogiTrack.Core.ViewModels.Delivery.ClientsDeliveriesViewModel
+﻿@model LogiTrack.Core.ViewModels.Driver.SearchDriverViewModel
 @{
     Layout = null;
 }
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,8 +13,7 @@
     <link rel="stylesheet" href="~/css/site.css" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>    <script src="~/js/site.js"></script>
+    <script src="~/js/site.js"></script>
     <style>
         body {
             font-family: 'Roboto', sans-serif;
@@ -21,7 +22,7 @@
         .container {
             background-color: white;
             padding: 20px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 0 25px 1px #0000000f !important;
             width: 96.5%;
             margin: auto;
         }
@@ -112,6 +113,10 @@
             box-shadow: 0 3px 1px -2px #0003, 0 2px 2px 0 #00000024, 0 1px 5px 0 #0000001f;
         }
 
+            .btn:hover {
+                opacity: 0.9;
+            }
+
         .btn-clear {
             width: 80px;
             text-align: center;
@@ -127,18 +132,14 @@
             font-size: 13px;
         }
 
-        .btn:hover {
-            opacity: 0.9;
-        }
-
-        .btn-clear:hover {
-            opacity: 0.8;
-        }
+            .btn-clear:hover {
+                opacity: 0.8;
+            }
 
         .filtered-deliveries-container {
             background-color: #ffff;
             margin-top: 20px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 0 25px 1px #0000000f !important;
         }
 
         .quick-search-form {
@@ -157,7 +158,7 @@
             padding: 30px;
             font-weight: bold;
             font-size: 0.90rem;
-            width: 95%;
+            width: 90%;
         }
 
         .delivery-card {
@@ -212,18 +213,6 @@
             padding: 15px;
             color: #00aa87;
             text-align: center;
-        }
-
-        .address {
-            width: 130px;
-            flex-wrap: wrap;
-        }
-
-        .checkboxes{
-            display:flex;
-            flex-direction: row;
-            gap: 20px;
-            width: 33%;
         }
     </style>
 </head>
@@ -287,53 +276,40 @@
         <div class="container mt-5">
             <div class="quick-search-header">
                 <img src="https://via.placeholder.com/40" alt="Quick Search Icon" class="search-icon">
-                <h2 class="quick-search-title">My deliveries</h2>
+                <h2 class="quick-search-title">Drivers register</h2>
             </div>
             <p class="search-description">Please enter your search criteria</p>
 
-            <form asp-action="SearchDeliveries" asp-controller="Accountant" method="get" class="search-form">
+            <form asp-action="DriversRegister" asp-controller="Logistics" method="get" class="search-form">
                 <div class="row">
+
                     <div class="form-group">
-                        <label asp-for="ReferenceNumber"><b>Ref No</b></label>
-                        <input type="text" id="ReferenceNumber" asp-for="ReferenceNumber" placeholder="Please enter">
-                        <span asp-validation-for="ReferenceNumber"></span>
+                        <label asp-for="Name"><b>Name</b></label>
+                        <input type="text" id="MaxWeightCapacity" asp-for="Name" class="flatpickr" placeholder="Please enter">
                     </div>
                     <div class="form-group">
-                        <label asp-for="MinPrice"><b>Min price</b></label>
-                        <input type="text" id="CompanyName" asp-for="MinPrice" placeholder="Please enter">
+                        <label asp-for="LicenseNumber"><b>License number</b></label>
+                        <input type="text" id="MinVolume" asp-for="LicenseNumber" class="flatpickr" placeholder="Please enter">
                     </div>
                     <div class="form-group">
-                        <label asp-for="MaxPrice"><b>Max price</b></label>
-                        <input type="text" id="CompanyName" asp-for="MaxPrice" placeholder="Please enter">
+                        <label asp-for="Salary"><b>Salary</b></label>
+                        <input type="text" id="MinVolume" asp-for="Salary" class="flatpickr" placeholder="Please enter">
                     </div>
                     <div class="form-group">
-                        <label asp-for="StartDate"><b>Start</b></label>
-                        <input type="date" id="StartDate" asp-for="StartDate" class="flatpickr" placeholder="Please enter">
-                    </div>
-                    <div class="form-group">
-                        <label asp-for="EndDate"><b>End</b></label>
-                        <input type="date" id="EndDate" class="flatpickr" asp-for="EndDate" placeholder="Please enter">
-                    </div>
-                    <div class="checkboxes">
-                    <div class="form-group">
-                        <label asp-for="IsPaid"><b>Paid</b></label>
-                        <input type="checkbox" id="IsPaid" asp-for="IsPaid">
-                    </div>
-                    <div class="form-group">
-                        <label asp-for="IsDelivered"><b>Delivered</b></label>
-                        <input type="checkbox" id="IsDelivered" asp-for="IsPaid">
-                    </div>
+                        <label asp-for="IsAvailable"><b>Available</b></label>
+                        <input asp-for="IsAvailable" type="checkbox" id="IsNewCheckbox">
+
                     </div>
                 </div>
                 <div class="button-group">
                     <button type="submit" class="btn"><b>GO</b></button>
-                    <a asp-action="SearchDeliveries" asp-action="Accountant" type="reset" class="btn btn-clear"><b>CLEAR</b></a>
+                    <a asp-action="VehiclesRegister" asp-action="Logistics" type="reset" class="btn btn-clear"><b>CLEAR</b></a>
                 </div>
             </form>
         </div>
 
         <div class="filtered-deliveries-container">
-            <form asp-action="SearchDeliveries" asp-controller="Accountant" method="get" class="quick-search-form">
+            <form asp-action="VehiclesRegister" asp-controller="Logistics" method="get" class="quick-search-form">
                 <div class="form-group">
                     <input type="text" id="keyword" asp-for="SearchTerm" placeholder="Enter keyword">
                     <button type="submit">
@@ -344,78 +320,51 @@
                 </div>
             </form>
             <div class="delivery-header">
-                <span>Ref No</span>
-                <span>Origin</span>
-                <span>Destination</span>
-                <span>Expected Date</span>
-                <span>Price</span>
-                <span>Delivered</span>
-                <span>Paid</span>
+                <span>Name</span>
+                <span>Age</span>
+                <span>Phone</span>
+                <span>Status</span>
             </div>
-            @if (Model.Deliveries.Any())
+            @if (Model.Drivers.Any())
             {
                 <div class="delivery-list">
-                    @foreach (var delivery in Model.Deliveries)
+                    @foreach (var delivery in Model.Drivers)
                     {
-                        <div class="delivery-card">
-                            <div class="delivery-info">
-                                <a asp-action="DeliveryDetails" asp-controller="Accountant" asp-route-id="@delivery.Id" style="text-decoration:none; color:inherit;"><span>@delivery.ReferenceNumber</span></a>
-                                <span class="address">@delivery.PickupAddress</span>
-                                <span class="address">@delivery.DeliveryAddress</span>
-                                
-                                <span>@delivery.ExpectedDeliveryDate</span>
-                                <span>@delivery.FinalPrice</span>
-                                <span>
-                                    @if (delivery.IsDelivered)
-                                    {
-                                        <i class="bi bi-check-circle-fill" style="color: #00aa87;"></i>
-                                    }
-                                </span>
-                                <span>
-                                    @if (delivery.IsPaid)
-                                    {
-                                        <i class="bi bi-check-circle-fill" style="color: #00aa87;"></i>
-                                    }
-                                </span>
+                        <a asp-action="VehicleDetails" asp-controller="Logistics" asp-route-id="@delivery.Id" style="text-decoration: none; color: inherit;">
+                            <div class="delivery-card">
+                                <div class="delivery-info">
+                                    <span>@delivery.Name</span>
+                                    <span>@delivery.Age</span>
+                                    <span>@delivery.Phone</span>
+                                    <span>
+                                        @if (delivery.IsAvailable)
+                                        {
+                                            <i class="bi bi-check-circle-fill" style="color: #00aa87;">BOOK</i>
+                                        }
+                                        </span>
+                                </div>
+                               
                             </div>
-                            <div class="delivery-metrics">
-                                <p><b>Packs:</b> @delivery.TotalItems</p>
-                                <p><b>Weight:</b> @delivery.TotalWeight</p>
-                                <p><b>Volume:</b> @delivery.TotalVolume</p>
-                            </div>
-                        </div>
+                        </a>
                     }
                 </div>
             }
             else
             {
-                <p class="no-found">No deliveries found matching the search criteria.</p>
+                <p class="no-found">No vehicles found matching the search criteria.</p>
             }
         </div>
     </div>
 
     <script>
-        document.querySelectorAll('.delivery-card').forEach(card => {
-            card.addEventListener('mouseenter', () => {
-                const metrics = card.querySelector('.delivery-metrics');
-                metrics.style.display = 'flex';
-                metrics.style.width = `${card.clientWidth}px`;
-            });
-
-            card.addEventListener('mouseleave', () => {
-                const metrics = card.querySelector('.delivery-metrics');
-                metrics.style.display = 'none';
-            });
-        });
         document.addEventListener('DOMContentLoaded', function () {
             flatpickr(".flatpickr", {
                 dateFormat: "Y-m-d",
             });
         });
-
-
     </script>
 
 </body>
 
 </html>
+

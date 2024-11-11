@@ -1,4 +1,4 @@
-﻿
+﻿@model List<LogiTrack.Core.ViewModels.Clients.PendingRegistrationsViewModel>
 @{
     Layout = null;
 }
@@ -9,7 +9,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Custom Accountant Dashboard</title>
+    <title>Driver Dashboard</title>
     <link rel="stylesheet" href="~/css/site.css" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css">
@@ -22,47 +22,67 @@
         .search-delivery {
             background-color: #fff;
             padding: 20px;
-            box-shadow: 0 0 25px 1px #0000000f !important;
-            width: 800px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
 
         .search-header {
             display: flex;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 30px;
+           border-bottom: 1px solid #ccc;
         }
 
         .search-icon {
             width: 40px;
             margin-right: 10px;
+            margin-bottom: 30px;
         }
 
         .search-title {
             font-size: 1.1rem;
             font-weight: 500;
+            margin-bottom: 40px;
         }
 
-        .have-offer-buttons {
-            display: flex;
-            margin-top: 15px;
+        .registration{
+            display:flex;
+justify-content:space-between;
+margin-bottom:20px;
+flex-direction : row;
+            border-bottom: 1px solid #ccc;
+            width: 90%;
+        }
+
+        .photo-header{
+			display:flex;
+			align-items:center;
             flex-direction: row;
-            margin-bottom: 30px;
-            gap: 20px;
-            align-content: center;
-            justify-content : center;
+		}
+
+        .photo-info{
+            margin-bottom: 10px;
         }
 
+        .user-photo{
+			width:100px;
+			margin-right:20px;
+            margin-bottom: 10px;
+		}
+
+        .btn-div{
+            margin-top:45px;
+        }
         .btn {
+            text-decoration: none;
             background-color: #00aa87;
             width: 110px;
             height: 35px;
             color: white;
             border: none;
             border-radius: 3px;
-            padding: 10px 25px;
-            text-decoration:none;
+            padding: 10px 15px;
             cursor: pointer;
-            margin-left: 50px;
+            margin-left: 10px;
             box-shadow: 0 3px 1px -2px #0003, 0 2px 2px 0 #00000024, 0 1px 5px 0 #0000001f;
         }
 
@@ -70,47 +90,6 @@
                 opacity: 0.9;
             }
 
-        .btn-clear {
-            width: 80px;
-            text-align: center;
-            text-decoration: none;
-            height: 15px;
-            text-decoration: none;
-            background-color: white;
-            color: #00aa87;
-            border: 1px solid #00aa87;
-            border-radius: 3px;
-            padding: 12px 27px;
-            cursor: pointer;
-            margin-left: 50px;
-            font-size: 13px;
-        }
-
-            .btn-clear:hover {
-                opacity: 0.8;
-            }
-
-        .have-offer{
-			display: flex;
-			flex-direction: column;
-			align-items: center;
-        }
-
-        h4{
-            color: #00aa87;
-        }
-
-        .have-offer-img{
-			width: 220px;
-            height: 280px;
-			margin-bottom: 20px;
-        }
-
-        .button-text p{
-			font-size: 13px;
-			color: #333;
-            margin-top:20px;
-        }
     </style>
 
 </head>
@@ -129,32 +108,30 @@
                 <span class="arrow">&#x25BC;</span>
             </button>
             <div class="profile-dropdown-menu" id="profileDropdown">
-                <a asp-action="CompanyDetails" asp-controller="Clients">Company details</a>
-                <a asp-action="ContactDetails" asp-controller="Clients">Contact details</a>
+                <a asp-action="CompanyDetails" asp-controller="Logistics">Company details</a>
+
                 <a asp-action="Logout" asp-controller="Home">Logout</a>
             </div>
         </div>
     </header>
     <aside class="sidebar">
         <ul>
-            <li><a asp-action="Dashboard" asp-controller="Clients"><i class="bi bi-house-door"></i> Dashboard</a></li>
+            <li><a asp-action="Dashboard" asp-controller="Logistics"><i class="bi bi-house-door"></i> Dashboard</a></li>
             <li>
-                <a asp-action="MyRequests" asp-controller="Clients"><i class="bi bi-money"></i> Requests <span class="arrow">></span></a>
+                <a href="#"><i class="bi bi-money"></i> Clients <span class="arrow">></span></a>
                 <div class="dropdown-menu">
                     <ul>
-                        <li><a asp-action="MakeRequest" asp-controller="Clients">New</a></li>
-                        <li><a asp-action="MyRequests" asp-controller="Clients">Search</a></li>
+                        <li><a asp-action="GetPendingRegistrations" asp-controller="Logistics">New regsitration</a></li>
+                        <li><a asp-action="ClientsRegister" asp-controller="Logistics">Clients Register</a></li>
                     </ul>
                 </div>
             </li>
             <li>
-                <a asp-action="MyOffers" asp-controller="Clients"><i class="bi bi-money"></i> Offers <span class="arrow">></span></a>
-                <div class="dropdown-menu">
-                    <ul>
-                        <li><a asp-action="HaveOffer" asp-controller="Clients">Book</a></li>
-                        <li><a asp-action="MyOffers" asp-controller="Clients">Search</a></li>
-                    </ul>
-                </div>
+                <a asp-action="VehiclesRegister" asp-controller="Logistics"><i class="bi bi-money"></i> Vehicles register </a>
+            </li>
+            <li>
+                <a asp-action="DriversRegister" asp-controller="Logistics"><i class="bi bi-money"></i> Drivers register </a>
+
             </li>
             <li>
                 <a asp-action="MyDeliveries" asp-controller="Clients"><i class="bi bi-money"></i> Deliveries <span class="arrow">></span></a>
@@ -174,24 +151,28 @@
         <div class="search-delivery">
             <div class="search-header">
                 <img src="https://via.placeholder.com/40" alt="Search Icon" class="search-icon">
-                <h2 class="search-title"><b>Book</b></h2>
+                <h2 class="search-title"><b>Pending Registration</b></h2>
             </div>
-            <div class="have-offer">
-            <h4>Do you have offer?</h4>
-                <img src="https://via.placeholder.com/40" alt="Search Icon" class="have-offer-img">
-                <div class="have-offer-buttons">
-                    <div class="button-text">
-                        <a asp-action="SearchOffer" asp-controller="Clients" class="btn">YES</a>
-                        <p>Yes, I will enter offer number</p>
+            @foreach (var item in Model)
+            {
+                <div class="registration">
+                    <div class="photo-header">
+                        <img src="https://via.placeholder.com/100" alt="User Photo" class="user-photo">
+                        <div class="photo-info">
+                        <h3>@item.Name</h3>
+                        <p><b>Registration number:</b>@item.RegistrationNumber</p>
+                        </div>
                     </div>
-                    <div class="button-text">
-                        <a asp-action="MakeRequest" asp-controller="Clients" class="btn btn-clear">NO</a>
-                        <p>No, I will make new request</p>
+                    <div class="info">
+                        <p><b>Email:</b> @item.Email</p>
+                        <p><b>Phone:</b> @item.PhoneNumber</p>
+                        <p><b>CreatedAt:</b> @item.CreatedAt</p>
+                    </div>
+                    <div class="btn-div">
+                        <a asp-action="NewCompanyDetails" asp-controller="Logistics" asp-route-id="@item.Id" class="btn">SEE  </a>
                     </div>
                 </div>
-            </div>
-
-           
+            }
         </div>
     </div>
 

@@ -1,8 +1,8 @@
-﻿@model LogiTrack.Core.ViewModels.Delivery.DeliveryForDriverViewModel
+﻿@model LogiTrack.Core.ViewModels.Delivery.DeliveryForClientViewModel
 @{
     Layout = null;
 }
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -178,6 +178,11 @@
             margin-top: 20px;
         }
 
+        .movement-header{
+			display: flex;
+			flex-direction: row;
+			gap: 100px;
+        }
         .movement-rows {
             display: flex;
             flex-direction: column;
@@ -192,7 +197,7 @@
 
         .movement-event {
             display: flex;
-            flex-direction: column;
+            flex-direction: row;
             align-items: center;
             text-align: center;
         }
@@ -202,6 +207,7 @@
             height: 10px;
             border-radius: 50%;
             background-color: gray;
+            margin-right: 2px;
         }
 
         .event-line {
@@ -222,14 +228,14 @@
         }
 
             .vehicles-section-header h4,
-            .address-column h4, .metrics-header h4, .special-instructions h4, 
+            .address-column h4, .metrics-header h4, .special-instructions h4,
             .status-header h4, .metrics h4 {
                 font-size: 20px;
                 color: #00aa87;
                 font-weight: 500;
             }
 
-        .address-column p, .status-header p{
+        .address-column p, .status-header p {
             font-size: 14px;
             color: black;
             opacity: 80%;
@@ -246,11 +252,11 @@
             margin-bottom: 20px;
         }
 
-        .status-header{
-			display: flex;
-			flex-direction: row;
-			gap: 180px;
-			margin-bottom: 20px;
+        .status-header {
+            display: flex;
+            flex-direction: row;
+            gap: 180px;
+            margin-bottom: 20px;
         }
 
         .metrics {
@@ -330,20 +336,44 @@
                 <span class="arrow">&#x25BC;</span>
             </button>
             <div class="profile-dropdown-menu" id="profileDropdown">
-                <a asp-action="Details" asp-controller="Driver">Personal details</a>
-                <a asp-action="LicenseDetails" asp-controller="Driver">License</a>
+                <a asp-action="CompanyDetails" asp-controller="Clients">Company details</a>
+                <a asp-action="ContactDetails" asp-controller="Clients">Contact details</a>
                 <a asp-action="Logout" asp-controller="Home">Logout</a>
             </div>
         </div>
     </header>
     <aside class="sidebar">
         <ul>
-            <li><a asp-action="Dashboard" asp-controller="Driver"><i class="bi bi-house-door"></i> Dashboard</a></li>
+            <li><a asp-action="Dashboard" asp-controller="Clients"><i class="bi bi-house-door"></i> Dashboard</a></li>
             <li>
-                <a asp-action="SearchDelivery" asp-controller="Driver"><i class="bi bi-journal"></i> New Delivery</a>
+                <a asp-action="MyRequests" asp-controller="Clients"><i class="bi bi-money"></i> Requests <span class="arrow">></span></a>
+                <div class="dropdown-menu">
+                    <ul>
+                        <li><a asp-action="MakeRequest" asp-controller="Clients">New</a></li>
+                        <li><a asp-action="MyRequests" asp-controller="Clients">Search</a></li>
+                    </ul>
+                </div>
             </li>
             <li>
-                <a asp-action="SearchDeliveries" asp-controller="Driver"><i class="bi bi-truck"></i> Deliveries</a>
+                <a asp-action="MyOffers" asp-controller="Clients"><i class="bi bi-money"></i> Offers <span class="arrow">></span></a>
+                <div class="dropdown-menu">
+                    <ul>
+                        <li><a asp-action="HaveOffer" asp-controller="Clients">Book</a></li>
+                        <li><a asp-action="MyOffers" asp-controller="Clients">Search</a></li>
+                    </ul>
+                </div>
+            </li>
+            <li>
+                <a asp-action="MyDeliveries" asp-controller="Clients"><i class="bi bi-money"></i> Deliveries <span class="arrow">></span></a>
+                <div class="dropdown-menu">
+                    <ul>
+                        <li><a asp-action="SearchDelivery" asp-controller="Clients">Track</a></li>
+                        <li><a asp-action="MyDeliveries" asp-controller="Clients">Search</a></li>
+                    </ul>
+                </div>
+            </li>
+            <li>
+                <a asp-action="MyInvoices" asp-controller="Clients"><i class="bi bi-money"></i> Invoices <span class="arrow">></span></a>
             </li>
         </ul>
     </aside>
@@ -357,19 +387,63 @@
                 </div>
 
                 <div class="button-tabs">
-                    <button class="tab-button" id="vehicleBtn">VEHICLE</button>
+                    <button class="tab-button" id="vehicleBtn">INFO</button>
                     <button class="tab-button" id="addressesBtn">ADDRESSES</button>
                     <button class="tab-button" id="metricsBtn">METRICS</button>
                     <button class="tab-button" id="statusBtn">STATUS</button>
+                    <button class="tab-button" id="invoicesBtn">INVOICES</button>
+
                 </div>
 
                 <div id="vehicleSection" class="section d-none">
                     <div class="vehicles-section-header">
-                        @*<img src="https://via.placeholder.com/100" alt="Delivery Image" class="delivery-image">*@
-                        <h4><b>Vehicle details</b></h4>
+                       
+                        <h4><b>Delivery info</b></h4>
                     </div>
-                    <p><strong>Registration Number:</strong> @Model.RegistrationNumber</p>
-                    <p><strong>Vehicle Type:</strong> @Model.VehicleType</p>
+                    <p><strong>Offer was made on:</strong> @Model.OfferDate</p>
+                    <p><strong>Days till payment:</strong> @Model.DaysTillPayment</p>
+<p><strong>Given price in request:</strong> @Model.ApproximatePrice </p>
+                    <p><strong> Accepted price:</strong> @Model.FinalPrice</p>
+                    <div class="ratings">
+                        @if(Model.HasRated == true)
+						{
+                            <p>
+                                <strong>Rating:</strong>
+                                <div class="star-rating">
+                                    @for (int i = 1; i <= 5; i++)
+                                    {
+                                        <label class="star @((i <= Model.RatingStars) ? "rated" : "")">☆</label>
+                                    }
+                                </div>
+                            </p>
+                            <p><strong>Comment:</strong> @Model.Comment</p>
+						}
+						else
+						{
+                            <form asp-action="LeaveRating" asp-controller="Clients" asp-route-id="@Model.Id" method="post">
+                                <div class="form-group">
+                                    <label asp-for="Comment">Comment</label>
+                                    <textarea id="Comment" asp-for="Comment" class="form-control"></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label><strong>Rate the service:</strong></label>
+                                    <div class="star-rating">
+                                        <input type="radio" id="star5" name="rating" value="5" />
+                                        <label for="star5">☆</label>
+                                        <input type="radio" id="star4" name="rating" value="4" />
+                                        <label for="star4">☆</label>
+                                        <input type="radio" id="star3" name="rating" value="3" />
+                                        <label for="star3">☆</label>
+                                        <input type="radio" id="star2" name="rating" value="2" />
+                                        <label for="star2">☆</label>
+                                        <input type="radio" id="star1" name="rating" value="1" />
+                                        <label for="star1">☆</label>
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Submit Rating</button>
+                            </form>
+						})
+                    </div>
                 </div>
 
                 <div id="addressesSection" class="section d-none">
@@ -399,10 +473,7 @@
 
                 <div id="metricsSection" class="section  d-none">
                     <div class="metrics-header">
-                        <div class="metrics-header-row">
-                            <h4><b>Client</b></h4>
-                            <p>@Model.ClientCompanyName</p>
-                        </div>
+
 
                         <div class="metrics-header-row">
                             <h4><b>Type of Goods</b></h4>
@@ -414,26 +485,26 @@
                         <p>@Model.SpecialInstructions</p>
                     </div>
 
-                        <div class="metrics">
-                            <h4><b>Standard Metrics</b></h4>
-                        </div>
-                        <div class="standart-metrics-header-row">
-                            <p><b>Number</b></p>
-                            <p><b>Length</b></p>
-                            <p><b>Width</b></p>
-                            <p><b>Height</b></p>
-                            <p><b>Weight</b></p>
-                            <p><b>Stackable</b></p>
-                        </div>
-                        <div class="standart-metrics-info-row">
-                            <p>@Model.NumberOfPallets</p>
-                            <p>@Model.PalletLength</p>
-                            <p>@Model.PalletWidth</p>
-                            <p>@Model.PalletHeight</p>
-                            <p>@Model.WeightOfPallets</p>
-                            <p>@Model.PalletsAreStackable</p>
+                    <div class="metrics">
+                        <h4><b>Standard Metrics</b></h4>
+                    </div>
+                    <div class="standart-metrics-header-row">
+                        <p><b>Number</b></p>
+                        <p><b>Length</b></p>
+                        <p><b>Width</b></p>
+                        <p><b>Height</b></p>
+                        <p><b>Weight</b></p>
+                        <p><b>Stackable</b></p>
+                    </div>
+                    <div class="standart-metrics-info-row">
+                        <p>@Model.NumberOfPallets</p>
+                        <p>@Model.PalletLength</p>
+                        <p>@Model.PalletWidth</p>
+                        <p>@Model.PalletHeight</p>
+                        <p>@Model.WeightOfPallets</p>
+                        <p>@Model.PalletsAreStackable</p>
 
-                        </div>
+                    </div>
                     <div class="metrics">
                         <h4><b>Non-Standart Metrics</b></h4>
                     </div>
@@ -468,76 +539,103 @@
                         <p>@Model.SharedTruck</p>
                     </div>
                 </div>
-            
 
-            <div id="statusSection" class="section d-none">
-                <div class="status-header">
-                    <div class="status-header-row">
+
+                <div id="statusSection" class="section d-none">
+                    <div class="status-header">
+                        <div class="status-header-row">
                             <h4>Expected delivery date</h4>
                             <hp>@Model.ExpectedDeliveryDate</hp>
-                    </div>
-                        <div class="status-header-row">
-                            <h4>Current time</h4>
-                            <p> <span id="currentTime"></span></p>
                         </div>
-
-                        <div class="status-header-row">
-                            <h4>Current location</h4>
-                            <p id="location" style="font-size:0.9rem;">Fetching location...</p>
-                        </div>
+                        @if (Model.DeliveryStep == 4)
+                        {
+                            <div class="status-header-row">
+                                <h4>Actual delivery date</h4>
+                                <hp>@Model.ActualDeliveryDate</hp>
+                            </div>
+                        }
                         
                     </div>
-                
-                <a asp-action="AddStatus" asp-controller="Driver" asp-route-id="@Model.Id" id="addStatusButton">Add Status</a>
 
-                <div class="delivery-steps">
-                    @{
-                        var steps = new[] { "Booked", "Collected", "In Transit", "Delivered" };
-                        var currentStep = Model.DeliveryStep;
-                    }
 
-                    @for (int i = 0; i < steps.Length; i++)
-                    {
-                        var isCompleted = i + 1 <= currentStep;
-                        var dotClass = isCompleted ? "step-dot completed" : "step-dot";
-                        var lineClass = i < steps.Length - 1 ? (isCompleted ? "step-line completed" : "step-line") : "";
+                    <div class="delivery-steps">
+                        @{
+                            var steps = new[] { "Booked", "Collected", "In Transit", "Delivered" };
+                            var currentStep = Model.DeliveryStep;
+                        }
 
-                        <div class="step-container">
-                            <div class="step-dot">
-                                <div class="@dotClass"></div>
-                                @if (i < steps.Length - 1)
-                                {
-                                    <div class="@lineClass"></div>
-                                }
-                            </div>
-                            <div class="step-text">
-                                <img src="path/to/@steps[i].ToLower().Replace(" ", "_")-icon.jpg" alt="@steps[i] Icon">
-                                <p>@steps[i]</p>
-                            </div>
-                        </div>
-                    }
-                </div>
-
-                <!-- Movement History -->
-                <div class="movement-history">
-                    <h4>Movement Updates</h4>
-                    <div class="movement-rows">
-                        @foreach (var movement in Model.DeliveryTrackings)
+                        @for (int i = 0; i < steps.Length; i++)
                         {
-                            <div class="movement-row">
-                                <div class="movement-event">
-                                    <div class="movement-dot"></div>
-                                    <div class="event-line"></div>
-                                    <p>@movement.StatusUpdate</p>
+                            var isCompleted = i + 1 <= currentStep;
+                            var dotClass = isCompleted ? "step-dot completed" : "step-dot";
+                            var lineClass = i < steps.Length - 1 ? (isCompleted ? "step-line completed" : "step-line") : "";
+
+                            <div class="step-container">
+                                <div class="step-dot">
+                                    <div class="@dotClass"></div>
+                                    @if (i < steps.Length - 1)
+                                    {
+                                        <div class="@lineClass"></div>
+                                    }
                                 </div>
-                                <p class="movement-location">@movement.Address</p>
-                                <p class="movement-time">@movement.Timestamp</p>
+                                <div class="step-text">
+                                    <img src="path/to/@steps[i].ToLower().Replace(" ", "_")-icon.jpg" alt="@steps[i] Icon">
+                                    <p>@steps[i]</p>
+                                </div>
                             </div>
                         }
                     </div>
-                </div>
 
-            </div>
+                    <!-- Movement History -->
+                    <div class="movement-history">
+                        <h4>Movement Updates</h4>
+                        <div class="movement-header">
+                            <p>Status</p>
+                            <p>Location</p>
+                            <p>Timestamp</p>
+</div>
+                        <div class="movement-rows">
+                            @foreach (var movement in Model.DeliveryTrackings)
+                            {
+                                <div class="movement-row">
+                                    <div class="movement-event">
+                                        <div class="movement-dot-line">
+                                        <div class="movement-dot"></div>
+                                        <div class="event-line"></div>
+                                        </div>
+                                        <p>@movement.StatusUpdate</p>
+                                    </div>
+                                    <p class="movement-location">@movement.Address</p>
+                                    <p class="movement-time">@movement.Timestamp</p>
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                </div>
+                <div id="invoicesSection" class="section d-none invoices">
+                    <div class="address-column">
+                        <h4><b>Invoices</b></h4>
+                    </div>
+                    <div class="standart-metrics-header-row">
+                        <p><b>Number</b></p>
+                        <p><b>Date</b></p>
+                        <p><b>Description</b></p>
+                        <p><b>Status</b></p>
+                        <p><b>File</b></p>
+                    </div>
+                    <div class="standart-metrics-info-row">
+                        <p>@Model.Invoice.Number</p>
+                        <p>@Model.Invoice.Date</p>
+                        <p>@Model.Invoice.Description</p>
+                        <p>@Model.Invoice.IsPaid</p>
+                        <p>
+                            <a href="@Model.Invoice.FileUrl" target="_blank" class="file-icon" title="View or Download File">
+                                <i class="fas fa-file-download"></i> See
+                            </a>
+                        </p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -558,6 +656,9 @@
             });
             $('#statusBtn').click(function () {
                 showSection('#statusSection');
+            });
+            $('#invoicesBtn').click(function () {
+                showSection('#invoicesSection');
             });
 
             function showSection(sectionId) {
@@ -623,7 +724,7 @@
         setInterval(() => {
             document.getElementById("currentTime").innerText = new Date().toLocaleString();
         }, 1000);
-                        }); document.querySelectorAll('.tab-button').forEach(button => {
+                                }); document.querySelectorAll('.tab-button').forEach(button => {
             button.addEventListener('click', function () {
                 document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
                 this.classList.add('active');
@@ -636,4 +737,5 @@
 
 </body>
 </html>
+
 
