@@ -62,7 +62,7 @@
             public const double LatitudeMinValue = -90.0;
             public const double LongitudeMaxValue = 180.0;
             public const double LongitudeMinValue = -180.0;
-            public const int AddressMaxLength = 200;    
+            public const int AddressMaxLength = 200;
             public const int AddressMinLength = 0;
         }
 
@@ -167,7 +167,8 @@
             public const int EventTitleMaxLength = 100;
             public const int EventTitleMinLength = 0;
         }
-        public static class Address {            
+        public static class Address
+        {
             public const int StreetMaxLength = 100;
             public const int StreetMinLength = 0;
             public const int CityMaxLength = 40;
@@ -180,6 +181,11 @@
             public const double LatitudeMinValue = -90.0;
             public const double LongitudeMaxValue = 180.0;
             public const double LongitudeMinValue = -180.0;
+        }
+        public static class SearchTerm
+        {
+            public const int SearchTermMaxLength = 20;
+            public const int SearchTermMinLength = 0;
         }
     }
 }

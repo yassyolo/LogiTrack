@@ -58,8 +58,6 @@ namespace LogisticsSystem.Infrastructure.Data.DataModels
         [Comment("Address of the company")]
         public Address Address { get; set; } = null!;
 
-        public string EmailAddress { get; set; }  = string.Empty;
-
         [Required]
         [Comment("Registration created at")]
         public DateTime CreatedAt { get; set; }

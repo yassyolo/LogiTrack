@@ -12,6 +12,8 @@ namespace LogisticsSystem.Infrastructure.Data.DataModels
         [Comment("Vehicle identifier")]
         public int Id { get; set; }
 
+        public bool IsRefrigerated { get; set; }
+
         [Required]
         [Comment("Vehicle registration number")]
         [StringLength(RegistartionNumberMaxLength)]
@@ -79,9 +81,11 @@ namespace LogisticsSystem.Infrastructure.Data.DataModels
         [Range(KilometersMinValue, KilometersMaxValue)]
         public double KilometersDriven { get; set; }
 
-        [Comment("Kilometers left to change parts")]
+        [Comment("Kilometers to change parts")]
         [Range(KilometersMinValue, KilometersMaxValue)]
-        public double KilometersLeftToChangeParts { get; set; }
+        public double KilometersToChangeParts { get; set; }
+
+        public double KilometersLeftToChangeParts {get; set; }
 
         [Comment("Vehicle's delivery")]
         public IEnumerable<Delivery> Deliveries { get; set; } = new List<Delivery>();

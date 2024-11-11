@@ -8,6 +8,7 @@ namespace LogiTrack.Infrastructure.SeedDb
     public class SeedData
     {
         public IdentityUser ClientCompany1User { get; set; } = null!;
+        public IdentityUser ClientCompany2User { get; set; } = null!;
         public IdentityUser LogiticsCompanyUser { get; set; } = null!;
         public IdentityUser SecretaryUser { get; set; } = null!;
         public IdentityUser SpeditorUser { get; set; } = null!;
@@ -135,6 +136,14 @@ namespace LogiTrack.Infrastructure.SeedDb
             };
             ClientCompany1User.PasswordHash = hasher.HashPassword(ClientCompany1User, "clientcompany1");
 
+            ClientCompany2User = new IdentityUser
+            {
+                UserName = "clientcompany2",
+                Email = "yyotova@tu-sofia.bg",
+                Id = "f1b1b1b1-1b1b-1b1b-1b1b-1b1b1b1b1b1b",
+                PhoneNumber = "0987654321",
+            };
+
             LogiticsCompanyUser = new IdentityUser
             {
                 UserName = "logistics",
@@ -169,6 +178,7 @@ namespace LogiTrack.Infrastructure.SeedDb
                 NormalizedUserName = "DRIVER1@EXAMPLE.COM",
                 Email = "driver1@example.com",
                 NormalizedEmail = "DRIVER1@EXAMPLE.COM",
+                PhoneNumber = "1234567893",
                 EmailConfirmed = true
             };
             DriverUser1.PasswordHash = hasher.HashPassword(DriverUser1, "driver1");
@@ -178,6 +188,7 @@ namespace LogiTrack.Infrastructure.SeedDb
                 UserName = "driver2@example.com",
                 NormalizedUserName = "DRIVER2@EXAMPLE.COM",
                 Email = "driver2@example.com",
+                PhoneNumber = "0987654321",
                 NormalizedEmail = "DRIVER2@EXAMPLE.COM",
                 EmailConfirmed = true,
             };
@@ -259,17 +270,17 @@ namespace LogiTrack.Infrastructure.SeedDb
         private void SeedAddresses()
         {
             Address1 = new Address { Id = 1, Street = "123 Main St", County = "Central", City = "Metropolis", PostalCode = "10001" };
-            Address2 = new Address { Id = 2, Street = "456 Side St", County = "Westside", City = "Gotham", PostalCode = "10002" };
-            Address3 = new Address { Id = 3, Street = "789 Elm St", County = "Northside", City = "Star City" };
-            Address4 = new Address { Id = 4, Street = "101 Pine St", County = "Eastville", City = "Central City" };
-            Address5 = new Address { Id = 5, Street = "202 Maple St", County = "Southend", City = "Smallville" };
-            Address6 = new Address { Id = 6, Street = "303 Oak St", County = "Old Town", City = "Bludhaven" };
-            Address7 = new Address { Id = 7, Street = "404 Birch St", County = "Downtown", City = "Coast City" };
-            Address8 = new Address { Id = 8, Street = "505 Cedar St", County = "West End", City = "National City" };
-            Address9 = new Address { Id = 9, Street = "606 Cherry St", County = "Upper Hill", City = "Ivy Town" };
-            Address10 = new Address { Id = 10, Street = "707 Aspen St", County = "Harborview", City = "Gateway City" };
-            Address11 = new Address { Id = 11, Street = "808 Willow St", County = "Lakeside", City = "Opal City" };
-            Address12 = new Address { Id = 12, Street = "909 Fir St", County = "Midtown", City = "Fawcett City" };
+            Address2 = new Address { Id = 2, Street = "456 Side St", County = "Westside", City = "Gotham", PostalCode = "10002", Latitude = "40.7128", Longitude = "-74.0060" };
+            Address3 = new Address { Id = 3, Street = "789 Elm St", County = "Northside", City = "Star City", PostalCode = "10003", Latitude = "37.7749", Longitude = "-122.4194" };
+            Address4 = new Address { Id = 4, Street = "101 Pine St", County = "Eastville", City = "Central City", PostalCode = "10004", Latitude = "39.9526", Longitude = "-75.1652" };
+            Address5 = new Address { Id = 5, Street = "202 Maple St", County = "Southend", City = "Smallville", PostalCode = "10005", Latitude = "38.0293", Longitude = "-78.4767" };
+            Address6 = new Address { Id = 6, Street = "303 Oak St", County = "Old Town", City = "Bludhaven", PostalCode = "10006", Latitude = "36.8508", Longitude = "-76.2859" };
+            Address7 = new Address { Id = 7, Street = "404 Birch St", County = "Downtown", City = "Coast City", PostalCode = "10007", Latitude = "34.0522", Longitude = "-118.2437" };
+            Address8 = new Address { Id = 8, Street = "505 Cedar St", County = "West End", City = "National City", PostalCode = "10008", Latitude = "32.7157", Longitude = "-117.1611" };
+            Address9 = new Address { Id = 9, Street = "606 Cherry St", County = "Upper Hill", City = "Ivy Town", PostalCode = "10009", Latitude = "40.7580", Longitude = "-111.8762" };
+            Address10 = new Address { Id = 10, Street = "707 Aspen St", County = "Harborview", City = "Gateway City", PostalCode = "10010", Latitude = "47.6062", Longitude = "-122.3321" };
+            Address11 = new Address { Id = 11, Street = "808 Willow St", County = "Lakeside", City = "Opal City", PostalCode = "10011", Latitude = "35.2271", Longitude = "-80.8431" };
+            Address12 = new Address { Id = 12, Street = "909 Fir St", County = "Midtown", City = "Fawcett City", PostalCode = "10012", Latitude = "33.7490", Longitude = "-84.3880" };
         }
         private void SeedClientCompanies()
         {
@@ -291,12 +302,12 @@ namespace LogiTrack.Infrastructure.SeedDb
             {
                 Id = 2,
                 Name = "Client Company 2",
+                //UserId = ClientCompany2User.Id,
                 RegistrationStatus = "Pending",
                 ContactPerson = "Jane Smith",
                 AlternativePhoneNumber = "9876543210",
                 RegistrationNumber = "REG654321",
                 Industry = "Fashion",
-                EmailAddress = "yyotova@tu-sofia.bg",
                 AddressId = 2,
                 CreatedAt = DateTime.Now.AddDays(-10),
             };

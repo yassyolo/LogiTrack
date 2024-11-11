@@ -19,7 +19,7 @@ namespace LogiTrack.Infrastructure.Data.DataModels
         [ForeignKey(nameof(DeliveryId))]
         public Delivery Delivery { get; set; } = null!;
 
-        [Comment("Description of the register")]
+        [Comment("Description of the cash register")]
         [Required]
         [StringLength(RegisterDescriptionMaxLength)]
         public string Description { get; set; } = string.Empty;
