@@ -1,10 +1,7 @@
 ﻿using LogiTrack.Core.Contracts;
-using LogiTrack.Core.ViewModels.Accountant;
 using static LogiTrack.Core.Constants.MessageConstants.ErrorMessages;
 using Microsoft.AspNetCore.Mvc;
 using LogiTrack.Core.ViewModels.Delivery;
-using LogiTrack.Extensions;
-using LogiTrack.Core.ViewModels.Driver;
 using LogiTrack.Core.Services;
 
 namespace LogiTrack.Controllers
@@ -30,7 +27,7 @@ namespace LogiTrack.Controllers
             {
                 return BadRequest(DriverNotFoundErrorMessage);
             }*/
-            var model = await deliveryService.GetDriverDashboardAsync("driver1@example.com");
+            var model = await driverService.GetDriverDashboardAsync("driver1@example.com");
             return View(model);
         }
 
@@ -56,7 +53,7 @@ namespace LogiTrack.Controllers
                 return BadRequest(DriverNotFoundErrorMessage);
             }*/
 
-            var deliveryId = await deliveryService.GetDeliveryByReferenceNumberAsync(model.ReferenceNumber);
+            var deliveryId = await deliveryService.GetDeliveryByReferenceNumberForAccountantAsync(model.ReferenceNumber);
             if (deliveryId == null)
             {
                 TempData["NotFound"] = DeliveryNotFoundErrorMessage;
@@ -105,12 +102,12 @@ namespace LogiTrack.Controllers
 
             //var username = User.GetUsername();
             var username = "driver1@example.com";
-            if (await deliveryService.DriverWithUsernameExistsAsync(username) == false)
+            if (await driverService.DriverWithUsernameExistsAsync(username) == false)
             {
                 return BadRequest(DriverNotFoundErrorMessage);
             }
 
-            if (await deliveryService.DriverHasDeliveryAsync(username, id) == false)
+            if (await driverService.DriverHasDeliveryAsync(username, id) == false)
             {
                 return Unauthorized(DriverDoesNotHaveDeliveryErrorMessage);
             }
@@ -143,7 +140,7 @@ namespace LogiTrack.Controllers
             }
             //var username = User.GetUsername();
             var username = "driver1@example.com";
-            await deliveryService.AddStatusForDeliveryAsync(id, model, username, address);
+            await driverService.AddStatusForDeliveryAsync(id, model, username, address);
             return RedirectToAction(nameof(DeliveryDetails), new { id = id });
         }
 
@@ -162,11 +159,12 @@ namespace LogiTrack.Controllers
             return View(query);
         }
 
+
         [HttpGet]
         public async Task<IActionResult> Details()
         {
             var username = "driver1@example.com";
-            if (await deliveryService.DriverWithUsernameExistsAsync(username) == false)
+            if (await driverService.DriverWithUsernameExistsAsync(username) == false)
             {
                 return BadRequest(DriverNotFoundErrorMessage);
             }
@@ -178,7 +176,7 @@ namespace LogiTrack.Controllers
         public async Task<IActionResult> LicenseDetails()
         {
             var username = "driver1@example.com";
-            if (await deliveryService.DriverWithUsernameExistsAsync(username) == false)
+            if (await driverService.DriverWithUsernameExistsAsync(username) == false)
             {
                 return BadRequest(DriverNotFoundErrorMessage);
             }

@@ -5,11 +5,13 @@ using static LogiTrack.Core.Constants.UserRolesConstants;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using LogiTrack.Core.Services;
-using LogiTrack.Extensions;
 using LogiTrack.Core.CustomExceptions;
 using Microsoft.AspNetCore.Authorization;
-using Newtonsoft.Json;
 using LogiTrack.Core.ViewModels.Accountant;
+using LogiTrack.Core.ViewModels.Invoice;
+using LogiTrack.Core.ViewModels.Offer;
+using LogiTrack.Core.ViewModels.Request;
+using LogiTrack.Core.ViewModels.Delivery;
 
 namespace LogiTrack.Controllers
 {
@@ -18,12 +20,20 @@ namespace LogiTrack.Controllers
         private readonly UserManager<IdentityUser> userManager;
         private readonly IClientsService clientsService;
         private readonly GeocodingService geocodingService;
+        private readonly IDeliveryService deliveryService;
+        private readonly IInvoiceService invoiceService;
+        private readonly IRequestService requestService;
+        private readonly IOfferService offerService;
 
-        public ClientsController(UserManager<IdentityUser> userManager, IClientsService clientsService, GeocodingService geocodingService)
+        public ClientsController(UserManager<IdentityUser> userManager, IClientsService clientsService, GeocodingService geocodingService, IDeliveryService deliveryService, IInvoiceService invoiceService, IRequestService requestService, IOfferService offerService)
         {
             this.userManager = userManager;
             this.clientsService = clientsService;
             this.geocodingService = geocodingService;
+            this.deliveryService = deliveryService;
+            this.invoiceService = invoiceService;
+            this.requestService = requestService;
+            this.offerService = offerService;
         }
 
         [HttpGet]
@@ -44,6 +54,10 @@ namespace LogiTrack.Controllers
         {
             var model = await clientsService.GetClientCompanyEventsAsync("clientcompany1");
             return Json(model);
+        }
+        public IActionResult Calendar()
+        {
+            return View(); 
         }
 
         [HttpGet]
@@ -119,7 +133,7 @@ namespace LogiTrack.Controllers
            // var userEmail = User.GetEmail();
             try
             {
-                await clientsService.MakeRequestAsync(model, "clientcompany1@example.com");
+                await requestService.MakeRequestAsync(model, "clientcompany1@example.com");
                 return RedirectToAction(nameof(MyRequests));
             }
             catch (ClientCompanyNotFoundException ex)
@@ -131,15 +145,85 @@ namespace LogiTrack.Controllers
         [HttpGet]
         public async Task<IActionResult> MyRequests([FromQuery] SearchRequestsViewModel query)
         {
-            var companyUsername = User.GetUsername();
+            /*var companyUsername = User.GetUsername();
             if (await clientsService.UserWithEmailExistsAsync(companyUsername) == false)
             {
                 return BadRequest(ClientCompanyNotFoundErrorMessage);
-            }
+            }*/
 
-            var model = await clientsService.GetRequestsForCompanyAsync(companyUsername, query.StartDate, query.EndDate, query.PickupAddress, query.DeliveryAddress, query.IsApproved);
+            var model = await requestService.GetRequestsForCompanyAsync("clientcompany1", query.StartDate, query.EndDate, query.PickupAddress, query.DeliveryAddress, query.IsApproved);
+            query.Requests = model;
+            model = await requestService.GetRequestsForCompanyBySearchTermAsync("clientcompany1", query.SearchTerm);
             query.Requests = model;
             return View(query);
+        }
+        [HttpGet]
+        public async Task<IActionResult> RequestDetails(int id)
+        {
+            if (await requestService.RequestWithIdExistsAsync(id) == false)
+            {
+                return BadRequest(RequestNotFoundErrorMessage);
+            }
+            //var companyUsername = User.GetUsername();
+            var username = "clientcompany1";
+            /*if (await clientsService.UserWithEmailExistsAsync(username) == false)
+            {
+                return BadRequest(ClientCompanyNotFoundErrorMessage);
+            }*/
+
+            if (await requestService.RequestWithCompanyExistsAsync(id, username ) == false)
+            {
+                return Unauthorized(CompanyDoesNotHaveRequestErrorMessage);
+            }
+            var model = await clientsService.GetRequestDetailsAsync(id);
+            return View(model);
+        }
+        [HttpGet]
+        public IActionResult SearchOffer()
+        {
+            var model = new SearchOfferByOfferNumberViewModel();
+            return View(model);
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SearchOffer(SearchOfferByOfferNumberViewModel model)
+        {
+            if (ModelState.IsValid == false)
+            {
+                return View(model);
+            }
+            var offerId = await offerService.GetOfferIdByOfferNumberAsync(model.OfferNumber);
+            if (offerId == default)
+            {
+                TempData["NotFound"] = "Offer not found.";
+                return View(model);
+            }
+            //var companyUsername = User.GetUsername();
+            var username = "clientcompany1";
+            /*if (await clientsService.UserWithEmailExistsAsync(username) == false)
+            {
+                return BadRequest(ClientCompanyNotFoundErrorMessage);
+            }*/
+            if (await offerService.OfferWithCompanyExistsAsync(offerId, username) == false)
+            {
+                TempData["NotAuthorized"] = "Company does not have this offer.";
+                return View(model);
+            }
+            return RedirectToAction(nameof(OfferDetails), new { id = model.OfferNumber });
+        }
+        [HttpGet]
+        public IActionResult HaveOffer()
+        {
+            return View();
+        }
+        public async Task<IActionResult> OfferDetails(int id)
+        {
+            if (await offerService.OfferWithIdExistsAsync(id) == false)
+            {
+                return BadRequest(OfferNotFoundErrorMessage);
+            }
+            var model = await offerService.GetOfferDetailsAsync(id);
+            return View(model);
         }
 
         [HttpGet]
@@ -194,11 +278,12 @@ namespace LogiTrack.Controllers
         [HttpGet]
         public async Task<IActionResult> CompanyDetails()
         {
-            var username = User.GetUsername();
-            if (await clientsService.UserWithEmailExistsAsync(username) == false)
+            //var companyUsername = User.GetUsername();
+            var username = "clientcompany1";
+            /*if (await clientsService.UserWithEmailExistsAsync(username) == false)
             {
                 return BadRequest(ClientCompanyNotFoundErrorMessage);
-            }
+            }*/
             var model = await clientsService.GetCompanyDetailsAsync(username);
             return View(model);
         }
@@ -206,11 +291,12 @@ namespace LogiTrack.Controllers
         [HttpGet]
         public async Task<IActionResult> ContactDetails()
         {
-            var username = User.GetUsername();
-            if (await clientsService.UserWithEmailExistsAsync(username) == false)
+            //var companyUsername = User.GetUsername();
+            var username = "clientcompany1";
+            /*if (await clientsService.UserWithEmailExistsAsync(username) == false)
             {
                 return BadRequest(ClientCompanyNotFoundErrorMessage);
-            }
+            }*/
             var model = await clientsService.GetCompanyContactDetailsAsync(username);
             return View(model);
         }
@@ -218,12 +304,15 @@ namespace LogiTrack.Controllers
         [HttpGet]
         public async Task<IActionResult> MyOffers([FromQuery] SearchOffersViewModel query)
         {
-            var username = User.GetUsername();
-            if (await clientsService.UserWithEmailExistsAsync(username) == false)
+            //var companyUsername = User.GetUsername();
+            var username = "clientcompany1";
+            /*if (await clientsService.UserWithEmailExistsAsync(username) == false)
             {
                 return BadRequest(ClientCompanyNotFoundErrorMessage);
-            }
-            var model = await clientsService.GetOffersForCompanyAsync(username, query.DeliveryAddress, query.PickupAddress, query.StartDate, query.EndDate);
+            }*/
+            var model = await offerService.GetOffersForCompanyAsync(username, query.DeliveryAddress, query.PickupAddress, query.StartDate, query.EndDate, query.MinPrice, query.MaxPrice, query.IsApproved);
+            query.Offers = model;
+            model = await offerService.GetOffersForCompanyBySearchTermAsync(username, query.SearchTerm);
             query.Offers = model;
             return View(query);
         }
@@ -231,26 +320,155 @@ namespace LogiTrack.Controllers
         [HttpGet]
         public async Task<IActionResult> BookOffer(int id)
         {
-            var username = User.GetUsername();
-            if (await clientsService.UserWithEmailExistsAsync(username) == false)
+            //var companyUsername = User.GetUsername();
+            var username = "clientcompany1";
+            /*if (await clientsService.UserWithEmailExistsAsync(username) == false)
             {
                 return BadRequest(ClientCompanyNotFoundErrorMessage);
-            }
-            if(await clientsService.OfferWithIdExistsAsync(id) == false)
+            }*/
+            if (await offerService.OfferWithIdExistsAsync(id) == false)
             {
                 return BadRequest(OfferNotFoundErrorMessage);
             }
-            if(await clientsService.OfferWithCompanyExistsAsync(id, username) == false)
+            if(await offerService.OfferWithCompanyExistsAsync(id, username) == false)
             {
                 return Unauthorized(CompanyDoesNotHaveOfferErrorMessage);
             }
-            await clientsService.BookOfferAsync(id, username);
-            return RedirectToAction(nameof(AprovedOrders));
+            await offerService.BookOfferAsync(id, username);
+            return RedirectToAction(nameof(MyOffers));
         }
 
-        private object AprovedOrders()
+        [HttpGet]
+        public IActionResult SearchDelivery()
         {
-            throw new NotImplementedException();
+            var model = new SearchDeliveryByReferenceNumberViewModel();
+            return View(model);
         }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SearchDelivery(SearchDeliveryByReferenceNumberViewModel model)
+        {
+            if (ModelState.IsValid == false)
+            {
+                return View(model);
+            }
+            //var companyUsername = User.GetUsername();
+            var username = "clientcompany1";
+            /*if (await clientsService.UserWithEmailExistsAsync(username) == false)
+            {
+                return BadRequest(ClientCompanyNotFoundErrorMessage);
+            }*/
+            var deliveryId = await deliveryService.GetDeliveryByReferenceNumberForAccountantAsync(model.ReferenceNumber);
+            if (deliveryId == default)
+            {
+                TempData["NotFound"] = DeliveryNotFoundErrorMessage;
+                return View(model);
+            }
+            if(await deliveryService.DeliveryWithCompanyExistsAsync(deliveryId, username) == false)
+            {
+                TempData["NotAuthorized"] = CompanyDoesNotHaveDeliveryErrorMessage;
+                return View(model);
+            }
+            return RedirectToAction(nameof(DeliveryDetails), new { id = deliveryId });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> DeliveryDetails(int id)
+        {
+            if (await deliveryService.DeliveryWithIdExistsAsync(id) == false)
+            {
+                return BadRequest(DeliveryNotFoundErrorMessage);
+            }
+
+            var model = await deliveryService.GetDeliveryDetailsForCompanyAsync(id);
+            return View(model);
+        }
+
+        public async Task<IActionResult> LeaveRating(int id, DeliveryForClientViewModel model)
+        {
+            if (await deliveryService.DeliveryWithIdExistsAsync(id) == false)
+            {
+                return BadRequest(DeliveryNotFoundErrorMessage);
+            }
+            //var companyUsername = User.GetUsername();
+            var username = "clientcompany1";
+            /*if (await clientsService.UserWithEmailExistsAsync(username) == false)
+             *{
+             *  return BadRequest(ClientCompanyNotFoundErrorMessage);
+             }*/
+            if (await deliveryService.DeliveryWithCompanyExistsAsync(id, username) == false)
+            {
+                return Unauthorized(CompanyDoesNotHaveDeliveryErrorMessage);
+            }
+            await deliveryService.LeaveRatingForDeliveryAsync(id, model.Comment, model.RatingStars);
+            return View(model);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> MyDeliveries([FromQuery] ClientsDeliveriesViewModel query)
+        {
+            //var companyUsername = User.GetUsername();
+            var username = "clientcompany1";
+            /*if (await clientsService.UserWithEmailExistsAsync(username) == false)
+             *{
+             *  return BadRequest(ClientCompanyNotFoundErrorMessage);
+             }*/
+            var model = await deliveryService.GetDeliveriesForClientAsync(username, query.ReferenceNumber, query.EndDate, query.StartDate, query.MinPrice, query.MaxPrice, query.IsDelivered, query.IsPaid);
+            query.Deliveries = model;
+            model = await deliveryService.GetDeliveriesForClientBySearchtermAsync(username, query.SearchTerm);
+            query.Deliveries = model;
+            return View(query);
+        }
+        [HttpGet]
+        public async Task<IActionResult> MyInvoices([FromQuery] ClientsInvoicesViewModel query)
+        {
+            //var companyUsername = User.GetUsername();
+            var username = "clientcompany1";
+            /*if (await clientsService.UserWithEmailExistsAsync(username) == false)
+             *{
+             *  return BadRequest(ClientCompanyNotFoundErrorMessage);
+             }*/
+            try
+            {
+                var model = await invoiceService.GetInvoicesForCompanyAsync(username, query.DeliveryReferenceNumber, query.StartDate, query.EndDate, query.MinPrice, query.MaxPrice, query.IsPaid);
+                query.Invoices = model;
+                
+                return View(query);
+            }
+            catch (DeliveryNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
+        [HttpGet]
+        public async Task<JsonResult> GetDeliveryTypes()
+        {
+            //var companyUsername = User.GetUsername();
+            var username = "clientcompany1";
+            /*if (await clientsService.UserWithEmailExistsAsync(username) == false)
+             *{
+             *  return BadRequest(ClientCompanyNotFoundErrorMessage);
+             }*/
+            var model = await clientsService.GetDeliveryTypesForCompanyAsync(username);
+            return Json(new { Domestic = model.domesticDeliveries, International = model.internationalDeliveries});
+        }
+        public IActionResult DeliveryStatistics()
+        {
+            return View();
+        }
+        [HttpGet]
+        public async Task<JsonResult> GetDeliveryCounts()
+        {
+            //var companyUsername = User.GetUsername();
+            var username = "clientcompany1";
+            /*if (await clientsService.UserWithEmailExistsAsync(username) == false)
+             *{
+             *  return BadRequest(ClientCompanyNotFoundErrorMessage);
+             }*/
+            var model = await clientsService.GetDeliveryCountsForCompanyAsync(username);
+            return Json(new {months = model.Item1, deliveries = model.Item2});
+        }
+
     }
 }

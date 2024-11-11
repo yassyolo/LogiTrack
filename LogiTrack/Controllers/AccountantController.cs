@@ -1,9 +1,10 @@
 ﻿using LogiTrack.Core.Contracts;
 using LogiTrack.Core.CustomExceptions;
-using LogiTrack.Core.ViewModels.Accountant;
 using static LogiTrack.Core.Constants.MessageConstants.ErrorMessages;
 using Microsoft.AspNetCore.Mvc;
-using LogiTrack.Core.Constants;
+using LogiTrack.Core.ViewModels.Invoice;
+using LogiTrack.Core.ViewModels.CashRegister;
+using LogiTrack.Core.ViewModels.Delivery;
 
 namespace LogiTrack.Controllers
 {
@@ -12,12 +13,16 @@ namespace LogiTrack.Controllers
         private readonly IAccountantService accountantService;
         private readonly IVehicleService vehicleService;
         private readonly IDeliveryService deliveryService;
+        private readonly ICashRegisterService cashRegisterService;
+        private readonly IInvoiceService invoiceService;
 
-        public AccountantController(IAccountantService accountantService, IVehicleService vehicleService, IDeliveryService deliveryService)
+        public AccountantController(IAccountantService accountantService, IVehicleService vehicleService, IDeliveryService deliveryService, ICashRegisterService cashRegisterService, IInvoiceService invoiceService)
         {
             this.accountantService = accountantService;
             this.vehicleService = vehicleService;
             this.deliveryService = deliveryService;
+            this.cashRegisterService = cashRegisterService;
+            this.invoiceService = invoiceService;
         }
 
         [HttpGet]
@@ -42,8 +47,8 @@ namespace LogiTrack.Controllers
             {
                 return View(model);
             }
-            var deliveryId = await deliveryService.GetDeliveryByReferenceNumberAsync(model.ReferenceNumber);
-            if (deliveryId == null)
+            var deliveryId = await deliveryService.GetDeliveryByReferenceNumberForAccountantAsync(model.ReferenceNumber);
+            if (deliveryId == default)
             {
                 TempData["NotFound"] = DeliveryNotFoundErrorMessage;
                 return View(model);
@@ -87,7 +92,7 @@ namespace LogiTrack.Controllers
             }
             try
             {
-                await deliveryService.AddCashRegisterForDeliveryAsync(id, model, file);
+                await cashRegisterService.AddCashRegisterForDeliveryAsync(id, model, file);
                 return RedirectToAction(nameof(DeliveryDetails), new { id = id });
             }
             catch (DeliveryNotFoundException ex)
@@ -105,7 +110,7 @@ namespace LogiTrack.Controllers
         {
             try
             {
-                var model = await deliveryService.GetCashRegistersForDeliveryAsync(query.DeliveryReferenceNumber, query.StartDate, query.EndDate, query.Type);
+                var model = await cashRegisterService.GetCashRegistersForDeliveryAsync(query.DeliveryReferenceNumber, query.StartDate, query.EndDate, query.Type);
                 query.CashRegisters = model;
                 return View(query);
             }
@@ -116,7 +121,22 @@ namespace LogiTrack.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> SearchDeliveries([FromQuery] SearchDeliveryViewModel query)
+        public async Task<IActionResult> SearchInvoices([FromQuery] SearchInvoicesViewModel query)
+        {
+            try
+            {
+                var model = await invoiceService.GetInvoicesAsync(query.DeliveryReferenceNumber, query.StartDate, query.EndDate, query.CompanyName, query.IsPaid);
+                query.Invoices = model;
+                return View(query);
+            }
+            catch (DeliveryNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> SearchDeliveries([FromQuery] SearchDeliveryForAccountantViewModel query)
         {
             var model = await deliveryService.GetDeliveryForAccountantAsync(query.ReferenceNumber, query.EndDate, query.StartDate, query.ClientCompanyName, query.IsPaid);
             query.Deliveries = model;
@@ -132,16 +152,18 @@ namespace LogiTrack.Controllers
             {
                 return NotFound(DeliveryNotFoundErrorMessage);
             }
-            var model = await accountantService.GetInvoiceForPaymentAsync(id);
+            var model = await invoiceService.GetInvoiceForPaymentAsync(id);
             return View(model);
         }
+
+        [HttpPost]
         public async Task<IActionResult> MarkAsPaidSuccessful(int id)
         {
-            if(await accountantService.InvoiceWithIdExistsAsync(id) == false)
+            if(await invoiceService.InvoiceWithIdExistsAsync(id) == false)
             {
                 return NotFound(InvoiceNotFoundErrorMessage);
             }
-            var deliveryId = await accountantService.MarkInvoiceAsPaidAsync(id);
+            var deliveryId = await invoiceService.MarkInvoiceAsPaidAsync(id);
             return RedirectToAction(nameof(DeliveryDetails), new { id = deliveryId });
         }
     }
