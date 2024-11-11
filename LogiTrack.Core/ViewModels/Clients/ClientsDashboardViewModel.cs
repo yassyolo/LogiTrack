@@ -1,4 +1,8 @@
-﻿namespace LogiTrack.Core.ViewModels.Clients
+﻿using LogiTrack.Core.ViewModels.Delivery;
+using LogiTrack.Core.ViewModels.Invoice;
+using LogiTrack.Core.ViewModels.Offer;
+
+namespace LogiTrack.Core.ViewModels.Clients
 {
     public class ClientsDashboardViewModel
     {
@@ -9,11 +13,9 @@
         public int InvoicesCount { get; set; }
         public int InvoiceLastMonthCount { get; set; }
         public decimal DueAmountForDeliveries { get; set; }
-
         public IEnumerable<OfferForDashboardViewModel> LastFivePendingOffers { get; set; } = new List<OfferForDashboardViewModel>();
         public IEnumerable<InvoiceForDashboardViewModel> LastFiveInvoices { get; set; } = new List<InvoiceForDashboardViewModel>();
         public IEnumerable<DeliveryTrackingForDashboardViewModel> LastFiveDeliveries { get; set; } = new List<DeliveryTrackingForDashboardViewModel>();
-
         public int DomesticDeliveriesCount { get; set; }
         public int InternationalDeliveriesCount { get; set; }
     }

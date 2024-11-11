@@ -1,4 +1,6 @@
 ﻿using LogiTrack.Core.ViewModels.Clients;
+using LogiTrack.Core.ViewModels.Delivery;
+using LogiTrack.Core.ViewModels.Invoice;
 
 namespace LogiTrack.Core.ViewModels.Accountant
 {

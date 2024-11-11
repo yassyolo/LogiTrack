@@ -1,7 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System.ComponentModel.DataAnnotations;
-
-namespace LogiTrack.Core.ViewModels.Clients
+﻿namespace LogiTrack.Core.ViewModels.Clients
 {
     public class CalendarEventViewModel
     {

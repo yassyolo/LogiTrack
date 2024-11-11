@@ -18,7 +18,7 @@ namespace LogiTrack.Core.ViewModels.Delivery
         [Required(ErrorMessage = RequiredFieldErrorMessage)]
         public string StatusUpdate { get; set; } = string.Empty;
 
-        //[StringLength(TrackingNotesMaxLength, MinimumLength = TrackingNotesMinLength, ErrorMessage = LengthErrorMessage)]
+        [StringLength(TrackingNotesMaxLength, MinimumLength = TrackingNotesMinLength, ErrorMessage = LengthErrorMessage)]
         public string? Notes { get; set; }
         public double? Latitude { get; set; }
         public double? Longitude { get; set;}
