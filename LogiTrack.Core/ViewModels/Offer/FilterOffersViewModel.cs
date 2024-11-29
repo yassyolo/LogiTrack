@@ -1,6 +1,6 @@
 ﻿namespace LogiTrack.Core.ViewModels.Offer
 {
-    public class SearchOffersViewModel
+    public class FilterOffersViewModel
     {
         public List<OfferForSearchViewModel> Offers { get; set; } = new List<OfferForSearchViewModel>();
         public string? DeliveryAddress { get; set; } 
@@ -11,5 +11,7 @@
         public decimal? MinPrice { get; set; }
         public decimal? MaxPrice { get; set; }
         public string? SearchTerm { get; set; }
+        public double? MinWeight { get; set; }
+        public double? MaxWeight { get; set; }
     }
 }

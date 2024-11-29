@@ -3,6 +3,7 @@
     public class MarkAsPaidInvoiceViewModel
     {
         public int DeliveryId { get; set; }
+        public string DeliveryReferenceNumber { get; set; } = string.Empty;
         public int InvoiceId { get; set; }
         public string ClientName { get; set; } = string.Empty;
         public string ClientRegistrationNumber { get; set; } = string.Empty;

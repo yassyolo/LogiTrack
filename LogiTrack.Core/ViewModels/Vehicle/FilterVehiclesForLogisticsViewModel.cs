@@ -1,10 +1,11 @@
 ﻿namespace LogiTrack.Core.ViewModels.Vehicle
 {
-    public class SearchVehicleForLogisticsViewModel
+    public class FilterVehiclesForLogisticsViewModel
     {
         public string? RegistrationNumber { get; set; } 
         public string? VehicleType { get; set; } 
         public bool Refrigerated { get; set; }
+        public bool ForMaintentance { get; set; }
         public double? MinWeightCapacity { get; set; }
         public double? MaxWeightCapacity { get; set; }
         public double? MinVolume { get; set; }

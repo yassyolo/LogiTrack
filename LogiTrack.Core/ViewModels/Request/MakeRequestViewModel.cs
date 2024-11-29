@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 using static LogiTrack.Core.Constants.MessageConstants.ErrorMessages;
 using static LogiTrack.Infrastructure.Data.DataConstants.DataModelConstants.Request;
+using Org.BouncyCastle.Asn1.Mozilla;
 
 namespace LogiTrack.Core.ViewModels.Request
 {
@@ -10,7 +11,7 @@ namespace LogiTrack.Core.ViewModels.Request
     {
         [Required(ErrorMessage = RequiredFieldErrorMessage)]
         [StringLength(CargoTypeMaxLength, MinimumLength = CargoTypeMinLength, ErrorMessage = LengthErrorMessage)]
-        public string CargoType { get; set; } = string.Empty; //standard , not standard
+        public string CargoType { get; set; } = string.Empty; 
 
         [Comment("Type of pallet")]
         [StringLength(TypeOfPalletMaxLength)]
@@ -47,19 +48,15 @@ namespace LogiTrack.Core.ViewModels.Request
         [StringLength(RequestTypeMaxLength)]
         public string Type { get; set; } = string.Empty; //domestic, international
 
-        [Required(ErrorMessage = RequiredFieldErrorMessage)]
-        [StringLength(AddressMaxLength, MinimumLength = AddressMinLength, ErrorMessage = LengthErrorMessage)]
-        public string PickupAddress { get; set; } = string.Empty;
-
+        public string PickupStreet { get; set; } = string.Empty;
+        public string PickupCity { get; set; } = string.Empty;
+        public string PickupCountry { get; set; } = string.Empty;
         public double PickupLatitude { get; set; }
         public double PickupLongitude { get; set; }
-
-        [Required(ErrorMessage = RequiredFieldErrorMessage)]
-        [StringLength(AddressMaxLength, MinimumLength = AddressMinLength, ErrorMessage = LengthErrorMessage)]
-        public string DeliveryAddress { get; set; } = string.Empty;
-
+        public string DeliveryStreet { get; set; } = string.Empty;
+        public string DeliveryCity { get; set; } = string.Empty;
+        public string DeliveryCountry { get; set; } = string.Empty;
         public double DeliveryLatitude { get; set; }
-
         public double DeliveryLongitude { get; set; }
 
         [Required(ErrorMessage = RequiredFieldErrorMessage)]

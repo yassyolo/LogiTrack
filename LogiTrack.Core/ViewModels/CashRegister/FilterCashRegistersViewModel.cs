@@ -8,7 +8,7 @@ using static LogiTrack.Infrastructure.Data.DataConstants.DataModelConstants.Cash
 
 namespace LogiTrack.Core.ViewModels.CashRegister
 {
-    public class SearchCashRegistersViewModel
+    public class FilterCashRegistersViewModel
     {
         public List<CashRegisterIndexViewModel> CashRegisters { get; set; } = new List<CashRegisterIndexViewModel>();
         public DateTime? StartDate { get; set; }
@@ -25,5 +25,7 @@ namespace LogiTrack.Core.ViewModels.CashRegister
 
         [StringLength(RegisterTypeMaxLength, MinimumLength = RegisterTypeMinLength, ErrorMessage = LengthErrorMessage)]
         public string? Type { get; set; } = string.Empty;
+        public decimal? MinPrice { get; set; }
+        public decimal? MaxPrice { get; set; }
     }
 }

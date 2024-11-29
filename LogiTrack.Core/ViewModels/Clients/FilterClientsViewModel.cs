@@ -6,10 +6,11 @@ using static LogiTrack.Infrastructure.Data.DataConstants.DataModelConstants.Sear
 
 namespace LogiTrack.Core.ViewModels.Clients
 {
-    public class SearchClientsViewModel
+    public class FilterClientsViewModel
     {
         [StringLength(CompanyNameMaxLength, MinimumLength = CompanyNameMinLength, ErrorMessage = LengthErrorMessage)]
         public string? Name { get; set; }
+        public string? PhoneNumber { get; set; }
 
         [StringLength(SearchTermMaxLength, MinimumLength = SearchTermMinLength, ErrorMessage = LengthErrorMessage)]
         public string? SearchTerm { get; set; }

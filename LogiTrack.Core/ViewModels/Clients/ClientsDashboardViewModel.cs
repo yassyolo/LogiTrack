@@ -16,7 +16,5 @@ namespace LogiTrack.Core.ViewModels.Clients
         public IEnumerable<OfferForDashboardViewModel> LastFivePendingOffers { get; set; } = new List<OfferForDashboardViewModel>();
         public IEnumerable<InvoiceForDashboardViewModel> LastFiveInvoices { get; set; } = new List<InvoiceForDashboardViewModel>();
         public IEnumerable<DeliveryTrackingForDashboardViewModel> LastFiveDeliveries { get; set; } = new List<DeliveryTrackingForDashboardViewModel>();
-        public int DomesticDeliveriesCount { get; set; }
-        public int InternationalDeliveriesCount { get; set; }
     }
 }

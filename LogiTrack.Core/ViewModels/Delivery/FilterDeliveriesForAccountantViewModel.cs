@@ -1,6 +1,6 @@
 ﻿namespace LogiTrack.Core.ViewModels.Delivery
 {
-    public class SearchDeliveryForAccountantViewModel
+    public class FilterDeliveriesForAccountantViewModel
     {
         public string? ReferenceNumber { get; set; } 
         public string? SearchTerm { get; set; } 

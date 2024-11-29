@@ -12,9 +12,6 @@ namespace LogiTrack.Core.ViewModels.Delivery
         public string ClientCompanyName { get; set; } = string.Empty;
         public string PickupAddress { get; set; } = string.Empty;
         public string DeliveryAddress { get; set; } = string.Empty;
-        public string VehicleRegistrationNumber { get; set; } = string.Empty;
-        public string DriverName { get; set; } = string.Empty;
-        public string TotalExpenses { get; set; } = string.Empty;
         public string Profit { get; set; } = string.Empty;
         public string ReferenceNumber { get; set; } = string.Empty;
         public string VehicleType { get; set; } = string.Empty;

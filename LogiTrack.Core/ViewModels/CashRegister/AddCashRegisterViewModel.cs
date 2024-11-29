@@ -20,7 +20,7 @@ namespace LogiTrack.Core.ViewModels.CashRegister
         public string? CustomType { get; set; } = string.Empty;
 
         [Required(ErrorMessage = RequiredFieldErrorMessage)]
-        [Range(RegisterAmountMinValue, RegisterAmountMinValue, ErrorMessage = InvalidAmountErrorMessage)]
+        //[Range(RegisterAmountMinValue, RegisterAmountMinValue, ErrorMessage = InvalidAmountErrorMessage)]
         public decimal Amount { get; set; }
     }
 }

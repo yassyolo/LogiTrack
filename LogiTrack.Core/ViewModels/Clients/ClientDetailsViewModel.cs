@@ -18,6 +18,18 @@ namespace LogiTrack.Core.ViewModels.Clients
         public string PhoneNumber { get; set; } = string.Empty;
         public string AlternativePhoneNumber { get; set; } = string.Empty;
         public string Username { get; set; } = string.Empty;
+        public int DeliveriesLastMonth { get; set; }
+        public int NotOnTimeDeliveries { get; set; }
+        public int NotPaidDeliveries { get; set; }
+        public int TotalDeliveries { get; set; }
+        public decimal TotalProfit { get; set; }
+        public decimal TotalSatisfactionDeliveries { get; set; }
+        public decimal TotalRequests { get; set; }
+        public double AverageResponseTimeForRequests { get; set; }
+        public double AverageWeightForRequests { get; set; }
+        public double AverageVolumeForRequests { get; set; }
+        public double AveragePriceForRequests { get; set; }
+        public int OverdueInvoices { get; set; }
         public List<DeliveryForClientsDeliveriesViewModel> Deliveries { get; set; } = new List<DeliveryForClientsDeliveriesViewModel>();
     }
 }

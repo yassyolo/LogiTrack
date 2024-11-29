@@ -1,6 +1,6 @@
 ﻿namespace LogiTrack.Core.ViewModels.Offer
 {
-    public class SearchBookedOffersViewModel
+    public class FilterBookedOffersViewModel
     {
         public List<OfferForSearchViewModel> Offers { get; set; } = new List<OfferForSearchViewModel>();
         public string? DeliveryAddress { get; set; }

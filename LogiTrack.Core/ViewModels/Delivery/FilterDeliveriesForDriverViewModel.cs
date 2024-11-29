@@ -2,7 +2,7 @@
 
 namespace LogiTrack.Core.ViewModels.Delivery
 {
-    public class SearchDeliveryForDriverViewModel
+    public class FilterDeliveriesForDriverViewModel
     {
         public string? ReferenceNumber { get; set; }
         public string? DeliveryAddress { get; set; }
