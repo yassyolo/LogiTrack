@@ -34,3 +34,9 @@ document.querySelectorAll('.sidebar ul li').forEach(item => {
         }
     });
 });
+
+document.addEventListener('DOMContentLoaded', function () {
+    flatpickr(".flatpickr", {
+        dateFormat: "Y-m-d",
+    });
+});
