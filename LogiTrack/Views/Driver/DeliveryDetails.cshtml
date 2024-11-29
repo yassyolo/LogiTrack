@@ -12,20 +12,16 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap">
     <link rel="stylesheet" href="~/css/site.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
 
-    <script src="https://maps.googleapis.com/maps/api/js?key=test"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDfA3_DsCdEYZeSpUwLBSenw1Gyp1VGIp4"></script>
     <script src="~/js/site.js"></script>
     <style>
-
-        body {
-            font-family: 'Roboto', sans-serif;
-        }
-
         .delivery-details-container {
             width: 85%;
         }
 
-        .card {
+        .details-card {
             box-shadow: 0 0 25px 1px #0000000f !important;
             padding: 17px;
             background-color: white;
@@ -40,79 +36,33 @@
         .delivery-image {
             width: 50px;
             height: auto;
-            margin-right: 20px;
-        }
-
-        .details-header h2 {
-            font-size: 19px;
-            margin: 0;
+            margin-left:10px;
+            margin-right: 10px;
         }
 
         h4 {
             margin: 10px 0;
+            font-size: 20px;
+            color: #00aa87;
+            font-weight: 500;
         }
 
-        .button-tabs {
+        .columns-container {
             display: flex;
-            border-bottom: 1px solid grey;
-            margin-bottom: 15px;
+            flex-direction: row;
+            justify-content: space-between;
+            width: 80%;
         }
 
-        .tab-button {
-            padding: 10px 30px;
-            border: none;
-            cursor: pointer;
-            display: inline-block;
-            font-size: 15px;
-            transition: background-color 0.3s;
-            color: black;
-            background-color: white;
-        }
-
-            .tab-button:focus,
-            .tab-button:active {
-                border-bottom: 2px solid #00aa87;
-            }
-
-        .btn {
-            color: grey;
-            border: none;
-            cursor: pointer;
-            margin: 0 5px;
-            transition: background-color 0.3s;
-        }
-
-        hr {
-            margin-bottom: 15px;
-            margin-left: 10px;
-        }
-
-        .section {
-            display: none;
-            margin-left: 25px;
-        }
-
-            .section:not(.d-none) {
-                display: block;
-            }
-
-        .addresses-container {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-
-        .address-column {
+        .column {
             display: flex;
             flex-direction: column;
         }
 
-            .address-column h5 {
-                margin-bottom: 10px;
-            }
-
-            .address-column p {
-                margin: 5px 0;
+            .column p {
+                font-size: 14px;
+                color: black;
+                opacity: 80%;
             }
 
         .maps-container {
@@ -129,114 +79,57 @@
             border-radius: 5px;
         }
 
-        .delivery-steps {
+        .button-steps {
             display: flex;
-            align-items: center;
-            gap: 30px;
+            flex-direction: row;
+            margin-top: 30px;
+            gap: 200px;
+            margin-bottom: 30px;
         }
 
-        .step-container {
+        .text-tracking-line {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: 70%;
+        }
+
+        .tracking-line {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+            margin-left: 35px;
+        }
+
+        .dot {
+            width: 17px;
+            height: 17px;
+            border-radius: 50%;
+        }
+
+        .line {
+            flex: 1;
+            height: 6px;
+        }
+
+        .steps-text-container {
+            width: 100%;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .text-icon {
             display: flex;
             flex-direction: column;
             align-items: center;
+            gap: 5px;
         }
-
-        .step-dot {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background-color: gray;
-        }
-
-            .step-dot.completed {
-                background-color: green;
-            }
-
-        .step-line {
-            width: 3px;
-            height: 50px;
-            background-color: gray;
-            margin: 0 auto;
-        }
-
-            .step-line.completed {
-                background-color: green;
-            }
 
         .step-text {
             text-align: center;
             margin-top: 8px;
-        }
-
-            .step-text img {
-                width: 30px;
-                height: 30px;
-            }
-
-
-        .movement-history {
-            margin-top: 20px;
-        }
-
-        .movement-rows {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .movement-row {
-            display: flex;
-            align-items: center;
-            gap: 40px;
-            padding: 10px 0;
-        }
-
-        .movement-event {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-        }
-
-        .movement-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background-color: gray;
-        }
-
-        .event-line {
-            width: 2px;
-            height: 20px;
-            background-color: gray;
-            margin-top: 2px;
-        }
-
-        .movement-location, .movement-time {
-            margin-left: 10px;
-        }
-
-        .vehicles-section-header, .address-column h4 {
-            display: flex;
-            margin-bottom: 20px;
-            flex-direction: row;
-        }
-
-            .vehicles-section-header h4,
-            .address-column h4, .metrics-header h4, .special-instructions h4, 
-            .status-header h4, .metrics h4 {
-                font-size: 20px;
-                color: #00aa87;
-                font-weight: 500;
-            }
-
-        .address-column p, .status-header p{
-            font-size: 14px;
-            color: black;
-            opacity: 80%;
-        }
-
-        .address-column strong {
-            color: black;
         }
 
         .metrics-header {
@@ -244,13 +137,6 @@
             flex-direction: row;
             gap: 300px;
             margin-bottom: 20px;
-        }
-
-        .status-header{
-			display: flex;
-			flex-direction: row;
-			gap: 180px;
-			margin-bottom: 20px;
         }
 
         .metrics {
@@ -261,7 +147,8 @@
             display: flex;
             flex-direction: row;
             margin-left: 40px;
-            gap: 50px;
+            justify-content: space-between;
+            width: 90%;
         }
 
         .standart-metrics-info-row {
@@ -274,20 +161,16 @@
             font-weight: 300;
             font-size: 14px;
             opacity: 80%;
+            justify-content: space-between;
+            width: 90%;
         }
 
         .non-standart-metrics-header-row {
             display: flex;
             flex-direction: row;
             margin-left: 40px;
-            gap: 70px;
-        }
-
-        .more-header-row {
-            display: flex;
-            flex-direction: row;
-            margin-left: 40px;
-            gap: 50px;
+            justify-content: space-between;
+            width: 90%;
         }
 
         .non-standart-metrics-info-row {
@@ -299,6 +182,15 @@
             font-weight: 300;
             font-size: 14px;
             opacity: 80%;
+            justify-content: space-between;
+            width: 90%;
+        }
+
+        .more-header-row {
+            display: flex;
+            flex-direction: row;
+            margin-left: 40px;
+            gap: 50px;
         }
 
         .more-info-row {
@@ -306,12 +198,89 @@
             flex-direction: row;
             background-color: #fbfbfb;
             margin-left: 40px;
-            gap: 60px;
+            gap: 100px;
             font-weight: 300;
             font-size: 14px;
             opacity: 80%;
         }
 
+        .status-header {
+            display: flex;
+            flex-direction: row;
+            gap: 180px;
+            margin-bottom: 20px;
+        }
+
+        p {
+            font-size: 14px;
+            color: black;
+            opacity: 80%;
+        }
+
+        .btn-primary {
+            background-color: #00aa87;
+            text-decoration: none;
+            width: 145px;
+            height: 30px;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            padding: 10px 15px;
+            cursor: pointer;
+            margin-left: 10px;
+            box-shadow: 0 3px 1px -2px #0003, 0 2px 2px 0 #00000024, 0 1px 5px 0 #0000001f;
+        }
+
+            .btn-primary:hover {
+                opacity: 0.9;
+            }
+
+        a .btn-primary {
+            text-decoration: none;
+            color: white;
+            font-size: 14px;
+        }
+
+        .movement-history {
+            margin-top: 40px;
+        }
+
+        .movement-steps {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            width: 60%;
+            margin-left: 10px;
+            margin-top: 20px;
+        }
+
+        .movement-rows {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .movement-row {
+            display: flex;
+            align-items: center;
+            gap: 90px;
+            padding: 10px 0;
+        }
+
+        .movement-event {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            text-align: center;
+        }
+
+        .movement-location {
+            flex-wrap: wrap;
+            max-width: 60%;
+        }
+
+        .movement-location, .movement-time {
+            margin-left: 10px;
+        }
     </style>
 
 </head>
@@ -338,22 +307,46 @@
     </header>
     <aside class="sidebar">
         <ul>
-            <li><a asp-action="Dashboard" asp-controller="Driver"><i class="bi bi-house-door"></i> Dashboard</a></li>
             <li>
-                <a asp-action="SearchDelivery" asp-controller="Driver"><i class="bi bi-journal"></i> New Delivery</a>
+                <a asp-action="Dashboard" asp-controller="Driver">
+                    <i class="bi bi-house-door"></i> Dashboard
+                </a>
             </li>
             <li>
-                <a asp-action="SearchDeliveries" asp-controller="Driver"><i class="bi bi-truck"></i> Deliveries</a>
+                <a asp-action="SearchDelivery" asp-controller="Driver">
+                    <i class="bi bi-plus-circle"></i> New delivery
+                </a>
+            </li>
+            <li>
+                <a asp-action="SearchDeliveries" asp-controller="Driver">
+                    <i class="bi bi-truck"></i> Deliveries <span class="arrow">></span>
+                </a>
+                <div class="dropdown-menu">
+                    <ul>
+                        <li>
+                            <a asp-action="SearchDeliveries" asp-controller="Driver">
+                                <i class="bi bi-box"></i> My deliveries
+                            </a>
+                        </li>
+                        <li>
+                            <a asp-action="DeliveryStatistics" asp-controller="Driver">
+                                <i class="bi bi-graph-up"></i> Statistics
+                            </a>
+                        </li>
+                    </ul>
+                </div>
             </li>
         </ul>
     </aside>
 
     <div class="main-content">
         <div class="delivery-details-container">
-            <div class="card">
+            <div class="details-card">
                 <div class="details-header">
-                    <img src="https://via.placeholder.com/100" alt="Delivery Image" class="delivery-image">
-                    <h2><b>@Model.ReferenceNumber</b></h2>
+                    <div class="delivery-image">
+                        <i class="fas fa-shipping-fast" style="font-size: 40px; color: #00aa87;"></i>
+                    </div>                    
+                    <h3><b>@Model.ReferenceNumber</b></h3>
                 </div>
 
                 <div class="button-tabs">
@@ -364,18 +357,25 @@
                 </div>
 
                 <div id="vehicleSection" class="section d-none">
-                    <div class="vehicles-section-header">
-                        @*<img src="https://via.placeholder.com/100" alt="Delivery Image" class="delivery-image">*@
-                        <h4><b>Vehicle details</b></h4>
+                    <div class="columns-container">
+                        <div class="column">
+                            <h4><b>Vehicle details</b></h4>
+                            <p><b>Registration number:</b> @Model.RegistrationNumber</p>
+                            <p><b>Vehicle type:</b> @Model.VehicleType</p>
+                        </div>
+
+                        <div class="column">
+                            <h4><b>Parameters</b></h4>
+                            <p><b>Metrics:</b> @Model.VehicleLength cm X @Model.VehicleWidth cm X @Model.VehicleHeight cm</p>
+                            <p><b>Weight capacity:</b> @Model.VehicleWeightCapacity KG</p>
+                            <p><b>Fuel consumption:</b> @Model.FuelConsumptionPer100Km L/100KM</p>
+                        </div>
                     </div>
-                    <p><strong>Registration Number:</strong> @Model.RegistrationNumber</p>
-                    <p><strong>Vehicle Type:</strong> @Model.VehicleType</p>
                 </div>
 
                 <div id="addressesSection" class="section d-none">
-
-                    <div class="addresses-container">
-                        <div class="address-column">
+                    <div class="columns-container">
+                        <div class="column">
                             <h4><b>Pickup Address</b></h4>
                             <p><strong>Street:</strong> @Model.PickupStreet</p>
                             <p><strong>City:</strong> @Model.PickupCity</p>
@@ -385,7 +385,7 @@
                             @*<div id="pickupMap" class="map"></div>*@
                         </div>
 
-                        <div class="address-column">
+                        <div class="column">
                             <h4><b>Delivery Address</b></h4>
                             <p><strong>Street:</strong> @Model.DeliveryStreet</p>
                             <p><strong>City:</strong> @Model.DeliveryCity</p>
@@ -403,43 +403,41 @@
                             <h4><b>Client</b></h4>
                             <p>@Model.ClientCompanyName</p>
                         </div>
-
                         <div class="metrics-header-row">
-                            <h4><b>Type of Goods</b></h4>
+                            <h4><b>Type of goods</b></h4>
                             <p>@Model.TypeOfGoods</p>
                         </div>
                     </div>
                     <div class="special-instructions">
-                        <h4><b>Special Instructions</b></h4>
+                        <h4><b>Special instructions</b></h4>
                         <p>@Model.SpecialInstructions</p>
                     </div>
 
-                        <div class="metrics">
-                            <h4><b>Standard Metrics</b></h4>
-                        </div>
-                        <div class="standart-metrics-header-row">
-                            <p><b>Number</b></p>
-                            <p><b>Length</b></p>
-                            <p><b>Width</b></p>
-                            <p><b>Height</b></p>
-                            <p><b>Weight</b></p>
-                            <p><b>Stackable</b></p>
-                        </div>
-                        <div class="standart-metrics-info-row">
-                            <p>@Model.NumberOfPallets</p>
-                            <p>@Model.PalletLength</p>
-                            <p>@Model.PalletWidth</p>
-                            <p>@Model.PalletHeight</p>
-                            <p>@Model.WeightOfPallets</p>
-                            <p>@Model.PalletsAreStackable</p>
-
-                        </div>
                     <div class="metrics">
-                        <h4><b>Non-Standart Metrics</b></h4>
+                        <h4><b>Standard metrics</b></h4>
+                    </div>
+                    <div class="standart-metrics-header-row">
+                        <p><b>Number</b></p>
+                        <p><b>Length</b></p>
+                        <p><b>Width</b></p>
+                        <p><b>Height</b></p>
+                        <p><b>Weight</b></p>
+                        <p><b>Stackable</b></p>
+                    </div>
+                    <div class="standart-metrics-info-row">
+                        <p>@Model.NumberOfPallets</p>
+                        <p>@Model.PalletLength</p>
+                        <p>@Model.PalletWidth</p>
+                        <p>@Model.PalletHeight</p>
+                        <p>@Model.WeightOfPallets</p>
+                        <p>@Model.PalletsAreStackable</p>
                     </div>
 
                     @foreach (var item in Model.NonStandardCargos)
                     {
+                        <div class="metrics">
+                            <h4><b>Non-Standart Metrics</b></h4>
+                        </div>
                         <div class="non-standart-metrics-header-row">
                             <p><b>Length</b></p>
                             <p><b>Width</b></p>
@@ -457,7 +455,7 @@
                         </div>
                     }
                     <div class="metrics">
-                        <h4><b>More Info</b></h4>
+                        <h4><b>More info</b></h4>
                     </div>
                     <div class="more-header-row">
                         <p><b>Refrigerated</b></p>
@@ -468,76 +466,78 @@
                         <p>@Model.SharedTruck</p>
                     </div>
                 </div>
-            
 
-            <div id="statusSection" class="section d-none">
-                <div class="status-header">
-                    <div class="status-header-row">
-                            <h4>Expected delivery date</h4>
-                            <hp>@Model.ExpectedDeliveryDate</hp>
-                    </div>
+                <div id="statusSection" class="section d-none">
+                    <div class="status-header">
                         <div class="status-header-row">
-                            <h4>Current time</h4>
-                            <p> <span id="currentTime"></span></p>
+                            <h4><b>Expected delivery date</b></h4>
+                            <p>@Model.ExpectedDeliveryDate</p>
                         </div>
-
                         <div class="status-header-row">
-                            <h4>Current location</h4>
+                            <h4><b>Current time</b></h4>
+                            <p>@Model.CurrentTime</p>
+                        </div>
+                        <div class="status-header-row">
+                            <h4><b>Current location</b></h4>
                             <p id="location" style="font-size:0.9rem;">Fetching location...</p>
                         </div>
-                        
                     </div>
-                
-                <a asp-action="AddStatus" asp-controller="Driver" asp-route-id="@Model.Id" id="addStatusButton">Add Status</a>
+                    <h4><b>Status</b></h4>
 
-                <div class="delivery-steps">
-                    @{
-                        var steps = new[] { "Booked", "Collected", "In Transit", "Delivered" };
-                        var currentStep = Model.DeliveryStep;
-                    }
-
-                    @for (int i = 0; i < steps.Length; i++)
-                    {
-                        var isCompleted = i + 1 <= currentStep;
-                        var dotClass = isCompleted ? "step-dot completed" : "step-dot";
-                        var lineClass = i < steps.Length - 1 ? (isCompleted ? "step-line completed" : "step-line") : "";
-
-                        <div class="step-container">
-                            <div class="step-dot">
-                                <div class="@dotClass"></div>
-                                @if (i < steps.Length - 1)
-                                {
-                                    <div class="@lineClass"></div>
-                                }
+                    <div class="button-steps">
+                        <a asp-action="AddStatus" asp-controller="Driver" asp-route-id="@Model.Id" class="btn-primary">NEW STATUS +</a>
+                        <div class="text-tracking-line">
+                            <div class="tracking-line">
+                                <div class="dot" style="background-color: @(Model.DeliveryStep >= 1 ? "#00aa87" : "gray")"></div>
+                                <div class="line" style="background-color: @(Model.DeliveryStep >= 2 ? "#00aa87" : "gray")"></div>
+                                <div class="dot" style="background-color: @(Model.DeliveryStep >= 2 ? "#00aa87" : "gray")"></div>
+                                <div class="line" style="background-color: @(Model.DeliveryStep >= 3 ? "#00aa87" : "gray")"></div>
+                                <div class="dot" style="background-color: @(Model.DeliveryStep >= 3 ? "#00aa87" : "gray")"></div>
+                                <div class="line" style="background-color: @(Model.DeliveryStep >= 4 ? "#00aa87" : "gray")"></div>
+                                <div class="dot" style="background-color: @(Model.DeliveryStep >= 4 ? "#00aa87" : "gray")"></div>
                             </div>
-                            <div class="step-text">
-                                <img src="path/to/@steps[i].ToLower().Replace(" ", "_")-icon.jpg" alt="@steps[i] Icon">
-                                <p>@steps[i]</p>
+                            <div class="steps-text-container" style="display: flex; justify-content: space-around; align-items: center;">
+                                <div class="text-icon" style="text-align: center;">
+                                    <i class="fas fa-calendar-check fa-2x" style="color: #4caf50;"></i>
+                                    <p class="step-text">Booked</p>
+                                </div>
+                                <div class="text-icon" style="text-align: center;">
+                                    <i class="fas fa-box fa-2x" style="color: #2196f3;"></i>
+                                    <p class="step-text">Collected</p>
+                                </div>
+                                <div class="text-icon" style="text-align: center;">
+                                    <i class="fas fa-truck-moving fa-2x" style="color: #ff9800;"></i>
+                                    <p class="step-text">In transit</p>
+                                </div>
+                                <div class="text-icon" style="text-align: center;">
+                                    <i class="fas fa-check-circle fa-2x" style="color: #8bc34a;"></i>
+                                    <p class="step-text">Delivered</p>
+                                </div>
                             </div>
                         </div>
-                    }
-                </div>
+                    </div>
 
-                <!-- Movement History -->
-                <div class="movement-history">
-                    <h4>Movement Updates</h4>
-                    <div class="movement-rows">
-                        @foreach (var movement in Model.DeliveryTrackings)
-                        {
-                            <div class="movement-row">
-                                <div class="movement-event">
-                                    <div class="movement-dot"></div>
-                                    <div class="event-line"></div>
-                                    <p>@movement.StatusUpdate</p>
+                    <div class="movement-history">
+                        <h4><b>Movement updates</b></h4>
+                        <div class="movement-steps">
+                            <p><b>Status</b></p>
+                            <p><b>Location</b></p>
+                            <p><b>Timestamp</b></p>
+                        </div>
+                        <div class="movement-rows">
+                            @foreach (var movement in Model.DeliveryTrackings)
+                            {
+                                <div class="movement-row">
+                                    <div class="movement-event">
+                                        <p style="color:#00aa87;">@movement.StatusUpdate.ToUpper()</p>
+                                    </div>
+                                    <p class="movement-location"><i class="fas fa-map-marker-alt" style="margin-right: 5px; color: #FF5733;"></i> @movement.Address</p>
+                                    <p class="movement-time">@movement.Timestamp</p>
                                 </div>
-                                <p class="movement-location">@movement.Address</p>
-                                <p class="movement-time">@movement.Timestamp</p>
-                            </div>
-                        }
+                            }
+                        </div>
                     </div>
                 </div>
-
-            </div>
             </div>
         </div>
     </div>
@@ -567,8 +567,31 @@
         });
     </script>
     <script>
+        async function getCurrentLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(showPosition, showError);
+            } else {
+                document.getElementById('location').textContent = "Geolocation is not supported by this browser.";
+            }
+        }
+
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                position => console.log("Latitude:", position.coords.latitude, "Longitude:", position.coords.longitude),
+                error => console.error("Error:", error)
+            );
+        } else {
+            console.error("Geolocation not supported by this browser.");
+        }
+
+        function showPosition(position) {
+            const lat = position.coords.latitude;
+            const long = position.coords.longitude;
+            fetchLocation(lat, long);
+        }
+
         async function fetchLocation(lat, long) {
-            const apiKey = 'AIzaSyDfA3_DsCdEYZeSpUwLBSenw1Gyp1VGIp4';
+            const apiKey = 'test';
             const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${long}&key=${apiKey}`;
 
             try {
@@ -577,6 +600,7 @@
 
                 if (data.results && data.results.length > 0) {
                     const address = data.results[0].formatted_address;
+                    console.log(address);
                     document.getElementById('location').textContent = address;
                 } else {
                     document.getElementById('location').textContent = "Unable to retrieve location.";
@@ -585,10 +609,24 @@
                 console.error("Error fetching location:", error);
                 document.getElementById('location').textContent = "Error fetching location.";
             }
-
-            showCurrentTime();
         }
 
+        function showError(error) {
+            switch (error.code) {
+                case error.PERMISSION_DENIED:
+                    document.getElementById('location').textContent = "User denied the request for Geolocation.";
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    document.getElementById('location').textContent = "Location information is unavailable.";
+                    break;
+                case error.TIMEOUT:
+                    document.getElementById('location').textContent = "The request to get user location timed out.";
+                    break;
+                case error.UNKNOWN_ERROR:
+                    document.getElementById('location').textContent = "An unknown error occurred.";
+                    break;
+            }
+        }
 
         function initPickupMap() {
             const pickupLatLng = { lat: @Model.PickupLatitude, lng: @Model.PickupLongitude };
@@ -620,20 +658,11 @@
             });
         }
 
-        setInterval(() => {
-            document.getElementById("currentTime").innerText = new Date().toLocaleString();
-        }, 1000);
-                        }); document.querySelectorAll('.tab-button').forEach(button => {
-            button.addEventListener('click', function () {
-                document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
-                this.classList.add('active');
-            });
-        });
+        window.onload = getCurrentLocation;
+
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
-
-
 </body>
 </html>
 

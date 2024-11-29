@@ -1,4 +1,4 @@
-﻿@model LogiTrack.Core.ViewModels.Delivery.SearchDeliveryForDriverViewModel
+﻿@model LogiTrack.Core.ViewModels.Delivery.FilterDeliveriesForDriverViewModel
 @{
     Layout = null;
 }
@@ -17,9 +17,6 @@
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="~/js/site.js"></script>
     <style>
-        body {
-            font-family: 'Roboto', sans-serif;
-        }
         .container {
             background-color: white;
             padding: 20px;
@@ -50,11 +47,13 @@
             font-size: 13px;
             color: grey;
         }
+
         .search-form{
             display:flex;
             gap: 20px;
             flex-direction:row;
         }
+
         .row {
             display: flex;
             flex-wrap: wrap;
@@ -63,8 +62,7 @@
 
         .form-group {
             flex: 1 1 33%; 
-            margin-bottom: 10px;
-           
+            margin-bottom: 10px;           
         }
 
             .form-group:last-child {
@@ -74,8 +72,7 @@
         label {
             display: block;
             font-size: 13px; 
-            margin-bottom: 5px;
-            
+            margin-bottom: 5px;           
         }
 
         input[type="text"],
@@ -114,6 +111,10 @@
             box-shadow: 0 3px 1px -2px #0003, 0 2px 2px 0 #00000024, 0 1px 5px 0 #0000001f;
         }
 
+            .btn:hover {
+                opacity: 0.9;
+            }
+
         .btn-clear {
             width: 80px;
             text-align: center;
@@ -129,18 +130,14 @@
             font-size: 13px;
         }
 
-        .btn:hover {
-            opacity: 0.9; 
-        }
-
-        .btn-clear:hover {
-            opacity: 0.8; 
-        }
+            .btn-clear:hover {
+                opacity: 0.8;
+            }
 
         .filtered-deliveries-container {
             background-color: #ffff;
             margin-top: 20px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 0 25px 1px #0000000f !important;
         }
 
         .quick-search-form {
@@ -151,6 +148,7 @@
             .quick-search-form .form-group {
                 width: 55%;
             }
+
         .delivery-header {
             display: flex;
             justify-content: space-between;
@@ -158,12 +156,11 @@
             padding: 30px;
             font-weight: bold;
             font-size: 0.90rem;
-            width:90%;
+            width:95%;
         }
 
         .delivery-card {
-            background-color: white; 
-           
+            background-color: white;           
             font-size:0.80rem;
             display: flex;
             flex-direction: column; 
@@ -172,13 +169,19 @@
             overflow: hidden;
         }
 
+            .delivery-card:hover {
+                display: flex;
+                background-color: #73EC8B;
+                opacity: 90%;
+            }
+
             .delivery-card:nth-child(even) {
                 background-color: #F5F5F7;
             }
 
         .delivery-info {
             display: flex; 
-            width: 90%;
+            width: 95%;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 28px;
@@ -193,22 +196,22 @@
             background-color: #f1f8ff; 
             width: 100%;
             transition: background-color 0.3s ease;
-        } 
-        .delivery-metrics p{
-            margin-left:210px;
         }
+
+            .delivery-metrics p {
+                margin-left: 210px;
+            }
+
         .delivery-card:hover .delivery-metrics {
             display: flex; 
             background-color: #54C392;
             opacity: 1;
         }
 
-        .delivery-card:hover{
-            background-color: #73EC8B;
-            opacity:90%;
-        }
-        
-        
+        .address {
+            width: 140px;
+            flex-wrap: wrap;
+        }               
     </style>
 </head>
 
@@ -223,7 +226,7 @@
         <div class="profile-dropdown">
             <button onclick="toggleDropdown()">
                 <i class="bi bi-person-circle"></i>
-                <span class="arrow">&#x25BC;</span> 
+                <span class="arrow">&#x25BC;</span>
             </button>
             <div class="profile-dropdown-menu" id="profileDropdown">
                 <a asp-action="Details" asp-controller="Driver">Personal details</a>
@@ -234,20 +237,43 @@
     </header>
     <aside class="sidebar">
         <ul>
-            <li><a asp-action="Dashboard" asp-controller="Driver"><i class="bi bi-house-door"></i> Dashboard</a></li>
             <li>
-                <a asp-action="SearchDelivery" asp-controller="Driver"><i class="bi bi-journal"></i> New Delivery</a>
+                <a asp-action="Dashboard" asp-controller="Driver">
+                    <i class="bi bi-house-door"></i> Dashboard
+                </a>
             </li>
             <li>
-                <a asp-action="SearchDeliveries" asp-controller="Driver"><i class="bi bi-truck"></i> Deliveries</a>
+                <a asp-action="SearchDelivery" asp-controller="Driver">
+                    <i class="bi bi-plus-circle"></i> New delivery
+                </a>
+            </li>
+            <li>
+                <a asp-action="SearchDeliveries" asp-controller="Driver">
+                    <i class="bi bi-truck"></i> Deliveries <span class="arrow">></span>
+                </a>
+                <div class="dropdown-menu">
+                    <ul>
+                        <li>
+                            <a asp-action="SearchDeliveries" asp-controller="Driver">
+                                <i class="bi bi-box"></i> My deliveries
+                            </a>
+                        </li>
+                        <li>
+                            <a asp-action="DeliveryStatistics" asp-controller="Driver">
+                                <i class="bi bi-graph-up"></i> Statistics
+                            </a>
+                        </li>
+                    </ul>
+                </div>
             </li>
         </ul>
     </aside>
     <div class="main-content">
         <div class="container mt-5">
             <div class="quick-search-header">
-                <img src="https://via.placeholder.com/40" alt="Quick Search Icon" class="search-icon">
-                <h2 class="quick-search-title">Quick Search</h2>
+                <div class="search-icon">
+                    <i class="bi bi-search" style="font-size: 35px; color:#00aa87;"></i>
+                </div>                <h2 class="quick-search-title">Quick my deliveries search</h2>
             </div>
             <p class="search-description">Please enter your search criteria</p>
 
@@ -303,7 +329,8 @@
                 <span>Origin</span>
                 <span>Destination</span>
                 <span>Client</span>
-                <span>Expected Date</span>
+                <span>Expected date</span>
+                <span>Actual date</span>
                 <span>New</span>
             </div>
             @if (Model.Deliveries.Any())
@@ -314,10 +341,12 @@
                         <div class="delivery-card">
                             <div class="delivery-info">
                                 <a asp-action="DeliveryDetails" asp-controller="Driver" asp-route-id="@delivery.Id" style="text-decoration:none; color:inherit;"><span>@delivery.ReferenceNumber</span></a>
-                                <span>@delivery.PickupAddress</span>
-                                <span>@delivery.DeliveryAddress</span>
+                                <span class="address">@delivery.PickupAddress</span>
+                                <span class="address">@delivery.DeliveryAddress</span>
                                 <span>@delivery.ClientCompanyName</span>
                                 <span>@delivery.ExpectedDeliveryDate</span>
+                                <span>@delivery.ActualDeliveryDate</span>
+
                                 <span>
                                     @if (delivery.IsNew)
                                     {

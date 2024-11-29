@@ -15,10 +15,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css">
     <script src="~/js/site.js"></script>
     <style>
-        body {
-            font-family: 'Roboto', sans-serif;
-        }
-
         .license-container {
             width: 800px;
             background-color: #ffffff;
@@ -43,6 +39,7 @@
         .details-info {
             padding: 20px;
         }
+
         .general-details {
             font-size: 18px;
             color: #00aa87;
@@ -63,13 +60,13 @@
                 color: black;
                 font-size: 15px;
                 flex: 1;
+                opacity: 80%;
             }
 
                 .license-row span:first-child {
                     width: 150px;
                     font-weight: bold;
                 }
-
 
         .license-expiry {
             color: #ff4d4d;
@@ -108,12 +105,34 @@
     </header>
     <aside class="sidebar">
         <ul>
-            <li><a asp-action="Dashboard" asp-controller="Driver"><i class="bi bi-house-door"></i> Dashboard</a></li>
             <li>
-                <a asp-action="SearchDelivery" asp-controller="Driver"><i class="bi bi-journal"></i> New Delivery</a>
+                <a asp-action="Dashboard" asp-controller="Driver">
+                    <i class="bi bi-house-door"></i> Dashboard
+                </a>
             </li>
             <li>
-                <a asp-action="SearchDeliveries" asp-controller="Driver"><i class="bi bi-truck"></i> Delivery</a>
+                <a asp-action="SearchDelivery" asp-controller="Driver">
+                    <i class="bi bi-plus-circle"></i> New delivery
+                </a>
+            </li>
+            <li>
+                <a asp-action="SearchDeliveries" asp-controller="Driver">
+                    <i class="bi bi-truck"></i> Deliveries <span class="arrow">></span>
+                </a>
+                <div class="dropdown-menu">
+                    <ul>
+                        <li>
+                            <a asp-action="SearchDeliveries" asp-controller="Driver">
+                                <i class="bi bi-box"></i> My deliveries
+                            </a>
+                        </li>
+                        <li>
+                            <a asp-action="DeliveryStatistics" asp-controller="Driver">
+                                <i class="bi bi-graph-up"></i> Statistics
+                            </a>
+                        </li>
+                    </ul>
+                </div>
             </li>
         </ul>
     </aside>

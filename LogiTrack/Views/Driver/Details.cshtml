@@ -14,18 +14,14 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css">
     <script src="~/js/site.js"></script>
     <style>
-        body {
-            font-family: 'Roboto', sans-serif;
-        }
-
-        .license-container {
+        .details-container {
             width: 800px;
             background-color: #ffffff;
             box-shadow: 0 0 25px 1px #0000000f !important;
             display: block;
         }
 
-        .license-title {
+        .details-title {
             font-size: 23px;
             font-weight: 700;
             color: #000;
@@ -40,15 +36,19 @@
             margin: 10px 0;
         }
 
+
+        .details-info {
+            padding: 20px;
+        }
+
         .general-details {
             font-size: 18px;
             color: #00aa87;
             font-weight: 600;
             margin-bottom: 25px;
-
         }
 
-        .license-row {
+        .details-row {
             display: flex;
             justify-content: space-between;
             font-size: 16px;
@@ -57,20 +57,17 @@
             margin-left: 10px;
         }
 
-            .license-row span {
+            .details-row span {
                 color: black;
                 font-size: 15px;
                 flex: 1; 
+                opacity: 80%;
             }
 
-                .license-row span:first-child {
+                .details-row span:first-child {
                     width: 150px; 
                     font-weight: bold;
                 }
-       
-        .details-info {
-            padding: 20px;
-        }
     </style>
 
 </head>
@@ -95,45 +92,66 @@
             </div>
         </div>
     </header>
-
     <aside class="sidebar">
         <ul>
-            <li><a asp-action="Dashboard" asp-controller="Driver"><i class="bi bi-house-door"></i> Dashboard</a></li>
             <li>
-                <a asp-action="SearchDelivery" asp-controller="Driver"><i class="bi bi-journal"></i> New Delivery</a>
+                <a asp-action="Dashboard" asp-controller="Driver">
+                    <i class="bi bi-house-door"></i> Dashboard
+                </a>
             </li>
             <li>
-                <a asp-action="SearchDeliveries" asp-controller="Driver"><i class="bi bi-truck"></i> Delivery</a>
+                <a asp-action="SearchDelivery" asp-controller="Driver">
+                    <i class="bi bi-plus-circle"></i> New delivery
+                </a>
+            </li>
+            <li>
+                <a asp-action="SearchDeliveries" asp-controller="Driver">
+                    <i class="bi bi-truck"></i> Deliveries <span class="arrow">></span>
+                </a>
+                <div class="dropdown-menu">
+                    <ul>
+                        <li>
+                            <a asp-action="SearchDeliveries" asp-controller="Driver">
+                                <i class="bi bi-box"></i> My deliveries
+                            </a>
+                        </li>
+                        <li>
+                            <a asp-action="DeliveryStatistics" asp-controller="Driver">
+                                <i class="bi bi-graph-up"></i> Statistics
+                            </a>
+                        </li>
+                    </ul>
+                </div>
             </li>
         </ul>
     </aside>
     <div class="main-content">
-        <div class="license-container">
-            <div class="license-title">Driver Details</div>
+        <div class="details-container">
+            <div class="details-title">Driver Details</div>
             <div class="divider-line"></div>
             <div class="details-info">
                 <div class="general-details">General Information</div>
-                <div class="license-row">
+                <div class="details-row">
                     <span><b>Name</b></span>
                     <span>@Model.Name</span>
                 </div>
-                <div class="license-row">
+                <div class="details-row">
                     <span><b>Username</b></span>
                     <span>@Model.Username</span>
                 </div>
-                <div class="license-row">
+                <div class="details-row">
                     <span><b>Age</b></span>
                     <span>@Model.Age</span>
                 </div>
-                <div class="license-row">
+                <div class="details-row">
                     <span><b>Salary</b></span>
                     <span>$@Model.Salary / month</span>
                 </div>
-                <div class="license-row">
+                <div class="details-row">
                     <span><b>Experience</b></span>
                     <span>@Model.YearOfExperience years, @Model.MonthsOfExperience months</span>
                 </div>
-                <div class="license-row">
+                <div class="details-row">
                     <span><b>Preferences</b></span>
                     <span>@Model.Preferrences</span>
                 </div>
