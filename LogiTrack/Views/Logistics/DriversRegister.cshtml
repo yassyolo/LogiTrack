@@ -1,4 +1,4 @@
-﻿@model LogiTrack.Core.ViewModels.Driver.SearchDriverViewModel
+﻿@model LogiTrack.Core.ViewModels.Driver.FilterDriversViewModel
 @{
     Layout = null;
 }
@@ -15,10 +15,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css">
     <script src="~/js/site.js"></script>
     <style>
-        body {
-            font-family: 'Roboto', sans-serif;
-        }
-
         .container {
             background-color: white;
             padding: 20px;
@@ -77,8 +73,7 @@
             margin-bottom: 5px;
         }
 
-        input[type="text"],
-        input[type="date"] {
+        input[type="text"] {
             width: 70%;
             border: none;
             border-bottom: 1px solid grey;
@@ -86,8 +81,7 @@
             margin-bottom: 15px;
         }
 
-            input[type="text"]:focus,
-            input[type="date"]:focus {
+            input[type="text"]:focus {
                 outline: none;
                 border-bottom-color: #00aa87;
             }
@@ -239,43 +233,115 @@
     </header>
     <aside class="sidebar">
         <ul>
-            <li><a asp-action="Dashboard" asp-controller="Clients"><i class="bi bi-house-door"></i> Dashboard</a></li>
             <li>
-                <a asp-action="MyRequests" asp-controller="Clients"><i class="bi bi-money"></i> Requests <span class="arrow">></span></a>
+                <a asp-action="Dashboard" asp-controller="Logistics">
+                    <i class="bi bi-house-door"></i> Dashboard
+                </a>
+            </li>
+            <li>
+                <a href="#">
+                    <i class="bi bi-people"></i> Clients <span class="arrow">></span>
+                </a>
                 <div class="dropdown-menu">
                     <ul>
-                        <li><a asp-action="MakeRequest" asp-controller="Clients">New</a></li>
-                        <li><a asp-action="MyRequests" asp-controller="Clients">Search</a></li>
+                        <li><a asp-action="GetPendingRegistrations" asp-controller="Logistics"><i class="bi bi-person-plus"></i> New registrations</a></li>
+                        <li><a asp-action="ClientsRegister" asp-controller="Logistics"><i class="bi bi-journal-text"></i> Clients register</a></li>
+                        <li><a asp-action="SearchCompany" asp-controller="Logistics"><i class="bi bi-search"></i> Search</a></li>
+                        <li><a asp-action="ClientsStatistics" asp-controller="Logistics"><i class="bi bi-bar-chart-line"></i> Statistics</a></li>
                     </ul>
                 </div>
             </li>
             <li>
-                <a asp-action="MyOffers" asp-controller="Clients"><i class="bi bi-money"></i> Offers <span class="arrow">></span></a>
+                <a asp-action="VehiclesRegister" asp-controller="Logistics">
+                    <i class="bi bi-truck"></i> Vehicles <span class="arrow">></span>
+                </a>
                 <div class="dropdown-menu">
                     <ul>
-                        <li><a asp-action="HaveOffer" asp-controller="Clients">Book</a></li>
-                        <li><a asp-action="MyOffers" asp-controller="Clients">Search</a></li>
+                        <li><a asp-action="SearchVehicle" asp-controller="Logistics"><i class="bi bi-search"></i> Search</a></li>
+                        <li><a asp-action="VehiclesRegister" asp-controller="Logistics"><i class="bi bi-list-task"></i> Vehicles Register</a></li>
+                        <li><a asp-action="VehicleStatistics" asp-controller="Logistics"><i class="bi bi-bar-chart"></i> Statistics</a></li>
                     </ul>
                 </div>
             </li>
             <li>
-                <a asp-action="MyDeliveries" asp-controller="Clients"><i class="bi bi-money"></i> Deliveries <span class="arrow">></span></a>
+                <a asp-action="DriversRegister" asp-controller="Logistics">
+                    <i class="bi bi-person-badge"></i> Drivers <span class="arrow">></span>
+                </a>
                 <div class="dropdown-menu">
                     <ul>
-                        <li><a asp-action="SearchDelivery" asp-controller="Clients">Track</a></li>
-                        <li><a asp-action="MyDeliveries" asp-controller="Clients">Search</a></li>
+                        <li><a asp-action="SearchDriver" asp-controller="Logistics"><i class="bi bi-search"></i> Search</a></li>
+                        <li><a asp-action="DriversRegister" asp-controller="Logistics"><i class="bi bi-people-fill"></i> Drivers Register</a></li>
+                        <li><a asp-action="DriverStatistics" asp-controller="Logistics"><i class="bi bi-bar-chart-line"></i> Statistics</a></li>
                     </ul>
                 </div>
             </li>
             <li>
-                <a asp-action="MyInvoices" asp-controller="Clients"><i class="bi bi-money"></i> Invoices <span class="arrow">></span></a>
+                <a asp-action="RequestsRegister" asp-controller="Logistics">
+                    <i class="bi bi-card-list"></i> Requests <span class="arrow">></span>
+                </a>
+                <div class="dropdown-menu">
+                    <ul>
+                        <li><a asp-action="SearchRequest" asp-controller="Logistics"><i class="bi bi-search"></i> Search</a></li>
+                        <li><a asp-action="RequestsRegister" asp-controller="Logistics"><i class="bi bi-journal"></i> Requests Register</a></li>
+                        <li><a asp-action="RequestsStatistics" asp-controller="Logistics"><i class="bi bi-bar-chart"></i> Statistics</a></li>
+                    </ul>
+                </div>
+            </li>
+            <li>
+                <a asp-action="OffersRegister" asp-controller="Logistics">
+                    <i class="bi bi-file-earmark-text"></i> Offers <span class="arrow">></span>
+                </a>
+                <div class="dropdown-menu">
+                    <ul>
+                        <li><a asp-action="SearchOffer" asp-controller="Logistics"><i class="bi bi-search"></i> Search</a></li>
+                        <li><a asp-action="OffersRegister" asp-controller="Logistics"><i class="bi bi-journal-text"></i> Offers Register</a></li>
+                        <li><a asp-action="OfferStatistics" asp-controller="Logistics"><i class="bi bi-bar-chart"></i> Statistics</a></li>
+                    </ul>
+                </div>
+            </li>
+            <li>
+                <a asp-action="DeliveriesRegister" asp-controller="Logistics">
+                    <i class="bi bi-box-seam"></i> Deliveries <span class="arrow">></span>
+                </a>
+                <div class="dropdown-menu">
+                    <ul>
+                        <li><a asp-action="SearchDelivery" asp-controller="Logistics"><i class="bi bi-search"></i> Search</a></li>
+                        <li><a asp-action="DeliveriesRegister" asp-controller="Logistics"><i class="bi bi-journal"></i> Deliveries Register</a></li>
+                        <li><a asp-action="DeliveryStatistics" asp-controller="Logistics"><i class="bi bi-bar-chart"></i> Statistics</a></li>
+                    </ul>
+                </div>
+            </li>
+            <li>
+                <a asp-action="InvoicesRegister" asp-controller="Logistics">
+                    <i class="bi bi-receipt"></i> Invoices register <span class="arrow">></span>
+                </a>
+                <div class="dropdown-menu">
+                    <ul>
+                        <li><a asp-action="InvoicesRegister" asp-controller="Logistics"><i class="bi bi-journal"></i> Invoices Register</a></li>
+                        <li><a asp-action="InvoicesStatistics" asp-controller="Logistics"><i class="bi bi-bar-chart-line"></i> Statistics</a></li>
+                    </ul>
+                </div>
+            </li>
+            <li>
+                <a asp-action="SearchCashRegisters" asp-controller="Logistics">
+                    <i class="bi bi-cash-stack"></i> Cash registers <span class="arrow">></span>
+                </a>
+                <div class="dropdown-menu">
+                    <ul>
+                        <li><a asp-action="SearchCashRegisters" asp-controller="Logistics"><i class="bi bi-journal"></i> Cash Register</a></li>
+                        <li><a asp-action="CashRegisterStatistics" asp-controller="Logistics"><i class="bi bi-bar-chart-line"></i> Statistics</a></li>
+                    </ul>
+                </div>
             </li>
         </ul>
     </aside>
+
     <div class="main-content">
         <div class="container mt-5">
             <div class="quick-search-header">
-                <img src="https://via.placeholder.com/40" alt="Quick Search Icon" class="search-icon">
+                <div class="search-icon">
+                    <i class="bi bi-search" style="font-size: 35px; color:#00aa87;"></i>
+                </div>
                 <h2 class="quick-search-title">Drivers register</h2>
             </div>
             <p class="search-description">Please enter your search criteria</p>
@@ -292,8 +358,12 @@
                         <input type="text" id="MinVolume" asp-for="LicenseNumber" class="flatpickr" placeholder="Please enter">
                     </div>
                     <div class="form-group">
-                        <label asp-for="Salary"><b>Salary</b></label>
-                        <input type="text" id="MinVolume" asp-for="Salary" class="flatpickr" placeholder="Please enter">
+                        <label asp-for="MinSalary"><b>Salary</b></label>
+                        <input type="text" id="MinVolume" asp-for="MinSalary" class="flatpickr" placeholder="Please enter">
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="MaxSalary"><b>Salary</b></label>
+                        <input type="text" id="MinVolume" asp-for="MaxSalary" class="flatpickr" placeholder="Please enter">
                     </div>
                     <div class="form-group">
                         <label asp-for="IsAvailable"><b>Available</b></label>
@@ -320,26 +390,30 @@
                 </div>
             </form>
             <div class="delivery-header">
+                <span>License number</span>
+                <span>License expiration date</span>
                 <span>Name</span>
                 <span>Age</span>
                 <span>Phone</span>
-                <span>Status</span>
+                <span>Available</span>
             </div>
             @if (Model.Drivers.Any())
             {
                 <div class="delivery-list">
                     @foreach (var delivery in Model.Drivers)
                     {
-                        <a asp-action="VehicleDetails" asp-controller="Logistics" asp-route-id="@delivery.Id" style="text-decoration: none; color: inherit;">
+                        <a asp-action="DriverDetails" asp-controller="Logistics" asp-route-id="@delivery.Id" style="text-decoration: none; color: inherit;">
                             <div class="delivery-card">
                                 <div class="delivery-info">
+                                    <span>@delivery.LicenseNumber</span>
+                                    <span>@delivery.LicenseExpiryDate</span>
                                     <span>@delivery.Name</span>
                                     <span>@delivery.Age</span>
                                     <span>@delivery.Phone</span>
                                     <span>
                                         @if (delivery.IsAvailable)
                                         {
-                                            <i class="bi bi-check-circle-fill" style="color: #00aa87;">BOOK</i>
+                                            <i class="bi bi-check-circle-fill" style="color: #00aa87;"></i>
                                         }
                                         </span>
                                 </div>
@@ -351,18 +425,10 @@
             }
             else
             {
-                <p class="no-found">No vehicles found matching the search criteria.</p>
+                <p class="no-found">No drivers found matching the search criteria.</p>
             }
         </div>
     </div>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            flatpickr(".flatpickr", {
-                dateFormat: "Y-m-d",
-            });
-        });
-    </script>
 
 </body>
 

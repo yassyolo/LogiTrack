@@ -1,4 +1,4 @@
-﻿@model LogiTrack.Core.ViewModels.Vehicle.VehicleDetailsViewModel
+﻿@model LogiTrack.Core.ViewModels.Driver.DriverForLogisticsViewModel
 @{
     Layout = null;
 }
@@ -14,14 +14,12 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css">
     <script src="~/js/site.js"></script>
     <style>
-        .details-container {
-            width: 90%;
+        .delivery-details-container {
+            width: 100%;
         }
 
         .details-card {
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 0 25px 1px #0000000f !important;
+            box-shadow: 0 0 15px 1px #0000000f !important;
             padding: 17px;
             background-color: white;
         }
@@ -29,18 +27,12 @@
         .details-header {
             display: flex;
             align-items: center;
-            margin-bottom: 10px;
+            margin-bottom: 40px;
         }
 
         .delivery-image {
             width: 50px;
             height: auto;
-        }
-
-        p {
-            font-size: 14px;
-            color: black;
-            opacity: 80%;
         }
 
         h4 {
@@ -49,83 +41,22 @@
             font-size: 1.1rem;
         }
 
-        .metrics-header {
+        .contact-container {
             display: flex;
             flex-direction: row;
-            gap: 300px;
-            margin-bottom: 20px;
-        }
-
-        .status-header {
-            display: flex;
-            flex-direction: row;
-            gap: 180px;
-            margin-bottom: 20px;
-        }
-
-        .metrics {
-            margin-top: 50px;
-        }
-
-        .metrics-header {
-            display: flex;
-            flex-direction: row;
-            gap: 300px;
-            margin-bottom: 20px;
-        }
-
-        .metrics {
-            margin-top: 50px;
-        }
-
-        .standart-metrics-header-row {
-            display: flex;
-            flex-direction: row;
-            margin-left: 40px;
             justify-content: space-between;
-            width: 90%;
+            width: 98%;
         }
 
-        .standart-metrics-info-row {
-            display: flex;
-            flex-direction: row;
-            background-color: #fbfbfb;
-            margin-left: 40px;
-            gap: 100px;
-            white-space: nowrap;
-            font-weight: 300;
-            font-size: 14px;
-            opacity: 80%;
-            justify-content: space-between;
-            width: 90%;
-        }
+            .contact-container p {
+                font-size: 0.9rem;
+                opacity: 90%;
+            }
 
-        .non-standart-metrics-header-row {
-            display: flex;
-            flex-direction: row;
-            margin-left: 40px;
-            justify-content: space-between;
-            width: 90%;
-        }
-
-        .non-standart-metrics-info-row {
-            display: flex;
-            flex-direction: row;
-            background-color: #fbfbfb;
-            margin-left: 40px;
-            gap: 100px;
-            font-weight: 300;
-            font-size: 14px;
-            opacity: 80%;
-            justify-content: space-between;
-            width: 90%;
-        }
-
-        .more-header-row {
-            display: flex;
-            flex-direction: row;
-            margin-left: 40px;
-            gap: 50px;
+        .divider-line {
+            height: 1px;
+            background-color: #e0e0e0;
+            margin: 10px 0;
         }
 
         .filtered-deliveries-container {
@@ -203,13 +134,13 @@
             flex-wrap: wrap;
         }
 
-        .divider-line {
-            height: 1px;
-            background-color: #e0e0e0;
-            margin: 10px 0;
+        p {
+            font-size: 14px;
+            color: black;
+            opacity: 80%;
         }
 
-        .chart-container {
+        .chart-container, .delay-time-container {
             background-color: white;
             width: 100%;
             max-width: 1000px;
@@ -244,29 +175,10 @@
             color: #00aa87;
         }
 
-        .column{
-			display: flex;
-			flex-direction: column;
-        }
-
-        .row{
+        .delay {
             display: flex;
             flex-direction: row;
-            justify-content:space-between; 
-            width: 80%;
-        }
-
-        .alert {
-            padding: 15px;
-            margin-bottom: 20px;
-            border: 1px solid transparent;
-            border-radius: 4px;
-        }
-
-        .alert-danger {
-            color: #a94442;
-            background-color: #f2dede;
-            border-color: #ebccd1;
+            align-items: center;
         }
     </style>
 
@@ -398,57 +310,64 @@
     </aside>
 
     <div class="main-content">
-        <div class="details-container">
+        <div class="delivery-details-container">
             <div class="details-card">
                 <div class="details-header">
                     <div class="delivery-image">
-                        <i class="bi bi-truck" style="font-size: 40px; color: #00aa87;"></i>
+                        <i class="bi bi-person-circle " style="font-size: 40px; color:#00aa87;"></i>
                     </div>
-                    <h3><b>@Model.RegistrationNumber</b></h3>
+                    <h3><b>@Model.Name</b></h3>
                 </div>
 
                 <div class="button-tabs">
-                    <button class="tab-button" id="vehicleBtn">INFO</button>
-                    <button class="tab-button" id="priceBtn">PRICES</button>
-                    <button class="tab-button" id="addressesBtn">DELIVERIES</button>
-                    <button class="tab-button" id="statusBtn">MAINTENANCE</button>
-                    <button class="tab-button" id="metricsBtn">METRICS</button>
+                    <button class="tab-button" id="infoBtn">INFO</button>
+                    <button class="tab-button" id="licenseBtn">LICENSE</button>
+                    <button class="tab-button" id="deliveriesBtn">DELIVERIES</button>
                     <button class="tab-button" id="statisticsBtn">STATISTICS</button>
                 </div>
 
                 <div id="vehicleSection" class="section d-none">
-                    <div class="row">
+                    <h4><b>General details</b></h4>
+                    <div class="column-container">
                         <div class="column">
-                        <h4><b>General details</b></h4>
-                        <p><strong>Registration Number:</strong> @Model.RegistrationNumber</p>
-                        <p><strong>Vehicle Type:</strong> @Model.VehicleType</p>
+                            <p><strong>Name:</strong> @Model.Name</p>
+                            <p><strong>Age:</strong> @Model.Age</p>
+                            <p><strong>Preferences:</strong> @Model.Preferrences</p>
+                            <p><strong>Username:</strong> @Model.Username</p>
+                            <p><strong>Phone number:</strong> @Model.PhoneNumber</p>
                         </div>
-                        <div class="column">
-                        <h4><b>Status</b></h4>
-                        <p><strong>Vehicle Type:</strong> @Model.VehicleStatus</p>
-                        </div>
-                    </div>
-                    
-                </div>
-
-                <div id="priceSection" class="section d-none">
-                    <h4><b>Prices</b></h4>
-                    <div class="row">
-                    <p><strong>Purchase price:</strong> @Model.PurchasePrice BGN</p>
-                    <p><strong>Constant expenses:</strong> @Model.ContantsExpenses BGN</p>
                     </div>
                     <div class="divider-line"></div>
-                    <h4 style="margin-left:300px;"><b>Quotients for prices</b></h4>
-                    <div class="row" >
+
+                    <h4><b>Experience</b></h4>
+                    <div class="contact-container">
+
+                        <p><strong>Years:</strong> @Model.YearOfExperience</p>
+                        <p><strong>Months:</strong> @Model.MonthsOfExperience</p>
+                        <p><strong>Salary:</strong> @Model.Salary BGN</p>
+
+                    </div>
+                    <div class="divider-line"></div>
+                    <h4><b>Status</b></h4>
+                    <div class="column">
+                        @if (Model.IsAvailable)
+                        {
+                            <p><strong>Available:</strong><i class="bi bi-check-circle-fill" style="color: #00aa87; margin-top: 10px; margin-left:10px;"></i></p>
+                        }
+                        else
+                        {
+                            <p style="color: #00aa87;"><strong>Available:</strong>No</p>
+                        }
+                    </div>
+                </div>
+
+                <div id="licenseSection" class="section d-none">
+                    <h4><b>License</b></h4>
+                    <div class="column-container">
                         <div class="column">
-                            <h4><b>Domestic deliveries</b></h4>
-                            <p><strong>Shared truck:</strong> @Model.QuotientForDomesticSharedTruck</p>
-                            <p><strong>Not shared truck:</strong> @Model.QuotientForDomesticNotSharedTruck</p>
-                        </div>
-                        <div class="column">
-                            <h4><b>International deliveries</b></h4>
-                            <p><strong>Shared truck:</strong> @Model.QuotientForInternationalSharedTruck</p>
-                            <p><strong>Not shared truck:</strong> @Model.QuotientForInternationalNotSharedTruck</p>
+                            <p><strong>Number:</strong> @Model.LicenseNumber</p>
+                            <p><strong>Expiry date:</strong> @Model.LicenseExpiryDate</p>
+                            <p><strong>Days till expiration:</strong> @Model.DaysTillExpiry days</p>
                         </div>
                     </div>
                 </div>
@@ -457,16 +376,23 @@
                     <div class="cards-container">
                         <div class="card" id="locationCard">
                             <div class="card-content">
-                                <h3>Last month</h3>
-                                <p><b>@Model.DeliveriesLastMonth</b></p>
+                                <h3>Deliveries</h3>
+                                <p><b>@Model.DeliveriesCount</b></p>
                             </div>
                         </div>
                         <div class="card" id="locationCard">
                             <div class="card-content">
-                                <h3>Not on time</h3>
-                                <p><b>@Model.NotOnTimeDeliveries</b></p>
+                                <h3>Successful</h3>
+                                <p><b>@Model.SuccessfulDeliveriesCount</b></p>
                             </div>
                         </div>
+                        <div class="card" id="locationCard">
+                            <div class="card-content">
+                                <h3>Current</h3>
+                                <p><b>@Model.UndeliveryDeliveriesCount</b></p>
+                            </div>
+                        </div>
+
                     </div>
 
                     <div class="filtered-deliveries-container">
@@ -486,12 +412,12 @@
                                 {
                                     <div class="delivery-card">
                                         <div class="delivery-info">
-                                            <a asp-action="DeliveryDetails" asp-controller="Accountant" asp-route-id="@delivery.Id" style="text-decoration:none; color:inherit;"><span>@delivery.ReferenceNumber</span></a>
+                                            <a asp-action="DeliveryDetails" asp-controller="Logistics" asp-route-id="@delivery.Id" style="text-decoration:none; color:inherit;"><span>@delivery.ReferenceNumber</span></a>
                                             <span class="address">@delivery.PickupAddress</span>
                                             <span class="address">@delivery.DeliveryAddress</span>
 
                                             <span>@delivery.ExpectedDeliveryDate</span>
-                                            <span>@delivery.FinalPrice</span>
+                                            <span>@delivery.FinalPrice BGN</span>
                                             <span>
                                                 @if (delivery.IsDelivered)
                                                 {
@@ -516,102 +442,32 @@
                         }
                         else
                         {
-                            <p class="no-found">No deliveries found matching the search criteria.</p>
+                            <p class="no-found">No deliveries found for the driver.</p>
                         }
                     </div>
                 </div>
 
                 <div id="metricsSection" class="section  d-none">
-                    <div class="metrics-header">
-                        <div class="metrics-header-row">
-                            <h4><b>Fuel consumption per 100km</b></h4>
-                            <p>@Model.FuelConsumptionPer100Km l/100km</p>
-                        </div>
-                        <div class="metrics-header-row">
-                            <h4><b>Emission factor</b></h4>
-                            <p>@Model.EmisionFactor M3</p>
-                        </div>
-                    </div>
-                    <div class="metrics">
-                        <h4><b>Standard Metrics</b></h4>
-                    </div>
-                    <div class="standart-metrics-header-row">
-                        <p><b>Length</b></p>
-                        <p><b>Width</b></p>
-                        <p><b>Height</b></p>
-                        <p><b>Volume</b></p>
-                        <p><b>Max weight capacity</b></p>
-                    </div>
-                    <div class="standart-metrics-info-row">
-                        <p>@Model.Length cm</p>
-                        <p>@Model.Width cm</p>
-                        <p>@Model.Height cm</p>
-                        <p>@Model.Volume m3</p>
-                        <p>@Model.MaxWeightCapacity kg</p>
-                    </div>
-                    <div class="metrics">
-                        <h4><b>Non-Standart Metrics</b></h4>
-                    </div>
-                    <div class="non-standart-metrics-header-row">
-                        <p><b>Euro pallet capacity</b></p>
-                        <p><b>Industrial pallet capacity</b></p>
-                        <p><b>Stackable</b></p>
-                    </div>
-                    <div class="non-standart-metrics-info-row">
-                        <p>@Model.EuroPalletCapacity</p>
-                        <p>@Model.IndustrialPalletCapacity</p>
-                        @if (Model.ArePalletsStackable)
-                        {
-                            <p>Yes</p>
-                        }
-                        else
-                        {
-                            <p>No</p>
-                        }
-                    </div>
-                </div>
-
-                <div id="statusSection" class="section d-none">
-                    <h4><b>Yearly maintenance</b></h4>
-
-                    <div class="row">
-                        <div class="status-header-row">
-                            <p><strong>Last year</strong></p>
-                            <p>@Model.LastYearMaintenance</p>
-                        </div>
-                        <div class="status-header-row">
-                            <p><strong>Days till next</strong></p>
-                            <p>@Model.DaysTillMaintenance days</p>
-                        </div>
-                        @if(Model.DaysTillMaintenance <= 50)
-                        {
-                             <div class="alert alert-danger">
-                            Yearly maintenace due!
-                            </div>
-                        }                     
-                    </div>
-                    <div class="divider-line"></div>
-                    <h4><b>Kilometers</b></h4>
-                    <div class="row">
-                        <div class="status-header-row">
-                            <p><strong>Kms driven</strong></p>
-                            <p>@Model.KilometersDriven KM</p>
-                        </div>
-                        <div class="status-header-row">
-                            <p><strong>Kms till part changing</strong></p>
-                            <p>@Model.KilometersLeftToChangeParts KM</p>
-                        </div>  
-                        @if (Model.KilometersLeftToChangeParts <= 1000)
-                        {
-                            <div class="alert alert-danger">
-                                Changing parts due!
-                            </div>
-                        }
-                    </div>
-                </div>
-                <div id="statisticsSection" class="section  d-none">
                     <div class="chart-container">
                         <div class="cards-container">
+                            <div class="card" id="locationCard">
+                                <div class="card-content">
+                                    <h3>Kilometers</h3>
+                                    <p><b>@Model.KiloMetersDriven KM</b></p>
+                                </div>
+                            </div>
+                            <div class="card" id="locationCard">
+                                <div class="card-content">
+                                    <h3>Average distance</h3>
+                                    <p><b>@Model.AverageDeliveryDistance KM</b></p>
+                                </div>
+                            </div>
+                            <div class="card" id="locationCard">
+                                <div class="card-content">
+                                    <h3>Average time</h3>
+                                    <p><b>@Model.AverageDeliveryTime hrs</b></p>
+                                </div>
+                            </div>
                             <div class="card" id="locationCard">
                                 <div class="card-content">
                                     <h3>Adittional costs</h3>
@@ -624,105 +480,150 @@
                                     <p><b>@Model.AverageAdditionalCost BGN</b></p>
                                 </div>
                             </div>
-                            <div class="card" id="locationCard">
-                                <div class="card-content">
-                                    <h3>Average distance per delivery</h3>
-                                    <p><b>@Model.AverageKilometers KM</b></p>
-                                </div>
+                        </div>
+
+                        <h4>Deliveries</h4>
+                        <div class="first-row">
+                            <div class="chart-container">
+                                <h4>Delivery types ratio</h4>
+                                <canvas id="deliveryChart" class="chart"></canvas>
                             </div>
-                            <div class="card" id="locationCard">
-                                <div class="card-content">
-                                    <h3>Emission factor</h3>
-                                    <p><b>@Model.EmissionFactorFrAllDeliveries M3</b></p>
-                                </div>
+                            <div class="chart-container">
+                                <h4>Deliveries last year</h4>
+                                <canvas id="monthlyDeliveryChart" class="chart"></canvas>
                             </div>
                         </div>
 
-                        <div class="first-row">
-                            <div class="first-row">
-                                <div class="chart-container">
-                                    <h4>Delivery types ratio</h4>
-                                    <canvas id="vehicleCostsChart" class="chart"></canvas>
-                                </div>
-                                <div class="chart-container">
-                                    <h4>Distance</h4>
-                                    <canvas id="distanceDeliveriesChart" class="chart"></canvas>
-                                </div>
+                        <div class="delay-time-container">
+                            <h4>Deliveries made on time</h4>
+                            <div class="delay">
+                                <canvas id="successRateChart" class="chart"></canvas>
+                                <p style="color: #00aa87; " id="averageDelay" class="stat-text"></p>
                             </div>
+                            < /div>
                         </div>
                     </div>
-
                 </div>
             </div>
         </div>
-    </div>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        $(document).ready(function () {
-            $('#vehicleBtn').click(function () {
-                showSection('#vehicleSection');
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+        <script>
+            $(document).ready(function () {
+                $('#infoBtn').click(function () {
+                    showSection('#vehicleSection');
+                });
+                $('#deliveriesBtn').click(function () {
+                    showSection('#addressesSection');
+                });
+                $('#statisticsBtn').click(function () {
+                    showSection('#metricsSection');
+                });
+                $('#licenseBtn').click(function () {
+                    showSection('#licenseSection');
+                });
+
+                function showSection(sectionId) {
+                    $('.section').addClass('d-none');
+                    $(sectionId).removeClass('d-none');
+                }
             });
-            $('#addressesBtn').click(function () {
-                showSection('#addressesSection');
-            });
-            $('#priceBtn').click(function () {
-                showSection('#priceSection');
-            });
-            $('#metricsBtn').click(function () {
-                showSection('#metricsSection');
-            });
-            $('#statusBtn').click(function () {
-                showSection('#statusSection');
-            });
-            $('#statisticsBtn').click(function () {
-                showSection('#statisticsSection');
+        </script>
+        <script>
+            document.addEventListener("DOMContentLoaded", async () => {
+                try {
+                    await fetchDeliveryCounts();
+                    await fetchMonthlyDeliveries();
+                    await fetchDeliverySuccessRate();
+
+                } catch (error) {
+                    console.error("Error during chart rendering:", error);
+                }
             });
 
-            function showSection(sectionId) {
-                $('.section').addClass('d-none');
-                $(sectionId).removeClass('d-none');
-            }
-        });
-    </script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            async function fetchVehicleCosts(vehicleId) {
+            async function fetchDeliveryCounts() {
                 try {
-                    const response = await fetch(`/Logistics/GetVehicleCostsDataForVehicle/${vehicleId}`);
-                    if (!response.ok) {
-                        throw new Error('Failed to fetch vehicle costs data.');
+                    const response = await fetch('/Logistics/GetDeliveryTypesForDriver/@Model.Id');
+                    const data = await response.json();
+
+                    const domesticCount = data.domestic ?? 0;
+                    const internationalCount = data.international ?? 0;
+
+                    const ctx = document.getElementById('deliveryChart').getContext('2d');
+                    new Chart(ctx, {
+                        type: 'pie',
+                        data: {
+                            labels: ['Domestic', 'International'],
+                            datasets: [{
+                                label: 'Deliveries',
+                                data: [domesticCount, internationalCount],
+                                backgroundColor: ['#00aa87', '#FF6384'],
+                                hoverOffset: 4
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                legend: {
+                                    position: 'bottom',
+                                }
+                            }
+                        }
+                    });
+                } catch (error) {
+                    console.error('Error fetching delivery counts:', error);
+                }
+            }
+            async function fetchMonthlyDeliveries() {
+                try {
+                    const response = await fetch('/Logistics/GetDeliveryCountsForDriver/@Model.Id');
+                    const data = await response.json();
+
+                    while (data.deliveries.length < data.months.length) {
+                        data.deliveries.push(0);
                     }
 
-                    const data = await response.json();
-                    console.log('Fetched vehicle costs data:', data);
+                    if (window.monthlyDeliveryChart && typeof window.monthlyDeliveryChart.destroy === 'function') {
+                        window.monthlyDeliveryChart.destroy();
+                    }
 
-                    const totalCosts = data.totalCosts || 0;
-                    const numDeliveries = data.numDeliveries || 1;
-                    const avgCostPerDelivery = totalCosts / numDeliveries;
-
-                    const ctx = document.getElementById('vehicleCostsChart').getContext('2d');
-                    new Chart(ctx, {
+                    const ctx = document.getElementById('monthlyDeliveryChart').getContext('2d');
+                    window.monthlyDeliveryChart = new Chart(ctx, {
                         type: 'bar',
                         data: {
-                            labels: ['Total Costs', 'Average Cost per Delivery'],
+                            labels: data.months,
                             datasets: [{
-                                label: 'Vehicle Costs',
-                                data: [totalCosts, avgCostPerDelivery],
-                                backgroundColor: ['#00aa87', '#FF6384'],
-                                borderColor: ['#00aa87', '#FF6384'],
-                                borderWidth: 1
+                                label: 'Deliveries per Month',
+                                data: data.deliveries,
+                                backgroundColor: '#00aa87',
+                                borderColor: '#00aa87',
+                                borderWidth: 1,
+                                borderSkipped: false
                             }]
                         },
                         options: {
                             responsive: true,
                             scales: {
-                                y: {
-                                    beginAtZero: true,
+                                x: {
+                                    ticks: {
+                                        autoSkip: false
+                                    },
                                     title: {
                                         display: true,
-                                        text: 'Costs (in currency)'
+                                        text: 'Months'
+                                    }
+                                },
+                                y: {
+                                    beginAtZero: true,
+                                    min: 0,
+                                    max: 1,
+                                    ticks: {
+                                        stepSize: 1
+                                    },
+                                    title: {
+                                        display: true,
+                                        text: 'Deliveries'
                                     }
                                 }
                             },
@@ -733,7 +634,7 @@
                                 tooltip: {
                                     callbacks: {
                                         label: function (tooltipItem) {
-                                            return `${tooltipItem.dataset.label}: ${tooltipItem.raw}`;
+                                            return 'Deliveries: ' + tooltipItem.raw;
                                         }
                                     }
                                 }
@@ -741,91 +642,57 @@
                         }
                     });
                 } catch (error) {
-                    console.error('Error fetching vehicle costs data:', error);
+                    console.error('Error fetching monthly deliveries:', error);
                 }
             }
-
-            async function fetchDistanceAndDeliveriesData(vehicleId) {
+            async function fetchDeliverySuccessRate() {
                 try {
-                    const response = await fetch(`/Logistics/GetDistanceAndDeliveriesForVehicle/${vehicleId}`);
-                    if (!response.ok) {
-                        throw new Error('Failed to fetch distance and deliveries data.');
-                    }
-
+                    const response = await fetch('/Logistics/GetDeliveryTimesForDriver/@Model.Id');
                     const data = await response.json();
-                    console.log('Fetched distance and deliveries data:', data);
 
-                    const labels = data.months || []; 
-                    const totalDistance = data.totalDistance || 0;
-                    const totalDeliveries = data.totalDeliveries || 0;
+                    const successRate = data.successRate || 0;
+                    const failureRate = 100 - successRate;
+                    const averageDelay = data.averageDelay || 0;
 
-                    const ctx = document.getElementById('distanceDeliveriesChart').getContext('2d');
+                    const ctx = document.getElementById('successRateChart').getContext('2d');
                     new Chart(ctx, {
-                        type: 'line',
+                        type: 'radar',
                         data: {
-                            labels: labels,
-                            datasets: [
-                                {
-                                    label: 'Total Distance Travelled (km)',
-                                    data: labels.map((_, index) => (index === 4 ? totalDistance : 0)), 
-                                    borderColor: '#00aa87',
-                                    backgroundColor: '#00aa87',
-                                    fill: true,
-                                    tension: 0.4
-                                },
-                                {
-                                    label: 'Total Deliveries',
-                                    data: labels.map((_, index) => (index === 4 ? totalDeliveries : 0)), 
-                                    borderColor: '#FF6384',
-                                    backgroundColor: '#FF6384',
-                                    fill: true,
-                                    tension: 0.4
-                                }
-                            ]
+                            labels: ['Success', 'Failure'],
+                            datasets: [{
+                                label: 'Delivery Rates',
+                                data: [successRate, failureRate],
+                                backgroundColor: '#FF6384',
+                                borderColor: '#FF6384',
+                                borderWidth: 2
+                            }]
                         },
                         options: {
                             responsive: true,
                             scales: {
-                                y: {
-                                    beginAtZero: true,
-                                    title: {
-                                        display: true,
-                                        text: 'Values'
-                                    }
-                                },
-                                x: {
-                                    title: {
-                                        display: true,
-                                        text: 'Months'
-                                    }
+                                r: {
+                                    angleLines: {
+                                        display: true
+                                    },
+                                    beginAtZero: true
                                 }
                             },
                             plugins: {
                                 legend: {
-                                    display: true,
-                                    position: 'top'
-                                },
-                                tooltip: {
-                                    callbacks: {
-                                        label: function (tooltipItem) {
-                                            return `${tooltipItem.dataset.label}: ${tooltipItem.raw}`;
-                                        }
-                                    }
+                                    position: 'top',
                                 }
                             }
                         }
                     });
+
+                    document.getElementById('averageDelay').innerText =
+                        `Average delay time: ${averageDelay.toFixed(2)} hrs`;
+
                 } catch (error) {
-                    console.error('Error fetching distance and deliveries data:', error);
+                    console.error('Error fetching delivery success rate:', error);
                 }
             }
-
-            const vehicleId = '@Model.Id'; 
-            fetchVehicleCosts(vehicleId);
-            fetchDistanceAndDeliveriesData(vehicleId);
-        });
-    </script>
-
+        </script>
 </body>
 </html>
 

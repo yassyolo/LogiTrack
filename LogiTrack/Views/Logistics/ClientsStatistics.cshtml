@@ -1,8 +1,7 @@
-﻿@model List<LogiTrack.Core.ViewModels.Clients.PendingRegistrationsViewModel>
+﻿@model LogiTrack.Core.ViewModels.Clients.ClientsStatisticsViewModel
 @{
     Layout = null;
 }
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -13,78 +12,57 @@
     <link rel="stylesheet" href="~/css/site.css" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
     <script src="~/js/site.js"></script>
     <style>
-        .search-container {
-            background-color: #fff;
-            padding: 20px;
-            box-shadow: 0 0 25px 1px #0000000f !important;
-        }
-
-        .search-header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 30px;
-            border-bottom: 1px solid #ccc;
-        }
-
-        .search-icon {
-            width: 40px;
-            margin-right: 10px;
-            margin-bottom: 30px;
-        }
-
-        .search-title {
+        .card h3 {
+            margin: 0;
             font-size: 1.1rem;
-            font-weight: 500;
+            color: #00aa87;
         }
 
-        .registration {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 20px;
-            flex-direction: row;
-            border-bottom: 1px solid #ccc;
-            width: 100%;
+        .chart-container {
+            background: white;
+            padding: 20px;
         }
 
-        .photo-header {
-            display: flex;
-            align-items: center;
-            flex-direction: row;
-        }
-
-        .photo-info {
-            margin-bottom: 10px;
-        }
-
-        .user-photo {
-            width: 100px;
-            margin-right: 20px;
-            margin-bottom: 10px;
-        }
-
-        .btn-div {
-            margin-top: 45px;
-        }
-
-        .btn {
-            text-decoration: none;
-            background-color: #00aa87;
-            width: 110px;
-            height: 35px;
-            color: white;
-            border: none;
-            border-radius: 3px;
-            padding: 10px 15px;
-            cursor: pointer;
-            margin-left: 10px;
-            box-shadow: 0 3px 1px -2px #0003, 0 2px 2px 0 #00000024, 0 1px 5px 0 #0000001f;
-        }
-
-            .btn:hover {
-                opacity: 0.9;
+            .chart-container h4 {
+                margin-bottom: 20px;
+                font-size: 1.2em;
+                color: #00aa87;
+                text-align: center;
             }
+
+        .chart {
+            max-width: 100%;
+            max-height: 300px;
+        }
+
+        .first-row {
+            display: flex;
+            width: 90%;
+            margin-bottom: 50px;
+            justify-content: space-between;
+        }
+
+        .second-row {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            width: 90%;
+            margin-bottom: 30px;
+        }
+
+            .second-row .chart-container {
+                width: 600px;
+            }
+
+        .delay {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+        }
     </style>
 
 </head>
@@ -103,8 +81,8 @@
                 <span class="arrow">&#x25BC;</span>
             </button>
             <div class="profile-dropdown-menu" id="profileDropdown">
-                <a asp-action="CompanyDetails" asp-controller="Logistics">Company details</a>
-
+                <a asp-action="CompanyDetails" asp-controller="Clients">Company details</a>
+                <a asp-action="ContactDetails" asp-controller="Clients">Contact details</a>
                 <a asp-action="Logout" asp-controller="Home">Logout</a>
             </div>
         </div>
@@ -213,42 +191,121 @@
             </li>
         </ul>
     </aside>
-    <div class="main-content">
-        <div class="search-container">
-            <div class="search-header">
-                <div class="card-icon">
-                    <i class="bi bi-person-plus " style="font-size: 40px; color:#00aa87;"></i>
 
+    <div class="main-content">
+        <div class="chart-container">
+            <div class="cards-container">
+                <div class="card" id="locationCard">
+                    <div class="card-content">
+                        <h3>Clients</h3>
+                        <p><b>@Model.TotalClients</b></p>
+                    </div>
                 </div>
-                <h3 class="search-title"><b>Pending Registration</b></h3>
+                <div class="card" id="locationCard">
+                    <div class="card-content">
+                        <h3>New registrations</h3>
+                        <p><b>@Model.NewRegistrations</b></p>
+                    </div>
+                </div>
+                <div class="card" id="locationCard">
+                    <div class="card-content">
+                        <h3>Satisfied clients</h3>
+                        <p><b>@Model.SatisfiedClients</b></p>
+                    </div>
+                </div>                
             </div>
-            @foreach (var item in Model)
-            {
-                <div class="registration">
-                    <div class="photo-header">
-                        <div class="user-photo">
-                            <i class="bi bi-person-circle " style="font-size: 40px; margin-left: 20px;"></i>
-                        </div>
-                        <div class="photo-info">
-                            <h3>@item.Name</h3>
-                            <p><b>Registration number:</b> @item.RegistrationNumber</p>
-                        </div>
-                    </div>
-                    <div class="info">
-                        <p><b>Email:</b> @item.Email</p>
-                        <p><b>Phone:</b> @item.PhoneNumber</p>
-                        <p><b>Created At:</b> @item.CreatedAt</p>
-                    </div>
-                    <div class="btn-div">
-                        <a asp-action="NewCompanyDetails" asp-controller="Logistics" asp-route-id="@item.Id" class="btn">
-                            <i class="bi bi-eye"></i> SEE
-                        </a>
-                    </div>
+
+            <div class="first-row">
+                <div class="chart-container">
+                    <h4>Top 10 clients by payment</h4>
+                    <canvas id="topClientsChart"></canvas>
                 </div>
-            }
+                <div class="chart-container">
+                    <h4>Top 10 clients by deliveries</h4>
+                    <canvas id="topClientsByDeliveryVolumeChart"></canvas>
+                </div>
+            </div>
         </div>
     </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
+    <script>
+        fetch('/Logistics/GetTop10Clients')
+            .then(response => response.json())
+            .then(data => {
+                const labels = Object.keys(data);  
+                const payments = Object.values(data);  
+
+                // Create the chart
+                new Chart(document.getElementById('topClientsChart'), {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Total Payments',
+                            data: payments,
+                            backgroundColor: '#FF6384',
+                            borderColor: '#FF6384',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                title: { display: true, text: 'Total Payments' }
+                            },
+                            x: {
+                                title: { display: true, text: 'Client Names' }
+                            }
+                        }
+                    }
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching data:', error);
+            });
+        fetch('/Logistics/GetTop10ClientsByDeliveries')
+            .then(response => response.json())
+            .then(data => {
+                const clientNames = Object.keys(data);
+                const deliveryCounts = Object.values(data);
+
+                new Chart(document.getElementById('topClientsByDeliveryVolumeChart'), {
+                    type: 'bar',
+                    data: {
+                        labels: clientNames,
+                        datasets: [{
+                            label: 'Delivery Volume',
+                            data: deliveryCounts,
+                            backgroundColor: '#00aa87', 
+                            borderColor: '#00aa87',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                title: { display: true, text: 'Number of Deliveries' }
+                            },
+                            x: {
+                                title: { display: true, text: 'Client Names' },
+                                ticks: {
+                                    autoSkip: true,
+                                    maxRotation: 45, 
+                                    minRotation: 0
+                                }
+                            }
+                        }
+                    }
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching data:', error);
+            });
+    </script>
 </body>
 
 </html>
+
+
