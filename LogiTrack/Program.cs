@@ -17,9 +17,15 @@ builder.Services.AddScoped<IEmailSenderService, EmailSenderService>();
 builder.Services.AddHttpClient<GeocodingService>();
 builder.Services.AddScoped<IGoogleDriveService, GoogleDriveService>();
 builder.Services.AddScoped<IRepository, Repository>();
+builder.Services.AddScoped<IEventService, EventService>();
+builder.Services.AddScoped<IDashboardService, DashboardService>();
+builder.Services.AddScoped<IStatisticsService, StatisticsService>();
+builder.Services.AddScoped<IDeliveryStatisticsService, DeliveryStatisticsService>();
+
+builder.Services.AddScoped<IFuelPriceService, FuelPriceService>();
+builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IHomeService, HomeService>();
 builder.Services.AddScoped<IClientsService, ClientsService>();
-builder.Services.AddScoped<IAccountantService, AccountantService>();
 builder.Services.AddScoped<IVehicleService, VehicleService>();
 builder.Services.AddScoped<IDeliveryService, DeliveryService>();
 builder.Services.AddScoped<IDriverService, DriverService>();
