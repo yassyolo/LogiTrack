@@ -12,6 +12,7 @@ namespace LogiTrack.Infrastructure.Data.DataModels
         public int RatingStars { get; set; }
         public string Comment { get; set; } = string.Empty;
         public int DeliveryId { get; set; }
+
         [ForeignKey(nameof(DeliveryId))]
         public Delivery Delivery { get; set; } = null!;
 

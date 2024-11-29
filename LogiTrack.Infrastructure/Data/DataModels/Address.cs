@@ -31,10 +31,10 @@ namespace LogiTrack.Infrastructure.Data.DataModels
 
         [Range(LatitudeMinValue, LatitudeMaxValue)]
         [Comment("Latitude of the address")]
-        public string? Latitude { get; set; }
+        public double? Latitude { get; set; }
 
         [Range(LongitudeMinValue, LongitudeMaxValue)]
         [Comment("Longitude of the address")]
-        public string? Longitude { get; set; }
+        public double? Longitude { get; set; }
     }
 }

@@ -270,17 +270,17 @@ namespace LogiTrack.Infrastructure.SeedDb
         private void SeedAddresses()
         {
             Address1 = new Address { Id = 1, Street = "123 Main St", County = "Central", City = "Metropolis", PostalCode = "10001" };
-            Address2 = new Address { Id = 2, Street = "456 Side St", County = "Westside", City = "Gotham", PostalCode = "10002", Latitude = "40.7128", Longitude = "-74.0060" };
-            Address3 = new Address { Id = 3, Street = "789 Elm St", County = "Northside", City = "Star City", PostalCode = "10003", Latitude = "37.7749", Longitude = "-122.4194" };
-            Address4 = new Address { Id = 4, Street = "101 Pine St", County = "Eastville", City = "Central City", PostalCode = "10004", Latitude = "39.9526", Longitude = "-75.1652" };
-            Address5 = new Address { Id = 5, Street = "202 Maple St", County = "Southend", City = "Smallville", PostalCode = "10005", Latitude = "38.0293", Longitude = "-78.4767" };
-            Address6 = new Address { Id = 6, Street = "303 Oak St", County = "Old Town", City = "Bludhaven", PostalCode = "10006", Latitude = "36.8508", Longitude = "-76.2859" };
-            Address7 = new Address { Id = 7, Street = "404 Birch St", County = "Downtown", City = "Coast City", PostalCode = "10007", Latitude = "34.0522", Longitude = "-118.2437" };
-            Address8 = new Address { Id = 8, Street = "505 Cedar St", County = "West End", City = "National City", PostalCode = "10008", Latitude = "32.7157", Longitude = "-117.1611" };
-            Address9 = new Address { Id = 9, Street = "606 Cherry St", County = "Upper Hill", City = "Ivy Town", PostalCode = "10009", Latitude = "40.7580", Longitude = "-111.8762" };
-            Address10 = new Address { Id = 10, Street = "707 Aspen St", County = "Harborview", City = "Gateway City", PostalCode = "10010", Latitude = "47.6062", Longitude = "-122.3321" };
-            Address11 = new Address { Id = 11, Street = "808 Willow St", County = "Lakeside", City = "Opal City", PostalCode = "10011", Latitude = "35.2271", Longitude = "-80.8431" };
-            Address12 = new Address { Id = 12, Street = "909 Fir St", County = "Midtown", City = "Fawcett City", PostalCode = "10012", Latitude = "33.7490", Longitude = "-84.3880" };
+            Address2 = new Address { Id = 2, Street = "456 Side St", County = "Westside", City = "Gotham", PostalCode = "10002", Latitude = 40.7128, Longitude = -74.0060 };
+            Address3 = new Address { Id = 3, Street = "789 Elm St", County = "Northside", City = "Star City", PostalCode = "10003", Latitude = 37.7749, Longitude = -122.4194 };
+            Address4 = new Address { Id = 4, Street = "101 Pine St", County = "Eastville", City = "Central City", PostalCode = "10004", Latitude = 39.9526, Longitude = -75.1652 };
+            Address5 = new Address { Id = 5, Street = "202 Maple St", County = "Southend", City = "Smallville", PostalCode = "10005", Latitude = 38.0293, Longitude = -78.4767 };
+            Address6 = new Address { Id = 6, Street = "303 Oak St", County = "Old Town", City = "Bludhaven", PostalCode = "10006", Latitude = 36.8508, Longitude = -76.2859 };
+            Address7 = new Address { Id = 7, Street = "404 Birch St", County = "Downtown", City = "Coast City", PostalCode = "10007", Latitude = 34.0522, Longitude = -118.2437 };
+            Address8 = new Address { Id = 8, Street = "505 Cedar St", County = "West End", City = "National City", PostalCode = "10008", Latitude = 32.7157, Longitude = -117.1611 };
+            Address9 = new Address { Id = 9, Street = "606 Cherry St", County = "Upper Hill", City = "Ivy Town", PostalCode = "10009", Latitude = 40.7580, Longitude = -111.8762 };
+            Address10 = new Address { Id = 10, Street = "707 Aspen St", County = "Harborview", City = "Gateway City", PostalCode = "10010", Latitude = 47.6062, Longitude = -122.3321 };
+            Address11 = new Address { Id = 11, Street = "808 Willow St", County = "Lakeside", City = "Opal City", PostalCode = "10011", Latitude = 35.2271, Longitude = -80.8431 };
+            Address12 = new Address { Id = 12, Street = "909 Fir St", County = "Midtown", City = "Fawcett City", PostalCode = "10012", Latitude = 33.7490, Longitude = -84.3880 };
         }
         private void SeedClientCompanies()
         {
@@ -311,13 +311,13 @@ namespace LogiTrack.Infrastructure.SeedDb
                 AddressId = 2,
                 CreatedAt = DateTime.Now.AddDays(-10),
             };
-        }
-       
+        }      
         private void SeedRequests()
         {          
             Request1 = new Request
             {
                 Id = 1,
+                RerefenceNumber = "R0001",
                 ClientCompanyId = 1,
                 CargoType = "Standard",
                 TypeOfGoods = "Electronics",
@@ -331,8 +331,8 @@ namespace LogiTrack.Infrastructure.SeedDb
                 Status = "Pending",
                 SpecialInstructions = "Handle with care",
                 IsRefrigerated = false,
-                CreatedAt = DateTime.Now,
-                //StandartCargoId = 1,
+                CreatedAt = DateTime.Now.AddDays(-20),
+                StandartCargoId = 1,
                 TotalWeight = 300,
                 TotalVolume = 12,
                 Kilometers = 500
@@ -342,6 +342,7 @@ namespace LogiTrack.Infrastructure.SeedDb
         {
             Id = 2,
             ClientCompanyId = 1,
+            RerefenceNumber = "R0002",
             CargoType = "Standard",
             TypeOfGoods = "Furniture",
             Type = "International",
@@ -354,8 +355,8 @@ namespace LogiTrack.Infrastructure.SeedDb
             Status = "Accepted",
             SpecialInstructions = "Keep dry",
             IsRefrigerated = false,
-            CreatedAt = DateTime.Now,
-            //StandartCargoId = 2,
+            CreatedAt = DateTime.Now.AddDays(-21),
+            StandartCargoId = 2,
             TotalWeight = 500,
             TotalVolume = 20,
             Kilometers = 1000
@@ -365,6 +366,7 @@ namespace LogiTrack.Infrastructure.SeedDb
         {
             Id = 3,
             ClientCompanyId = 1,
+            RerefenceNumber = "R0003",
             CargoType = "Non-Standard",
             TypeOfGoods = "Machinery",
             Type = "Domestic",
@@ -373,11 +375,11 @@ namespace LogiTrack.Infrastructure.SeedDb
             SharedTruck = false,
             ApproximatePrice = 2000,
             CalculatedPrice = 1900,
-            ExpectedDeliveryDate = DateTime.Now.AddDays(15),
+            ExpectedDeliveryDate = DateTime.Now.AddDays(5),
             Status = "Pending",
             SpecialInstructions = "Requires crane",
             IsRefrigerated = false,
-            CreatedAt = DateTime.Now,
+            CreatedAt = DateTime.Now.AddDays(-22),
             TotalWeight = 2000,
             TotalVolume = 50,
             Kilometers = 2000
@@ -386,6 +388,7 @@ namespace LogiTrack.Infrastructure.SeedDb
         Request4  = new Request
         {
             Id = 4,
+            RerefenceNumber = "R0004",
             ClientCompanyId = 1,
             CargoType = "Standard",
             TypeOfGoods = "Textiles",
@@ -395,12 +398,12 @@ namespace LogiTrack.Infrastructure.SeedDb
             SharedTruck = true,
             ApproximatePrice = 350,
             CalculatedPrice = 340,
-            ExpectedDeliveryDate = DateTime.Now.AddDays(3),
+            ExpectedDeliveryDate = DateTime.Now.AddDays(-3),
             Status = "Pending",
             SpecialInstructions = "Do not compress",
             IsRefrigerated = false,
-            CreatedAt = DateTime.Now,
-            //StandartCargoId = 3,
+            CreatedAt = DateTime.Now.AddDays(-23),
+            StandartCargoId = 3,
             TotalWeight = 150,
             TotalVolume = 8,
             Kilometers = 500
@@ -409,6 +412,7 @@ namespace LogiTrack.Infrastructure.SeedDb
         Request5 = new Request
         {
             Id = 5,
+            RerefenceNumber = "R0005",
             ClientCompanyId = 1,
             CargoType = "Standard",
             TypeOfGoods = "Books",
@@ -418,12 +422,12 @@ namespace LogiTrack.Infrastructure.SeedDb
             SharedTruck = false,
             ApproximatePrice = 220,
             CalculatedPrice = 210,
-            ExpectedDeliveryDate = DateTime.Now.AddDays(4),
+            ExpectedDeliveryDate = DateTime.Now.AddDays(-5),
             Status = "Pending",
             SpecialInstructions = "Fragile binding",
             IsRefrigerated = false,
-            CreatedAt = DateTime.Now,
-            //StandartCargoId = 4,
+            CreatedAt = DateTime.Now.AddDays(-24),
+            StandartCargoId = 4,
             TotalWeight = 300,
             TotalVolume = 1.8,
             Kilometers = 1000
@@ -434,7 +438,6 @@ namespace LogiTrack.Infrastructure.SeedDb
             StandartCargo1 = new StandartCargo
             {
                 Id = 1,
-                RequestId = 1,
                 TypeOfPallet = "Euro",
                 NumberOfPallets = 5,
                 PalletLength = 120,
@@ -448,7 +451,6 @@ namespace LogiTrack.Infrastructure.SeedDb
             StandartCargo2 = new StandartCargo
             {
                 Id = 2,
-                RequestId = 2,
                 TypeOfPallet = "Industrial",
                 NumberOfPallets = 3,
                 PalletLength = 130,
@@ -462,7 +464,6 @@ namespace LogiTrack.Infrastructure.SeedDb
             StandartCargo3 = new StandartCargo
             {
                 Id = 3,
-                RequestId = 4,
                 TypeOfPallet = "Standard",
                 NumberOfPallets = 4,
                 PalletLength = 120,
@@ -473,7 +474,6 @@ namespace LogiTrack.Infrastructure.SeedDb
                 PalletsAreStackable = true
             };
         }
-
         private void SeedNonStandartCargos()
         {
             NonStandardCargo1 = new NonStandardCargo
@@ -531,7 +531,8 @@ namespace LogiTrack.Infrastructure.SeedDb
                 RequestId = 1, 
                 FinalPrice = 1200.0m,
                 OfferStatus = "Pending",
-                OfferDate = DateTime.Now.AddDays(-10),
+                OfferDate = DateTime.Now.AddDays(-15),
+                OfferNumber = "OFFER0001",
                 Notes = "Initial offer for Request 1",
             };
             Offer2 = new Offer
@@ -540,7 +541,8 @@ namespace LogiTrack.Infrastructure.SeedDb
                 RequestId = 2, 
                 FinalPrice = 1500.0m,
                 OfferStatus = "Approved",
-                OfferDate = DateTime.Now.AddDays(-8),
+                OfferNumber = "OFFER0002",
+                OfferDate = DateTime.Now.AddDays(-16),
                 Notes = "Offer accepted for Request 2",
             };
             Offer3 = new Offer
@@ -549,7 +551,8 @@ namespace LogiTrack.Infrastructure.SeedDb
                 RequestId = 3,
                 FinalPrice = 1800.0m,
                 OfferStatus = "Approved",
-                OfferDate = DateTime.Now.AddDays(-5),
+                OfferDate = DateTime.Now.AddDays(-15),
+                OfferNumber = "OFFER0003",
                 Notes = "Offer approved for Request 3",
                 DeliveryId = null
             };
@@ -558,8 +561,9 @@ namespace LogiTrack.Infrastructure.SeedDb
                 Id = 4,
                 RequestId = 4, 
                 FinalPrice = 2100.0m,
+                OfferNumber = "OFFER0004",
                 OfferStatus = "Approved",
-                OfferDate = DateTime.Now.AddDays(-2),
+                OfferDate = DateTime.Now.AddDays(-12),
                 Notes = "Approved offer for Request 4",
 
             };
@@ -567,9 +571,10 @@ namespace LogiTrack.Infrastructure.SeedDb
             {
                 Id = 5,
                 RequestId = 5,
+                OfferNumber = "OFFER0005",
                 FinalPrice = 2300.0m,
                 OfferStatus = "Accepted",
-                OfferDate = DateTime.Now,
+                OfferDate = DateTime.Now.AddDays(-13),
                 Notes = "Finalized offer for Request 5",
 
             };
@@ -611,6 +616,7 @@ namespace LogiTrack.Infrastructure.SeedDb
             {
                 Id = 1,
                 RegistrationNumber = "ABC123",
+                EmissionFactor = 2.63,
                 VehicleType = "Truck",
                 Length = 12.0,
                 Width = 2.5,
@@ -631,6 +637,7 @@ namespace LogiTrack.Infrastructure.SeedDb
             Vehicle2 = new Vehicle
             {
                 Id = 2,
+                EmissionFactor = 2.63,
                 RegistrationNumber = "XYZ789",
                 VehicleType = "Van",
                 Length = 6.0,
@@ -655,6 +662,7 @@ namespace LogiTrack.Infrastructure.SeedDb
             Delivery1 = new Delivery
             {
                 Id = 1,
+                CarbonEmission = 38.7,
                 VehicleId = 1,
                 DriverId = 1,
                 OfferId = 1,
@@ -668,6 +676,7 @@ namespace LogiTrack.Infrastructure.SeedDb
             Delivery2 = new Delivery
             {
                 Id = 2,
+                CarbonEmission = 40.0,
                 VehicleId = 1,
                 DriverId = 1,
                 OfferId = 2,
@@ -681,6 +690,7 @@ namespace LogiTrack.Infrastructure.SeedDb
             Delivery3 = new Delivery
             {
                 Id = 3,
+                CarbonEmission = 35.0,
                 VehicleId = 1,
                 DriverId = 1,
                 OfferId = 3,
@@ -695,6 +705,7 @@ namespace LogiTrack.Infrastructure.SeedDb
             {
                 Id = 4,
                 VehicleId = 1,
+                CarbonEmission = 45.0,
                 DriverId = 1,
                 OfferId = 4,
                 Status = "In Transit",
@@ -708,6 +719,7 @@ namespace LogiTrack.Infrastructure.SeedDb
             {
                 Id = 5,
                 VehicleId = 1,
+                CarbonEmission = 50.0,
                 DriverId = 1,
                 OfferId = 5,
                 Status = "Booked",
@@ -719,55 +731,72 @@ namespace LogiTrack.Infrastructure.SeedDb
 
             };
          }
-         private void SeedInvoices()
-         {
+        private void SeedInvoices()
+        {
             Invoice1 = new Invoice
             {
                 Id = 1,
+                PaidOnTime = true,
+                PaidDate = DateTime.Now.AddDays(-5),
                 DeliveryId = 1,
                 InvoiceNumber = "INV001",
                 InvoiceDate = DateTime.Now.AddDays(-10),
                 Description = "Invoice for Delivery 1",
-                IsPaid = true 
+                FileId = "1hcVFpCA0Mh1txKh0KbCbDR5N_QAoTFLq",
+                Status = "Paid",
+                IsPaid = true
             };
             Invoice2 = new Invoice
             {
                 Id = 2,
                 DeliveryId = 2,
+
                 InvoiceNumber = "INV002",
+                FileId = "1hcVFpCA0Mh1txKh0KbCbDR5N_QAoTFLq",
                 InvoiceDate = DateTime.Now.AddDays(-9),
                 Description = "Invoice for Delivery 2",
-                IsPaid = false 
+                Status = "Pending",
+                IsPaid = false
             };
             Invoice3 = new Invoice
             {
                 Id = 3,
                 DeliveryId = 3,
+                PaidOnTime = true,
+                PaidDate = DateTime.Now.AddDays(-6),
                 InvoiceNumber = "INV003",
                 InvoiceDate = DateTime.Now.AddDays(-8),
+                FileId = "1hcVFpCA0Mh1txKh0KbCbDR5N_QAoTFLq",
                 Description = "Invoice for Delivery 3",
-                IsPaid = true 
+                Status = "Paid",
+                IsPaid = true
             };
             Invoice4 = new Invoice
             {
                 Id = 4,
                 DeliveryId = 4,
                 InvoiceNumber = "INV004",
+                PaidOnTime = false,
+                FileId = "1hcVFpCA0Mh1txKh0KbCbDR5N_QAoTFLq",
                 InvoiceDate = DateTime.Now.AddDays(-7),
                 Description = "Invoice for Delivery 4",
+                Status = "Paid",
                 IsPaid = false
             };
             Invoice5 = new Invoice
             {
-            Id = 5,
-            DeliveryId = 5,
-            InvoiceNumber = "INV005",
-            InvoiceDate = DateTime.Now.AddDays(-6),
-            Description = "Invoice for Delivery 5",
-            IsPaid = true 
+                Id = 5,
+                DeliveryId = 5,
+                PaidOnTime = false,
+                InvoiceNumber = "INV005",
+                InvoiceDate = DateTime.Now.AddDays(-6),
+                FileId = "1hcVFpCA0Mh1txKh0KbCbDR5N_QAoTFLq",
+                Description = "Invoice for Delivery 5",
+                Status = "Overdue",
+                IsPaid = true
             };
-         }
-         private void SeedCashRegisters()
+        }
+        private void SeedCashRegisters()
          {
             CashRegister1 = new CashRegister
             {
@@ -776,7 +805,8 @@ namespace LogiTrack.Infrastructure.SeedDb
                 Description = "Fuel Expense",
                 Type = "Vehicle Expenses",
                 Amount = 100.00m,
-                DateSubmitted = DateTime.Now.AddDays(-5)
+                DateSubmitted = DateTime.Now.AddDays(-5),
+                FileId = "1hcVFpCA0Mh1txKh0KbCbDR5N_QAoTFLq"
             };
             CashRegister2 = new CashRegister
             {
@@ -785,7 +815,8 @@ namespace LogiTrack.Infrastructure.SeedDb
                 Description = "Toll Fee",
                 Type = "Vehicle Expenses",
                 Amount = 50.00m,
-                DateSubmitted = DateTime.Now.AddDays(-4)
+                DateSubmitted = DateTime.Now.AddDays(-4),
+                FileId = "1hcVFpCA0Mh1txKh0KbCbDR5N_QAoTFLq"
             };
             CashRegister3 = new CashRegister
             {
@@ -794,7 +825,8 @@ namespace LogiTrack.Infrastructure.SeedDb
                 Description = "Driver Lunch",
                 Type = "Driver Expenses",
                 Amount = 20.00m,
-                DateSubmitted = DateTime.Now.AddDays(-3)
+                DateSubmitted = DateTime.Now.AddDays(-3),
+                FileId = "1hcVFpCA0Mh1txKh0KbCbDR5N_QAoTFLq"
 
             };
             CashRegister4 = new CashRegister
@@ -804,7 +836,8 @@ namespace LogiTrack.Infrastructure.SeedDb
                 Description = "Repair Costs",
                 Type = "Vehicle Expenses",
                 Amount = 150.00m,
-                DateSubmitted = DateTime.Now.AddDays(-2)
+                DateSubmitted = DateTime.Now.AddDays(-2),
+                FileId = "1hcVFpCA0Mh1txKh0KbCbDR5N_QAoTFLq"
             };
             CashRegister5 = new CashRegister
             {
@@ -813,7 +846,8 @@ namespace LogiTrack.Infrastructure.SeedDb
                 Description = "Accommodation",
                 Type = "Driver Expenses",
                 Amount = 80.00m,
-                DateSubmitted = DateTime.Now.AddDays(-1)
+                DateSubmitted = DateTime.Now.AddDays(-1),
+                FileId = "1hcVFpCA0Mh1txKh0KbCbDR5N_QAoTFLq"
             };
             CashRegister6 = new CashRegister
             {
@@ -822,7 +856,8 @@ namespace LogiTrack.Infrastructure.SeedDb
                 Description = "Miscellaneous",
                 Type = "Other Expenses",
                 Amount = 40.00m,
-                DateSubmitted = DateTime.Now
+                DateSubmitted = DateTime.Now,
+                FileId = "1hcVFpCA0Mh1txKh0KbCbDR5N_QAoTFLq"
             };
          }
         public void SeedPricesPerSize()
@@ -835,10 +870,6 @@ namespace LogiTrack.Infrastructure.SeedDb
                 QuotientForDomesticSharedTruck = 0.9,
                 QuotientForInternationalNotSharedTruck = 1.5,
                 QuotientForInternationalSharedTruck = 1.1,
-                DomesticPriceForNotSharedTruck = 1000.0m,
-                DomesticPriceForSharedTruck = 800.0m,
-                InternationalPriceForNotSharedTruck = 1500.0m,
-                InternationalPriceForSharedTruck = 1200.0m
             };
             PricesPerSize2 = new PricesPerSize
             {
@@ -848,10 +879,6 @@ namespace LogiTrack.Infrastructure.SeedDb
                 QuotientForDomesticSharedTruck = 0.85,
                 QuotientForInternationalNotSharedTruck = 1.6,
                 QuotientForInternationalSharedTruck = 1.2,
-                DomesticPriceForNotSharedTruck = 1100.0m,
-                DomesticPriceForSharedTruck = 850.0m,
-                InternationalPriceForNotSharedTruck = 1600.0m,
-                InternationalPriceForSharedTruck = 1300.0m
             };
         }
         private void SeedFuelPrices()
@@ -942,7 +969,7 @@ namespace LogiTrack.Infrastructure.SeedDb
                 Title = "Monthly Payment Due",
                 Date = DateTime.Now.AddMonths(-1),
                 EventType = "Paid",
-                ClientCompanyId = 1
+                UserId = ClientCompany1User.Id
             };
             CalendarEvent2 = new CalendarEvent
             {
@@ -950,7 +977,7 @@ namespace LogiTrack.Infrastructure.SeedDb
                 Title = "Quarterly Review",
                 Date = DateTime.Now.AddMonths(-3),
                 EventType = "Paid",
-                ClientCompanyId = 1
+                UserId = ClientCompany1User.Id
             };
             CalendarEvent3 = new CalendarEvent
             {
@@ -958,7 +985,7 @@ namespace LogiTrack.Infrastructure.SeedDb
                 Title = "Annual Delivery Milestone",
                 Date = DateTime.Now.AddMonths(-6),
                 EventType = "Delivered",
-                ClientCompanyId = 1
+                UserId = ClientCompany1User.Id
             };
         }
     }

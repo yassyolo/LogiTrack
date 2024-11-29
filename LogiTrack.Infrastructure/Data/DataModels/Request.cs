@@ -97,6 +97,8 @@ namespace LogisticsSystem.Infrastructure.Data.DataModels
 
         public double Kilometers { get; set; }
 
+        public string RerefenceNumber { get; set; } = string.Empty;
+
         public IEnumerable<NonStandardCargo>? NonStandardCargos { get; set; } = new List<NonStandardCargo>();
 
         [Comment("Standart cargo identifier")]

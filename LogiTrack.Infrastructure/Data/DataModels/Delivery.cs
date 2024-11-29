@@ -69,5 +69,9 @@ namespace LogiTrack.Infrastructure.Data.DataModels
 
         [Comment("Invoice identifier")]
         public int? InvoiceId { get; set; }
+
+        [Comment("Carbon emission blueprint (in kg CO2)")]
+        [Range(0, double.MaxValue)]
+        public double CarbonEmission { get; set; }
     }
 }

@@ -13,14 +13,6 @@ namespace LogiTrack.Infrastructure.Data.DataModels
         [Comment("Standard cargo identifier")]
         public int Id { get; set; }
 
-        [Required]
-        [Comment("Request identifier")]
-        public int RequestId { get; set; }
-
-        [Comment("Request associated with this standard cargo")]
-        [ForeignKey(nameof(RequestId))]
-        public Request Request { get; set; } = null!;
-
         [Comment("Type of pallet")]
         [StringLength(TypeOfPalletMaxLength)]
         public string? TypeOfPallet { get; set; } = string.Empty; //euro, industrial
@@ -31,7 +23,7 @@ namespace LogiTrack.Infrastructure.Data.DataModels
 
         [Comment("Pallet length")]
         [Range(PalletMetricsValue, PalletMetricsMaxValue)]
-        public double? PalletLength { get; set; } //in cm
+        public double? PalletLength { get; set; } 
 
         [Comment("Pallet width")]
         [Range(PalletMetricsValue, PalletMetricsMaxValue)]

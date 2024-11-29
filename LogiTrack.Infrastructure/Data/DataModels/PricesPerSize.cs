@@ -35,25 +35,5 @@ namespace LogiTrack.Infrastructure.Data.DataModels
         [Comment("Quotient for international shared truck")]
         [Range(QuotientMinValue, QuotientMaxValue)]
         public double QuotientForInternationalSharedTruck { get; set; }
-
-        [Required]
-        [Comment("Domestic price for shared truck")]
-        [Range(PriceMinValue, PriceMaxValue)]
-        public decimal DomesticPriceForNotSharedTruck { get; set; }
-
-        [Required]
-        [Comment("Domestic price for shared truck")]
-        [Range(PriceMinValue, PriceMaxValue)]
-        public decimal DomesticPriceForSharedTruck { get; set; }
-
-        [Required]
-        [Comment("International price for shared truck")]
-        [Range(PriceMinValue, PriceMaxValue)]
-        public decimal InternationalPriceForNotSharedTruck { get; set; }
-
-        [Required]
-        [Comment("International price for shared truck")]
-        [Range(PriceMinValue, PriceMaxValue)]
-        public decimal InternationalPriceForSharedTruck { get; set; }
     }
 }

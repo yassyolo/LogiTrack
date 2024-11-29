@@ -105,6 +105,7 @@
             public const int DriverNameMaxLength = 100;
             public const int DriverNameMinLength = 0;
             public const int DriverLicenceNumberMaxLength = 10;
+            public const int DriverLicenceNumberMinLength = 0;
             public const double SalaryMinValue = 0.0;
             public const double SalaryMaxValue = 10000.0;
             public const int YearOfExperienceMaxValue = 56;

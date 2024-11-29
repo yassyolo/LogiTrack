@@ -36,5 +36,8 @@ namespace LogisticsSystem.Infrastructure.Data.DataModels
 
         [Comment("File identifier in Google drive")]
         public string FileId { get; set; } = string.Empty;
+        public string Status { get; set; } = string.Empty;
+        public bool? PaidOnTime { get; set; }
+        public DateTime? PaidDate { get; set; }
     }
 }

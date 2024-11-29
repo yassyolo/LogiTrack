@@ -95,6 +95,12 @@ namespace LogisticsSystem.Infrastructure.Data.DataModels
         [Range(PriceMinValue, PriceMaxValue)]
         public decimal PurchasePrice { get; set; }
 
+        [Comment("Emission factor (kg CO2 per liter)")]
+        [Range(0, 10)] 
+        public double EmissionFactor { get; set; }
+
+        public bool IsAvailable { get; set; }
+
         [Required]
         [Comment("Vehicle's constant expences")]
         public decimal ContantsExpenses { get; set; } //given by the accountant(road tax,vignette, salaries, vehicle inspection and maintenance,insurance, ammortization, etc.)

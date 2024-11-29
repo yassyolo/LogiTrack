@@ -69,9 +69,6 @@ namespace LogisticsSystem.Infrastructure.Data.DataModels
         public IEnumerable<Offer> Offers { get; set; } = new List<Offer>();
 
         [Comment("Company's invoices")]
-        public IEnumerable<Invoice> Invoices { get; set; } = new List<Invoice>();
-
-        [Comment("Company's calendar events")]
-        public IEnumerable<CalendarEvent> CalendarEvents { get; set; } = new List<CalendarEvent>();
+        public IEnumerable<Invoice> Invoices { get; set; } = new List<Invoice>();       
     }
 }

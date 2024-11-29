@@ -8,9 +8,9 @@ namespace LogiTrack.Infrastructure.SeedDb.Configurations
     {
         public void Configure(EntityTypeBuilder<CalendarEvent> builder)
         {
-            builder.HasOne(x => x.ClientCompany)
-                .WithMany(x => x.CalendarEvents)
-                .HasForeignKey(x => x.ClientCompanyId)
+            builder.HasOne(x => x.User)
+                .WithMany()
+                .HasForeignKey(x => x.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
             var data = new SeedData();
             builder.HasData(new CalendarEvent[] {data.CalendarEvent1, data.CalendarEvent2, data.CalendarEvent3});

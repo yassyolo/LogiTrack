@@ -34,6 +34,7 @@ namespace LogiTrack.Infrastructure
             builder.ApplyConfiguration(new FuelPriceConfiguration());
             builder.ApplyConfiguration(new CalendarEventConfiguration());
             builder.ApplyConfiguration(new RatingConfiguration());
+            builder.ApplyConfiguration(new ReservedForDeliveryConfiguration());
 
             base.OnModelCreating(builder);
         }
@@ -54,5 +55,6 @@ namespace LogiTrack.Infrastructure
         public DbSet<StandartCargo> StandartCargos { get; set; } = null!;
         public DbSet<Address> Addresses { get; set; } = null!;
         public DbSet<Rating> Ratings { get; set; } = null!;
+        public DbSet<ReservedForDelivery> ReservedForDeliveries { get; set; } = null!;
     }
 }

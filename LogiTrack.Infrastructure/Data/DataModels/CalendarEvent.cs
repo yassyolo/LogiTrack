@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using static LogiTrack.Infrastructure.Data.DataConstants.DataModelConstants.CalendarEvent;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.AspNetCore.Identity;
 
 namespace LogiTrack.Infrastructure.Data.DataModels
 {
@@ -27,11 +28,11 @@ namespace LogiTrack.Infrastructure.Data.DataModels
         [StringLength(EventTypeMaxLength)]
         public string EventType { get; set; } = string.Empty;
 
-        [Comment("Client Company identifier")]
-        public int ClientCompanyId { get; set; }
+        [Comment("User identifier")]
+        public string UserId { get; set; } = string.Empty;
 
-        [Comment("Client Company")]
-        [ForeignKey(nameof(ClientCompanyId))]
-        public ClientCompany ClientCompany { get; set; } = null!;
+        [Comment("User")]
+        [ForeignKey(nameof(UserId))]
+        public IdentityUser User { get; set; } = null!;
     }
 }
