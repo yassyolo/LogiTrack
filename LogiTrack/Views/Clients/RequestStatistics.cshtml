@@ -1,4 +1,4 @@
-﻿@model LogiTrack.Core.ViewModels.Delivery.DeliveryStatisticsForClientViewModel
+﻿@model LogiTrack.Core.ViewModels.Request.RequestStatisticsForClientViewModel
 @{
     Layout = null;
 }
@@ -13,10 +13,10 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-matrix"></script>
 
-    <script src="~/js/site.js"></script>
     <style>
-
         .card h3 {
             margin: 0;
             font-size: 1.1rem;
@@ -57,19 +57,7 @@
             .second-row .chart-container {
                 width: 600px;
             }
-
-        .delay{
-			display: flex;
-			flex-direction: row;
-			align-items: center;
-        }
-
-        .monthly-delivery-chart{
-            width: 400px;
-height: 400px;
-        }
     </style>
-
 </head>
 
 <body>
@@ -141,132 +129,118 @@ height: 400px;
             <div class="cards-container">
                 <div class="card" id="locationCard">
                     <div class="card-content">
-                        <h3>Deliveries</h3>
-                        <p><b>@Model.TotalDeliveries</b></p>
+                        <h3>Requests</h3>
+                        <p><b>@Model.TotalRequests</b></p>
                     </div>
                 </div>
                 <div class="card" id="locationCard">
                     <div class="card-content">
-                        <h3>Kilometers</h3>
-                        <p><b>@Model.Kilometers KM</b></p>
+                        <h3>Requests with offer</h3>
+                        <p><b>@Model.TotalRequestsWithOffers </b></p>
                     </div>
                 </div>
                 <div class="card" id="locationCard">
                     <div class="card-content">
-                        <h3>CO2 emissions</h3>
-                        <p><b>@Model.CO2Emissions M3</b></p>
+                        <h3>Average price given by you</h3>
+                        <p><b>@Model.AveragePrice BGN</b></p>
                     </div>
                 </div>
                 <div class="card" id="locationCard">
                     <div class="card-content">
-                        <h3>Average distance</h3>
-                        <p><b>@Model.AverageDeliveryDistance KM</b></p>
+                        <h3>Average weight</h3>
+                        <p><b>@Model.AverageWeight KG</b></p>
                     </div>
                 </div>
                 <div class="card" id="locationCard">
                     <div class="card-content">
-                        <h3>Average delivery time</h3>
-                        <p><b>@Model.AverageDeliveryTime hrs</b></p>
+                        <h3>Average weight</h3>
+                        <p><b>@Model.AverageVolume M3</b></p>
                     </div>
                 </div>
             </div>
 
             <div class="first-row">
                 <div class="chart-container">
-					<h4>Delivery types ratio</h4>
-                    <canvas id="deliveryChart" class="chart"></canvas>
+                    <h4>My requests status ratio</h4>
+                    <canvas id="requestStatusChart" class="chart"></canvas>
                 </div>
+
                 <div class="chart-container">
-                    <h4>Deliveries made on time</h4>
-                    <div class="delay">
-                    <canvas id="successRateChart" class="chart"></canvas>
-                    <p style="color: #00aa87; width: 100px;" id="averageDelay" class="stat-text"></p>
-                    </div>
+                    <h4>Response time for requests</h4>
+                    <canvas id="responseTimeGauge" class="chart"></canvas>
                 </div>
-       
+
             </div>
-                         
-                <h4>Last year deliveries</h4>
-                <canvas id="monthlyDeliveryChart" class="monthly-delivery-chart"></canvas>
-            
+            <div class="first-row">
+                <div class="chart-container">
+                    <h4>Requests this month</h4>
+                    <canvas id="heatMapChart" class="chart"></canvas>
+                </div>
+               
+            </div>
         </div>
     </div>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <script>
-        async function fetchDeliveryCounts() {
+        async function fetchRequestStatusDistribution() {
             try {
-                const response = await fetch('/Clients/GetDeliveryTypes');
+                const response = await fetch('/Clients/GetRequestStatusDistribution');
                 const data = await response.json();
 
-                const domesticCount = data.domestic ?? 0;
-                const internationalCount = data.international ?? 0;
+                const labels = Object.keys(data.statusCounts);
+                const counts = Object.values(data.statusCounts);
 
-                const ctx = document.getElementById('deliveryChart').getContext('2d');
-                const deliveryChart = new Chart(ctx, {
-                    type: 'pie',
+                const ctx = document.getElementById('requestStatusChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'doughnut',
                     data: {
-                        labels: ['Domestic', 'International'],
+                        labels: labels,
                         datasets: [{
-                            label: 'Deliveries',
-                            data: [domesticCount, internationalCount],
-                            backgroundColor: ['#00aa87', '#FF6384'],
+                            data: counts,
+                            backgroundColor: [
+                                '#00aa87', '#FF6384', '#3498db', '#f1c40f', '#9b59b6'
+                            ],
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'bottom'
+                            }
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error('Error fetching request status distribution:', error);
+            }
+        }
+
+        async function fetchAverageResponseTime() {
+            try {
+                const response = await fetch('/Logistics/GetAverageResponseTime');
+                const data = await response.json();
+
+                const ctx = document.getElementById('responseTimeGauge').getContext('2d');
+                new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Average Response Time (Hours)'],
+                        datasets: [{
+                            data: [data.averageResponseTime, 24 - data.averageResponseTime],
+                            backgroundColor: ['#00aa87', '#e0e0e0'],
                             hoverOffset: 4
                         }]
                     },
                     options: {
                         responsive: true,
+                        rotation: -90,
+                        circumference: 180,
                         plugins: {
-                            legend: {
-                                position: 'bottom',
-                            }
-                        }
-                    }
-                });
-
-            } catch (error) {
-                console.error('Error fetching delivery counts:', error);
-            }
-        }
-        async function fetchMonthlyDeliveries() {
-            try {
-                const response = await fetch('/Clients/GetDeliveryCounts');
-                const data = await response.json();
-
-                console.log('Fetched data:', data);
-
-                const ctx = document.getElementById('monthlyDeliveryChart').getContext('2d');
-                const monthlyDeliveryChart = new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: data.months,
-                        datasets: [{
-                            label: 'Deliveries per Month',
-                            data: data.deliveries,
-                            backgroundColor: '#00aa87',
-                            borderColor: '#00aa87',
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                ticks: {
-                                    stepSize: 1
-                                }
-                            }
-                        },
-                        plugins: {
-                            legend: {
-                                display: false
-                            },
                             tooltip: {
                                 callbacks: {
                                     label: function (tooltipItem) {
-                                        return 'Deliveries: ' + tooltipItem.raw;
+                                        return `Average Response Time: ${data.averageResponseTime.toFixed(2)} hours`;
                                     }
                                 }
                             }
@@ -274,64 +248,90 @@ height: 400px;
                     }
                 });
             } catch (error) {
-                console.error('Error fetching monthly deliveries:', error);
+                console.error('Error fetching average response time:', error);
             }
         }
-        async function fetchDeliverySuccessRate() {
+
+        async function renderHeatMap() {
             try {
-                const response = await fetch('/Clients/GetDeliveryTimes');
+                const response = await fetch('/Clients/GetMonthlyRequestPatterns');
                 const data = await response.json();
 
-                const successRate = data.successRate || 0;
-                const failureRate = 100 - successRate;
-                const averageDelay = data.averageDelay || 0;
+                const daysInMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate();
+                const dailyCounts = Array(daysInMonth).fill(0);
 
-                const ctx = document.getElementById('successRateChart').getContext('2d');
-                new Chart(ctx, {
-                    type: 'radar',
+                for (const [day, count] of Object.entries(data.data)) {
+                    const dayIndex = parseInt(day, 10) - 1;
+                    if (dayIndex >= 0 && dayIndex < daysInMonth) {
+                        dailyCounts[dayIndex] = count;
+                    }
+                }
+
+                const heatmapData = dailyCounts.map((count, index) => ({
+                    x: index + 1,
+                    y: count,
+                    v: count
+                }));
+
+                new Chart(document.getElementById('heatMapChart'), {
+                    type: 'scatter',
                     data: {
-                        labels: ['Success', 'Failure'], 
                         datasets: [{
-                            label: 'Delivery Rates',
-                            data: [successRate, failureRate],
-                            backgroundColor: '#FF6384',
-                            borderColor: '#FF6384',
-                            borderWidth: 2
+                            label: 'Requests per Day',
+                            data: heatmapData,
+                            pointStyle: 'rect',
+                            pointRadius: 10,
+                            backgroundColor(context) {
+                                const value = context.raw.v;
+                                const colorIntensity = Math.min(value * 15, 255);
+                                return `#FF6384`;
+                            },
                         }]
                     },
                     options: {
                         responsive: true,
                         scales: {
-                            r: {
-                                angleLines: {
-                                    display: true
-                                },
-                                beginAtZero: true
+                            x: {
+                                type: 'linear',
+                                position: 'bottom',
+                                title: { display: true, text: 'Day of the Month' },
+                                ticks: {
+                                    stepSize: 1,
+                                    min: 1,
+                                    max: daysInMonth
+                                }
+                            },
+                            y: {
+                                title: { display: true, text: 'Request Count' },
+                                beginAtZero: true,
+                                ticks: {
+                                    stepSize: 1,
+                                    callback: function (value) { return Number.isInteger(value) ? value : null; }
+                                }
                             }
                         },
                         plugins: {
-                            legend: {
-                                position: 'top',
+                            tooltip: {
+                                callbacks: {
+                                    label: function (context) {
+                                        return `Day ${context.raw.x}: ${context.raw.y} request(s)`;
+                                    }
+                                }
                             }
                         }
                     }
                 });
-
-                document.getElementById('averageDelay').innerText =
-                    `Average delay time: ${averageDelay.toFixed(2)} hrs`;
-
             } catch (error) {
-                console.error('Error fetching delivery success rate:', error);
+                console.error('Error fetching heat map data:', error);
             }
         }
+
         window.onload = async function () {
-            await fetchDeliverySuccessRate();
-            await fetchMonthlyDeliveries();
-            await fetchDeliveryCounts();
+            await fetchRequestStatusDistribution();
+            await fetchAverageResponseTime();
+            await renderHeatMap();
         };
     </script>
 </body>
 
 </html>
-
-

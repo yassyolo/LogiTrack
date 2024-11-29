@@ -1,4 +1,4 @@
-﻿@model LogiTrack.Core.ViewModels.Request.SearchRequestsViewModel
+﻿@model LogiTrack.Core.ViewModels.Request.FilterRequestsViewModel
 @{
     Layout = null;
 }
@@ -17,10 +17,6 @@
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="~/js/site.js"></script>
     <style>
-        body {
-            font-family: 'Roboto', sans-serif;
-        }
-
         .container {
             background-color: white;
             padding: 20px;
@@ -136,7 +132,7 @@
 
             .btn-clear:hover {
                 opacity: 0.8;
-            }       
+            }
 
         .filtered-deliveries-container {
             background-color: #ffff;
@@ -186,6 +182,11 @@
             margin-top: 28px;
             margin-left: 30px;
             height: 5px;
+        }
+
+        .address {
+            width: 150px;
+            flex-wrap: wrap;
         }
 
         .delivery-metrics {
@@ -243,42 +244,52 @@
         <ul>
             <li><a asp-action="Dashboard" asp-controller="Clients"><i class="bi bi-house-door"></i> Dashboard</a></li>
             <li>
-                <a asp-action="MyRequests" asp-controller="Clients"><i class="bi bi-money"></i> Requests <span class="arrow">></span></a>
+                <a asp-action="MyRequests" asp-controller="Clients"><i class="bi bi-clipboard-check"></i> Requests <span class="arrow">></span></a>
                 <div class="dropdown-menu">
                     <ul>
-                        <li><a asp-action="MakeRequest" asp-controller="Clients">New</a></li>
-                        <li><a asp-action="MyRequests" asp-controller="Clients">Search</a></li>
+                        <li><a asp-action="MakeRequest" asp-controller="Clients"><i class="bi bi-plus-circle"></i> New</a></li>
+                        <li><a asp-action="MyRequests" asp-controller="Clients"><i class="bi bi-search"></i> Search</a></li>
+                        <li><a asp-action="RequestStatistics" asp-controller="Clients"><i class="bi bi-bar-chart"></i> Statistics</a></li>
                     </ul>
                 </div>
             </li>
             <li>
-                <a asp-action="MyOffers" asp-controller="Clients"><i class="bi bi-money"></i> Offers <span class="arrow">></span></a>
+                <a asp-action="MyOffers" asp-controller="Clients"><i class="bi bi-file-earmark-text"></i> Offers <span class="arrow">></span></a>
                 <div class="dropdown-menu">
                     <ul>
-                        <li><a asp-action="HaveOffer" asp-controller="Clients">Book</a></li>
-                        <li><a asp-action="MyOffers" asp-controller="Clients">Search</a></li>
+                        <li><a asp-action="HaveOffer" asp-controller="Clients"><i class="bi bi-calendar-check"></i> Book</a></li>
+                        <li><a asp-action="MyOffers" asp-controller="Clients"><i class="bi bi-search"></i> Search</a></li>
+                        <li><a asp-action="OfferStatistics" asp-controller="Clients"><i class="bi bi-bar-chart"></i> Statistics</a></li>
                     </ul>
                 </div>
             </li>
             <li>
-                <a asp-action="MyDeliveries" asp-controller="Clients"><i class="bi bi-money"></i> Deliveries <span class="arrow">></span></a>
+                <a asp-action="MyDeliveries" asp-controller="Clients"><i class="bi bi-truck"></i> Deliveries <span class="arrow">></span></a>
                 <div class="dropdown-menu">
                     <ul>
-                        <li><a asp-action="SearchDelivery" asp-controller="Clients">Track</a></li>
-                        <li><a asp-action="MyDeliveries" asp-controller="Clients">Search</a></li>
+                        <li><a asp-action="SearchDelivery" asp-controller="Clients"><i class="bi bi-binoculars"></i> Track</a></li>
+                        <li><a asp-action="MyDeliveries" asp-controller="Clients"><i class="bi bi-search"></i> Search</a></li>
+                        <li><a asp-action="DeliveryStatistics" asp-controller="Clients"><i class="bi bi-bar-chart"></i> Statistics</a></li>
                     </ul>
                 </div>
             </li>
             <li>
-                <a asp-action="MyInvoices" asp-controller="Clients"><i class="bi bi-money"></i> Invoices <span class="arrow">></span></a>
+                <a asp-action="MyInvoices" asp-controller="Clients"><i class="bi bi-receipt"></i> Invoices <span class="arrow">></span></a>
+                <div class="dropdown-menu">
+                    <ul>
+                        <li><a asp-action="MyInvoices" asp-controller="Clients"><i class="bi bi-search"></i> Search</a></li>
+                        <li><a asp-action="InvoicesStatistics" asp-controller="Clients"><i class="bi bi-bar-chart"></i> Statistics</a></li>
+                    </ul>
+                </div>
             </li>
         </ul>
     </aside>
     <div class="main-content">
         <div class="container mt-5">
             <div class="quick-search-header">
-                <img src="https://via.placeholder.com/40" alt="Quick Search Icon" class="search-icon">
-                <h2 class="quick-search-title">Quick Search</h2>
+                <div class="search-icon">
+                    <i class="bi bi-search" style="font-size: 35px; color:#00aa87;"></i>
+                </div>                 <h2 class="quick-search-title">Quick my requests search</h2>
             </div>
             <p class="search-description">Please enter your search criteria</p>
 
@@ -296,14 +307,32 @@
                         <label asp-for="StartDate"><b>Start</b></label>
                         <input type="text" id="StartDate" asp-for="StartDate" class="flatpickr" placeholder="Please enter">
                     </div>
+                    
                     <div class="form-group">
                         <label asp-for="EndDate"><b>End</b></label>
                         <input type="text" id="EndDate" asp-for="EndDate" class="flatpickr" placeholder="Please enter">
                     </div>
                     <div class="form-group">
+                        <label asp-for="MinPrice"><b>Min price</b></label>
+                        <input type="text" id="EndDate" asp-for="MinPrice" class="flatpickr" placeholder="Please enter">
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="MaxPrice"><b>Max price</b></label>
+                        <input type="text" id="EndDate" asp-for="MaxPrice" class="flatpickr" placeholder="Please enter">
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="MinWeight"><b>Min weight</b></label>
+                        <input type="text" id="EndDate" asp-for="MinWeight" class="flatpickr" placeholder="Please enter">
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="MaxWeight"><b>Max weight</b></label>
+                        <input type="text" id="EndDate" asp-for="MaxWeight" class="flatpickr" placeholder="Please enter">
+                    </div>
+                    <div class="form-group">
                         <label asp-for="IsApproved"><b>Approved</b></label>
-                        <input asp-for="IsApproved" type="checkbox" id="IsNewCheckbox">
+                        <input type="hidden" name="IsApproved" value="false" />
 
+                        <input type="checkbox" id="IsPaid" asp-for="IsApproved" value="true" />
                     </div>
                 </div>
                 <div class="button-group">
@@ -325,39 +354,38 @@
                 </div>
             </form>
             <div class="delivery-header">
+                <span>Ref No</span>
                 <span>Created</span>
                 <span>Expected Date</span>
                 <span>Origin</span>
                 <span>Destination</span>
-                
                 <span>Approved</span>
             </div>
             @if (Model.Requests.Any())
             {
                 <div class="delivery-list">
-                    @foreach (var delivery in Model.Requests)
+                    @foreach (var request in Model.Requests)
                     {
-                        <a asp-action="RequestDetails" asp-controller="Clients" asp-route-id = "@delivery.Id" style="text-decoration: none; color: inherit;">
-                            <div class="delivery-card">
-                                <div class="delivery-info">
-                                    <span>@delivery.CreationDate</span>
-                                    <span>@delivery.ExpectedDeliveryDate</span>
-                                    <span>@delivery.PickupAddress</span>
-                                    <span>@delivery.DeliveryAddress</span>
-                                    <span>
-                                        @if (delivery.Approved)
-                                        {
-                                            <i class="bi bi-check-circle-fill" style="color: #00aa87;"></i>
-                                        }
-                                    </span>
-                                </div>
-                                <div class="delivery-metrics">
-                                    <p><b>Packs:</b> @delivery.NumberOfItems</p>
-                                    <p><b>Weight:</b> @delivery.TotalWeight</p>
-                                    <p><b>Volume:</b> @delivery.TotalVolume</p>
-                                </div>
+                        <div class="delivery-card">
+                            <div class="delivery-info">
+                                <a asp-action="RequestDetails" asp-controller="Clients" asp-route-id="@request.Id" style="text-decoration: none; color: inherit;"> @request.ReferenceNumber </a>
+                                <span>@request.CreationDate</span>
+                                <span>@request.ExpectedDeliveryDate</span>
+                                <span class="address">@request.PickupAddress</span>
+                                <span class="address">@request.DeliveryAddress</span>
+                                <span>
+                                    @if (request.Approved)
+                                    {
+                                        <i class="bi bi-check-circle-fill" style="color: #00aa87;"></i>
+                                    }
+                                </span>
                             </div>
-                        </a>
+                            <div class="delivery-metrics">
+                                <p><b>Packs:</b> @request.NumberOfItems</p>
+                                <p><b>Weight:</b> @request.TotalWeight</p>
+                                <p><b>Volume:</b> @request.TotalVolume</p>
+                            </div>
+                        </div>
                     }
                 </div>
             }
@@ -367,14 +395,6 @@
             }
         </div>
     </div>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            flatpickr(".flatpickr", {
-                dateFormat: "Y-m-d",
-            });
-        });
-    </script>
 
 </body>
 

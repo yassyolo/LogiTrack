@@ -3,7 +3,7 @@
     Layout = null;
 }
 
-    <!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -14,19 +14,17 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+
 
     <script src="~/js/site.js"></script>
 
     <style>
-        body {
-            font-family: 'Roboto', sans-serif;
-        }
-
         .delivery-details-container {
             width: 85%;
         }
 
-        .card {
+        .details-card {
             box-shadow: 0 0 25px 1px #0000000f !important;
             padding: 17px;
             background-color: white;
@@ -38,11 +36,6 @@
             margin-bottom: 40px;
         }
 
-            .details-header h2 {
-                font-size: 19px;
-                margin: 0;
-            }
-
         .delivery-image {
             width: 50px;
             height: auto;
@@ -51,195 +44,104 @@
 
         h4 {
             margin: 10px 0;
+            font-size: 20px;
+            color: #00aa87;
+            font-weight: 500;
         }
 
-        .button-tabs {
+        .columns-container {
             display: flex;
-            border-bottom: 1px solid grey;
-            margin-bottom: 15px;
-        }
-
-        .tab-button {
-            padding: 10px 30px;
-            border: none;
-            cursor: pointer;
-            display: inline-block;
-            font-size: 15px;
-            transition: background-color 0.3s;
-            color: black;
-            background-color: white;
-        }
-
-            .tab-button:focus,
-            .tab-button:active {
-                border-bottom: 2px solid #00aa87;
-            }
-
-        .btn {
-            color: grey;
-            border: none;
-            cursor: pointer;
-            margin: 0 5px;
-            transition: background-color 0.3s;
-        }
-
-        .section {
-            display: none;
-            margin-left: 25px;
-        }
-
-            .section:not(.d-none) {
-                display: block;
-            }
-
-        .vehicle-container {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
+            flex-direction: row;
+            justify-content: space-between;
+            width: 80%;
         }
 
         .column {
             display: flex;
             flex-direction: column;
-            flex: 1;
         }
 
-            .column h5 {
-                margin-bottom: 10px;
-            }
-
             .column p {
-                margin: 5px 0;
                 font-size: 14px;
                 color: black;
                 opacity: 80%;
             }
-
-            .column strong {
-                color: black;
-            }
-
-        .maps-container {
-            display: flex;
-            gap: 20px;
-            margin-top: 20px;
-        }
-
-        .map {
-            width: 90%;
-            height: 200px;
-            background-color: #e0e0e0;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
 
         .address-steps {
             display: flex;
             justify-content: space-between;
             flex-direction: row;
         }
-        .delivery-steps {
+
+        .text-tracking-line {
             display: flex;
-            align-items: center;
-            gap: 30px;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 10px;
+            width: 55%;
         }
 
-        .step-container {
+        .tracking-line {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+            margin-left: 35px;
+        }
+
+        .dot {
+            width: 17px;
+            height: 17px;
+            border-radius: 50%;
+        }
+
+        .line {
+            flex: 1;
+            height: 6px;
+        }
+
+        .steps-text-container {
+            width: 100%;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .text-icon {
             display: flex;
             flex-direction: column;
             align-items: center;
+            gap: 5px;
         }
-
-        .step-dot {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background-color: gray;
-        }
-
-            .step-dot.completed {
-                background-color: green;
-            }
-
-        .step-line {
-            width: 3px;
-            height: 50px;
-            background-color: gray;
-            margin: 0 auto;
-        }
-
-            .step-line.completed {
-                background-color: green;
-            }
 
         .step-text {
             text-align: center;
             margin-top: 8px;
         }
 
-            .step-text img {
-                width: 30px;
-                height: 30px;
-            }
-
-
-        .vehicles-section-header, .column h4 {
-            display: flex;
-            margin-bottom: 20px;
-            flex-direction: row;
-        }
-
-            .vehicles-section-header h4,
-            .column h4, .metrics-header h4, .special-instructions h4,
-             .metrics h4, .cash-register-title {
-                font-size: 20px;
-                color: #00aa87;
-                font-weight: 500;
-            }
-
-        .metrics-header {
+        .table-header-row {
             display: flex;
             flex-direction: row;
-            gap: 300px;
-            margin-bottom: 20px;
-        }
-
-        .metrics {
-            margin-top: 50px;
-        }
-
-        .standart-metrics-header-row {
-            display: flex;
-            flex-direction: row;
-            margin-left: 60px;
+            margin-left: 50px;
             justify-content: space-between;
             width: 90%;
         }
 
-        .standart-metrics-info-row {
+        .table-info-row {
             display: flex;
             flex-direction: row;
             background-color: #fbfbfb;
-            margin-left: 40px;
+            margin-left: 30px;
             justify-content: space-between;
             white-space: nowrap;
             font-weight: 300;
             font-size: 14px;
             opacity: 80%;
-            width: 90%;
-        }
-
-        .invoices, .cash-registers {
-            margin-top: 20px;
-        }
-      
-        h2 {
-            font-size: 24px;
-            margin: 0;
+            width: 95%;
         }
 
         .file-icon {
-            color: #007bff;
+            color: #00aa87;
             text-decoration: none;
             display: inline-flex;
             align-items: center;
@@ -254,7 +156,6 @@
                 color: #0056b3;
             }
 
-
         .cash-register-title-button {
             display: flex;
             justify-content: space-between;
@@ -262,12 +163,13 @@
             width: 85%;
         }
 
-        .cash-register-title-button a{
-            color:white;
+        .cash-register-title-button a {
+            color: white;
             background-color: #00aa87;
             text-decoration: none;
             padding: 3px;
             border-radius: 5px;
+            height: 20px;
         }
     </style>
 
@@ -293,38 +195,62 @@
     </header>
     <aside class="sidebar">
         <ul>
-            <li><a asp-action="Dashboard" asp-controller="Accountant"><i class="bi bi-house-door"></i> Dashboard</a></li>
             <li>
-                <a asp-action="SearchDeliveries" asp-controller="Accountant"><i class="bi bi-truck"></i> Deliveries</a>
+                <a asp-action="Dashboard" asp-controller="Accountant">
+                    <i class="bi bi-house-door"></i> Dashboard
+                </a>
             </li>
             <li>
-                <a asp-action="SearchCashRegisters" asp-controller="Accountant"><i class="bi bi-money"></i> Cash registers <span class="arrow">></span></a>
+                <a asp-action="SearchDeliveries" asp-controller="Accountant">
+                    <i class="bi bi-truck"></i> Deliveries <span class="arrow">></span>
+                </a>
                 <div class="dropdown-menu">
                     <ul>
-                        <li><a asp-action="SearchDelivery" asp-controller="Accountant">New</a></li>
-                        <li><a asp-action="SearchCashRegisters" asp-controller="Accountant">Search</a></li>
+                        <li><a asp-action="SearchDeliveries" asp-controller="Accountant"><i class="bi bi-list"></i> All</a></li>
+                        <li><a asp-action="SearchDelivery" asp-controller="Accountant"><i class="bi bi-search"></i> Search</a></li>
                     </ul>
                 </div>
             </li>
             <li>
-                <a asp-action="SearchInvoices" asp-controller="Accountant"><i class="bi bi-money"></i> Invoices</a>
+                <a asp-action="SearchCashRegisters" asp-controller="Accountant">
+                    <i class="bi bi-cash"></i> Cash registers <span class="arrow">></span>
+                </a>
+                <div class="dropdown-menu">
+                    <ul>
+                        <li><a asp-action="SearchCashRegisters" asp-controller="Accountant"><i class="bi bi-list"></i> All</a></li>
+                        <li><a asp-action="CashRegistersStatistics" asp-controller="Accountant"><i class="bi bi-bar-chart"></i> Statistics</a></li>
+                    </ul>
+                </div>
+            </li>
+            <li>
+                <a asp-action="SearchInvoices" asp-controller="Accountant">
+                    <i class="bi bi-receipt"></i> Invoices <span class="arrow">></span>
+                </a>
+                <div class="dropdown-menu">
+                    <ul>
+                        <li><a asp-action="SearchInvoices" asp-controller="Accountant"><i class="bi bi-list"></i> All</a></li>
+                        <li><a asp-action="InvoicesStatistics" asp-controller="Accountant"><i class="bi bi-bar-chart"></i> Statistics</a></li>
+                    </ul>
+                </div>
             </li>
         </ul>
     </aside>
 
     <div class="main-content">
         <div class="delivery-details-container">
-            <div class="card">
+            <div class="details-card">
                 <div class="details-header">
-                    <img src="https://via.placeholder.com/100" alt="Delivery Image" class="delivery-image">
-                    <h2><b>@Model.ReferenceNumber</b></h2>
+                    <div class="delivery-image">
+                        <i class="fas fa-shipping-fast" style="font-size: 40px; color: #00aa87;"></i>
+                    </div>
+                    <h3><b>@Model.ReferenceNumber</b></h3>
                 </div>
 
                 <div class="button-tabs">
                     <button class="tab-button" id="infoBtn">INFO</button>
                     <button class="tab-button" id="vehicleBtn">VEHICLE/DRIVER</button>
                     <button class="tab-button" id="statusBtn">STATUS</button>
-                    <button class="tab-button" id="invoicesBtn">INVOICES</button>
+                    <button class="tab-button" id="invoicesBtn">INVOICE</button>
                     <button class="tab-button" id="cashRegistersBtn">CASH REGISTERS</button>
                 </div>
 
@@ -338,14 +264,12 @@
                     </div>
                 </div>
                 <div id="vehicleSection" class="section d-none">
-
-                    <div class="vehicle-container">
+                    <div class="columns-container">
                         <div class="column">
                             <h4><b>Vehicle</b></h4>
                             <p><strong>Type:</strong> @Model.VehicleType</p>
                             <p><strong>Registration:</strong> @Model.RegistrationNumber</p>
                         </div>
-
                         <div class="column">
                             <h4><b>Driver</b></h4>
                             <p><strong>Name:</strong> @Model.Name</p>
@@ -358,7 +282,7 @@
 
                 <div id="statusSection" class="section d-none">
                     <div class="address-steps">
-                        <div class="column-section">
+                        <div class="column-container">
                             <div class="column">
                                 <h4><b>Origin</b></h4>
                                 <p>@Model.PickupAddress</p>
@@ -369,49 +293,58 @@
                             </div>
                         </div>
 
-                        <div class="delivery-steps">
-                            @{
-                                var steps = new[] { "Booked", "Collected", "In Transit", "Delivered" };
-                                var currentStep = Model.DeliveryStep;
-                            }
-
-                            @for (int i = 0; i < steps.Length; i++)
-                            {
-                                var isCompleted = i + 1 <= currentStep;
-                                var dotClass = isCompleted ? "step-dot completed" : "step-dot";
-                                var lineClass = i < steps.Length - 1 ? (isCompleted ? "step-line completed" : "step-line") : "";
-
-                                <div class="step-container">
-                                    <div class="@dotClass"></div>
-                                    @if (i < steps.Length - 1)
-                                    {
-                                        <div class="@lineClass"></div>
-                                    }
-                                    <p>@steps[i]</p>
+                        <div class="text-tracking-line">
+                            <div class="tracking-line">
+                                <div class="dot" style="background-color: @(Model.DeliveryStep >= 1 ? "#00aa87" : "gray")"></div>
+                                <div class="line" style="background-color: @(Model.DeliveryStep >= 2 ? "#00aa87" : "gray")"></div>
+                                <div class="dot" style="background-color: @(Model.DeliveryStep >= 2 ? "#00aa87" : "gray")"></div>
+                                <div class="line" style="background-color: @(Model.DeliveryStep >= 3 ? "#00aa87" : "gray")"></div>
+                                <div class="dot" style="background-color: @(Model.DeliveryStep >= 3 ? "#00aa87" : "gray")"></div>
+                                <div class="line" style="background-color: @(Model.DeliveryStep >= 4 ? "#00aa87" : "gray")"></div>
+                                <div class="dot" style="background-color: @(Model.DeliveryStep >= 4 ? "#00aa87" : "gray")"></div>
+                            </div>
+                            <div class="steps-text-container" style="display: flex; justify-content: space-around; align-items: center;">
+                                <div class="text-icon" style="text-align: center;">
+                                    <i class="fas fa-calendar-check fa-2x" style="color: #4caf50;"></i>
+                                    <p class="step-text">Booked</p>
                                 </div>
-                            }
+                                <div class="text-icon" style="text-align: center;">
+                                    <i class="fas fa-box fa-2x" style="color: #2196f3;"></i>
+                                    <p class="step-text">Collected</p>
+                                </div>
+                                <div class="text-icon" style="text-align: center;">
+                                    <i class="fas fa-truck-moving fa-2x" style="color: #ff9800;"></i>
+                                    <p class="step-text">In transit</p>
+                                </div>
+                                <div class="text-icon" style="text-align: center;">
+                                    <i class="fas fa-check-circle fa-2x" style="color: #8bc34a;"></i>
+                                    <p class="step-text">Delivered</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
+
+
                 </div>
 
                 <div id="invoicesSection" class="section d-none invoices">
                     <div class="column">
                         <div class="cash-register-title-button">
-                            <div class="cash-register-title">Invoices</div>
+                            <h4><b>Invoices</b></h4>
                             @if (!Model.Invoice.IsPaid)
                             {
-                                <a asp-action="MarkAsPaid" asp-controller="Accountant" asp-route-id="@Model.Id" class="btn btn-primary">Mark as Paid</a>
+                                <a asp-action="MarkAsPaid" asp-controller="Accountant" asp-route-id="@Model.Id" class="btn btn-primary">MARK AS PAID +</a>
                             }
                         </div>
                     </div>
-                    <div class="standart-metrics-header-row">
+                    <div class="table-header-row">
                         <p><b>Number</b></p>
                         <p><b>Date</b></p>
                         <p><b>Description</b></p>
                         <p><b>Status</b></p>
                         <p><b>File</b></p>
                     </div>
-                    <div class="standart-metrics-info-row">
+                    <div class="table-info-row">
                         <p>@Model.Invoice.Number</p>
                         <p>@Model.Invoice.Date</p>
                         <p>@Model.Invoice.Description</p>
@@ -426,10 +359,10 @@
 
                 <div id="cashRegistersSection" class="section d-none cash-registers">
                     <div class="cash-register-title-button">
-                        <div class="cash-register-title"><b>Cash registers</b></div>
-                        <a asp-action="AddCashRegister" asp-controller="Accountant" asp-route-id="@Model.Id" class="btn btn-primary">ADD</a>
+                        <h4><b>Cash registers</b></h4>
+                        <a asp-action="AddCashRegister" asp-controller="Accountant" asp-route-id="@Model.Id" class="btn btn-primary">ADD +</a>
                     </div>
-                    <div class="standart-metrics-header-row">
+                    <div class="table-header-row">
                         <p><b>Date</b></p>
                         <p><b>Description</b></p>
                         <p><b>Type</b></p>
@@ -438,7 +371,7 @@
                     </div>
                     @foreach (var cashRegister in Model.CashRegisters)
                     {
-                        <div class="standart-metrics-info-row">
+                        <div class="table-info-row">
                             <p>@cashRegister.DateSubmitted</p>
                             <p>@cashRegister.Description</p>
                             <p>@cashRegister.Type</p>
@@ -448,7 +381,6 @@
                                     <i class="fas fa-file-download"></i> See
                                 </a>
                             </p>
-
                         </div>
                     }
                 </div>
@@ -483,7 +415,6 @@
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
-
 
 </body>
 </html>

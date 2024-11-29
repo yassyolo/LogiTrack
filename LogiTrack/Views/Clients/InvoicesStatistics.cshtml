@@ -1,4 +1,4 @@
-﻿@model LogiTrack.Core.ViewModels.Delivery.DeliveryStatisticsForClientViewModel
+﻿@model LogiTrack.Core.ViewModels.Invoice.InvoiceStatisticsForClientViewModel
 @{
     Layout = null;
 }
@@ -16,12 +16,12 @@
 
     <script src="~/js/site.js"></script>
     <style>
-
         .card h3 {
             margin: 0;
             font-size: 1.1rem;
             color: #00aa87;
         }
+
         .chart-container {
             background: white;
             padding: 20px;
@@ -57,17 +57,6 @@
             .second-row .chart-container {
                 width: 600px;
             }
-
-        .delay{
-			display: flex;
-			flex-direction: row;
-			align-items: center;
-        }
-
-        .monthly-delivery-chart{
-            width: 400px;
-height: 400px;
-        }
     </style>
 
 </head>
@@ -141,195 +130,213 @@ height: 400px;
             <div class="cards-container">
                 <div class="card" id="locationCard">
                     <div class="card-content">
-                        <h3>Deliveries</h3>
-                        <p><b>@Model.TotalDeliveries</b></p>
+                        <h3>Paid invoices- amount</h3>
+                        <p><b>@Model.PaidInvoices - @Model.PaidAmount BGN</b></p>
                     </div>
                 </div>
                 <div class="card" id="locationCard">
                     <div class="card-content">
-                        <h3>Kilometers</h3>
-                        <p><b>@Model.Kilometers KM</b></p>
+                        <h3>Pending invoices- amount</h3>
+                        <p><b>@Model.PendingInvoices - @Model.PendingAmount BGN</b></p>
                     </div>
                 </div>
                 <div class="card" id="locationCard">
                     <div class="card-content">
-                        <h3>CO2 emissions</h3>
-                        <p><b>@Model.CO2Emissions M3</b></p>
+                        <h3>Overdue invoices- amount</h3>
+                        <p><b>@Model.OverdueInvoices - @Model.OverdueAmount BGN</b></p>
                     </div>
                 </div>
                 <div class="card" id="locationCard">
                     <div class="card-content">
-                        <h3>Average distance</h3>
-                        <p><b>@Model.AverageDeliveryDistance KM</b></p>
-                    </div>
-                </div>
-                <div class="card" id="locationCard">
-                    <div class="card-content">
-                        <h3>Average delivery time</h3>
-                        <p><b>@Model.AverageDeliveryTime hrs</b></p>
+                        <h3>Average payment time</h3>
+                        <p><b>@Model.AveragePaymentTime days</b></p>
                     </div>
                 </div>
             </div>
 
             <div class="first-row">
+
                 <div class="chart-container">
-					<h4>Delivery types ratio</h4>
-                    <canvas id="deliveryChart" class="chart"></canvas>
-                </div>
-                <div class="chart-container">
-                    <h4>Deliveries made on time</h4>
-                    <div class="delay">
-                    <canvas id="successRateChart" class="chart"></canvas>
-                    <p style="color: #00aa87; width: 100px;" id="averageDelay" class="stat-text"></p>
+                        <h4>Invoices status ratio</h4>
+                        <canvas id="invoiceStatusChart" class="chart"></canvas>
                     </div>
-                </div>
-       
+                    <div class="chart-container">
+                        <h4>Total amount spent on services</h4>
+                        <canvas id="totalSpendingChartContainer" class="chart"></canvas>
+                    </div>
+                
+
             </div>
-                         
-                <h4>Last year deliveries</h4>
-                <canvas id="monthlyDeliveryChart" class="monthly-delivery-chart"></canvas>
-            
+            <div class="chart-container">
+                <h4>Approximate price to final price differences</h4>
+                <canvas id="priceDifferenceChart" class="chart"></canvas>
+            </div>
         </div>
     </div>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <script>
-        async function fetchDeliveryCounts() {
+        document.addEventListener('DOMContentLoaded', async function () {
             try {
-                const response = await fetch('/Clients/GetDeliveryTypes');
+                await Promise.all([
+                    renderInvoiceStatusDistribution(),
+                    renderTotalSpendingChart(),
+                    renderPriceDifferenceChart()
+                ]);
+            } catch (error) {
+                console.error('Error initializing charts:', error);
+            }
+        });
+
+        async function renderInvoiceStatusDistribution() {
+            try {
+                const response = await fetch('/Clients/GetInvoicesStatusDistribution');
+                if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
                 const data = await response.json();
 
-                const domesticCount = data.domestic ?? 0;
-                const internationalCount = data.international ?? 0;
+                const statuses = Object.keys(data.statusCounts || {});
+                const counts = Object.values(data.statusCounts || {});
 
-                const ctx = document.getElementById('deliveryChart').getContext('2d');
-                const deliveryChart = new Chart(ctx, {
-                    type: 'pie',
+                if (!statuses.length) {
+                    console.warn('No data available for Invoice Status Distribution');
+                    return;
+                }
+
+                const ctx = document.getElementById('invoiceStatusChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'doughnut',
                     data: {
-                        labels: ['Domestic', 'International'],
+                        labels: statuses,
                         datasets: [{
-                            label: 'Deliveries',
-                            data: [domesticCount, internationalCount],
-                            backgroundColor: ['#00aa87', '#FF6384'],
-                            hoverOffset: 4
+                            data: counts,
+                            backgroundColor: ['#4CAF50', '#00aa87', '#FF6384'],
                         }]
                     },
                     options: {
                         responsive: true,
                         plugins: {
                             legend: {
-                                position: 'bottom',
+                                display: true,
+                                position: 'bottom'
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: (tooltipItem) => `${statuses[tooltipItem.dataIndex]}: ${counts[tooltipItem.dataIndex]}`
+                                }
                             }
                         }
                     }
                 });
-
             } catch (error) {
-                console.error('Error fetching delivery counts:', error);
+                console.error('Error rendering Invoice Status Distribution:', error);
             }
         }
-        async function fetchMonthlyDeliveries() {
+
+        async function renderTotalSpendingChart() {
             try {
-                const response = await fetch('/Clients/GetDeliveryCounts');
+                const response = await fetch('/Clients/GetTotalSpending');
+                if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
                 const data = await response.json();
 
-                console.log('Fetched data:', data);
+                const totalSpent = data.totalSpent || 0;
 
-                const ctx = document.getElementById('monthlyDeliveryChart').getContext('2d');
-                const monthlyDeliveryChart = new Chart(ctx, {
+                const ctx = document.getElementById('totalSpendingChartContainer').getContext('2d');
+                new Chart(ctx, {
                     type: 'bar',
                     data: {
-                        labels: data.months,
+                        labels: ['Total Money Spent'],
                         datasets: [{
-                            label: 'Deliveries per Month',
-                            data: data.deliveries,
-                            backgroundColor: '#00aa87',
-                            borderColor: '#00aa87',
+                            label: 'Money Spent ($)',
+                            data: [totalSpent],
+                            backgroundColor: ['#00aa87'],
+                            borderColor: ['#00aa87'],
                             borderWidth: 1
                         }]
                     },
                     options: {
                         responsive: true,
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                ticks: {
-                                    stepSize: 1
-                                }
-                            }
-                        },
                         plugins: {
                             legend: {
                                 display: false
                             },
                             tooltip: {
                                 callbacks: {
-                                    label: function (tooltipItem) {
-                                        return 'Deliveries: ' + tooltipItem.raw;
-                                    }
+                                    label: (tooltipItem) => `$${tooltipItem.raw.toFixed(2)}`
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Amount ($)'
                                 }
                             }
                         }
                     }
                 });
             } catch (error) {
-                console.error('Error fetching monthly deliveries:', error);
+                console.error('Error rendering Total Spending Chart:', error);
             }
         }
-        async function fetchDeliverySuccessRate() {
+
+        async function renderPriceDifferenceChart() {
             try {
-                const response = await fetch('/Clients/GetDeliveryTimes');
+                const response = await fetch('/Clients/GetRequestPriceDifferences');
+                if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
                 const data = await response.json();
+                console.log('API Response:', data); 
 
-                const successRate = data.successRate || 0;
-                const failureRate = 100 - successRate;
-                const averageDelay = data.averageDelay || 0;
+                const labels = data.map(item => item.offerReference || 'Unknown');
+                const approxPrices = data.map(item => item.approximatePrice || 0);
+                const finalPrices = data.map(item => item.finalPrice || 0);
 
-                const ctx = document.getElementById('successRateChart').getContext('2d');
+                const ctx = document.getElementById('priceDifferenceChart').getContext('2d');
                 new Chart(ctx, {
-                    type: 'radar',
+                    type: 'bar',
                     data: {
-                        labels: ['Success', 'Failure'], 
-                        datasets: [{
-                            label: 'Delivery Rates',
-                            data: [successRate, failureRate],
-                            backgroundColor: '#FF6384',
-                            borderColor: '#FF6384',
-                            borderWidth: 2
-                        }]
+                        labels: labels,
+                        datasets: [
+                            {
+                                label: 'Approximate Price',
+                                data: approxPrices,
+                                backgroundColor: '#00aa87',
+                                borderColor: '#00aa87',
+                                borderWidth: 1
+                            },
+                            {
+                                label: 'Final Price',
+                                data: finalPrices,
+                                backgroundColor: '#FF6384',
+                                borderColor: '#FF6384',
+                                borderWidth: 1
+                            }
+                        ]
                     },
                     options: {
                         responsive: true,
                         scales: {
-                            r: {
-                                angleLines: {
-                                    display: true
-                                },
-                                beginAtZero: true
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Price ($)'
+                                }
                             }
                         },
                         plugins: {
                             legend: {
-                                position: 'top',
+                                position: 'top'
                             }
                         }
                     }
                 });
-
-                document.getElementById('averageDelay').innerText =
-                    `Average delay time: ${averageDelay.toFixed(2)} hrs`;
-
             } catch (error) {
-                console.error('Error fetching delivery success rate:', error);
+                console.error('Error rendering Price Difference Chart:', error);
             }
-        }
-        window.onload = async function () {
-            await fetchDeliverySuccessRate();
-            await fetchMonthlyDeliveries();
-            await fetchDeliveryCounts();
-        };
-    </script>
+        }</script>
 </body>
 
 </html>

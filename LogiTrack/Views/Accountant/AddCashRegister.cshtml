@@ -20,6 +20,13 @@
             padding: 20px;
             box-shadow: 0 0 25px 1px #0000000f !important;
         }
+
+        .search-item h3 {
+            margin-top: 30px;
+            font-size: 0.9rem;
+            margin-bottom: 50px;
+            font-weight: 500;
+        }
         .search-header {
             display: flex;
             align-items: center;
@@ -27,7 +34,7 @@
         }
 
         .search-icon {
-            width: 50px;
+            width: 40px;
             margin-right: 10px;
         }
 
@@ -36,7 +43,7 @@
             font-weight: 500;
         }
 
-        .search-delivery h3 {
+        .search-container h3 {
             margin-top: 30px;
             font-size: 1rem;
             margin-bottom: 50px;
@@ -91,6 +98,12 @@
         .file {
             margin-bottom: 30px;
         }
+
+            .file label {
+                display: block;
+                margin-bottom: 10px;
+                margin-top: 5px;
+            }
     </style>
 </head>
 
@@ -114,21 +127,43 @@
     </header>
     <aside class="sidebar">
         <ul>
-            <li><a asp-action="Dashboard" asp-controller="Accountant"><i class="bi bi-house-door"></i> Dashboard</a></li>
             <li>
-                <a asp-action="SearchDeliveries" asp-controller="Accountant"><i class="bi bi-truck"></i> Deliveries</a>
+                <a asp-action="Dashboard" asp-controller="Accountant">
+                    <i class="bi bi-house-door"></i> Dashboard
+                </a>
             </li>
             <li>
-                <a asp-action="SearchCashRegisters" asp-controller="Accountant"><i class="bi bi-money"></i> Cash registers <span class="arrow">></span></a>
+                <a asp-action="SearchDeliveries" asp-controller="Accountant">
+                    <i class="bi bi-truck"></i> Deliveries <span class="arrow">></span>
+                </a>
                 <div class="dropdown-menu">
                     <ul>
-                        <li><a asp-action="SearchDelivery" asp-controller="Accountant">New</a></li>
-                        <li><a asp-action="SearchCashRegisters" asp-controller="Accountant">Search</a></li>
+                        <li><a asp-action="SearchDeliveries" asp-controller="Accountant"><i class="bi bi-list"></i> All</a></li>
+                        <li><a asp-action="SearchDelivery" asp-controller="Accountant"><i class="bi bi-search"></i> Search</a></li>
                     </ul>
                 </div>
             </li>
             <li>
-                <a asp-action="SearchInvoices" asp-controller="Accountant"><i class="bi bi-money"></i> Invoices</a>
+                <a asp-action="SearchCashRegisters" asp-controller="Accountant">
+                    <i class="bi bi-cash"></i> Cash registers <span class="arrow">></span>
+                </a>
+                <div class="dropdown-menu">
+                    <ul>
+                        <li><a asp-action="SearchCashRegisters" asp-controller="Accountant"><i class="bi bi-list"></i> All</a></li>
+                        <li><a asp-action="CashRegistersStatistics" asp-controller="Accountant"><i class="bi bi-bar-chart"></i> Statistics</a></li>
+                    </ul>
+                </div>
+            </li>
+            <li>
+                <a asp-action="SearchInvoices" asp-controller="Accountant">
+                    <i class="bi bi-receipt"></i> Invoices <span class="arrow">></span>
+                </a>
+                <div class="dropdown-menu">
+                    <ul>
+                        <li><a asp-action="SearchInvoices" asp-controller="Accountant"><i class="bi bi-list"></i> All</a></li>
+                        <li><a asp-action="InvoicesStatistics" asp-controller="Accountant"><i class="bi bi-bar-chart"></i> Statistics</a></li>
+                    </ul>
+                </div>
             </li>
         </ul>
     </aside>
@@ -142,35 +177,34 @@
 
             <form asp-action="AddCashRegister" asp-route-id="@Model.DeliveryId" method="post" enctype="multipart/form-data">
                 <div class="form-group">
-                    <label asp-for="Description"></label>
+                    <label asp-for="Description"><b>Description</b></label>
                     <input asp-for="Description" type="text" placeholder="Please enter">
                     <span asp-validation-for="Description" class="validation-message"></span>
                 </div>
                 <div class="form-group">
-                    <label asp-for="Type"></label>
+                    <label asp-for="Type"><b>Type</b></label>
                     <input asp-for="Type" list="cargoTypeOptions" placeholder="Please enter or select">
                     <datalist id="cargoTypeOptions">
-                        <option value="Vehicle Expenses"></option>
-                        <option value="Driver Expenses"></option>
-                        <option value="Other Expenses"></option>
+                        <option value="Refrigerated"></option>
+                        <option value="Solo"></option>
+                        <option value="Tent"></option>
                     </datalist>
                     <span asp-validation-for="Type" class="validation-message"></span>
                 </div>
-
                 <div class="form-group" id="customTypeGroup" style="display:none;">
                     <label asp-for="CustomType">Specify Type:</label>
                     <input type="text" id="customType" asp-for="CustomType" />
                 </div>
                 <div class="form-group">
-                    <label asp-for="Amount"></label>
-                    <input asp-for="Amount" type="text" />
+                    <label asp-for="Amount"><b>Amount</b></label>
+                    <input asp-for="Amount" type="text" placeholder="Please enter" />
                     <span asp-validation-for="Amount" class="validation-message"></span>
                 </div>
                 <div class="form-group file">
-                    <label for="file">Upload File:</label>
+                    <label for="file"><b>Upload file</b></label>
                     <input type="file" name="file" />
                 </div>
-                <button type="submit" class="btn-primary">ADD</button>
+                <button type="submit" class="btn-primary"><b>SUBMIT</b></button>
             </form>
         </div>
     </div>

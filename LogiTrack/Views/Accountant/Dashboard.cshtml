@@ -14,93 +14,7 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css">
     <script src="~/js/site.js"></script>
-    <style>
-        body {
-            font-family: 'Roboto', sans-serif;
-        }
-
-        .cards-container {
-            display: flex;
-            gap: 20px;
-            margin-bottom: 20px;
-        }
-
-        .card {
-            display: flex;
-            align-items: center;
-            background-color: white;
-            box-shadow: 0 0 25px 1px #0000000f !important;
-            width: calc((100% - 40px) / 3);
-            padding: 10px;
-            height: 90px;
-        }
-
-        .card-icon {
-            width: 60px;
-            height: 60px;
-            border-radius: 3px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 10px;
-        }
-
-            .card-icon img {
-                width: 50px;
-                height: auto;
-            }
-
-        .card-content {
-            flex-grow: 1;
-            padding: 0 10px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .card h3 {
-            margin: 0;
-            font-size: 1rem;
-            color: #404040;
-        }
-
-        .card p {
-            margin: 0;
-            font-size: 1.12rem;
-            color: #404040;
-        }
-
-        .card-button {
-            background-color: #1e87f0;
-            padding: 3px 7px;
-            color: white;
-            border: none;
-            border-radius: 20px;
-            text-align: center;
-            text-decoration: none;
-            cursor: pointer;
-            font-size: 0.75rem;
-            margin-bottom: 14px;
-            font-weight: 200;
-        }
-
-            .card-button:hover {
-                background-color: #167ac4;
-            }
-
-        .card-button-info {
-            display: flex;
-            flex-direction: column;
-            margin-bottom: 20px;
-            margin-right: 5px;
-        }
-
-            .card-button-info p {
-                font-size: 0.85rem;
-                margin-top: 48px;
-                opacity: 0.5;
-            }
-
+    <style>      
         .diagrams {
             display: flex;
             gap: 20px;
@@ -126,12 +40,6 @@
                 letter-spacing: revert;
             }
 
-        .see-all {
-            text-decoration: underline;
-            color: #707070;
-            font-size: 14px;
-        }
-
         .delivery {
             display: flex;
             gap: 70px;
@@ -150,12 +58,7 @@
                 margin: 0;
             }
 
-            .delivery-info .ref-number {
-                font-weight: bold;
-            }
-
         .addresses {
-            margin-left: 10px;
             font-size: 14px;
         }
 
@@ -172,66 +75,7 @@
         .pickup-address,
         .delivery-address {
             margin: 0;
-        }
-
-        .ref-num {
-            text-decoration: none;
-            color: black;
-            text-rendering: optimizelegibility;
-        }
-
-        .diagram-button {
-            display: block;
-            color: #00aa87;
-            border: 1px solid #00aa87;
-            padding: 5px 10px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-            margin-top: 50px;
-            text-align: center;
-            font-size: 0.8rem;
-            width: 90%;
-            text-decoration: none;
-        }
-
-        .paid-button {
-            background-color: #28a745;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            padding: 5px 10px;
-            cursor: default;
-            font-size: 0.85rem;
-        }
-
-        .invoice-header {
-            display: flex;
-            flex-direction: row;
-            gap: 70px;
-            font-size: 0.85rem;
-            white-space: nowrap;
-            margin-left: 15px;
-        }
-
-        .invoice {
-            display: flex;
-            flex-direction: row;
-            gap: 82px;
-            font-size: 0.85rem;
-            white-space: nowrap;
-            margin-left: 20px;
-        }
-
-        .paid-button {
-            background-color: #28a745;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            padding: 5px 10px;
-            cursor: default;
-            font-size: 0.85rem;
-        }
+        }        
     </style>
 
 </head>
@@ -256,21 +100,43 @@
     </header>
     <aside class="sidebar">
         <ul>
-            <li><a asp-action="Dashboard" asp-controller="Accountant"><i class="bi bi-house-door"></i> Dashboard</a></li>
             <li>
-                <a asp-action="SearchDeliveries" asp-controller="Accountant"><i class="bi bi-truck"></i> Deliveries</a>
+                <a asp-action="Dashboard" asp-controller="Accountant">
+                    <i class="bi bi-house-door"></i> Dashboard
+                </a>
             </li>
             <li>
-                <a asp-action="SearchCashRegisters" asp-controller="Accountant"><i class="bi bi-money"></i> Cash registers <span class="arrow">></span></a>
+                <a asp-action="SearchDeliveries" asp-controller="Accountant">
+                    <i class="bi bi-truck"></i> Deliveries <span class="arrow">></span>
+                </a>
                 <div class="dropdown-menu">
                     <ul>
-                        <li><a asp-action="SearchDelivery" asp-controller="Accountant">New</a></li>
-                        <li><a asp-action="SearchCashRegisters" asp-controller="Accountant">Search</a></li>
+                        <li><a asp-action="SearchDeliveries" asp-controller="Accountant"><i class="bi bi-list"></i> All</a></li>
+                        <li><a asp-action="SearchDelivery" asp-controller="Accountant"><i class="bi bi-search"></i> Search</a></li>
                     </ul>
                 </div>
             </li>
             <li>
-                <a asp-action="SearchInvoices" asp-controller="Accountant"><i class="bi bi-money"></i> Invoices</a>
+                <a asp-action="SearchCashRegisters" asp-controller="Accountant">
+                    <i class="bi bi-cash"></i> Cash registers <span class="arrow">></span>
+                </a>
+                <div class="dropdown-menu">
+                    <ul>
+                        <li><a asp-action="SearchCashRegisters" asp-controller="Accountant"><i class="bi bi-list"></i> All</a></li>
+                        <li><a asp-action="CashRegistersStatistics" asp-controller="Accountant"><i class="bi bi-bar-chart"></i> Statistics</a></li>
+                    </ul>
+                </div>
+            </li>
+            <li>
+                <a asp-action="SearchInvoices" asp-controller="Accountant">
+                    <i class="bi bi-receipt"></i> Invoices <span class="arrow">></span>
+                </a>
+                <div class="dropdown-menu">
+                    <ul>
+                        <li><a asp-action="SearchInvoices" asp-controller="Accountant"><i class="bi bi-list"></i> All</a></li>
+                        <li><a asp-action="InvoicesStatistics" asp-controller="Accountant"><i class="bi bi-bar-chart"></i> Statistics</a></li>
+                    </ul>
+                </div>
             </li>
         </ul>
     </aside>
@@ -278,7 +144,7 @@
         <div class="cards-container">
             <div class="card" id="locationCard">
                 <div class="card-icon">
-                    <img src="https://via.placeholder.com/50" alt="Location Icon">
+                    <i class="bi bi-truck" style="font-size: 50px; color: #00aa87;"></i>
                 </div>
                 <div class="card-content">
                     <h3>NEW DELIVERIES</h3>
@@ -287,19 +153,19 @@
             </div>
             <div class="card">
                 <div class="card-icon">
-                    <img src="https://via.placeholder.com/50" alt="Icon 1">
+                    <i class="bi bi-x-circle" style="font-size: 50px; color: #00aa87;"></i>
                 </div>
                 <div class="card-content">
                     <h3>UNPAID DELIVERIES</h3>
                     <p>@Model.NotPaidDeliveriesCount</p>
                 </div>
                 <div class="card-button-info">
-                    <a asp-action="SearchDeliveries" asp-controller="Accountant" class="card-button">See all</a>
+                    <a asp-action="SearchDeliveries" asp-controller="Accountant" class="card-button"><b>SEE</b></a>
                 </div>
             </div>
             <div class="card">
                 <div class="card-icon">
-                    <img src="https://via.placeholder.com/50" alt="Icon 2">
+                    <i class="bi bi-receipt" style="font-size: 50px; color: #00aa87;"></i>
                 </div>
                 <div class="card-content">
                     <h3>INVOICES</h3>
@@ -316,11 +182,17 @@
                     <h3>Deliveries</h3>
                     <a asp-action="SearchDeliveries" asp-controller="Accountant" class="see-all">See all</a>
                 </div>
+                <div class="invoice-header">
+                    <p><b>Ref No</b></p>
+                    <p><b>Addresses</b></p>
+                    <p><b>Client</b></p>
+                    <p><b>Paid</b></p>
+                </div>
                 @foreach (var item in Model.Last5NewDeliveries)
                 {
                     <div class="delivery">
                         <div class="delivery-info">
-                            <a asp-action="DeliveryDetails" asp-controller="Accountant" asp-route-id="@item.Id" class="ref-num">@item.ReferenceNumber</a>
+                            <a asp-action="DeliveryDetails" asp-controller="Accountant" asp-route-id="@item.Id" style="text-decoration:none; color:black;" class="ref-num">@item.ReferenceNumber</a>
                             <img src="~/dashboard_books_dots.svg" alt="Road" class="road-icon">
                             <div class="addresses">
                                 <p class="pickup-address">@item.PickupAddress</p>
@@ -328,7 +200,7 @@
                             </div>
                         </div>
                         <p class="client-company">@item.ClientCompanyName</p>
-                        <button class="paid-button" style="display:@(item.IsPaid == true ? "inline-block" : "none")">Paid</button>
+                        <i class="bi bi-check-circle-fill" style="color: #00aa87;"></i>
                     </div>
                 }
             </div>
@@ -338,14 +210,13 @@
                     <h3>Invoices</h3>
                     <a asp-action="SearchInvoices" asp-controller="Accountant" class="see-all">See All</a>
                     <h4 class="due-amount" style="color: #00aa87;">Due amount:</h4>
-                    <p style="font-size:0.9rem;">@Model.DueAmountForDeliveries</p>
+                    <p style="font-size:0.9rem; color: #707070;">@Model.DueAmountForDeliveries BGN</p>
                 </div>
                 <div class="invoice-header">
                     <p><b>Invoice No</b></p>
                     <p><b>Current Date</b></p>
                     <p><b>Invoice Date</b></p>
                     <p><b>Amount</b></p>
-
                 </div>
                 @foreach (var invoice in Model.Last5NotPaidInvoices)
                 {
@@ -353,7 +224,7 @@
                         <p>@invoice.InvoiceNumber</p>
                         <p>@invoice.Date</p>
                         <p>@invoice.CreationDate</p>
-                        <p>@invoice.Amount</p>
+                        <p>@invoice.Amount BGN</p>
                     </div>
                 }
             </div>

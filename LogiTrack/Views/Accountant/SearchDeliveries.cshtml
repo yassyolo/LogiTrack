@@ -1,4 +1,4 @@
-﻿@model LogiTrack.Core.ViewModels.Delivery.SearchDeliveryForAccountantViewModel
+﻿@model LogiTrack.Core.ViewModels.Delivery.FilterDeliveriesForAccountantViewModel
 @{
 Layout = null;
 }
@@ -236,37 +236,59 @@ Layout = null;
                 <span class="arrow">&#x25BC;</span>
             </button>
             <div class="profile-dropdown-menu" id="profileDropdown">
-                <a asp-action="DriverDetails" asp-controller="Driver">Personal details</a>
                 <a asp-action="Logout" asp-controller="Home">Logout</a>
             </div>
         </div>
     </header>
-
     <aside class="sidebar">
         <ul>
-            <li><a asp-action="Dashboard" asp-controller="Accountant"><i class="bi bi-house-door"></i> Dashboard</a></li>
             <li>
-                <a asp-action="SearchDeliveries" asp-controller="Accountant"><i class="bi bi-truck"></i> Deliveries</a>
+                <a asp-action="Dashboard" asp-controller="Accountant">
+                    <i class="bi bi-house-door"></i> Dashboard
+                </a>
             </li>
             <li>
-                <a asp-action="SearchCashRegisters" asp-controller="Accountant"><i class="bi bi-money"></i> Cash registers <span class="arrow">></span></a>
+                <a asp-action="SearchDeliveries" asp-controller="Accountant">
+                    <i class="bi bi-truck"></i> Deliveries <span class="arrow">></span>
+                </a>
                 <div class="dropdown-menu">
                     <ul>
-                        <li><a asp-action="SearchDelivery" asp-controller="Accountant">New cash register</a></li>
-                        <li><a asp-action="SearchCashRegisters" asp-controller="Accountant">Search</a></li>
+                        <li><a asp-action="SearchDeliveries" asp-controller="Accountant"><i class="bi bi-list"></i> All</a></li>
+                        <li><a asp-action="SearchDelivery" asp-controller="Accountant"><i class="bi bi-search"></i> Search</a></li>
                     </ul>
                 </div>
             </li>
             <li>
-                <a asp-action="SearchInvoices" asp-controller="Accountant"><i class="bi bi-money"></i> Invoices</a>
+                <a asp-action="SearchCashRegisters" asp-controller="Accountant">
+                    <i class="bi bi-cash"></i> Cash registers <span class="arrow">></span>
+                </a>
+                <div class="dropdown-menu">
+                    <ul>
+                        <li><a asp-action="SearchCashRegisters" asp-controller="Accountant"><i class="bi bi-list"></i> All</a></li>
+                        <li><a asp-action="CashRegistersStatistics" asp-controller="Accountant"><i class="bi bi-bar-chart"></i> Statistics</a></li>
+                    </ul>
+                </div>
+            </li>
+            <li>
+                <a asp-action="SearchInvoices" asp-controller="Accountant">
+                    <i class="bi bi-receipt"></i> Invoices <span class="arrow">></span>
+                </a>
+                <div class="dropdown-menu">
+                    <ul>
+                        <li><a asp-action="SearchInvoices" asp-controller="Accountant"><i class="bi bi-list"></i> All</a></li>
+                        <li><a asp-action="InvoicesStatistics" asp-controller="Accountant"><i class="bi bi-bar-chart"></i> Statistics</a></li>
+                    </ul>
+                </div>
             </li>
         </ul>
     </aside>
     <div class="main-content">
         <div class="container mt-5">
             <div class="quick-search-header">
-                <img src="https://via.placeholder.com/40" alt="Quick Search Icon" class="search-icon">
-                <h2 class="quick-search-title">Quick Search</h2>
+                <div class="search-icon">
+                    <i class="bi bi-search" style="font-size: 35px; color:#00aa87;"></i>
+                </div>              
+                <h2 class="quick-search-title">Quick deliveries search</h2>
             </div>
             <p class="search-description">Please enter your search criteria</p>
 
@@ -291,7 +313,7 @@ Layout = null;
                     </div>
                     <div class="form-group">
                         <label asp-for="IsPaid"><b>Paid</b></label>
-                        <input type="checkbox" id="IsPaid" asp-for="IsPaid">
+                        <input type="checkbox" id="IsPaid" value="false" asp-for="IsPaid">
                     </div>
                 </div>
                 <div class="button-group">
@@ -317,7 +339,8 @@ Layout = null;
                 <span>Origin</span>
                 <span>Destination</span>
                 <span>Client</span>
-                <span>Expected Date</span>
+                <span>Expected date</span>
+                <span>Delivery date</span>
                 <span>Paid</span>
             </div>
             @if (Model.Deliveries.Any())
@@ -332,10 +355,12 @@ Layout = null;
                                 <span class="address">@delivery.DeliveryAddress</span>
                                 <span>@delivery.ClientCompanyName</span>
                                 <span>@delivery.ExpectedDeliveryDate</span>
+                                <span>@delivery.ActualDeliveryDate</span>
+
                                 <span>
                                     @if (delivery.IsPaid)
                                     {
-                                        <p style="color: #00aa87;">Yes</p>
+                                        <i class="bi bi-check-circle-fill" style="color: #00aa87;"></i>
                                     }
                                 </span>
                             </div>
@@ -373,8 +398,6 @@ Layout = null;
                 dateFormat: "Y-m-d",
             });
         });
-
-
     </script>
 
 </body>

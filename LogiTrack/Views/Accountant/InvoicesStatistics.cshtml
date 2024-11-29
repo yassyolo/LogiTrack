@@ -1,0 +1,326 @@
+﻿@model LogiTrack.Core.ViewModels.Invoice.InvoiceStatisticsViewModel
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Driver Dashboard</title>
+    <link rel="stylesheet" href="~/css/site.css" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script src="~/js/site.js"></script>
+    <style>
+
+        .card h3 {
+            margin: 0;
+            font-size: 1.1rem;
+            color: #00aa87;
+        }
+        .chart-container {
+            background-color: white;
+            width: 100%;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .chart {
+            flex: 1;
+            max-width: 300px;
+            max-height: 400px;
+        }
+
+        .monthy-deliveries {
+            flex: 1;
+            max-width: 500px;
+            height: 500px;
+            margin-top: 50px;
+        }
+
+        .first-row {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 1000px;
+        }
+
+        .chart-container, .delay-time-container {
+            padding: 10px;
+        }
+
+        .chart-container {
+            margin-right: 30px;
+        }
+
+            h4, .stat-text  {
+                text-align: center;
+                color: #00aa87;
+            }
+
+        .delay {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+        }
+
+        .second-row {
+            margin-top: 50px;
+            width: 70%;
+            align-content: center;
+            margin-left: 300px;
+        }
+    </style>
+
+</head>
+
+<body>
+    <header class="header">
+        <div class="logo-name">
+            <div class="company-logo">
+                <img src="https://via.placeholder.com/50" alt="Company Logo">
+            </div>
+            <div class="company-name">LogiTrack</div>
+        </div>
+        <div class="profile-dropdown">
+            <button onclick="toggleDropdown()">
+                <i class="bi bi-person-circle"></i>
+                <span class="arrow">&#x25BC;</span>
+            </button>
+            <div class="profile-dropdown-menu" id="profileDropdown">
+                <a asp-action="Logout" asp-controller="Home">Logout</a>
+            </div>
+        </div>
+    </header>
+    <aside class="sidebar">
+        <ul>
+            <li>
+                <a asp-action="Dashboard" asp-controller="Accountant">
+                    <i class="bi bi-house-door"></i> Dashboard
+                </a>
+            </li>
+            <li>
+                <a asp-action="SearchDeliveries" asp-controller="Accountant">
+                    <i class="bi bi-truck"></i> Deliveries <span class="arrow">></span>
+                </a>
+                <div class="dropdown-menu">
+                    <ul>
+                        <li><a asp-action="SearchDeliveries" asp-controller="Accountant"><i class="bi bi-list"></i> All</a></li>
+                        <li><a asp-action="SearchDelivery" asp-controller="Accountant"><i class="bi bi-search"></i> Search</a></li>
+                    </ul>
+                </div>
+            </li>
+            <li>
+                <a asp-action="SearchCashRegisters" asp-controller="Accountant">
+                    <i class="bi bi-cash"></i> Cash registers <span class="arrow">></span>
+                </a>
+                <div class="dropdown-menu">
+                    <ul>
+                        <li><a asp-action="SearchCashRegisters" asp-controller="Accountant"><i class="bi bi-list"></i> All</a></li>
+                        <li><a asp-action="CashRegistersStatistics" asp-controller="Accountant"><i class="bi bi-bar-chart"></i> Statistics</a></li>
+                    </ul>
+                </div>
+            </li>
+            <li>
+                <a asp-action="SearchInvoices" asp-controller="Accountant">
+                    <i class="bi bi-receipt"></i> Invoices <span class="arrow">></span>
+                </a>
+                <div class="dropdown-menu">
+                    <ul>
+                        <li><a asp-action="SearchInvoices" asp-controller="Accountant"><i class="bi bi-list"></i> All</a></li>
+                        <li><a asp-action="InvoicesStatistics" asp-controller="Accountant"><i class="bi bi-bar-chart"></i> Statistics</a></li>
+                    </ul>
+                </div>
+            </li>
+        </ul>
+    </aside>
+    <div class="main-content">
+        <div class="chart-container">
+            <div class="cards-container">
+                <div class="card" id="locationCard">
+                    <div class="card-content">
+                        <h3>Paid amount</h3>
+                        <p><b>@Model.PaidAmount BGN</b></p>
+                    </div>
+                </div>
+                <div class="card" id="locationCard">
+                    <div class="card-content">
+                        <h3>Overdue amount</h3>
+                        <p><b>@Model.OverdueAmount BGN</b></p>
+                    </div>
+                </div>
+                <div class="card" id="locationCard">
+                    <div class="card-content">
+                        <h3>Average payment time</h3>
+                        <p><b>@Model.AveragePaymentTime</b></p>
+                    </div>
+                </div>
+                <div class="card" id="locationCard">
+                    <div class="card-content">
+                        <h3>Clients with overdue invoices</h3>
+                        <p><b>@Model.ClientsWithOverdueInvoices</b></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="first-row">
+                <div class="chart-container">
+                    <h4>Invoices status ratio</h4>
+                    <canvas style="margin-left:50px;"id="invoiceStatusChart" class="chart"></canvas>
+                </div>
+                <div class="delay-time-container">
+                    <h4>Top 10 clients wiht biggest overdue amounts</h4>
+                    <canvas id="overdueAmountChart"></canvas>
+                </div>
+            </div>
+            <div class="chart-container">
+            <h4>Top 10 clients with overdue payments for all times</h4>
+            <canvas id="latePaymentsChart" style="margin-left:310px;" class="chart"></canvas>
+            </div>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-gauge"></script>
+
+
+    <script>
+        async function fetchInvoiceStatusData() {
+            try {
+                const response = await fetch('/Accountant/GetInvoicesByStatus');
+                if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+
+                const data = await response.json();
+                console.log('Invoice status data:', data);
+
+                const statuses = Object.keys(data);
+                const counts = Object.values(data);
+
+                const ctx = document.getElementById('invoiceStatusChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: statuses,
+                        datasets: [{
+                            label: 'Invoices by Status',
+                            data: counts,
+                            backgroundColor: ['#FF6384', '#00aa87', '#FFCE56'],
+                            borderColor: ['#FF6384', '#00aa87', '#FFCE56'],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    stepSize: 1 
+                                }
+                            }
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error('Error fetching invoice status data:', error);
+            }
+        }
+
+        async function fetchTop10OverdueClients() {
+            try {
+                const response = await fetch('/Accountant/GetTop10ClientsByOverdueAmount');
+                if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+
+                const data = await response.json();
+                console.log('Top 10 overdue clients data:', data);
+
+                const companies = Object.keys(data);
+                const amounts = Object.values(data);
+
+                const ctx = document.getElementById('overdueAmountChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: companies,
+                        datasets: [{
+                            label: 'Total Overdue Amount',
+                            data: amounts,
+                            backgroundColor: '#FF6384',
+                            borderColor: '#FF6384',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            },
+                            x: {
+                                ticks: {
+                                    autoSkip: false,
+                                    maxRotation: 90,
+                                    minRotation: 45
+                                }
+                            }
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error('Error fetching overdue client data:', error);
+            }
+        }
+
+        async function fetchLatePaymentsByClient() {
+            try {
+                const response = await fetch('/Accountant/GetLatePaymentsByClient');
+                if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+
+                const data = await response.json();
+                console.log('Late payments by client data:', data);
+
+                const labels = Object.keys(data);
+                const values = Object.values(data);
+
+                const ctx = document.getElementById('latePaymentsChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Overdue Amounts',
+                            data: values,
+                            backgroundColor: '#00aa87',
+                            borderColor: '#C70039',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error('Error fetching late payments data:', error);
+            }
+        }
+
+        $(document).ready(function () {
+            fetchInvoiceStatusData();
+            fetchTop10OverdueClients();
+            fetchLatePaymentsByClient();
+        });
+    </script>
+</body>
+
+</html>
+
+

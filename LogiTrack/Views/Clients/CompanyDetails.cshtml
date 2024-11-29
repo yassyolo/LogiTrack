@@ -99,34 +99,43 @@
         <ul>
             <li><a asp-action="Dashboard" asp-controller="Clients"><i class="bi bi-house-door"></i> Dashboard</a></li>
             <li>
-                <a asp-action="MyRequests" asp-controller="Clients"><i class="bi bi-money"></i> Requests <span class="arrow">></span></a>
+                <a asp-action="MyRequests" asp-controller="Clients"><i class="bi bi-clipboard-check"></i> Requests <span class="arrow">></span></a>
                 <div class="dropdown-menu">
                     <ul>
-                        <li><a asp-action="MakeRequest" asp-controller="Clients">New</a></li>
-                        <li><a asp-action="MyRequests" asp-controller="Clients">Search</a></li>
+                        <li><a asp-action="MakeRequest" asp-controller="Clients"><i class="bi bi-plus-circle"></i> New</a></li>
+                        <li><a asp-action="MyRequests" asp-controller="Clients"><i class="bi bi-search"></i> Search</a></li>
+                        <li><a asp-action="RequestStatistics" asp-controller="Clients"><i class="bi bi-bar-chart"></i> Statistics</a></li>
                     </ul>
                 </div>
             </li>
             <li>
-                <a asp-action="MyOffers" asp-controller="Clients"><i class="bi bi-money"></i> Offers <span class="arrow">></span></a>
+                <a asp-action="MyOffers" asp-controller="Clients"><i class="bi bi-file-earmark-text"></i> Offers <span class="arrow">></span></a>
                 <div class="dropdown-menu">
                     <ul>
-                        <li><a asp-action="HaveOffer" asp-controller="Clients">Book</a></li>
-                        <li><a asp-action="MyOffers" asp-controller="Clients">Search</a></li>
+                        <li><a asp-action="HaveOffer" asp-controller="Clients"><i class="bi bi-calendar-check"></i> Book</a></li>
+                        <li><a asp-action="MyOffers" asp-controller="Clients"><i class="bi bi-search"></i> Search</a></li>
+                        <li><a asp-action="OfferStatistics" asp-controller="Clients"><i class="bi bi-bar-chart"></i> Statistics</a></li>
                     </ul>
                 </div>
             </li>
             <li>
-                <a asp-action="MyDeliveries" asp-controller="Clients"><i class="bi bi-money"></i> Deliveries <span class="arrow">></span></a>
+                <a asp-action="MyDeliveries" asp-controller="Clients"><i class="bi bi-truck"></i> Deliveries <span class="arrow">></span></a>
                 <div class="dropdown-menu">
                     <ul>
-                        <li><a asp-action="SearchDelivery" asp-controller="Clients">Track</a></li>
-                        <li><a asp-action="MyDeliveries" asp-controller="Clients">Search</a></li>
+                        <li><a asp-action="SearchDelivery" asp-controller="Clients"><i class="bi bi-binoculars"></i> Track</a></li>
+                        <li><a asp-action="MyDeliveries" asp-controller="Clients"><i class="bi bi-search"></i> Search</a></li>
+                        <li><a asp-action="DeliveryStatistics" asp-controller="Clients"><i class="bi bi-bar-chart"></i> Statistics</a></li>
                     </ul>
                 </div>
             </li>
             <li>
-                <a asp-action="MyInvoices" asp-controller="Clients"><i class="bi bi-money"></i> Invoices <span class="arrow">></span></a>
+                <a asp-action="MyInvoices" asp-controller="Clients"><i class="bi bi-receipt"></i> Invoices <span class="arrow">></span></a>
+                <div class="dropdown-menu">
+                    <ul>
+                        <li><a asp-action="MyInvoices" asp-controller="Clients"><i class="bi bi-search"></i> Search</a></li>
+                        <li><a asp-action="InvoicesStatistics" asp-controller="Clients"><i class="bi bi-bar-chart"></i> Statistics</a></li>
+                    </ul>
+                </div>
             </li>
         </ul>
     </aside>
