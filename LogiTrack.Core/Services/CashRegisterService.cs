@@ -1,6 +1,5 @@
 ﻿using LogiTrack.Core.Contracts;
 using LogiTrack.Core.CustomExceptions;
-using LogiTrack.Core.ViewModels.Accountant;
 using LogiTrack.Core.ViewModels.CashRegister;
 using LogiTrack.Infrastructure.Repository;
 using Microsoft.EntityFrameworkCore;
@@ -57,9 +56,9 @@ namespace LogiTrack.Core.Services
             delivery.Profit -= model.Amount;
             await repository.SaveChangesAsync();
         }
-        public async Task<List<CashRegisterIndexViewModel>> GetCashRegistersForDeliveryAsync(string? referenceNumber = null, DateTime? startDate = null, DateTime? endDate = null, string? type = null)
+
+        public async Task<List<CashRegisterIndexViewModel>> GetCashRegistersAsync(string? referenceNumber = null, DateTime? startDate = null, DateTime? endDate = null, string? type = null, decimal? minPrice = null, decimal? maxPrice = null)
         {
-            //TODO: add file url
             var cashRegisters = await repository.AllReadonly<Infrastructure.Data.DataModels.CashRegister>()
                 .Include(x => x.Delivery).ToListAsync();
             if (startDate != null)
@@ -78,17 +77,31 @@ namespace LogiTrack.Core.Services
             {
                 cashRegisters = cashRegisters.Where(x => x.Type == type).ToList();
             }
-            return cashRegisters.Select(x => new CashRegisterIndexViewModel
+            if (minPrice != null)
+            {
+                cashRegisters = cashRegisters.Where(x => x.Amount >= minPrice).ToList();
+            }
+            if (maxPrice != null)
+            {
+                cashRegisters = cashRegisters.Where(x => x.Amount <= maxPrice).ToList();
+            }
+            var carshregistersToShow =  cashRegisters.Select(x => new CashRegisterIndexViewModel
             {
                 Id = x.Id,
                 Type = x.Type,
+                DeliveryId = x.DeliveryId,
                 Amount = x.Amount.ToString(),
                 Description = x.Description,
                 DateSubmitted = x.DateSubmitted.ToString("dd-MM-yyyy"),
                 DeliveryReferenceNumber = x.Delivery.ReferenceNumber,
+                FileId = x.FileId
             }).ToList();
-        }
 
-
+            foreach (var register in carshregistersToShow)
+            {
+                register.FileUrl = await googleDriveService.GetFileUrlAsync(register.FileId);
+            }
+            return carshregistersToShow;
+        }      
     }
 }

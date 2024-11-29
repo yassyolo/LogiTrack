@@ -1,5 +1,4 @@
 ﻿using System.Net.Http.Json;
-using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace LogiTrack.Core.Services
@@ -55,19 +54,19 @@ namespace LogiTrack.Core.Services
         private class Result
         {
             [JsonPropertyName("address_components")]
-            public List<AddressComponent> AddressComponents { get; set; }
+            public List<AddressComponent> AddressComponents { get; set; } = null!;
 
             [JsonPropertyName("formatted_address")]
-            public string FormattedAddress { get; set; }
+            public string FormattedAddress { get; set; } = string.Empty;
 
             [JsonPropertyName("geometry")]
-            public Geometry Geometry { get; set; }
+            public Geometry Geometry { get; set; } = null!;
 
             [JsonPropertyName("place_id")]
             public string PlaceId { get; set; } = string.Empty;
 
             [JsonPropertyName("types")]
-            public List<string> Types { get; set; }
+            public List<string> Types { get; set; } = null!;
         }
         public class AddressComponent
         {
@@ -104,10 +103,10 @@ namespace LogiTrack.Core.Services
         public class Viewport
         {
             [JsonPropertyName("northeast")]
-            public Coordinates Northeast { get; set; }
+            public Coordinates Northeast { get; set; } = null!;
 
             [JsonPropertyName("southwest")]
-            public Coordinates Southwest { get; set; }
+            public Coordinates Southwest { get; set; } = null!;
         }
 
         public class Coordinates

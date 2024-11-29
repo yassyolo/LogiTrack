@@ -1,10 +1,7 @@
 ﻿using LogiTrack.Core.Contracts;
-using MailKit.Net.Smtp;
 using Microsoft.Extensions.Configuration;
-using MimeKit;
 using SendGrid;
 using SendGrid.Helpers.Mail;
-using System.Net.Mail;
 
 
 namespace LogiTrack.Core.Services

@@ -8,7 +8,7 @@ namespace LogiTrack.Core.Services
     public class GoogleDriveService : IGoogleDriveService
     {
         private readonly string serviceAccountJson = @"{
-test
+ test
 }";
 
 
