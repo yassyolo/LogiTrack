@@ -56,5 +56,6 @@ namespace LogiTrack.Infrastructure
         public DbSet<Address> Addresses { get; set; } = null!;
         public DbSet<Rating> Ratings { get; set; } = null!;
         public DbSet<ReservedForDelivery> ReservedForDeliveries { get; set; } = null!;
+        public DbSet<Notification> Notifications { get; set; } = null!;
     }
 }

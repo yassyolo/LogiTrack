@@ -46,6 +46,5 @@ namespace LogisticsSystem.Infrastructure.Data.DataModels
         public Delivery? Delivery { get; set; } = null;
 
         public string OfferNumber { get; set; } = string.Empty;
-        public DateTime StartDate { get; set; }
     }
 }

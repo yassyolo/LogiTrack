@@ -60,7 +60,6 @@ namespace LogiTrack.Infrastructure.Data.DataModels
 
         public int DeliveryStep { get; set; }
 
-        //make it nullable
         public DateTime? ActualDeliveryDate { get; set; }
 
         [Comment("Invoice")]
@@ -73,5 +72,7 @@ namespace LogiTrack.Infrastructure.Data.DataModels
         [Comment("Carbon emission blueprint (in kg CO2)")]
         [Range(0, double.MaxValue)]
         public double CarbonEmission { get; set; }
+
+        public DateTime SuggestedDate { get; set; }        
     }
 }
