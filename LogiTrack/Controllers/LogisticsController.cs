@@ -1,4 +1,5 @@
-﻿using LogiTrack.Core.Contracts;
+﻿using LogiTrack.Core.Constants;
+using LogiTrack.Core.Contracts;
 using LogiTrack.Core.ViewModels.CashRegister;
 using LogiTrack.Core.ViewModels.Clients;
 using LogiTrack.Core.ViewModels.Delivery;
@@ -90,9 +91,7 @@ namespace LogiTrack.Controllers
             }
             var model = await clientsService.GetNewCompanyDetailsForLogisticsAsync(id);
             return View(model);
-        }
-
-        [HttpPut]
+        }     
         public async Task<IActionResult> ApprovePendingRegistration(int id)
         {
             if (await clientsService.CompanyWithIdExistsAsync(id) == false)
@@ -100,14 +99,15 @@ namespace LogiTrack.Controllers
                 return BadRequest(ClientCompanyNotFoundErrorMessage);
             }
             var user = await userService.ApprovePendingRegistrationForCompanyWithIdAsync(id);
+            await userManager.AddToRoleAsync(user, UserRolesConstants.ClientCompany);
             var generatedPassword = GenerateRandomPassword();
             var result = await userManager.AddPasswordAsync(user, generatedPassword);
             if (result.Succeeded)
             {
                 var token = await userManager.GenerateEmailConfirmationTokenAsync(user);
-                var confirmationLink = Url.Action(nameof(ConfirmEmail), "Logistics", new { userId = user.Id, token = token }, Request.Scheme);
+                var confirmationLink = Url.Action("Login", "Home", new { userId = user.Id, token = token }, Request.Scheme);
 
-                var emailBody = $"<h1>Confirm Your Email</h1><p>Please confirm your email by clicking the link: <a href='{confirmationLink}'>Confirm Email</a></p>";
+                var emailBody = $"<h1>Successful registration</h1><p>Welcome on board of LogiTrack! You can now request services and enjoy the full logistics journey! </p><p>You can access the platform with username: {user.UserName} and password: {generatedPassword}. It is recommended to change the password as soon as your first login.</p> <p><a href='{confirmationLink}'>Go to login</a></p>";
                 await emailSenderService.SendEmailAsync(user.Email, "Email Confirmation", emailBody);
             }
             else
@@ -130,26 +130,7 @@ namespace LogiTrack.Controllers
             await clientsService.RejectPendingRegistrationForCompanyWithIdAsync(id);
                       
             return RedirectToAction(nameof(GetPendingRegistrations));
-        }
-
-        public async Task<IActionResult> ConfirmEmail(string userId, string token)
-        {
-            if (userId == null || token == null)
-            {
-                return BadRequest();
-            }
-            var user = await userManager.FindByIdAsync(userId);
-            if (user == null)
-            {
-                return BadRequest();
-            }
-            var result = userManager.ConfirmEmailAsync(user, token);
-            if (result.Result.Succeeded)
-            {
-                return RedirectToAction(nameof(GetPendingRegistrations));
-            }
-            return RedirectToAction(nameof(GetPendingRegistrations));
-        }
+        }       
 
         [HttpGet]
         public async Task<IActionResult> ClientsRegister([FromQuery] FilterClientsViewModel query)
@@ -294,7 +275,7 @@ namespace LogiTrack.Controllers
         }
 
         [HttpGet]
-        public async Task<JsonResult> GetDeliveryTypes() //TODO:add company username
+        public async Task<JsonResult> GetDeliveryTypes() 
         {
             //var companyUsername = User.GetUsername();
             var username = "clientcompany1";
@@ -331,6 +312,7 @@ namespace LogiTrack.Controllers
             return Json(new { totalRevenue = model });
         }
         
+        //TODO:Driverstats
         [HttpGet]
         public async Task<JsonResult> GetVehicleCostsDataForVehicle(int id)
         {

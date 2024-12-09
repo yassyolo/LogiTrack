@@ -93,8 +93,12 @@ namespace LogiTrack.Controllers
                 ModelState.AddModelError("PhoneNumber", PhoneNumberAlreadyExistsErrorMessage);
                 return View(model);
             }
+            if (await userService.UserWithPhoneNumberExistsAsync(model.AlternativePhoneNumber))
+            {
+                ModelState.AddModelError("AlternativePhoneNumber", PhoneNumberAlreadyExistsErrorMessage);
+                return View(model);
+            }
             var user = await userService.RegisterUserAsync(model);
-            await userManager.AddToRoleAsync(user, ClientCompany);
             await userService.RegisterClientCompanyAsync(model, user);
 
             return RedirectToAction(nameof(SuccessfullRegistration));
@@ -294,6 +298,7 @@ namespace LogiTrack.Controllers
                 }
             }
             var result = await userManager.ChangePasswordAsync(user, model.CurrentPassword, model.NewPassword);
+         
             if (result.Succeeded)
             {
                 return RedirectToAction(nameof(CompanyDetails));
@@ -542,7 +547,7 @@ namespace LogiTrack.Controllers
              *{
              *  return BadRequest(ClientCompanyNotFoundErrorMessage);
              }*/
-            var model = await statisticsService.GetRequestStatisticsForCompanyAsync("clientcompany1");
+            var model = await statisticsService.GetRequestStatisticsForCompanyAsync(username);
             return View(model);
         }
 

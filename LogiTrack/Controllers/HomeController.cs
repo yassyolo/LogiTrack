@@ -1,4 +1,5 @@
 ﻿using LogiTrack.Core.Contracts;
+using LogiTrack.Core.Services;
 using LogiTrack.Core.ViewModels.Home;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -14,14 +15,16 @@ namespace LogiTrack.Controllers
         private readonly SignInManager<IdentityUser> signInManager;
         private readonly RoleManager<IdentityRole> roleManager;
         private readonly IHomeService homeService;
+        private readonly IUserService userService;
 
-        public HomeController(ILogger<HomeController> logger, UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager, RoleManager<IdentityRole> roleManager, IHomeService homeService)
+        public HomeController(ILogger<HomeController> logger, UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager, RoleManager<IdentityRole> roleManager, IHomeService homeService, IUserService userService)
         {
             this.logger = logger;
             this.userManager = userManager;
             this.signInManager = signInManager;
             this.roleManager = roleManager;
             this.homeService = homeService;
+            this.userService = userService;
         }
 
         [HttpGet]
@@ -88,6 +91,40 @@ namespace LogiTrack.Controllers
         {
             await signInManager.SignOutAsync();
             return RedirectToAction(nameof(Login));
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Notifications()
+        {
+            //var username = User.GetUsername();
+            var username = "logistics";
+            if (await userService.LogisticsUserWithUsernameExistsAsync(username) == false)
+            {
+                return BadRequest("Not found");
+            }
+            var model = await userService.GetNotificationsForUserAsync(username);
+            return View(model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> MarkAsRead(int id)
+        {
+            //var username = User.GetUsername();
+            var username = "logistics";
+            if (await userService.LogisticsUserWithUsernameExistsAsync(username) == false)
+            {
+                return BadRequest("Not found");
+            }
+            if(await userService.NotificationWithIdExistsForUserAsync(id, username) == false)
+            {
+                return Unauthorized();
+            }
+            if(await homeService.NotificationWithIdExistsdAsync(id) == false)
+            {
+                return BadRequest();
+            }
+            await homeService.MarkNotificationAsReadAsync(id);
+            return RedirectToAction(nameof(Notifications));
         }
     }
 }

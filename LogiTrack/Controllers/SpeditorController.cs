@@ -9,6 +9,9 @@ using static LogiTrack.Core.Helpers.RandomPasswordGenerator;
 using LogiTrack.Core.ViewModels.Vehicle;
 using LogiTrack.Core.ViewModels.FuelPrice;
 using LogiTrack.Core.ViewModels.Offer;
+using LogiTrack.Core.Services;
+using LogiTrack.Core.ViewModels.Request;
+using static iText.StyledXmlParser.Jsoup.Select.Evaluator;
 
 namespace LogiTrack.Controllers
 {
@@ -24,6 +27,7 @@ namespace LogiTrack.Controllers
         private readonly IStatisticsService statisticsService;
         private readonly IDashboardService dashboardService;
         private IFuelPriceService fuelPriceService;
+        private IRequestService requestService;
 
         public SpeditorController(IVehicleService vehicleService, IClientsService clientsService, IUserService userService, IDeliveryService deliveryService, IDriverService driverService, UserManager<IdentityUser> userManager, IOfferService offerService, IStatisticsService statisticsService, IDashboardService dashboardService, IFuelPriceService fuelPriceService)
         {
@@ -55,6 +59,30 @@ namespace LogiTrack.Controllers
             query.Clients = model;
 
             return View(query);
+        }
+
+        [HttpGet]
+        public IActionResult SearchCompany()
+        {
+            var model = new SearchCompanyByRegistrationNumberViewModel();
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SearchCompany(SearchCompanyByRegistrationNumberViewModel model)
+        {
+            if (ModelState.IsValid == false)
+            {
+                return View(model);
+            }
+            var companyId = await clientsService.GetCompanyIdByRegistrationNumberAsync(model.RegistrationNumber);
+            if (companyId == default)
+            {
+                TempData["NotFound"] = "Company not found";
+                return View(model);
+            }
+            return RedirectToAction(nameof(ClientDetails), new { id = companyId });
         }
 
         [HttpGet]
@@ -446,6 +474,73 @@ namespace LogiTrack.Controllers
             }
 
             return RedirectToAction(nameof(OfferDetails), new { id = offerId });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> PendingRequests([FromQuery] AllPendingRequestsViewModel query)
+        {
+            var model = await requestService.GetPendingRequestsAsync(query.SharedTruck, query.StartDate, query.EndDate, query.MinWeight, query.MaxWeight, query.MinVolume, query.MaxVolume, query.PickupAddress, query.DeliveryAddress);
+            query.Requests = model;
+            return View(model);
+        }
+
+        [HttpGet]
+        public IActionResult SearchRequest()
+        {
+            var model = new SearchRequestByReferenceNumberViewModel();
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SearchRequest(SearchRequestByReferenceNumberViewModel model)
+        {
+            if (ModelState.IsValid == false)
+            {
+                return View(model);
+            }
+            var requestId = await requestService.GetRequestIdByReferenceNumberAsync(model.ReferenceNumber);
+            if (requestId == default)
+            {
+                TempData["NotFound"] = "Request not found.";
+                return View(model);
+            }
+
+            return RedirectToAction(nameof(RequestDetails), new { id = requestId });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> RequestDetails(int id)
+        {
+            if (await requestService.RequestWithIdExistsAsync(id) == false)
+            {
+                return BadRequest(RequestNotFoundErrorMessage);
+            }
+
+            var model = await requestService.GetRequestDetailsForLogisticsAsync(id);
+            return View(model);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> RequestsRegister([FromQuery] FilterRequestsForLogisticsViewModel query)
+        {
+            /*var companyUsername = User.GetUsername();
+            if (await clientsService.UserWithEmailExistsAsync(companyUsername) == false)
+            {
+                return BadRequest(ClientCompanyNotFoundErrorMessage);
+            }*/
+
+            var model = await requestService.GetRequestsForLogisticsAsync(query.StartDate, query.EndDate, query.IsApproved, query.SharedTruck, query.MinWeight, query.MaxWeight, query.MinPrice, query.MaxPrice, query.PickupAddress, query.DeliveryAddress);
+            query.Requests = model;
+            model = await requestService.GetRequestsForLogisticsBySearchTermAsync(query.SearchTerm);
+            query.Requests = model;
+            return View(query);
+        }
+        [HttpGet]
+        public async Task<IActionResult> PendingRequestDetails(int id)
+        {
+            var model = await requestService.GetPendingRequestDetailsAsync(id);
+            return View(model);
         }
     }
 }

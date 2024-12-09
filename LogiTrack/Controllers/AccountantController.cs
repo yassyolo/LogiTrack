@@ -222,6 +222,5 @@ namespace LogiTrack.Controllers
             var data = await deliveryStatisticsService.GetLatePaymentsByClientAsync();
             return Json(data);
         }
-
     }
 }
