@@ -43,7 +43,7 @@ namespace LogiTrack.Core.Services
                      Country = x.Address.County,
                      CreatedAt = x.CreatedAt.ToString("dd-MM-yyyy"),                     
                  })
-                 .FirstOrDefaultAsync();
+                 .SingleOrDefaultAsync();
         }
 
         public async Task<List<PendingRegistrationsViewModel>?> GetPendingRegistrationsAsync()
@@ -83,7 +83,7 @@ namespace LogiTrack.Core.Services
                      PhoneNumber = x.User.PhoneNumber,
                      Email = x.User.Email
                  })
-                 .FirstOrDefaultAsync();
+                 .SingleOrDefaultAsync();
         }       
 
         public async Task<NewCompanyDetailsForLogisticsViewModel?> GetNewCompanyDetailsForLogisticsAsync(int id)
@@ -105,45 +105,47 @@ namespace LogiTrack.Core.Services
                     City = x.Address.City,
                     PostalCode = x.Address.PostalCode,
                     Country = x.Address.County,
-                    CreatedAt = x.CreatedAt.ToString("dd/MM/yyyy"),
+                    CreatedAt = x.CreatedAt.ToString("dd-MM-yyyy"),
                 })
                 .FirstOrDefaultAsync();
         }
 
         public async Task<List<ClientsForClientregisterViewModel>> GetClientsForClientsRegisterAsync(bool? active = null, string? name = null, string? email = null, string? registrationNumber = null, string? phoneNumber = null)
         {
-            var clients = await repository.AllReadonly<LogisticsSystem.Infrastructure.Data.DataModels.ClientCompany>()
-                .Where(x => x.RegistrationStatus == StatusConstants.Approved)
-                .Include(x => x.Address).Include(x => x.User).ToListAsync();
+            var query = repository.AllReadonly<LogisticsSystem.Infrastructure.Data.DataModels.ClientCompany>().Where(x => x.RegistrationStatus == StatusConstants.Approved)
+                .Include(x => x.Address).Include(x => x.User).AsQueryable();
+
             if (active == true)
             {
                 var deliveriesForClientsIds = await repository.AllReadonly<LogiTrack.Infrastructure.Data.DataModels.Delivery>().OrderByDescending(x => x.Offer.FinalPrice).Select(x => x.Offer.Request.ClientCompanyId).Take(10).ToListAsync();
-                clients = clients.Where(x => deliveriesForClientsIds.Contains(x.Id)).ToList();
+                query = query.Where(x => deliveriesForClientsIds.Contains(x.Id));
             }
             if(string.IsNullOrEmpty(phoneNumber) == false)
             {
-                clients = clients.Where(x => x.User.PhoneNumber.Contains(phoneNumber)).ToList();
+                query = query.Where(x => x.User.PhoneNumber.Contains(phoneNumber));
             }
             if (string.IsNullOrEmpty(name) == false)
             {
-                clients = clients.Where(x => x.Name.ToLower().Contains(name.ToLower())).ToList();
+                query = query.Where(x => x.Name.ToLower().Contains(name.ToLower()));
             }
             if (string.IsNullOrEmpty(email) == false)
             {
-                clients = clients.Where(x => x.User.Email.ToLower().Contains(email.ToLower())).ToList();
+                query = query.Where(x => x.User.Email.ToLower().Contains(email.ToLower()));
             }
             if (string.IsNullOrEmpty(registrationNumber) == false)
             {
-                clients = clients.Where(x => x.RegistrationNumber.ToLower() == (registrationNumber.ToLower())).ToList();
+                query = query.Where(x => x.RegistrationNumber.ToLower() == (registrationNumber.ToLower()));
             }
+
+            var clients = await query.ToListAsync();
             return clients.Select(x => new ClientsForClientregisterViewModel
             {
                 Id = x.Id,
                 Name = x.Name,
                 RegisterNumber = x.RegistrationNumber,
                 Address = $"{x.Address.Street}, {x.Address.City}, {x.Address.County}",
-                Email = x.User.Email,
-                Phone = x.User != null ? x.User.PhoneNumber : string.Empty
+                //Email = x.User.Email,
+                //Phone = x.User != null ? x.User.PhoneNumber : string.Empty
             }).ToList();
         }
 

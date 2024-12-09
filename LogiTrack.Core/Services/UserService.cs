@@ -1,6 +1,7 @@
 ﻿using LogiTrack.Core.Constants;
 using LogiTrack.Core.Contracts;
 using LogiTrack.Core.ViewModels.Clients;
+using LogiTrack.Core.ViewModels.Notifications;
 using LogiTrack.Infrastructure.Data.DataModels;
 using LogiTrack.Infrastructure.Repository;
 using Microsoft.AspNetCore.Identity;
@@ -84,6 +85,23 @@ namespace LogiTrack.Core.Services
         public async Task<string> GetCompanyUsernameByIdAsync(int id)
         {
             return await repository.AllReadonly<LogisticsSystem.Infrastructure.Data.DataModels.ClientCompany>().Where(x => x.Id == id).Select(x => x.User.UserName).FirstOrDefaultAsync();
+        }
+
+        public async Task<List<NotificationViewModel>?> GetNotificationsForUserAsync(string username)
+        {
+            return await repository.AllReadonly<Notification>().Where(x => x.User.UserName == username).Select(x => new NotificationViewModel
+            {
+                Id = x.Id,
+                Message = x.Message,
+                Title = x.Title,
+                Date = x.Date.ToString("dd-MM-yyyy"),
+                IsRead = x.IsRead
+            }).ToListAsync();
+        }
+
+        public async Task<bool> NotificationWithIdExistsForUserAsync(int id, string username)
+        {
+            return await repository.AllReadonly<Notification>().AnyAsync(x => x.Id == id && x.User.UserName == username);
         }
     }
 }

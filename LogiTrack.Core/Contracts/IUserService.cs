@@ -1,4 +1,5 @@
 ﻿using LogiTrack.Core.ViewModels.Clients;
+using LogiTrack.Core.ViewModels.Notifications;
 using Microsoft.AspNetCore.Identity;
 
 namespace LogiTrack.Core.Contracts
@@ -12,5 +13,7 @@ namespace LogiTrack.Core.Contracts
         Task<IdentityUser> RegisterUserAsync(RegisterViewModel model);
         Task<bool> UserWithEmailExistsAsync(string email);
         Task<bool> UserWithPhoneNumberExistsAsync(string phoneNumber);
+        Task<List<NotificationViewModel>?> GetNotificationsForUserAsync(string username);
+        Task<bool> NotificationWithIdExistsForUserAsync(int id, string username);
     }
 }

@@ -35,57 +35,59 @@ namespace LogiTrack.Core.Services
                 }
                 fileId = await googleDriveService.UploadFileAsync(tempFilePath, mimeType, "1hwrv9sZTBKLc6eN7AEr73WodN3lnBGhp");
             }
+
             var cashRegister = new Infrastructure.Data.DataModels.CashRegister
             {
                 DeliveryId = deliveryId,
                 Amount = model.Amount,
                 Description = model.Description,
                 DateSubmitted = DateTime.Now,
-                FileId = fileId
-            };
-            if (!string.IsNullOrEmpty(model.Type))
-            {
-                cashRegister.Type = model.Type;
-            }
-            else
-            {
-                cashRegister.Type = model.CustomType;
-            }
+                FileId = fileId,
+                Type = string.IsNullOrEmpty(model.Type) ? model.CustomType : model.Type
+            };           
             await repository.AddAsync(cashRegister);
+
             delivery.TotalExpenses += model.Amount;
             delivery.Profit -= model.Amount;
+
             await repository.SaveChangesAsync();
         }
 
         public async Task<List<CashRegisterIndexViewModel>> GetCashRegistersAsync(string? referenceNumber = null, DateTime? startDate = null, DateTime? endDate = null, string? type = null, decimal? minPrice = null, decimal? maxPrice = null)
         {
-            var cashRegisters = await repository.AllReadonly<Infrastructure.Data.DataModels.CashRegister>()
-                .Include(x => x.Delivery).ToListAsync();
+            var query = repository.AllReadonly<Infrastructure.Data.DataModels.CashRegister>().Include(x => x.Delivery).AsQueryable();
             if (startDate != null)
             {
-                cashRegisters = cashRegisters.Where(x => x.DateSubmitted >= startDate).ToList();
+                query = query.Where(x => x.DateSubmitted >= startDate);
             }
             if (endDate != null)
             {
-                cashRegisters = cashRegisters.Where(x => x.DateSubmitted <= endDate).ToList();
+                query = query.Where(x => x.DateSubmitted <= endDate);
             }
             if (string.IsNullOrEmpty(referenceNumber) == false)
             {
-                cashRegisters = cashRegisters.Where(x => x.Delivery.ReferenceNumber == referenceNumber).ToList();
+                query = query.Where(x => x.Delivery.ReferenceNumber == referenceNumber);
             }
             if (string.IsNullOrEmpty(type) == false)
             {
-                cashRegisters = cashRegisters.Where(x => x.Type == type).ToList();
+                query = query.Where(x => x.Type == type);
             }
             if (minPrice != null)
             {
-                cashRegisters = cashRegisters.Where(x => x.Amount >= minPrice).ToList();
+                query = query.Where(x => x.Amount >= minPrice);
             }
             if (maxPrice != null)
             {
-                cashRegisters = cashRegisters.Where(x => x.Amount <= maxPrice).ToList();
+                query = query.Where(x => x.Amount <= maxPrice);
             }
-            var carshregistersToShow =  cashRegisters.Select(x => new CashRegisterIndexViewModel
+
+            var cashRegisters = await query.ToListAsync();
+
+            var fileIds = cashRegisters.Select(x => x.FileId).Distinct().ToList();
+
+            var fileUrlTask = fileIds.Select(x => googleDriveService.GetFileUrlAsync(x)).ToArray();
+            var fileUrls = await Task.WhenAll(fileUrlTask);
+            var carshregistersToShow =  cashRegisters.Select((x, index) => new CashRegisterIndexViewModel
             {
                 Id = x.Id,
                 Type = x.Type,
@@ -94,13 +96,10 @@ namespace LogiTrack.Core.Services
                 Description = x.Description,
                 DateSubmitted = x.DateSubmitted.ToString("dd-MM-yyyy"),
                 DeliveryReferenceNumber = x.Delivery.ReferenceNumber,
-                FileId = x.FileId
+                FileId = x.FileId,
+                FileUrl = fileUrls.ElementAtOrDefault(index)
             }).ToList();
 
-            foreach (var register in carshregistersToShow)
-            {
-                register.FileUrl = await googleDriveService.GetFileUrlAsync(register.FileId);
-            }
             return carshregistersToShow;
         }      
     }

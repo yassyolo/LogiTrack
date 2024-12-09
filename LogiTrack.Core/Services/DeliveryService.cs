@@ -6,6 +6,7 @@ using LogiTrack.Core.ViewModels.Delivery;
 using LogiTrack.Core.ViewModels.Invoice;
 using LogiTrack.Infrastructure.Data.DataModels;
 using LogiTrack.Infrastructure.Repository;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace LogiTrack.Core.Services
@@ -20,6 +21,7 @@ namespace LogiTrack.Core.Services
             this.repository = repository;
             this.googleDriveService = googleDriveService;
         }
+
         public async Task<bool> DeliveryWithIdExistsAsync(int deliveryId)
         {
             return await repository.AllReadonly<Infrastructure.Data.DataModels.Delivery>().AnyAsync(x => x.Id == deliveryId);
@@ -33,16 +35,13 @@ namespace LogiTrack.Core.Services
         public async Task<DeliveryForAccountantViewModel> GetDeliveryDetailsForAccountantAsync(int id)
         {
             var delivery = await repository.AllReadonly<Infrastructure.Data.DataModels.Delivery>().Where(x => x.Id == id)
-                                .Include(x => x.Vehicle)
+                 .Where(x => x.Id == id)
+                .Include(x => x.Vehicle)
                 .Include(x => x.Driver)
                 .Include(x => x.Offer)
                 .ThenInclude(x => x.Request)
-                .ThenInclude(x => x.ClientCompany)
-                .ThenInclude(x => x.User)
-                .Include(x => x.Offer)
-                .ThenInclude(x => x.Request)
-                .ThenInclude(x => x.ClientCompany)
-                .ThenInclude(x => x.Address)
+                .ThenInclude(x => x.ClientCompany) 
+                .ThenInclude(x => x.User)  
                 .Include(x => x.Offer)
                 .ThenInclude(x => x.Request)
                 .ThenInclude(x => x.PickupAddress)
@@ -52,8 +51,8 @@ namespace LogiTrack.Core.Services
                 .Include(x => x.Offer)
                 .ThenInclude(x => x.Request)
                 .ThenInclude(x => x.StandartCargo)
-
                 .FirstOrDefaultAsync();
+
             var model = new DeliveryForAccountantViewModel
             {
                 Id = delivery.Id,
@@ -76,8 +75,14 @@ namespace LogiTrack.Core.Services
                 IsPaid = await repository.AllReadonly<Invoice>().AnyAsync(x => x.DeliveryId == delivery.Id && x.IsPaid == true)
             };
 
-            var cashRegisters = await repository.AllReadonly<Infrastructure.Data.DataModels.CashRegister>().Where(x => x.DeliveryId == delivery.Id)
-                .Select(x => new CashRegisterIndexViewModel()
+            var cashRegisters = await repository.AllReadonly<Infrastructure.Data.DataModels.CashRegister>().Where(x => x.DeliveryId == delivery.Id).ToListAsync();
+
+            var fileIds = cashRegisters.Select(x => x.FileId).Distinct().ToList();
+            var fileUrlTasks = fileIds.Select(x => googleDriveService.GetFileUrlAsync(x)).ToArray();
+            var fileUrls = await Task.WhenAll(fileUrlTasks);
+
+            var cashRegistersModel = cashRegisters
+                .Select((x, index) => new CashRegisterIndexViewModel()
                 {
                     Id = x.Id,
                     DeliveryId = x.DeliveryId,
@@ -85,23 +90,21 @@ namespace LogiTrack.Core.Services
                     Amount = x.Amount.ToString(),
                     Description = x.Description,
                     DateSubmitted = x.DateSubmitted.ToString("dd-MM-yyyy"),
-                    FileId = x.FileId
+                    FileId = x.FileId,
+                    FileUrl = fileUrls.ElementAtOrDefault(index)
                 })
-                .ToListAsync();
-            foreach (var register in cashRegisters)
-            {
-                register.FileUrl = await googleDriveService.GetFileUrlAsync(register.FileId);
-            }
-            model.CashRegisters = cashRegisters;
-            model.NonStandardCargos = await repository.AllReadonly<Infrastructure.Data.DataModels.NonStandardCargo>().Where(x => x.RequestId == delivery.Offer.RequestId)
-                .Select(x => new NonStandardCargosViewModel
-                {
-                    Length = x.Length.ToString(),
-                    Width = x.Width.ToString(),
-                    Height = x.Height.ToString(),
-                    Weight = x.Weight.ToString()
-                }).ToListAsync();
-            var invoice = await repository.AllReadonly<Invoice>().Where(x => x.DeliveryId == delivery.Id)
+                .ToList();
+
+            model.CashRegisters = cashRegistersModel;
+            model.NonStandardCargos = await GetNonStandartCargosForDelivery(id);
+
+            model.Invoice = await GetInvoiceForDelivery(id);
+
+            return model;
+        }
+        private async Task<InvoiceForDeliveryViewModel> GetInvoiceForDelivery(int id)
+        {
+            var invoice = await repository.AllReadonly<Invoice>().Where(x => x.DeliveryId == id)
                 .Select(x => new InvoiceForDeliveryViewModel
                 {
                     IsPaid = x.IsPaid,
@@ -111,11 +114,14 @@ namespace LogiTrack.Core.Services
                     Number = x.InvoiceNumber,
                     FileId = x.FileId
                 }).FirstOrDefaultAsync();
-            invoice.FileUrl = await googleDriveService.GetFileUrlAsync(invoice.FileId);
-            model.Invoice = invoice;
-            return model;
-        }
 
+            if (invoice != null)
+            {
+                invoice.FileUrl = await googleDriveService.GetFileUrlAsync(invoice.FileId);
+            }
+
+            return invoice;
+        }
         public async Task<DeliveryForDriverViewModel?> GetDeliveryDetailsForDriverAsync(int id)
         {
             var delivery = await repository.AllReadonly<Infrastructure.Data.DataModels.Delivery>().Where(x => x.Id == id)
@@ -134,7 +140,7 @@ namespace LogiTrack.Core.Services
                  .ThenInclude(x => x.Request)
                  .ThenInclude(x => x.DeliveryAddress)
                 .FirstOrDefaultAsync();
-            var vehicle = await repository.AllReadonly<Vehicle>().Where(x => x.Id == delivery.VehicleId).FirstOrDefaultAsync();
+            var vehicle = await repository.AllReadonly<LogisticsSystem.Infrastructure.Data.DataModels.Vehicle>().Where(x => x.Id == delivery.VehicleId).FirstOrDefaultAsync();
             var model = new DeliveryForDriverViewModel
             {
                 Id = delivery?.Id ?? throw new DeliveryNotFoundException(),
@@ -172,30 +178,31 @@ namespace LogiTrack.Core.Services
                 FuelConsumptionPer100Km = vehicle.FuelConsumptionPer100Km.ToString(),
                 DeliveryStep = delivery.DeliveryStep
             };
-            model.DeliveryTrackings = await repository.AllReadonly<Infrastructure.Data.DataModels.DeliveryTracking>().Where(x => x.DeliveryId == id)
-                .Select(x => new DeliveryTrackingViewModel
-                {
-                    Timestamp = x.Timestamp.ToString("dd-MM-yyyy"),
-                    StatusUpdate = x.StatusUpdate,
-                    Address = x.Address,
-                })
-                .ToListAsync();
-            model.NonStandardCargos = await repository.AllReadonly<Infrastructure.Data.DataModels.NonStandardCargo>().Where(x => x.RequestId == delivery.Offer.RequestId)
-                .Select(x => new NonStandardCargosViewModel
-                {
-                    Length = x.Length.ToString(),
-                    Width = x.Width.ToString(),
-                    Height = x.Height.ToString(),
-                    Weight = x.Weight.ToString(),
-                    Description = x.Description
-                }).ToListAsync();
+
+            model.DeliveryTrackings = await GetDeliveryTrackingsForDelivery(id);
+
+            model.NonStandardCargos = await GetNonStandartCargosForDelivery(id);
 
             return model;
         }
 
+        private async Task<List<NonStandardCargosViewModel>> GetNonStandartCargosForDelivery(int id)
+        {
+            var delivery = await repository.AllReadonly<Infrastructure.Data.DataModels.Delivery>().Include(x => x.Offer).ThenInclude(x => x.Request).Where(x => x.Id == id).FirstOrDefaultAsync();
+            return await repository.AllReadonly<Infrastructure.Data.DataModels.NonStandardCargo>().Where(x => x.RequestId == delivery.Offer.RequestId)
+                            .Select(x => new NonStandardCargosViewModel
+                            {
+                                Length = x.Length.ToString(),
+                                Width = x.Width.ToString(),
+                                Height = x.Height.ToString(),
+                                Weight = x.Weight.ToString(),
+                                Description = x.Description
+                            }).ToListAsync();
+        }
+
         public async Task<List<DeliveryViewModel>> GetDeliveriesForAccountantAsync(string? referenceNumber = null, DateTime? endDate = null, DateTime? startDate = null, string? clientCompanyName = null, bool? isPaid = null)
         {
-            var deliveries = await repository.AllReadonly<Infrastructure.Data.DataModels.Delivery>()
+            var query = repository.AllReadonly<Infrastructure.Data.DataModels.Delivery>()
                .Include(x => x.Vehicle)
                .Include(x => x.Driver)
                .Include(x => x.Offer)
@@ -208,32 +215,34 @@ namespace LogiTrack.Core.Services
                .ThenInclude(x => x.Request)
                .ThenInclude(x => x.DeliveryAddress)
                .Include(x => x.Invoice)
-               .ToListAsync();
+               .AsQueryable();
 
             if (string.IsNullOrEmpty(referenceNumber) == false)
             {
-                deliveries = deliveries.Where(x => x.ReferenceNumber == referenceNumber).ToList();
+                query = query.Where(x => x.ReferenceNumber == referenceNumber);
             }
             if (endDate != null)
             {
-                deliveries = deliveries.Where(x => x.Offer.Request.ExpectedDeliveryDate <= endDate).ToList();
+                query = query.Where(x => x.Offer.Request.ExpectedDeliveryDate <= endDate);
             }
             if (startDate != null)
             {
-                deliveries = deliveries.Where(x => x.Offer.Request.ExpectedDeliveryDate >= startDate).ToList();
+                query = query.Where(x => x.Offer.Request.ExpectedDeliveryDate >= startDate);
             }
             if (string.IsNullOrEmpty(clientCompanyName) == false)
             {
-                deliveries = deliveries.Where(x => x.Offer.Request.ClientCompany.Name.Contains(clientCompanyName)).ToList();
+                query = query.Where(x => x.Offer.Request.ClientCompany.Name.Contains(clientCompanyName));
             }
             if (isPaid == false)
             {
-                deliveries = deliveries.Where(x => x.Invoice.IsPaid == false).ToList();
+                query = query.Where(x => x.Invoice.IsPaid == false);
             }
             else if (isPaid == true)
             {
-                deliveries = deliveries.Where(x => x.Invoice.IsPaid == true).ToList();
+                query = query.Where(x => x.Invoice.IsPaid == true);
             }
+
+            var deliveries = await query.ToListAsync();
             var deliveriesToShow = deliveries.Select(x => new DeliveryViewModel
             {
                 Id = x.Id,
@@ -256,7 +265,7 @@ namespace LogiTrack.Core.Services
 
         public async Task<List<DeliveryViewModel>?> GetDeliveriesForDriverAsync(string username, string? referenceNumber = null, DateTime? endDate = null, DateTime? startDate = null, string? deliveryAddress = null, string? pickupAddress = null, bool? isNew = null)
         {
-            var deliveries = await repository.AllReadonly<Infrastructure.Data.DataModels.Delivery>()
+            var query = repository.AllReadonly<Infrastructure.Data.DataModels.Delivery>()
                 .Include(x => x.Vehicle)
                 .Include(x => x.Driver)
                 .Include(x => x.Offer)
@@ -272,33 +281,34 @@ namespace LogiTrack.Core.Services
                 .ThenInclude(x => x.Request)
                 .ThenInclude(x => x.DeliveryAddress)
                 .Where(x => x.Driver.User.UserName == username)
-                .ToListAsync();
+                .AsQueryable();
 
             if (isNew == true)
             {
-                deliveries = deliveries.Where(x => x.DeliveryStep == 1).ToList();
+                query = query.Where(x => x.DeliveryStep == 1);
             }
             if (string.IsNullOrEmpty(referenceNumber) == false)
             {
-                deliveries = deliveries.Where(x => x.ReferenceNumber == referenceNumber).ToList();
+                query = query.Where(x => x.ReferenceNumber == referenceNumber);
             }
             if (endDate != null)
             {
-                deliveries = deliveries.Where(x => x.Offer.Request.ExpectedDeliveryDate <= endDate).ToList();
+                query = query.Where(x => x.Offer.Request.ExpectedDeliveryDate <= endDate);
             }
             if (startDate != null)
             {
-                deliveries = deliveries.Where(x => x.Offer.Request.ExpectedDeliveryDate >= startDate).ToList();
+                query = query.Where(x => x.Offer.Request.ExpectedDeliveryDate >= startDate);
             }
             if (string.IsNullOrEmpty(deliveryAddress) == false)
             {
-                deliveries = deliveries.Where(x => x.Offer.Request.DeliveryAddress.City.ToLower().Contains(deliveryAddress.ToLower()) || x.Offer.Request.DeliveryAddress.County.ToLower().Contains(deliveryAddress.ToLower()) || x.Offer.Request.DeliveryAddress.Street.ToLower().Contains(deliveryAddress.ToLower())).ToList();
+                query = query.Where(x => x.Offer.Request.DeliveryAddress.City.ToLower().Contains(deliveryAddress.ToLower()) || x.Offer.Request.DeliveryAddress.County.ToLower().Contains(deliveryAddress.ToLower()) || x.Offer.Request.DeliveryAddress.Street.ToLower().Contains(deliveryAddress.ToLower()));
             }
             if (string.IsNullOrEmpty(pickupAddress) == false)
             {
-                deliveries = deliveries.Where(x => x.Offer.Request.PickupAddress.City.ToLower().Contains(pickupAddress.ToLower()) || x.Offer.Request.PickupAddress.County.ToLower().Contains(pickupAddress.ToLower()) || x.Offer.Request.PickupAddress.Street.ToLower().Contains(pickupAddress.ToLower())).ToList();
+                query = query.Where(x => x.Offer.Request.PickupAddress.City.ToLower().Contains(pickupAddress.ToLower()) || x.Offer.Request.PickupAddress.County.ToLower().Contains(pickupAddress.ToLower()) || x.Offer.Request.PickupAddress.Street.ToLower().Contains(pickupAddress.ToLower()));
             }
 
+            var deliveries = await query.ToListAsync();
             var deliveriesToShow = deliveries.Select(x => new DeliveryViewModel
             {
                 Id = x.Id,
@@ -323,43 +333,9 @@ namespace LogiTrack.Core.Services
             return deliveriesToShow;
         }
 
-        public async Task<DeliveryViewModel> GetDeliveryForDriverByReferenceNumberAsync(string referenceNumber)
-        {
-            return await repository.AllReadonly<Infrastructure.Data.DataModels.Delivery>().Where(x => x.ReferenceNumber.ToLower() == referenceNumber.ToLower())
-                .Include(x => x.Vehicle)
-                .Include(x => x.Driver)
-                .Include(x => x.Offer)
-                .Select(x => new DeliveryViewModel
-                {
-                    Id = x.Id,
-                    RequestId = x.Offer.RequestId,
-                    ClientCompanyId = x.Offer.Request.ClientCompanyId,
-                    ClientCompanyName = x.Offer.Request.ClientCompany.Name,
-                    CargoType = x.Offer.Request.CargoType,
-                    TypeOfPallet = x.Offer.Request.StandartCargo.TypeOfPallet,
-                    NumberOfPallets = x.Offer.Request.StandartCargo.NumberOfPallets.ToString(),
-                    PalletLength = x.Offer.Request.StandartCargo.PalletLength.ToString(),
-                    PalletWidth = x.Offer.Request.StandartCargo.PalletWidth.ToString(),
-                    PalletHeight = x.Offer.Request.StandartCargo.PalletHeight.ToString(),
-                    PalletVolume = x.Offer.Request.StandartCargo.PalletVolume.ToString(),
-                    WeightOfPallets = x.Offer.Request.StandartCargo.WeightOfPallets.ToString(),
-                    PalletsAreStackable = x.Offer.Request.StandartCargo.PalletsAreStackable,
-                    NumberOfNonStandartGoods = x.Offer.Request.NumberOfNonStandartGoods.ToString(),
-                    TypeOfGoods = x.Offer.Request.TypeOfGoods,
-                    PickupAddress = $"{x.Offer.Request.PickupAddress.Street}, {x.Offer.Request.PickupAddress.City}, {x.Offer.Request.PickupAddress.County}",
-                    DeliveryAddress = $"{x.Offer.Request.DeliveryAddress.Street}, {x.Offer.Request.DeliveryAddress.City}, {x.Offer.Request.DeliveryAddress.County}",
-                    SharedTruck = x.Offer.Request.SharedTruck,
-                    ExpectedDeliveryDate = x.Offer.Request.ExpectedDeliveryDate.ToString("dd-MM-yyyy"),
-                    SpecialInstructions = x.Offer.Request.SpecialInstructions,
-                    IsRefrigerated = x.Offer.Request.IsRefrigerated,
-                    ReferenceNumber = x.ReferenceNumber
-                })
-                .FirstOrDefaultAsync();
-        }
-
         public async Task<List<DeliveryViewModel>?> GetDeliveriesForDriverBySearchtermAsync(string username, string? searchTerm)
         {
-            var deliveries = await repository.AllReadonly<Infrastructure.Data.DataModels.Delivery>()
+            var query = repository.AllReadonly<Infrastructure.Data.DataModels.Delivery>()
                .Include(x => x.Vehicle)
                .Include(x => x.Driver)
                .Include(x => x.Offer)
@@ -372,33 +348,13 @@ namespace LogiTrack.Core.Services
                .ThenInclude(x => x.Request)
                .ThenInclude(x => x.DeliveryAddress)
                .Where(x => x.Driver.User.UserName == username)
-               .ToListAsync();
+               .AsQueryable();
 
             if (string.IsNullOrEmpty(searchTerm) == false)
             {
-                deliveries = deliveries
-     .Where(x =>
-         x.Offer.Request.DeliveryAddress.City.ToLower().Contains(searchTerm.ToLower()) ||
-         x.Offer.Request.DeliveryAddress.County.ToLower().Contains(searchTerm.ToLower()) ||
-         x.Offer.Request.DeliveryAddress.Street.ToLower().Contains(searchTerm.ToLower()) ||
-         x.Offer.Request.PickupAddress.City.ToLower().Contains(searchTerm.ToLower()) ||
-         x.Offer.Request.PickupAddress.County.ToLower().Contains(searchTerm.ToLower()) ||
-         x.Offer.Request.PickupAddress.Street.ToLower().Contains(searchTerm.ToLower()) ||
-         x.ReferenceNumber.ToLower().Contains(searchTerm.ToLower()) ||
-         (decimal.TryParse(searchTerm, out decimal finalPrice) && x.Offer.FinalPrice == finalPrice) ||
-         x.Offer.Request.ExpectedDeliveryDate.ToString("dd-MM-yyyy").Contains(searchTerm) ||
-         x.Offer.Request.TotalWeight.ToString().Contains(searchTerm) ||
-         x.Offer.Request.TotalVolume.ToString().Contains(searchTerm) ||
-         x.Offer.Request.NumberOfNonStandartGoods.ToString().Contains(searchTerm) ||
-         x.Offer.Request.StandartCargo.NumberOfPallets.ToString().Contains(searchTerm) ||
-         x.Offer.Request.TypeOfGoods.ToLower().Contains(searchTerm.ToLower()) ||
-         x.Offer.Request.CargoType.ToLower().Contains(searchTerm.ToLower()) ||
-         x.Offer.Request.SpecialInstructions.ToLower().Contains(searchTerm.ToLower()) ||
-         x.Offer.Request.IsRefrigerated.ToString().ToLower().Contains(searchTerm.ToLower()) ||
-         x.Offer.Request.SharedTruck.ToString().ToLower().Contains(searchTerm.ToLower()) ||
-         x.Offer.Request.ClientCompany.Name.ToLower().Contains(searchTerm.ToLower())
-     )
-     .ToList();
+                query = GetDeliveryAsQueryableBySearchTerm(query, searchTerm);
+
+                var deliveries = await query.ToListAsync();
                 return deliveries.Select(x => new DeliveryViewModel
                 {
                     Id = x.Id,
@@ -424,63 +380,9 @@ namespace LogiTrack.Core.Services
             return new List<DeliveryViewModel>();
         }
 
-        public async Task<List<DeliveryViewModel>?> GetNewDeliveryForDriverAsync(string username, string? referenceNumber = null, DateTime? endDate = null, DateTime? startDate = null, string? deliveryAddress = null, string? pickupAddress = null, string? companyName = null)
-        {
-            var deliveries = await repository.AllReadonly<Infrastructure.Data.DataModels.Delivery>()
-               .Include(x => x.Vehicle)
-               .Include(x => x.Driver)
-               .Include(x => x.Offer)
-               .ThenInclude(x => x.Request)
-               .ThenInclude(x => x.ClientCompany)
-               .Where(x => x.Driver.User.UserName == username && x.DeliveryStep == 1)
-               .ToListAsync();
-
-            if (string.IsNullOrEmpty(referenceNumber) == false)
-            {
-                deliveries = deliveries.Where(x => x.ReferenceNumber == referenceNumber).ToList();
-            }
-            if (endDate != null)
-            {
-                deliveries = deliveries.Where(x => x.Offer.Request.ExpectedDeliveryDate <= endDate).ToList();
-            }
-            if (startDate != null)
-            {
-                deliveries = deliveries.Where(x => x.Offer.Request.ExpectedDeliveryDate >= startDate).ToList();
-            }
-            if (string.IsNullOrEmpty(deliveryAddress) == false)
-            {
-                deliveries = deliveries.Where(x => x.Offer.Request.DeliveryAddress.City.ToLower().Contains(deliveryAddress.ToLower()) || x.Offer.Request.DeliveryAddress.County.ToLower().Contains(deliveryAddress.ToLower()) || x.Offer.Request.DeliveryAddress.Street.ToLower().Contains(deliveryAddress.ToLower())).ToList();
-            }
-            if (string.IsNullOrEmpty(pickupAddress) == false)
-            {
-                deliveries = deliveries.Where(x => x.Offer.Request.PickupAddress.City.ToLower().Contains(pickupAddress.ToLower()) || x.Offer.Request.PickupAddress.County.ToLower().Contains(pickupAddress.ToLower()) || x.Offer.Request.PickupAddress.Street.ToLower().Contains(pickupAddress.ToLower())).ToList();
-            }
-            if (string.IsNullOrEmpty(companyName) == false)
-            {
-                deliveries = deliveries.Where(x => x.Offer.Request.ClientCompany.Name.Contains(companyName)).ToList();
-            }
-            var deliveriesToShow = deliveries.Select(x => new DeliveryViewModel
-            {
-                Id = x.Id,
-                RequestId = x.Offer.RequestId,
-                ClientCompanyId = x.Offer.Request.ClientCompanyId,
-                ClientCompanyName = x.Offer.Request.ClientCompany.Name,
-                TypeOfGoods = x.Offer.Request.TypeOfGoods,
-                PickupAddress = $"{x.Offer.Request.PickupAddress.City}, {x.Offer.Request.PickupAddress.County}",
-                DeliveryAddress = $"{x.Offer.Request.DeliveryAddress.City}, {x.Offer.Request.DeliveryAddress.County}",
-                SharedTruck = x.Offer.Request.SharedTruck,
-                ExpectedDeliveryDate = x.Offer.Request.ExpectedDeliveryDate.ToString("dd/MM/yyyy"),
-                SpecialInstructions = x.Offer.Request.SpecialInstructions,
-                IsRefrigerated = x.Offer.Request.IsRefrigerated,
-                ReferenceNumber = x.ReferenceNumber,
-                TotalCargos = (x.Offer.Request.StandartCargo?.NumberOfPallets ?? 0) + (x.Offer.Request.NumberOfNonStandartGoods ?? 0).ToString(),
-            }).ToList();
-            return deliveriesToShow;
-        }
-
         public async Task<List<DeliveryViewModel>> GetDeliveriesForAccountantBySearchtermAsync(string? searchTerm = null)
         {
-            var deliveries = await repository.AllReadonly<Infrastructure.Data.DataModels.Delivery>()
+            var query = repository.AllReadonly<Infrastructure.Data.DataModels.Delivery>()
               .Include(x => x.Vehicle)
               .Include(x => x.Driver)
               .Include(x => x.Offer)
@@ -493,33 +395,13 @@ namespace LogiTrack.Core.Services
               .ThenInclude(x => x.Request)
               .ThenInclude(x => x.DeliveryAddress)
               .Include(x => x.Invoice)
-              .ToListAsync();
+              .AsQueryable();
+
             if (string.IsNullOrEmpty(searchTerm) == false)
             {
-                deliveries = deliveries.Where(x =>
-          x.Offer.Request.DeliveryAddress.City.ToLower().Contains(searchTerm.ToLower()) ||
-          x.Offer.Request.DeliveryAddress.County.ToLower().Contains(searchTerm.ToLower()) ||
-          x.Offer.Request.DeliveryAddress.Street.ToLower().Contains(searchTerm.ToLower()) ||
-          x.Offer.Request.PickupAddress.City.ToLower().Contains(searchTerm.ToLower()) ||
-          x.Offer.Request.PickupAddress.County.ToLower().Contains(searchTerm.ToLower()) ||
-          x.Offer.Request.PickupAddress.Street.ToLower().Contains(searchTerm.ToLower()) ||
-          x.ReferenceNumber.ToLower().Contains(searchTerm.ToLower()) ||
-          (decimal.TryParse(searchTerm, out decimal finalPrice) && x.Offer.FinalPrice == finalPrice) ||
-          x.Offer.Request.ExpectedDeliveryDate.ToString("dd-MM-yyyy").Contains(searchTerm) ||
-          x.Offer.Request.TotalWeight.ToString().Contains(searchTerm) ||
-          x.Offer.Request.TotalVolume.ToString().Contains(searchTerm) ||
-          x.Offer.Request.NumberOfNonStandartGoods.ToString().Contains(searchTerm) ||
-          x.Offer.Request.StandartCargo.NumberOfPallets.ToString().Contains(searchTerm) ||
-          x.Offer.Request.TypeOfGoods.ToLower().Contains(searchTerm.ToLower()) ||
-          x.Offer.Request.CargoType.ToLower().Contains(searchTerm.ToLower()) ||
-          x.Offer.Request.SpecialInstructions.ToLower().Contains(searchTerm.ToLower()) ||
-          x.Offer.Request.IsRefrigerated.ToString().ToLower().Contains(searchTerm.ToLower()) ||
-          x.Offer.Request.SharedTruck.ToString().ToLower().Contains(searchTerm.ToLower()) ||
-          x.Offer.Request.ClientCompany.Name.ToLower().Contains(searchTerm.ToLower())
-      )
-      .ToList();
+                query = GetDeliveryAsQueryableBySearchTerm(query, searchTerm);
 
-
+                var deliveries = await query.ToListAsync();
                 return deliveries.Select(x => new DeliveryViewModel
                 {
                     Id = x.Id,
@@ -542,6 +424,37 @@ namespace LogiTrack.Core.Services
             return new List<DeliveryViewModel>();
         }
 
+        private IQueryable<Infrastructure.Data.DataModels.Delivery?> GetDeliveryAsQueryableBySearchTerm(IQueryable<Infrastructure.Data.DataModels.Delivery?> query, string searchTerm)
+        {
+            decimal? parsedPrice = null;
+            if (decimal.TryParse(searchTerm, out decimal finalPrice))
+            {
+                parsedPrice = finalPrice;
+            }
+            var searchTermToLower = searchTerm.ToLower();
+
+             return query.Where(x =>
+             x.Offer.Request.DeliveryAddress.City.ToLower().Contains(searchTermToLower) ||
+             x.Offer.Request.DeliveryAddress.County.ToLower().Contains(searchTermToLower) ||
+             x.Offer.Request.DeliveryAddress.Street.ToLower().Contains(searchTermToLower) ||
+             x.Offer.Request.PickupAddress.City.ToLower().Contains(searchTermToLower) ||
+             x.Offer.Request.PickupAddress.County.ToLower().Contains(searchTermToLower) ||
+             x.Offer.Request.PickupAddress.Street.ToLower().Contains(searchTermToLower) ||
+             x.ReferenceNumber.ToLower().Contains(searchTermToLower) ||
+             x.Offer.FinalPrice == parsedPrice ||
+             x.Offer.Request.ExpectedDeliveryDate.ToString("dd-MM-yyyy").Contains(searchTerm) ||
+             x.Offer.Request.TotalWeight.ToString().Contains(searchTerm) ||
+             x.Offer.Request.TotalVolume.ToString().Contains(searchTerm) ||
+             x.Offer.Request.NumberOfNonStandartGoods.ToString().Contains(searchTerm) ||
+             x.Offer.Request.StandartCargo.NumberOfPallets.ToString().Contains(searchTerm) ||
+             x.Offer.Request.TypeOfGoods.ToLower().Contains(searchTermToLower) ||
+             x.Offer.Request.CargoType.ToLower().Contains(searchTermToLower) ||
+             x.Offer.Request.SpecialInstructions.ToLower().Contains(searchTermToLower) ||
+             x.Offer.Request.IsRefrigerated.ToString().ToLower().Contains(searchTermToLower) ||
+             x.Offer.Request.SharedTruck.ToString().ToLower().Contains(searchTermToLower) ||
+             x.Offer.Request.ClientCompany.Name.ToLower().Contains(searchTermToLower));           
+        }
+
         public async Task<bool> DeliveryWithCompanyExistsAsync(int deliveryId, string username)
         {
             return await repository.AllReadonly<Infrastructure.Data.DataModels.Delivery>().AnyAsync(x => x.Id == deliveryId && x.Offer.Request.ClientCompany.User.UserName == username);
@@ -558,13 +471,14 @@ namespace LogiTrack.Core.Services
                .Include(x => x.Offer)
                .ThenInclude(x => x.Request)
                .ThenInclude(x => x.ClientCompany)
-                .Include(x => x.Offer)
-                .ThenInclude(x => x.Request)
-                .ThenInclude(x => x.PickupAddress)
-                .Include(x => x.Offer)
-                .ThenInclude(x => x.Request)
-                .ThenInclude(x => x.DeliveryAddress)
+               .Include(x => x.Offer)
+               .ThenInclude(x => x.Request)
+               .ThenInclude(x => x.PickupAddress)
+               .Include(x => x.Offer)
+               .ThenInclude(x => x.Request)
+               .ThenInclude(x => x.DeliveryAddress)
                .FirstOrDefaultAsync();
+
             var model = new DeliveryForClientViewModel
             {
                 Id = delivery?.Id ?? throw new DeliveryNotFoundException(),
@@ -610,7 +524,20 @@ namespace LogiTrack.Core.Services
                 DeliveryStep = delivery.DeliveryStep,
             };
 
-            model.DeliveryTrackings = await repository.AllReadonly<Infrastructure.Data.DataModels.DeliveryTracking>().Where(x => x.DeliveryId == id)
+            model.DeliveryTrackings = await GetDeliveryTrackingsForDelivery(id);
+
+            model.NonStandardCargos = await GetNonStandartCargosForDelivery(id);
+
+            model.Invoice = await GetInvoiceForDelivery(id);
+            var invoice = await repository.AllReadonly<Invoice>().FirstOrDefaultAsync(x => x.DeliveryId == id);
+            model.DaysTillPayment = invoice.IsPaid ? "0" : (DateTime.Now - delivery.ActualDeliveryDate).GetValueOrDefault().Days.ToString();
+
+            return model;
+        }
+
+        private async Task<List<DeliveryTrackingViewModel>> GetDeliveryTrackingsForDelivery(int id)
+        {
+            return await repository.AllReadonly<Infrastructure.Data.DataModels.DeliveryTracking>().Where(x => x.DeliveryId == id)
                 .Select(x => new DeliveryTrackingViewModel
                 {
                     Timestamp = x.Timestamp.ToString("dd-MM-yyyy"),
@@ -618,46 +545,11 @@ namespace LogiTrack.Core.Services
                     Address = x.Address,
                 })
                 .ToListAsync();
-            model.NonStandardCargos = await repository.AllReadonly<Infrastructure.Data.DataModels.NonStandardCargo>().Where(x => x.RequestId == delivery.Offer.RequestId)
-                .Select(x => new NonStandardCargosViewModel
-                {
-                    Length = x.Length.ToString(),
-                    Width = x.Width.ToString(),
-                    Height = x.Height.ToString(),
-                    Weight = x.Weight.ToString(),
-                    Description = x.Description
-                }).ToListAsync();
-            var invoice = await repository.AllReadonly<Invoice>().Where(x => x.DeliveryId == delivery.Id)
-                .Select(x => new InvoiceForDeliveryViewModel
-                {
-                    IsPaid = x.IsPaid,
-                    Amount = x.Delivery.Offer.FinalPrice.ToString(),
-                    Date = x.InvoiceDate.ToString("dd-MM-yyyy"),
-                    Description = x.Description,
-                    Number = x.InvoiceNumber,
-                    FileId = x.FileId,
-                    Status = x.Status
-                }).FirstOrDefaultAsync();
-            invoice.FileUrl = await googleDriveService.GetFileUrlAsync(invoice.FileId);
-
-            model.Invoice = invoice;
-            if (invoice.IsPaid == false)
-            {
-                model.DaysTillPayment = (DateTime.Now - delivery.ActualDeliveryDate).GetValueOrDefault().Days.ToString();
-            }
-            else
-            {
-                model.DaysTillPayment = "0";
-            }
-
-            return model;
         }
 
         public async Task LeaveRatingForDeliveryAsync(int id, string? comment, int ratingStars)
         {
-            var delivery = await repository.AllReadonly<Infrastructure.Data.DataModels.Delivery>().Where(x => x.Id == id)
-
-                .FirstOrDefaultAsync();
+            var delivery = await repository.AllReadonly<Infrastructure.Data.DataModels.Delivery>().Where(x => x.Id == id).FirstOrDefaultAsync();
             var rating = new Rating
             {
                 DeliveryId = delivery.Id,
@@ -665,6 +557,25 @@ namespace LogiTrack.Core.Services
                 RatingStars = ratingStars
             };
             await repository.AddAsync(rating);
+
+            var logisticsUser = await repository.AllReadonly<IdentityUser>().FirstOrDefaultAsync(x => x.UserName == "logistics");
+            var notification = new Notification
+            {
+                Title = "Rating",
+                Message = $"You have received a rating for delivery with reference number {delivery.ReferenceNumber}  - {rating.RatingStars} / 5.",
+                UserId = logisticsUser.Id,
+                IsRead = false
+            };
+            var notificationForCompany = new Notification
+            {
+                Title = "Rating",
+                Message = $"You have left a rating for delivery with reference number {delivery.ReferenceNumber} - {rating.RatingStars} / 5.",
+                UserId = delivery.Offer.Request.ClientCompany.UserId,
+                IsRead = false
+            };
+
+            await repository.AddAsync(notification);
+            await repository.AddAsync(notificationForCompany);
             await repository.SaveChangesAsync();
         }
 
@@ -795,8 +706,9 @@ namespace LogiTrack.Core.Services
 
         public async Task<DelliveryDetailsForLogisticsViewModel?> GetDeliveryDetailsForLogisticsAsync(int id)
         {
-            var delivery = await repository.AllReadonly<Infrastructure.Data.DataModels.Delivery>().Where(x => x.Id == id)
-                               .Include(x => x.Vehicle)
+            var delivery = await repository.AllReadonly<Delivery>().FirstOrDefaultAsync(x => x.Id == id);
+            delivery = await repository.AllReadonly<Infrastructure.Data.DataModels.Delivery>().Where(x => x.Id == id)
+               .Include(x => x.Vehicle)
                .Include(x => x.Driver)
                .Include(x => x.Offer)
                .ThenInclude(x => x.Request)
@@ -812,9 +724,6 @@ namespace LogiTrack.Core.Services
                .Include(x => x.Offer)
                .ThenInclude(x => x.Request)
                .ThenInclude(x => x.DeliveryAddress)
-               .Include(x => x.Offer)
-               .ThenInclude(x => x.Request)
-               .ThenInclude(x => x.StandartCargo)
 
                .FirstOrDefaultAsync();
             var model = new DelliveryDetailsForLogisticsViewModel
@@ -910,26 +819,11 @@ namespace LogiTrack.Core.Services
                 register.FileUrl = await googleDriveService.GetFileUrlAsync(register.FileId);
             }
             model.CashRegisters = cashRegisters;
-            model.NonStandardCargos = await repository.AllReadonly<Infrastructure.Data.DataModels.NonStandardCargo>().Where(x => x.RequestId == delivery.Offer.RequestId)
-                .Select(x => new NonStandardCargosViewModel
-                {
-                    Length = x.Length.ToString(),
-                    Width = x.Width.ToString(),
-                    Height = x.Height.ToString(),
-                    Weight = x.Weight.ToString()
-                }).ToListAsync();
-            var invoice = await repository.AllReadonly<Invoice>().Where(x => x.DeliveryId == delivery.Id)
-                .Select(x => new InvoiceForDeliveryViewModel
-                {
-                    IsPaid = x.IsPaid,
-                    Amount = x.Delivery.Offer.FinalPrice.ToString(),
-                    Date = x.InvoiceDate.ToString("dd-MM-yyyy"),
-                    Description = x.Description,
-                    Number = x.InvoiceNumber,
-                    FileId = x.FileId
-                }).FirstOrDefaultAsync();
-            invoice.FileUrl = await googleDriveService.GetFileUrlAsync(invoice.FileId);
-            model.Invoice = invoice;
+
+            model.NonStandardCargos = await GetNonStandartCargosForDelivery(id);
+
+            model.Invoice = await GetInvoiceForDelivery(id);
+
             return model;
         }
 

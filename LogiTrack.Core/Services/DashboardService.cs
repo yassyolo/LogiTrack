@@ -24,17 +24,25 @@ namespace LogiTrack.Core.Services
         {
             this.repository = repository;
         }
+
         public async Task<AccountantDashboardViewModel?> GetAccountantDashboardAsync()
         {
+            var currentDate = DateTime.Now;
+            var lastWeekDate = currentDate.AddDays(-7);
+            var lastMonthDate = currentDate.AddDays(-31);
+
+            var deliveriesQuery = repository.AllReadonly<Delivery>();
+            var invoicesQuery = repository.AllReadonly<Invoice>();
+
             var model = new AccountantDashboardViewModel()
             {
-                NewFinishedDeliveriesFromLastWeek = await repository.All<Delivery>().CountAsync(x => x.Status == DeliveryStatusConstants.Delivered && x.ActualDeliveryDate > DateTime.Now.AddDays(-7)),
-                NotPaidDeliveriesCount = await repository.All<Invoice>().CountAsync(x => x.Delivery.Status == DeliveryStatusConstants.Delivered && x.IsPaid == false),
-                InvoicesCount = await repository.All<Invoice>().CountAsync(),
-                InvoicesCountFromLastMonth = await repository.All<Invoice>().Where(x => x.InvoiceDate > DateTime.Now.AddDays(-31)).CountAsync(),
-                DueAmountForDeliveries = repository.AllReadonly<Invoice>().Where(x => x.IsPaid == false).Sum(x => x.Delivery.Offer.FinalPrice).ToString()
+                NewFinishedDeliveriesFromLastWeek = await deliveriesQuery.CountAsync(x => x.Status == DeliveryStatusConstants.Delivered && x.ActualDeliveryDate > lastWeekDate),
+                NotPaidDeliveriesCount = await invoicesQuery.CountAsync(x => x.Delivery.Status == DeliveryStatusConstants.Delivered && x.IsPaid == false),
+                InvoicesCount = await invoicesQuery.CountAsync(),
+                InvoicesCountFromLastMonth = await invoicesQuery.Where(x => x.InvoiceDate > lastMonthDate).CountAsync(),
+                DueAmountForDeliveries = (await invoicesQuery.Where(x => x.IsPaid == false).SumAsync(x => x.Delivery.Offer.FinalPrice)).ToString()
             };
-            model.Last5NotPaidInvoices = await repository.All<Invoice>().Where(x => x.IsPaid == false).OrderByDescending(x => x.InvoiceDate).Take(5)
+            model.Last5NotPaidInvoices = await invoicesQuery.Where(x => x.IsPaid == false).OrderByDescending(x => x.InvoiceDate).Take(5)
                 .Select(x => new InvoiceForDashboardViewModel
                 {
                     Id = x.Id,
@@ -43,7 +51,7 @@ namespace LogiTrack.Core.Services
                     InvoiceNumber = x.InvoiceNumber,
                     Amount = x.Delivery.Offer.FinalPrice.ToString(),
                 }).ToListAsync();
-            model.Last5NewDeliveries = await repository.All<Delivery>().Where(x => x.DeliveryStep == 4).OrderByDescending(x => x.ActualDeliveryDate).Take(5)
+            model.Last5NewDeliveries = await deliveriesQuery.Where(x => x.DeliveryStep == 4).OrderByDescending(x => x.ActualDeliveryDate).Take(5)
                 .Select(x => new DeliveryForAccountantViewModel
                 {
                     Id = x.Id,
@@ -55,10 +63,16 @@ namespace LogiTrack.Core.Services
 
             return model;
         }
+
         public async Task<ClientsDashboardViewModel?> GetClientCompanyDashboardAsync(string username)
         {
+            var lastMonth = DateTime.Now.AddDays(-30);
             var company = await repository.AllReadonly<LogisticsSystem.Infrastructure.Data.DataModels.ClientCompany>().FirstOrDefaultAsync(x => x.User.UserName == username);
-            var offers = await repository.AllReadonly<LogisticsSystem.Infrastructure.Data.DataModels.Offer>().OrderByDescending(x => x.OfferDate).Where(x => x.Request.ClientCompanyId == company.Id && x.OfferStatus == StatusConstants.Pending).Take(5)
+            var invoicesQuery = repository.AllReadonly<Invoice>().Include(x => x.Delivery).ThenInclude(x => x.Offer).ThenInclude(x => x.Request).ThenInclude(x => x.ClientCompany).Where(x => x.Delivery.Offer.Request.ClientCompanyId == company.Id);
+            var offersQuery = repository.AllReadonly<Offer>().Include(x => x.Request).ThenInclude(x => x.ClientCompany).Where(x => x.Request.ClientCompanyId == company.Id);
+            var requestsQuery = repository.AllReadonly<Request>().Include(x => x.ClientCompany).Where(x => x.ClientCompanyId == company.Id);
+
+            var offers = await offersQuery.OrderByDescending(x => x.OfferDate).Where(x => x.OfferStatus == StatusConstants.Pending).Take(5)
                 .Select(x => new OfferForDashboardViewModel
                 {
                     Id = x.Id,
@@ -67,7 +81,7 @@ namespace LogiTrack.Core.Services
                     DeliveryAddress = $"{x.Request.DeliveryAddress.Street}, {x.Request.DeliveryAddress.City}, {x.Request.DeliveryAddress.County}",
                     Price = x.FinalPrice.ToString(),
                 }).ToListAsync();
-            var invoices = await repository.AllReadonly<Invoice>().OrderByDescending(x => x.InvoiceDate).Where(x => x.Delivery.Offer.Request.ClientCompanyId == company.Id).Take(5)
+            var invoices = await invoicesQuery.OrderByDescending(x => x.InvoiceDate).Take(5)
                  .Select(x => new InvoiceForDashboardViewModel
                  {
                      Id = x.Id,
@@ -94,26 +108,26 @@ namespace LogiTrack.Core.Services
                 LastFivePendingOffers = offers,
                 LastFiveDeliveries = deliveries,
                 LastFiveInvoices = invoices,
-                DueAmountForDeliveries = await repository.AllReadonly<Invoice>().Where(x => x.Delivery.Offer.Request.ClientCompanyId == company.Id && x.IsPaid == false).SumAsync(x => x.Delivery.Offer.Request.CalculatedPrice),
-                RequestsCount = await repository.AllReadonly<LogisticsSystem.Infrastructure.Data.DataModels.Request>().Where(x => x.ClientCompanyId == company.Id).CountAsync(),
-                RequestsLastMonthCount = await repository.AllReadonly<LogisticsSystem.Infrastructure.Data.DataModels.Request>().Where(x => x.ClientCompanyId == company.Id && x.CreatedAt.Month >= DateTime.Now.Month - 1 && x.CreatedAt.Month <= DateTime.Now.Month).CountAsync(),
-                BookedOffersCount = await repository.AllReadonly<LogisticsSystem.Infrastructure.Data.DataModels.Offer>().Where(x => x.Request.ClientCompanyId == company.Id && x.OfferStatus == StatusConstants.Approved).CountAsync(),
-                BookedOffersLastMonthCount = await repository.AllReadonly<LogisticsSystem.Infrastructure.Data.DataModels.Offer>().Where(x => x.Request.ClientCompanyId == company.Id && x.OfferStatus == StatusConstants.Approved && x.OfferDate.Month >= DateTime.Now.Month - 1 && x.OfferDate.Month <= DateTime.Now.Month).CountAsync(),
-                InvoicesCount = await repository.AllReadonly<Invoice>().Where(x => x.Delivery.Offer.Request.ClientCompanyId == company.Id).CountAsync(),
-                InvoiceLastMonthCount = await repository.AllReadonly<Invoice>().Where(x => x.Delivery.Offer.Request.ClientCompanyId == company.Id && x.InvoiceDate.Month >= DateTime.Now.Month - 1 && x.InvoiceDate.Month <= DateTime.Now.Month).CountAsync(),
+                DueAmountForDeliveries = await invoicesQuery.Where(x => x.IsPaid == false).SumAsync(x => x.Delivery.Offer.Request.CalculatedPrice),
+                RequestsCount = await requestsQuery.CountAsync(),
+                RequestsLastMonthCount = await requestsQuery.Where(x => x.CreatedAt >= lastMonth).CountAsync(),
+                BookedOffersCount = await offersQuery.Where(x => x.OfferStatus == StatusConstants.Approved).CountAsync(),
+                BookedOffersLastMonthCount = await offersQuery.Where(x => x.OfferStatus == StatusConstants.Approved && x.OfferDate >= lastMonth).CountAsync(),
+                InvoicesCount = await invoicesQuery.CountAsync(),
+                InvoiceLastMonthCount = await invoicesQuery.Where(x => x.InvoiceDate >= lastMonth).CountAsync(),
             };
         }
 
         public async Task<DriverDashboardViewModel?> GetDriverDashboardAsync(string username)
         {
-            var driver = await repository.AllReadonly<Infrastructure.Data.DataModels.Driver>().Where(x => x.User.UserName == username).FirstOrDefaultAsync();
+            var deliveryQuery = repository.AllReadonly<Delivery>().Include(x => x.Offer).ThenInclude(x => x.Request).Where(x => x.Driver.User.UserName == username);
             var model = new DriverDashboardViewModel()
             {
-                KilometersDriven = await repository.AllReadonly<Infrastructure.Data.DataModels.Delivery>().Where(x => x.DriverId == driver.Id).SumAsync(x => x.Offer.Request.Kilometers),
-                KilometersDrivenlastMonth = await repository.AllReadonly<Infrastructure.Data.DataModels.Delivery>().Where(x => x.DriverId == driver.Id && x.Offer.Request.ExpectedDeliveryDate.Month == DateTime.Now.Month - 1).SumAsync(x => x.Offer.Request.Kilometers),
-                NewDeliveriesCount = await repository.AllReadonly<Infrastructure.Data.DataModels.Delivery>().Where(x => x.DeliveryStep == 1).CountAsync()
+                KilometersDriven = await deliveryQuery.SumAsync(x => x.Offer.Request.Kilometers),
+                KilometersDrivenlastMonth = await deliveryQuery.Where(x => x.Offer.Request.ExpectedDeliveryDate.Month == DateTime.Now.Month - 1).SumAsync(x => x.Offer.Request.Kilometers),
+                NewDeliveriesCount = await deliveryQuery.CountAsync(x => x.DeliveryStep == 1)
             };
-            model.LastDeliveries = await repository.AllReadonly<Infrastructure.Data.DataModels.Delivery>().Where(x => x.DriverId == driver.Id).OrderByDescending(x => x.Offer.OfferDate).Take(5)
+            model.LastDeliveries = await deliveryQuery.OrderByDescending(x => x.Offer.OfferDate).Take(5)
                 .Select(x => new DeliveryForDriverDashboardViewModel
                 {
                     Id = x.Id,
@@ -123,7 +137,7 @@ namespace LogiTrack.Core.Services
                     ReferenceNumber = x.ReferenceNumber
                 })
                 .ToListAsync();
-            model.NewDeliveries = await repository.AllReadonly<Infrastructure.Data.DataModels.Delivery>().Where(x => x.DriverId == driver.Id && x.DeliveryStep == 1)
+            model.NewDeliveries = await deliveryQuery.Where(x => x.DeliveryStep == 1)
                 .Select(x => new DeliveryForDriverDashboardViewModel
                 {
                     Id = x.Id,
@@ -134,17 +148,23 @@ namespace LogiTrack.Core.Services
                 }).ToListAsync();
             return model;
         }
+
         public async Task<LogisticsDashboardViewModel?> GetLogisticsCompanyDashboardAsync()
         {
+            var deliveryQuery = repository.All<Delivery>().Include(x => x.Offer).ThenInclude(o => o.Request).Include(x => x.Vehicle).AsQueryable();
+            var clientsQuery = repository.All<ClientCompany>().AsQueryable();
+            var requestsQuery = repository.All<Request>().AsQueryable();
+
+            var lastWeek = DateTime.Now.AddDays(-7);
             var model = new LogisticsDashboardViewModel
             {
-                DeliveriesCount = await repository.AllReadonly<Delivery>().CountAsync(),
-                DeliveriesLastWeekCount = await repository.AllReadonly<Delivery>().Where(x => x.Offer.Request.CreatedAt.Day == DateTime.Now.Day - 7).CountAsync(),
-                PendingRegistrationsCount = await repository.AllReadonly<ClientCompany>().Where(x => x.RegistrationStatus == StatusConstants.Pending).CountAsync(),
-                RequestsCount = await repository.AllReadonly<Request>().CountAsync(),
-                RequestsLastWeekCount = await repository.AllReadonly<Request>().Where(x => x.CreatedAt.Day == DateTime.Now.Day - 7).CountAsync(),
+                DeliveriesCount = await deliveryQuery.CountAsync(),
+                DeliveriesLastWeekCount = await deliveryQuery.Where(x => x.Offer.Request.CreatedAt > lastWeek).CountAsync(),
+                PendingRegistrationsCount = await clientsQuery.Where(x => x.RegistrationStatus == StatusConstants.Pending).CountAsync(),
+                RequestsCount = await requestsQuery.CountAsync(),
+                RequestsLastWeekCount = await requestsQuery.Where(x => x.CreatedAt > lastWeek).CountAsync(),
             };
-            model.DeliveresWithVehicles = await repository.AllReadonly<Delivery>().Include(x => x.Vehicle).Take(5)
+            model.DeliveresWithVehicles = await deliveryQuery.Include(x => x.Vehicle).Take(5)
                 .Select(x => new DeliveryWithVehicleViewModel
                 {
                     Id = x.Id,
@@ -166,21 +186,22 @@ namespace LogiTrack.Core.Services
                 }).ToListAsync();
             return model;
         }
+
         public async Task<SpeditorDashboardViewModel?> GetSpeditorDashboardAsync()
         {
-            var request = await repository.AllReadonly<Request>().ToListAsync();
-            var offers = await repository.AllReadonly<Offer>().ToListAsync();
+            var requestsQuery = repository.AllReadonly<Request>();
+            var offersQuery = repository.AllReadonly<Offer>();
             var model = new SpeditorDashboardViewModel
             {
-                TotalRequests = request.Count(),
-                TotalOffers = offers.Count(),
-                NewRequests = request.Count(x => x.CreatedAt.Date <= DateTime.Now.Date.AddDays(-30)),
-                AcceptedOffers = offers.Count(x => x.OfferStatus == StatusConstants.Approved),
+                TotalRequests = await requestsQuery.CountAsync(),
+                TotalOffers = await offersQuery.CountAsync(),
+                NewRequests = await requestsQuery.CountAsync(x => x.CreatedAt.Date <= DateTime.Now.Date.AddDays(-30)),
+                AcceptedOffers = await offersQuery.CountAsync(x => x.OfferStatus == StatusConstants.Approved),
                 AvailableDrivers = await repository.AllReadonly<Driver>().CountAsync(x => x.IsAvailable),
                 AvailableVehicles = await repository.AllReadonly<Vehicle>().CountAsync(x => x.IsAvailable),
                 FuelPrice = await repository.AllReadonly<FuelPrice>().OrderByDescending(x => x.Date).Select(x => x.Price).FirstOrDefaultAsync(),
             };
-            model.LastFivePendingOffers = await repository.AllReadonly<LogisticsSystem.Infrastructure.Data.DataModels.Offer>().OrderByDescending(x => x.OfferDate).Where(x => x.OfferStatus == StatusConstants.Pending).Take(5)
+            model.LastFivePendingOffers = await offersQuery.OrderByDescending(x => x.OfferDate).Where(x => x.OfferStatus == StatusConstants.Pending).Take(5)
                .Select(x => new OfferForDashboardViewModel
                {
                    Id = x.Id,
@@ -190,7 +211,7 @@ namespace LogiTrack.Core.Services
                    Price = x.FinalPrice.ToString(),
                }).ToListAsync();
 
-            model.LastFiveDeliveries = await repository.AllReadonly<Infrastructure.Data.DataModels.Delivery>().OrderByDescending(x => x.Offer.StartDate).Take(5)
+            model.LastFiveDeliveries = await repository.AllReadonly<Infrastructure.Data.DataModels.Delivery>().OrderByDescending(x => x.SuggestedDate).Take(5)
                 .Select(x => new DeliveryTrackingForDashboardViewModel
                 {
                     Id = x.Id,
@@ -201,7 +222,7 @@ namespace LogiTrack.Core.Services
                     StatusUpdate = x.Status,
                 }).ToListAsync();
 
-            model.LastFiveNewRequests = await repository.AllReadonly<Request>().OrderByDescending(x => x.CreatedAt).Take(5)
+            model.LastFiveNewRequests = await requestsQuery.OrderByDescending(x => x.CreatedAt).Take(5)
                 .Select(x => new RequestsForSearchViewModel
                 {
                     Id = x.Id,
@@ -214,7 +235,6 @@ namespace LogiTrack.Core.Services
                     Price = x.ApproximatePrice.ToString(),
                 }).ToListAsync();
             return model;
-        }
-
+        }       
     }
 }

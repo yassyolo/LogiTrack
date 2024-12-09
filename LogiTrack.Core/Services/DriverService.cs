@@ -51,7 +51,7 @@ namespace LogiTrack.Core.Services
                     YearOfExperience = x.YearOfExperience.ToString(),
                     MonthsOfExperience = x.MonthsOfExperience.ToString(),
                     Preferrences = x.Preferrences
-                }).FirstOrDefaultAsync();
+                }).SingleOrDefaultAsync();
         }
 
         public async Task<LicenseViewModel?> GetDriversLicenseAsync(string username)
@@ -61,7 +61,7 @@ namespace LogiTrack.Core.Services
                 {
                     LicenseNumber = x.LicenseNumber,
                     LicenseExpiryDate = x.LicenseExpiryDate,
-                }).FirstOrDefaultAsync();
+                }).SingleOrDefaultAsync();
         }
 
         public async Task AddStatusForDeliveryAsync(int deliveryId, AddStatusViewModel model, string username, string address)
@@ -79,6 +79,7 @@ namespace LogiTrack.Core.Services
                 Longitude = model.Longitude.Value,
                 Address = address
             };
+
             var calendarEvent = new Infrastructure.Data.DataModels.CalendarEvent
             {
                 EventType = model.StatusUpdate,
@@ -97,6 +98,40 @@ namespace LogiTrack.Core.Services
                 case DeliveryTrackingStatusConstants.Delivered:
                     delivery.DeliveryStep = 4;
                     await GenerateInvoiceAsync(delivery);
+                   
+                    var notification = new Notification
+                    {
+                        Message = $"Delivery {delivery.ReferenceNumber} has been delivered. Check it out now!",
+                        Title = "Delivery Delivered",
+                        UserId = delivery.Offer.Request.ClientCompany.User.Id,
+                        Date = DateTime.Now
+                    };
+                    await repository.AddAsync(notification);
+                    var logisticsUser = await repository.AllReadonly<IdentityUser>().FirstOrDefaultAsync(x => x.UserName == "logistics");
+                    var notificationForLogisticsUser = new Notification
+                    {
+                        Title = "Rating",
+                        Message = $"Delivery {delivery.ReferenceNumber} has been delivered. Check it out now!",
+                        UserId = logisticsUser.Id,
+                        IsRead = false
+                    };
+                    var calendarEventForLogistics = new Infrastructure.Data.DataModels.CalendarEvent
+                    {
+                        EventType = model.StatusUpdate,
+                        Date = DateTime.Now,
+                        UserId = logisticsUser.Id,
+                        Title = $"Status for {delivery.ReferenceNumber}: {model.StatusUpdate}"
+                    };
+                    await repository.AddAsync(notificationForLogisticsUser);
+                    var speditorUser = await repository.AllReadonly<IdentityUser>().FirstOrDefaultAsync(x => x.UserName == "speditor");
+                    var notificationForSpeditorUser = new Notification
+                    {
+                        Title = "Rating",
+                        Message = $"Delivery {delivery.ReferenceNumber} has been delivered. Check it out now!",
+                        UserId = logisticsUser.Id,
+                        IsRead = false
+                    };
+                    await repository.AddAsync(notificationForSpeditorUser);
                     break;
             }
             await repository.AddAsync(calendarEvent);
@@ -206,37 +241,36 @@ namespace LogiTrack.Core.Services
 
         public async Task<List<DriverForLogisticsViewModel>> GetDriversAsync(string? name = null, string? licenseNumber = null, bool? isAvailable = null, decimal? minSalary = null, decimal? maxSalary = null)
         {
-            var drivers = await repository.AllReadonly<Infrastructure.Data.DataModels.Driver>()
-                .Include(x => x.User).ToListAsync();
+            var query = repository.AllReadonly<Infrastructure.Data.DataModels.Driver>().Include(x => x.User).AsQueryable();
             if(minSalary != null)
             {
-                drivers = drivers.Where(x => x.Salary >= minSalary).ToList();
+                query = query.Where(x => x.Salary >= minSalary);
             }
             if (maxSalary != null)
             {
-                drivers = drivers.Where(x => x.Salary <= maxSalary).ToList();
+                query = query.Where(x => x.Salary <= maxSalary);
             }
             if (name != null)
             {
-                drivers = drivers.Where(x => x.Name.Contains(name)).ToList();
+                query = query.Where(x => x.Name.Contains(name));
             }
             if (licenseNumber != null)
             {
-                drivers = drivers.Where(x => x.LicenseNumber.Contains(licenseNumber)).ToList();
+                query = query.Where(x => x.LicenseNumber.Contains(licenseNumber));
             }
             if (isAvailable != null)
             {
-                drivers = drivers.Where(x => x.IsAvailable == isAvailable).ToList();
+                query = query.Where(x => x.IsAvailable == isAvailable);
             }
+
+            var drivers = await query.ToListAsync();
             return drivers.Select(x => new DriverForLogisticsViewModel
             {
                 Id = x.Id,
                 Name = x.Name,
                 LicenseNumber = x.LicenseNumber,
                 Phone = x.User.PhoneNumber,
-                LicenseExpiryDate = x.LicenseExpiryDate.ToString(),
-                InternatinalDeliveries = x.Deliveries.Count(x => x.Offer.Request.Type == RequestTypeConstants.International),
-                DomesticDeliveries = x.Deliveries.Count(x => x.Offer.Request.Type == RequestTypeConstants.Domestic),
+                LicenseExpiryDate = x.LicenseExpiryDate.ToString(),               
                 Username = x.User.UserName,
                 Salary = x.Salary.ToString(),
                 Age = x.Age.ToString(),
@@ -248,21 +282,22 @@ namespace LogiTrack.Core.Services
 
         public async Task<List<DriverForLogisticsViewModel>> GetDriversBySearchtermAsync(string? searchTerm)
         {
-            var drivers = await repository.AllReadonly<Infrastructure.Data.DataModels.Driver>().Include(x => x.User).ToListAsync();
+            var query = repository.AllReadonly<Infrastructure.Data.DataModels.Driver>().Include(x => x.User).AsQueryable();
             if (searchTerm != null)
             {
-                drivers = drivers
-               .Where(x => x.Name.Contains(searchTerm) ||
-                x.LicenseNumber.Contains(searchTerm) ||
-                x.Salary.ToString().Contains(searchTerm) ||
-                x.User.UserName.ToLower().Contains(searchTerm.ToLower()) ||
-                x.User.PhoneNumber.Contains(searchTerm) ||
-                x.Preferrences.Contains(searchTerm) ||
-                x.Age.ToString().Contains(searchTerm) ||
-                x.YearOfExperience.ToString().Contains(searchTerm) ||
-                x.MonthsOfExperience.ToString().Contains(searchTerm) ||
-                x.IsAvailable.ToString().Contains(searchTerm))
-               .ToList();
+                var searchTermToLower = searchTerm.ToLower();
+                query = query.Where(x => x.Name.ToLower().Contains(searchTermToLower) ||
+                    x.LicenseNumber.ToLower().Contains(searchTermToLower) ||
+                    x.Salary.ToString().Contains(searchTermToLower) ||
+                    x.User.UserName.ToLower().Contains(searchTermToLower) ||
+                    x.User.PhoneNumber.Contains(searchTermToLower) ||
+                    x.Preferrences.ToLower().Contains(searchTermToLower) ||
+                    x.Age.ToString().Contains(searchTerm) ||
+                    x.YearOfExperience.ToString().Contains(searchTerm) ||
+                    x.MonthsOfExperience.ToString().Contains(searchTerm) ||
+                    x.IsAvailable.ToString().Contains(searchTerm));
+
+                var drivers = await query.ToListAsync();
 
                 return drivers.Select(x => new DriverForLogisticsViewModel
                 {
@@ -311,7 +346,7 @@ namespace LogiTrack.Core.Services
                 }).FirstOrDefaultAsync();
 
             var cashRegisters = await repository.AllReadonly<LogiTrack.Infrastructure.Data.DataModels.CashRegister>().Where(x => x.Delivery.DriverId == id).ToListAsync();
-            model.AdditionalCost = await repository.AllReadonly<LogiTrack.Infrastructure.Data.DataModels.CashRegister>().Where(x => x.Delivery.DriverId == id).SumAsync(x => x.Amount);
+            model.AdditionalCost = cashRegisters.Sum(x => x.Amount);
             model.AverageAdditionalCost = cashRegisters.Any() ? cashRegisters.Average(x => x.Amount): 0; 
             model.AverageDeliveryTime = deliveriesForDriver.Any(x => x.ActualDeliveryDate.HasValue) ? deliveriesForDriver.Average(x => (x.ActualDeliveryDate - x.Offer.Request.ExpectedDeliveryDate).Value.TotalHours).ToString("F2"): "0"; 
             model.SuccessfulDeliveriesCount = deliveriesForDriver.Count(x => x.DeliveryStep == 4 && x.Offer.Request.ExpectedDeliveryDate >= x.ActualDeliveryDate);
@@ -319,7 +354,7 @@ namespace LogiTrack.Core.Services
             model.AverageDeliveryDistance = deliveriesForDriver.Any() ? deliveriesForDriver.Average(x => x.Offer.Request.Kilometers).ToString() : "0";
             model.KiloMetersDriven = deliveriesForDriver.Sum(x => x.Offer.Request.Kilometers);
 
-            model.Deliveries = await repository.AllReadonly<LogiTrack.Infrastructure.Data.DataModels.Delivery>().Where(x => x.DriverId == id).Select(x => new DeliveryForClientsDeliveriesViewModel
+            model.Deliveries = deliveriesForDriver.Select(x => new DeliveryForClientsDeliveriesViewModel
             {
                 Id = x.Id,
                 ReferenceNumber = x.ReferenceNumber,
@@ -333,7 +368,7 @@ namespace LogiTrack.Core.Services
                 TotalVolume = x.Offer.Request.TotalVolume.ToString(),
                 TotalItems = x.Offer.Request.StandartCargo == null ? x.Offer.Request.NumberOfNonStandartGoods.ToString() : x.Offer.Request.StandartCargo.NumberOfPallets.ToString(),
                 ActualDeliveryDate = x.ActualDeliveryDate.GetValueOrDefault().ToString("dd-MM-yyyy")
-            }).ToListAsync();
+            }).ToList();
             return model;
         }
 

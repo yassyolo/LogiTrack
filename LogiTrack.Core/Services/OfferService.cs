@@ -1,4 +1,5 @@
-﻿using LogiTrack.Core.Constants;
+﻿using LogisticsSystem.Infrastructure.Data.DataModels;
+using LogiTrack.Core.Constants;
 using LogiTrack.Core.Contracts;
 using LogiTrack.Core.ViewModels.Offer;
 using LogiTrack.Core.ViewModels.Request;
@@ -6,6 +7,8 @@ using LogiTrack.Infrastructure.Data.DataModels;
 using LogiTrack.Infrastructure.Repository;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace LogiTrack.Core.Services
 {
@@ -20,48 +23,10 @@ namespace LogiTrack.Core.Services
 
         public async Task<List<OfferForSearchViewModel>?> GetOffersForCompanyAsync(string username, string? deliveryAddress = null, string? pickupAddress = null, DateTime? startDate = null, DateTime? endDate = null, decimal? minPrice = null, decimal? maxPrice = null, bool? isApproved = null, double ? minWeight = null, double? maxWeight = null)
         {
-            var company = await repository.AllReadonly<LogisticsSystem.Infrastructure.Data.DataModels.ClientCompany>().FirstOrDefaultAsync(x => x.User.UserName == username);
+            var query = GetFilteredOffersQuery(x => x.Request.ClientCompany.User.UserName == username, deliveryAddress = null, pickupAddress = null, startDate = null, endDate = null, minPrice = null, maxPrice = null, isApproved = null,  minWeight = null, maxWeight = null);            
 
-            var offers = await repository.AllReadonly<LogisticsSystem.Infrastructure.Data.DataModels.Offer>().Include(x => x.Request).ThenInclude(x => x.PickupAddress)
-                .Include(x => x.Request).ThenInclude(x => x.DeliveryAddress).Where(x => x.Request.ClientCompanyId == company.Id).ToListAsync();
-
-            if (string.IsNullOrEmpty(deliveryAddress) == false)
-            {
-                offers = offers.Where(x => x.Request.DeliveryAddress.City.ToLower().Contains(deliveryAddress.ToLower()) || x.Request.DeliveryAddress.County.ToLower().Contains(deliveryAddress.ToLower()) || x.Request.DeliveryAddress.Street.ToLower().Contains(deliveryAddress.ToLower())).ToList();
-            }
-            if(minWeight!= null)
-            {
-                offers = offers.Where(x => x.Request.TotalWeight >= minWeight).ToList();
-            }
-            if (maxWeight != null)
-            {
-                offers = offers.Where(x => x.Request.TotalWeight <= maxWeight).ToList();
-            }
-            if (string.IsNullOrEmpty(pickupAddress) == false)
-            {
-                offers = offers.Where(x => x.Request.PickupAddress.City.ToLower().Contains(pickupAddress.ToLower()) || x.Request.PickupAddress.County.ToLower().Contains(pickupAddress.ToLower()) || x.Request.PickupAddress.Street.ToLower().Contains(pickupAddress.ToLower())).ToList();
-            }
-            if (startDate != null)
-            {
-                offers = offers.Where(x => x.OfferDate >= startDate).ToList();
-            }
-            if (endDate != null)
-            {
-                offers = offers.Where(x => x.OfferDate <= endDate).ToList();
-            }
-            if (minPrice != null)
-            {
-                offers = offers.Where(x => x.FinalPrice >= minPrice).ToList();
-            }
-            if (maxPrice != null)
-            {
-                offers = offers.Where(x => x.FinalPrice <= maxPrice).ToList();
-            }
-            if (isApproved != null)
-            {
-                offers = offers.Where(x => x.OfferStatus == StatusConstants.Approved).ToList();
-            }
-            var offersToShow = offers.Select(x => new OfferForSearchViewModel
+            var offers = await query.ToListAsync();
+            return offers.Select(x => new OfferForSearchViewModel
             {
                 OfferNumber = x?.OfferNumber,
                 Status = x.OfferStatus,
@@ -78,38 +43,17 @@ namespace LogiTrack.Core.Services
                 Booked = x.OfferStatus == StatusConstants.Approved,
                 TotalCargos = (x.Request.StandartCargo?.NumberOfPallets ?? 0) + (x.Request.NumberOfNonStandartGoods ?? 0).ToString(),
             }).ToList();
-            return offersToShow;
         }
+
         public async Task<List<OfferForSearchViewModel>?> GetOffersForCompanyBySearchTermAsync(string username, string? searchTerm = null)
         {
-            var offers = await repository.AllReadonly<LogisticsSystem.Infrastructure.Data.DataModels.Offer>()
-                 .Include(x => x.Request).ThenInclude(x => x.PickupAddress).Include(x => x.Request).ThenInclude(x => x.DeliveryAddress).Where(x => x.Request.ClientCompany.User.UserName == username).ToListAsync();
+            var query = repository.AllReadonly<LogisticsSystem.Infrastructure.Data.DataModels.Offer>()
+                 .Include(x => x.Request).ThenInclude(x => x.PickupAddress).Include(x => x.Request).ThenInclude(x => x.DeliveryAddress).Where(x => x.Request.ClientCompany.User.UserName == username).AsQueryable();
             if (!string.IsNullOrEmpty(searchTerm))
             {
-                offers = offers.Where(x =>
-                    x.Request.DeliveryAddress.City.ToLower().Contains(searchTerm.ToLower()) ||
-                    x.Request.DeliveryAddress.County.ToLower().Contains(searchTerm.ToLower()) ||
-                    x.Request.DeliveryAddress.Street.ToLower().Contains(searchTerm.ToLower()) ||
-                    x.Request.PickupAddress.City.ToLower().Contains(searchTerm.ToLower()) ||
-                    x.Request.PickupAddress.County.ToLower().Contains(searchTerm.ToLower()) ||
-                    x.Request.PickupAddress.Street.ToLower().Contains(searchTerm.ToLower()) ||
-                    x.Request.CargoType.ToLower().Contains(searchTerm.ToLower()) ||
-                    x.Request.SpecialInstructions.ToLower().Contains(searchTerm.ToLower()) ||
-                    x.Request.Status.ToLower().Contains(searchTerm.ToLower()) ||
-                    x.FinalPrice >= decimal.Parse(searchTerm) ||
-                    x.FinalPrice <= decimal.Parse(searchTerm) ||
-                    x.Request.ExpectedDeliveryDate.ToString().Contains(searchTerm) ||
-                    x.Request.CreatedAt.ToString().Contains(searchTerm) ||
-                    x.Request.TypeOfGoods.ToLower().Contains(searchTerm.ToLower()) ||
-                    x.Request.StandartCargo.NumberOfPallets.ToString().Contains(searchTerm) ||
-                    x.Request.TotalVolume.ToString().Contains(searchTerm) ||
-                    x.Request.TotalWeight.ToString().Contains(searchTerm) ||
-                    x.Request.NumberOfNonStandartGoods.ToString().Contains(searchTerm) ||
-                    x.OfferDate.ToString().Contains(searchTerm) ||
-                    x.OfferStatus.ToLower().Contains(searchTerm) ||
-                    x.OfferNumber.ToLower().Contains(searchTerm) ||
-                    x.Request.RerefenceNumber.ToLower().Contains(searchTerm)
-                ).ToList();
+                query = FilterOffersBySearchTerm(query, searchTerm);
+
+                var offers = await query.ToListAsync();
 
                 return (offers.Select(x => new OfferForSearchViewModel
                 {
@@ -127,20 +71,24 @@ namespace LogiTrack.Core.Services
             }
             return new List<OfferForSearchViewModel>();
         }
+
         public async Task<bool> OfferWithIdExistsAsync(int id)
         {
             return await repository.AllReadonly<LogisticsSystem.Infrastructure.Data.DataModels.Offer>().AnyAsync(x => x.Id == id);
         }
+
         public async Task<bool> OfferWithCompanyExistsAsync(int id, string username)
         {
             var company = await repository.AllReadonly<LogisticsSystem.Infrastructure.Data.DataModels.ClientCompany>().FirstOrDefaultAsync(x => x.User.UserName == username);
 
             return await repository.AllReadonly<LogisticsSystem.Infrastructure.Data.DataModels.Offer>().AnyAsync(x => x.Id == id && x.Request.ClientCompanyId == company.Id);
         }
+
         public async Task<int> GetOfferIdByOfferNumberAsync(string offerNumber)
         {
             return await repository.AllReadonly<LogisticsSystem.Infrastructure.Data.DataModels.Offer>().Where(x => x.OfferNumber == offerNumber).Select(x => x.Id).FirstOrDefaultAsync();
         }
+
         public async Task<OfferViewModel?> GetOfferDetailsAsync(int id)
         {
             var model = await repository.AllReadonly<LogisticsSystem.Infrastructure.Data.DataModels.Offer>().Where(x => x.Id == id)
@@ -173,6 +121,7 @@ namespace LogiTrack.Core.Services
                     OfferStatus = x.OfferStatus,
                     Notes = x.Notes,
                 }).FirstOrDefaultAsync();
+
             model.DeliveryId = await repository.AllReadonly<Delivery>().Where(x => x.OfferId == id).Select(x => x.Id).FirstOrDefaultAsync();
             var nonStandardCargos = await repository.AllReadonly<LogisticsSystem.Infrastructure.Data.DataModels.Request>().Where(x => x.Id == id).SelectMany(x => x.NonStandardCargos).ToListAsync();
             foreach (var item in nonStandardCargos)
@@ -188,12 +137,13 @@ namespace LogiTrack.Core.Services
             }
             return model;
         }
-        //TODO: Implement this method   
+
         public async Task BookOfferAsync(int id, string username)
         {
             var company = await repository.AllReadonly<LogisticsSystem.Infrastructure.Data.DataModels.ClientCompany>().FirstOrDefaultAsync(x => x.User.UserName == username);
             var offer = await repository.AllReadonly<LogisticsSystem.Infrastructure.Data.DataModels.Offer>().Include(x => x.Request).ThenInclude(x => x.ClientCompany).FirstOrDefaultAsync(x => x.Id == id && x.Request.ClientCompanyId == company.Id);
             var reservedForDelivery = await repository.AllReadonly<ReservedForDelivery>().FirstOrDefaultAsync(x => x.OfferId == offer.Id);
+            var vehicle = await repository.AllReadonly<Vehicle>().FirstOrDefaultAsync(x => x.Id == reservedForDelivery.VehicleId);
             offer.OfferStatus = StatusConstants.Approved;
             var delivery = new Delivery
             {
@@ -201,38 +151,32 @@ namespace LogiTrack.Core.Services
                 Status = DeliveryStatusConstants.Pending,
                 DriverId = reservedForDelivery.DriverId,
                 VehicleId = reservedForDelivery.VehicleId,
-                
+                DeliveryStep = 1,
+                CarbonEmission = (offer.Request.Kilometers * vehicle.FuelConsumptionPer100Km * vehicle.EmissionFactor) / 100
             };
             await repository.AddAsync(delivery);
             delivery.ReferenceNumber = $"DEL{delivery.Id}";
             await repository.SaveChangesAsync();
-            var eventForDriver = new CalendarEvent()
-            {
-                Date = offer.Request.ExpectedDeliveryDate,
-                Title = $"New delivery {delivery.ReferenceNumber} for {offer.StartDate}",
-                UserId = delivery.Driver.UserId,
-                EventType = EventTypesConstants.NewDelivery
-            };
 
-            await repository.AddAsync(eventForDriver);
-            var eventForCompany = new CalendarEvent()
-            {
-                Date = offer.Request.ExpectedDeliveryDate,
-                Title = $"New delivery: {delivery.ReferenceNumber}",
-                UserId = offer.Request.ClientCompany.UserId,
-                EventType = EventTypesConstants.NewDelivery
-            };
-            await repository.AddAsync(eventForCompany);
-            var logisticsUser = await repository.AllReadonly<IdentityUser>().FirstOrDefaultAsync(x => x.UserName== "logistics");
-            var eventForLogistics = new CalendarEvent()
-            {
-                Date = offer.Request.ExpectedDeliveryDate,
-                Title = $"New delivery {delivery.ReferenceNumber} for {offer.StartDate}",
-                UserId = company.UserId,
-                EventType = EventTypesConstants.NewDelivery
-            };
-            await repository.AddAsync(eventForLogistics);
-            await repository.SaveChangesAsync();            
+            var logisticsUser = await repository.AllReadonly<IdentityUser>().FirstOrDefaultAsync(x => x.UserName == "logistics");
+            var speditorUser = await repository.AllReadonly<IdentityUser>().FirstOrDefaultAsync(x => x.UserName == "speditor");
+            await CreateCalendarEventAsync(EventTypesConstants.NewDelivery, $"New delivery {delivery.ReferenceNumber} scheduled for {delivery.SuggestedDate:dd-MM-yyyy}.", DateTime.Now, speditorUser.Id);
+
+            await CreateCalendarEventAsync(EventTypesConstants.NewDelivery, $"New delivery {delivery.ReferenceNumber} scheduled for {delivery.SuggestedDate:dd-MM-yyyy}.", DateTime.Now, logisticsUser.Id);
+
+            await CreateCalendarEventAsync(EventTypesConstants.NewDelivery,$"New delivery {delivery.ReferenceNumber} scheduled for {delivery.SuggestedDate:dd-MM-yyyy}.",delivery.SuggestedDate,delivery.Driver.UserId);
+
+            await CreateCalendarEventAsync(EventTypesConstants.NewDelivery, $"You have a new delivery: {delivery.ReferenceNumber}.", DateTime.Now,offer.Request.ClientCompany.UserId);
+
+            await CreateNotificationAsync("New Delivery Assigned",$"Delivery {delivery.ReferenceNumber} is scheduled for {delivery.SuggestedDate:dd-MM-yyyy}. Please check the details.",delivery.Driver.UserId);
+
+            await CreateNotificationAsync("New Delivery Created",$"A new delivery {delivery.ReferenceNumber} has been created for your company. Track it now!",offer.Request.ClientCompany.UserId);
+
+            await CreateNotificationAsync("New Delivery Alert",$"A new delivery {delivery.ReferenceNumber} from {company.Name} is scheduled for {delivery.SuggestedDate:dd-MM-yyyy}.",logisticsUser.Id);
+
+            await CreateNotificationAsync("New Delivery Alert", $"A new delivery {delivery.ReferenceNumber} from {company.Name} is scheduled for {delivery.SuggestedDate:dd-MM-yyyy}.", speditorUser.Id);
+
+            await repository.SaveChangesAsync();       
         }      
 
         public async Task<AcceptOfferViewModel?> GetOfferForAcceptAsync(int id)
@@ -244,39 +188,18 @@ namespace LogiTrack.Core.Services
                 OfferDate = x.OfferDate.ToString("dd-MM-yyyy"),
                 RequestNumber = x.Request.RerefenceNumber,
                 OfferId = x.Id, 
-            }).FirstOrDefaultAsync();
+            }).SingleOrDefaultAsync();
         }
 
         public async Task<List<OfferForSearchViewModel>> GetOffersForLogisticsBySearchTermAsync(string? searchTerm = null)
         {
-            var offers = await repository.AllReadonly<LogisticsSystem.Infrastructure.Data.DataModels.Offer>()
-                 .Include(x => x.Request).ThenInclude(x => x.PickupAddress).Include(x => x.Request).ThenInclude(x => x.DeliveryAddress).ToListAsync();
+            var query = repository.AllReadonly<LogisticsSystem.Infrastructure.Data.DataModels.Offer>()
+                 .Include(x => x.Request).ThenInclude(x => x.PickupAddress).Include(x => x.Request).ThenInclude(x => x.DeliveryAddress).AsQueryable();
             if (!string.IsNullOrEmpty(searchTerm))
             {
-                offers = offers.Where(x =>
-                    x.Request.DeliveryAddress.City.ToLower().Contains(searchTerm.ToLower()) ||
-                    x.Request.DeliveryAddress.County.ToLower().Contains(searchTerm.ToLower()) ||
-                    x.Request.DeliveryAddress.Street.ToLower().Contains(searchTerm.ToLower()) ||
-                    x.Request.PickupAddress.City.ToLower().Contains(searchTerm.ToLower()) ||
-                    x.Request.PickupAddress.County.ToLower().Contains(searchTerm.ToLower()) ||
-                    x.Request.PickupAddress.Street.ToLower().Contains(searchTerm.ToLower()) ||
-                    x.Request.CargoType.ToLower().Contains(searchTerm.ToLower()) ||
-                    x.Request.SpecialInstructions.ToLower().Contains(searchTerm.ToLower()) ||
-                    x.Request.Status.ToLower().Contains(searchTerm.ToLower()) ||
-                    x.FinalPrice >= decimal.Parse(searchTerm) ||
-                    x.FinalPrice <= decimal.Parse(searchTerm) ||
-                    x.Request.ExpectedDeliveryDate.ToString().Contains(searchTerm) ||
-                    x.Request.CreatedAt.ToString().Contains(searchTerm) ||
-                    x.Request.TypeOfGoods.ToLower().Contains(searchTerm.ToLower()) ||
-                    x.Request.StandartCargo.NumberOfPallets.ToString().Contains(searchTerm) ||
-                    x.Request.TotalVolume.ToString().Contains(searchTerm) ||
-                    x.Request.TotalWeight.ToString().Contains(searchTerm) ||
-                    x.Request.NumberOfNonStandartGoods.ToString().Contains(searchTerm) ||
-                    x.OfferDate.ToString().Contains(searchTerm) ||
-                    x.OfferStatus.ToLower().Contains(searchTerm) ||
-                    x.OfferNumber.ToLower().Contains(searchTerm) ||
-                    x.Request.RerefenceNumber.ToLower().Contains(searchTerm)
-                ).ToList();
+                query = FilterOffersBySearchTerm(query, searchTerm);
+
+                var offers = await query.ToListAsync();
 
                 return (offers.Select(x => new OfferForSearchViewModel
                 {
@@ -297,46 +220,10 @@ namespace LogiTrack.Core.Services
 
         public async Task<List<OfferForSearchViewModel>> GetOffersForLogisticsAsync(string? deliveryAddress = null, string? pickupAddress = null, DateTime? startDate = null, DateTime? endDate = null, decimal? minPrice = null, decimal? maxPrice = null, bool? isApproved = null, double? minWeight = null, double? maxWeight = null)
         {
-            var offers = await repository.AllReadonly<LogisticsSystem.Infrastructure.Data.DataModels.Offer>().Include(x => x.Request).ThenInclude(x => x.PickupAddress)
-                .Include(x => x.Request).ThenInclude(x => x.DeliveryAddress).ToListAsync();
+            var query = GetFilteredOffersQuery(null, deliveryAddress = null, pickupAddress = null, startDate = null, endDate = null, minPrice = null, maxPrice = null, isApproved = null, minWeight = null, maxWeight = null);            
 
-            if (string.IsNullOrEmpty(deliveryAddress) == false)
-            {
-                offers = offers.Where(x => x.Request.DeliveryAddress.City.ToLower().Contains(deliveryAddress.ToLower()) || x.Request.DeliveryAddress.County.ToLower().Contains(deliveryAddress.ToLower()) || x.Request.DeliveryAddress.Street.ToLower().Contains(deliveryAddress.ToLower())).ToList();
-            }
-            if (minWeight != null)
-            {
-                offers = offers.Where(x => x.Request.TotalWeight >= minWeight).ToList();
-            }
-            if (maxWeight != null)
-            {
-                offers = offers.Where(x => x.Request.TotalWeight <= maxWeight).ToList();
-            }
-            if (string.IsNullOrEmpty(pickupAddress) == false)
-            {
-                offers = offers.Where(x => x.Request.PickupAddress.City.ToLower().Contains(pickupAddress.ToLower()) || x.Request.PickupAddress.County.ToLower().Contains(pickupAddress.ToLower()) || x.Request.PickupAddress.Street.ToLower().Contains(pickupAddress.ToLower())).ToList();
-            }
-            if (startDate != null)
-            {
-                offers = offers.Where(x => x.OfferDate >= startDate).ToList();
-            }
-            if (endDate != null)
-            {
-                offers = offers.Where(x => x.OfferDate <= endDate).ToList();
-            }
-            if (minPrice != null)
-            {
-                offers = offers.Where(x => x.FinalPrice >= minPrice).ToList();
-            }
-            if (maxPrice != null)
-            {
-                offers = offers.Where(x => x.FinalPrice <= maxPrice).ToList();
-            }
-            if (isApproved != null)
-            {
-                offers = offers.Where(x => x.OfferStatus == StatusConstants.Approved).ToList();
-            }
-            var offersToShow = offers.Select(x => new OfferForSearchViewModel
+            var offers = await query.ToListAsync();
+            return offers.Select(x => new OfferForSearchViewModel
             {
                 OfferNumber = x?.OfferNumber,
                 Status = x.OfferStatus,
@@ -353,7 +240,110 @@ namespace LogiTrack.Core.Services
                 Booked = x.OfferStatus == StatusConstants.Approved,
                 TotalCargos = (x.Request.StandartCargo?.NumberOfPallets ?? 0) + (x.Request.NumberOfNonStandartGoods ?? 0).ToString(),
             }).ToList();
-            return offersToShow;
+        }
+
+        private IQueryable<Offer?> FilterOffersBySearchTerm(IQueryable<Offer> query, string searchTerm)
+        {
+            var searchTermToLower = searchTerm.ToLower();
+            return query.Where(x =>
+                x.Request.DeliveryAddress.City.ToLower().Contains(searchTermToLower) ||
+                x.Request.DeliveryAddress.County.ToLower().Contains(searchTermToLower) ||
+                x.Request.DeliveryAddress.Street.ToLower().Contains(searchTermToLower) ||
+                x.Request.PickupAddress.City.ToLower().Contains(searchTermToLower) ||
+                x.Request.PickupAddress.County.ToLower().Contains(searchTermToLower) ||
+                x.Request.PickupAddress.Street.ToLower().Contains(searchTermToLower) ||
+                x.Request.CargoType.ToLower().Contains(searchTermToLower) ||
+                x.Request.SpecialInstructions.ToLower().Contains(searchTermToLower) ||
+                x.Request.Status.ToLower().Contains(searchTermToLower) ||
+                x.FinalPrice >= decimal.Parse(searchTerm) ||
+                x.FinalPrice <= decimal.Parse(searchTerm) ||
+                x.Request.ExpectedDeliveryDate.ToString().Contains(searchTerm) ||
+                x.Request.CreatedAt.ToString().Contains(searchTerm) ||
+                x.Request.TypeOfGoods.ToLower().Contains(searchTerm.ToLower()) ||
+                x.Request.StandartCargo.NumberOfPallets.ToString().Contains(searchTerm) ||
+                x.Request.TotalVolume.ToString().Contains(searchTerm) ||
+                x.Request.TotalWeight.ToString().Contains(searchTerm) ||
+                x.Request.NumberOfNonStandartGoods.ToString().Contains(searchTerm) ||
+                x.OfferDate.ToString().Contains(searchTerm) ||
+                x.OfferStatus.ToLower().Contains(searchTerm) ||
+                x.OfferNumber.ToLower().Contains(searchTerm) ||
+                x.Request.RerefenceNumber.ToLower().Contains(searchTermToLower));
+        }
+
+        private IQueryable<Offer?> GetFilteredOffersQuery(Expression<Func<Offer, bool>>? companyFilter, string? deliveryAddress = null, string? pickupAddress = null, DateTime? startDate = null, DateTime? endDate = null, decimal? minPrice = null, decimal? maxPrice = null, bool? isApproved = null, double? minWeight = null, double? maxWeight = null)
+        {
+            var query = repository.AllReadonly<LogisticsSystem.Infrastructure.Data.DataModels.Offer>().Include(x => x.Request).ThenInclude(x => x.PickupAddress)
+                .Include(x => x.Request).ThenInclude(x => x.DeliveryAddress).AsQueryable();
+
+            if(companyFilter != null)
+            {
+                query = query.Where(companyFilter);
+            }
+            if (string.IsNullOrEmpty(deliveryAddress) == false)
+            {
+                query = query.Where(x => x.Request.DeliveryAddress.City.ToLower().Contains(deliveryAddress.ToLower()) || x.Request.DeliveryAddress.County.ToLower().Contains(deliveryAddress.ToLower()) || x.Request.DeliveryAddress.Street.ToLower().Contains(deliveryAddress.ToLower()));
+            }
+            if (minWeight != null)
+            {
+                query = query.Where(x => x.Request.TotalWeight >= minWeight);
+            }
+            if (maxWeight != null)
+            {
+                query = query.Where(x => x.Request.TotalWeight <= maxWeight);
+            }
+            if (string.IsNullOrEmpty(pickupAddress) == false)
+            {
+                query = query.Where(x => x.Request.PickupAddress.City.ToLower().Contains(pickupAddress.ToLower()) || x.Request.PickupAddress.County.ToLower().Contains(pickupAddress.ToLower()) || x.Request.PickupAddress.Street.ToLower().Contains(pickupAddress.ToLower()));
+            }
+            if (startDate != null)
+            {
+                query = query.Where(x => x.OfferDate >= startDate);
+            }
+            if (endDate != null)
+            {
+                query = query.Where(x => x.OfferDate <= endDate);
+            }
+            if (minPrice != null)
+            {
+                query = query.Where(x => x.FinalPrice >= minPrice);
+            }
+            if (maxPrice != null)
+            {
+                query = query.Where(x => x.FinalPrice <= maxPrice);
+            }
+            if (isApproved != null)
+            {
+                query = query.Where(x => x.OfferStatus == StatusConstants.Approved);
+            }
+
+            return query;
+        }
+
+        private async Task CreateNotificationAsync(string title, string message, string userId, bool isRead = false)
+        {
+            var notification = new Notification
+            {
+                Title = title,
+                Message = message,
+                UserId = userId,
+                IsRead = isRead,
+                Date = DateTime.Now
+            };
+
+            await repository.AddAsync(notification);
+        }
+
+        private async Task CreateCalendarEventAsync(string eventType, string title, DateTime date, string userId)
+        {
+            var calendarEvent = new CalendarEvent
+            {
+                EventType = eventType,
+                Title = title,
+                Date = date,
+                UserId = userId
+            };
+
+            await repository.AddAsync(calendarEvent);
         }
     }
 }

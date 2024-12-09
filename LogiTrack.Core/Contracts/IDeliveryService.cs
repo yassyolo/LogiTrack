@@ -11,7 +11,6 @@ namespace LogiTrack.Core.Contracts
         Task<List<DeliveryViewModel>> GetDeliveriesForAccountantAsync( string? referenceNumber, DateTime? endDate, DateTime? startDate, string? clientCompanyName, bool? isPaid);
         Task<List<DeliveryViewModel>?> GetDeliveriesForDriverAsync(string username, string? referenceNumber = null, DateTime? endDate = null, DateTime? startDate = null, string? deliveryAddress = null, string? pickupAddress = null, bool? isNew = null);
         Task<List<DeliveryViewModel>?> GetDeliveriesForDriverBySearchtermAsync(string username, string? searchTerm);
-        Task<List<DeliveryViewModel>?> GetNewDeliveryForDriverAsync(string username, string? referenceNumber = null, DateTime? endDate = null, DateTime? startDate = null, string? deliveryAddress = null, string? pickupAddress = null, string? companyName = null);
         Task<List<DeliveryViewModel>> GetDeliveriesForAccountantBySearchtermAsync(string? searchTerm = null);
         Task<bool> DeliveryWithCompanyExistsAsync(int deliveryId, string username);
         Task<DeliveryForClientViewModel?> GetDeliveryDetailsForCompanyAsync(int id);

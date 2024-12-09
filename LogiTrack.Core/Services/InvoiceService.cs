@@ -1,7 +1,6 @@
 ﻿using LogisticsSystem.Infrastructure.Data.DataModels;
 using LogiTrack.Core.Constants;
 using LogiTrack.Core.Contracts;
-using static LogiTrack.Core.Constants.MessageConstants.ErrorMessages;
 using LogiTrack.Infrastructure.Repository;
 using Microsoft.EntityFrameworkCore;
 using LogiTrack.Infrastructure.Data.DataModels;
@@ -23,8 +22,7 @@ namespace LogiTrack.Core.Services
 
         public async Task<MarkAsPaidInvoiceViewModel?> GetInvoiceForPaymentAsync(int deliveryId)
         {
-            var model = await repository.All<Invoice>().Include(x => x.Delivery).ThenInclude(x => x.Offer)
-                .ThenInclude(x => x.Request).ThenInclude(x => x.ClientCompany).Where(x => x.DeliveryId == deliveryId)
+            var model = await repository.AllReadonly<Invoice>().Where(x => x.DeliveryId == deliveryId)
                 .Select(x => new MarkAsPaidInvoiceViewModel
                 {
                     InvoiceId = x.Id,
@@ -36,91 +34,50 @@ namespace LogiTrack.Core.Services
                     ClientRegistrationNumber = x.Delivery.Offer.Request.ClientCompany.RegistrationNumber,
                     InvoiceDate = x.InvoiceDate.ToString("dd-MM-yyyy"),
                     Today = DateTime.Now.ToString("dd-MM-yyyy"),
-                }).FirstOrDefaultAsync();
+                }).SingleOrDefaultAsync();
             return model;
         }
 
         public async Task<List<InvoiceForDeliveryViewModel>> GetInvoicesAsync(string? deliveryReferenceNumber = null, DateTime? startDate = null, DateTime? endDate = null, string? companyName = null, bool? isPaid = null, decimal? minAmount = null, decimal? maxAmount = null)
         {
-            var invoices = await repository.All<Invoice>().Include(x => x.Delivery).ThenInclude(x => x.Offer)
-                .ThenInclude(x => x.Request).ThenInclude(x => x.ClientCompany).ToListAsync();
+            var query = repository.AllReadonly<Invoice>().Include(x => x.Delivery).ThenInclude(x => x.Offer)
+                .ThenInclude(x => x.Request).ThenInclude(x => x.ClientCompany).AsQueryable();
             if (string.IsNullOrEmpty(deliveryReferenceNumber) == false)
             {
-                invoices = invoices.Where(x => x.Delivery.ReferenceNumber == deliveryReferenceNumber).ToList();
+                query = query.Where(x => x.Delivery.ReferenceNumber == deliveryReferenceNumber);
             }
             if(minAmount != null)
             {
-                invoices = invoices.Where(x => x.Delivery.Offer.FinalPrice >= minAmount).ToList();
+                query = query.Where(x => x.Delivery.Offer.FinalPrice >= minAmount);
             }
             if (maxAmount != null)
             {
-                invoices = invoices.Where(x => x.Delivery.Offer.FinalPrice <= maxAmount).ToList();
+                query = query.Where(x => x.Delivery.Offer.FinalPrice <= maxAmount);
             }
             if (startDate != null)
             {
-                invoices = invoices.Where(x => x.InvoiceDate >= startDate).ToList();
+                query = query.Where(x => x.InvoiceDate >= startDate);
             }
             if (endDate != null)
             {
-                invoices = invoices.Where(x => x.InvoiceDate <= endDate).ToList();
+                query = query.Where(x => x.InvoiceDate <= endDate);
             }
             if (string.IsNullOrEmpty(companyName) == false)
             {
-                invoices = invoices.Where(x => x.Delivery.Offer.Request.ClientCompany.Name == companyName).ToList();
+                query = query.Where(x => x.Delivery.Offer.Request.ClientCompany.Name == companyName);
             }
-
             if (isPaid != null)
             {
-                invoices = invoices.Where(x => x.IsPaid == isPaid).ToList();
-            }
-            var invoicesToShow =  invoices.Select(x => new InvoiceForDeliveryViewModel
-            {
-                DeliveryId = x.DeliveryId,
-                PaymentDate = x.PaidDate.HasValue ? x.PaidDate.Value.ToString("dd-MM-yyyy") : string.Empty,
-                Number = x.InvoiceNumber,
-                Date = x.InvoiceDate.ToString("dd-MM-yyyy"),
-                IsPaid = x.IsPaid,
-                Amount = x.Delivery.Offer.FinalPrice.ToString(),
-                Description = x.Description,
-                FileId = x.FileId
-            }).ToList();
-            foreach (var invoice in invoicesToShow)
-            {
-                invoice.FileUrl = await googleDriveService.GetFileUrlAsync(invoice.FileId);
-            }
-            return invoicesToShow;  
-        }
-
-        public async Task<List<InvoiceForDeliveryViewModel>> GetInvoicesForCompanyAsync(string username, string? deliveryReferenceNumber = null, DateTime? startDate = null, DateTime? endDate = null, decimal? minPrice = null, decimal? maxPrice = null, bool? isPaid = null)     
-        {
-            var invoices = await repository.All<Invoice>().Include(x => x.Delivery).ThenInclude(x => x.Offer)
-                .ThenInclude(x => x.Request).ThenInclude(x => x.ClientCompany).Where(x => x.Delivery.Offer.Request.ClientCompany.User.UserName == username).ToListAsync();
-            if (string.IsNullOrEmpty(deliveryReferenceNumber) == false)
-            {
-                invoices = invoices.Where(x => x.Delivery.ReferenceNumber == deliveryReferenceNumber).ToList();
-            }
-            if (startDate != null)
-            {
-                invoices = invoices.Where(x => x.InvoiceDate >= startDate).ToList();
-            }
-            if (endDate != null)
-            {
-                invoices = invoices.Where(x => x.InvoiceDate <= endDate).ToList();
-            }
-            if (minPrice != null)
-            {
-                invoices = invoices.Where(x => x.Delivery.Offer.FinalPrice < minPrice).ToList();
-            }
-            if (maxPrice != null)
-            {
-                invoices = invoices.Where(x => x.Delivery.Offer.FinalPrice > maxPrice).ToList();
+                query = query.Where(x => x.IsPaid == isPaid);
             }
 
-            if (isPaid != null)
-            {
-                invoices = invoices.Where(x => x.IsPaid == isPaid).ToList();
-            }
-            var invoicesToShow = invoices.Select(x => new InvoiceForDeliveryViewModel
+            var invoices = await query.ToListAsync();
+
+            var fileIds = invoices.Select(x => x.FileId).Distinct().ToList();
+            var fileUrlTasks = fileIds.Select(x => googleDriveService.GetFileUrlAsync(x)).ToArray();
+            var fileUrls = await Task.WhenAll(fileUrlTasks);
+
+            var invoicesToShow =  invoices.Select((x, index) => new InvoiceForDeliveryViewModel
             {
                 DeliveryId = x.DeliveryId,
                 PaymentDate = x.PaidDate.HasValue ? x.PaidDate.Value.ToString("dd-MM-yyyy") : string.Empty,
@@ -130,12 +87,61 @@ namespace LogiTrack.Core.Services
                 Amount = x.Delivery.Offer.FinalPrice.ToString(),
                 Description = x.Description,
                 FileId = x.FileId,
-                Status = x.Status
+                FileUrl = fileUrls.ElementAtOrDefault(index)
             }).ToList();
-            foreach (var invoice in invoicesToShow)
+
+            return invoicesToShow;  
+        }
+
+        public async Task<List<InvoiceForDeliveryViewModel>> GetInvoicesForCompanyAsync(string username, string? deliveryReferenceNumber = null, DateTime? startDate = null, DateTime? endDate = null, decimal? minPrice = null, decimal? maxPrice = null, bool? isPaid = null)     
+        {
+            var query = repository.AllReadonly<Invoice>().Include(x => x.Delivery).ThenInclude(x => x.Offer)
+                .ThenInclude(x => x.Request).ThenInclude(x => x.ClientCompany).Where(x => x.Delivery.Offer.Request.ClientCompany.User.UserName == username).AsQueryable();
+            if (string.IsNullOrEmpty(deliveryReferenceNumber) == false)
             {
-                invoice.FileUrl = await googleDriveService.GetFileUrlAsync(invoice.FileId);
+                query = query.Where(x => x.Delivery.ReferenceNumber == deliveryReferenceNumber);
             }
+            if (startDate != null)
+            {
+                query = query.Where(x => x.InvoiceDate >= startDate);
+            }
+            if (endDate != null)
+            {
+                query = query.Where(x => x.InvoiceDate <= endDate);
+            }
+            if (minPrice != null)
+            {
+                query = query.Where(x => x.Delivery.Offer.FinalPrice < minPrice);
+            }
+            if (maxPrice != null)
+            {
+                query = query.Where(x => x.Delivery.Offer.FinalPrice > maxPrice);
+            }
+
+            if (isPaid != null)
+            {
+                query = query.Where(x => x.IsPaid == isPaid);
+            }
+
+            var invoices = await query.ToListAsync();
+
+            var fileIds = invoices.Select(x => x.FileId).Distinct().ToList();
+            var fileUrlTasks = fileIds.Select(x => googleDriveService.GetFileUrlAsync(x)).ToList();
+            var fileUrls = await Task.WhenAll(fileUrlTasks);
+            var invoicesToShow = invoices.Select((x, index) => new InvoiceForDeliveryViewModel
+            {
+                DeliveryId = x.DeliveryId,
+                PaymentDate = x.PaidDate.HasValue ? x.PaidDate.Value.ToString("dd-MM-yyyy") : string.Empty,
+                Number = x.InvoiceNumber,
+                Date = x.InvoiceDate.ToString("dd-MM-yyyy"),
+                IsPaid = x.IsPaid,
+                Amount = x.Delivery.Offer.FinalPrice.ToString(),
+                Description = x.Description,
+                FileId = x.FileId,
+                Status = x.Status,
+                FileUrl = fileUrls.ElementAtOrDefault(index)
+            }).ToList();
+
             return invoicesToShow;
         }
 
@@ -150,33 +156,40 @@ namespace LogiTrack.Core.Services
                 .ThenInclude(x => x.Request).ThenInclude(x => x.ClientCompany).FirstOrDefaultAsync(x => x.Id == id);
 
             invoice.IsPaid = true;
-            if(DateTime.Now > invoice.Delivery.ActualDeliveryDate.Value.AddDays(-30))
-            {
-                invoice.PaidOnTime = false;
-            }
-            else
-            {
-                invoice.PaidOnTime = true;
-            }
+            invoice.PaidOnTime = DateTime.Now <= invoice.Delivery.ActualDeliveryDate.Value.AddDays(30);
             
-            await repository.SaveChangesAsync();
             var calendarEvent = new CalendarEvent
             {
                 EventType = EventTypesConstants.InvoicePaid,
                 Date = DateTime.Now,
-                Title = $"Delivery {invoice.Delivery.ReferenceNumber} paid",
+                Title = $"Delivery {invoice.Delivery.ReferenceNumber} paid!",
                 UserId = invoice.Delivery.Offer.Request.ClientCompany.User.Id
             };
+
             var logisticsUser = await repository.AllReadonly<IdentityUser>().FirstOrDefaultAsync(x => x.UserName == "logistics");
-            var calendarEventForLogistics = new CalendarEvent
+            if (logisticsUser != null)
             {
-                EventType = EventTypesConstants.InvoicePaid,
-                Date = DateTime.Now,
-                Title = $"Delivery {invoice.Delivery.ReferenceNumber} paid",
-                UserId = logisticsUser.Id
-            };  
-            await repository.AddAsync(calendarEventForLogistics);
+                var calendarEventForLogistics = new CalendarEvent
+                {
+                    EventType = EventTypesConstants.InvoicePaid,
+                    Date = DateTime.Now,
+                    Title = $"Delivery {invoice.InvoiceNumber} paid!",
+                    UserId = logisticsUser.Id
+                };
+
+                var logisticsNotification = new Notification
+                {
+                    Message = $"Delivery {invoice.InvoiceNumber} paid!",
+                    Title = "Invoice paid",
+                    Date = DateTime.Now,
+                    UserId = logisticsUser.Id
+                };
+
+                await repository.AddAsync(calendarEventForLogistics);
+                await repository.AddAsync(logisticsNotification);
+            }
             await repository.AddAsync(calendarEvent);
+
             await repository.SaveChangesAsync();
             return invoice.DeliveryId;
         }      
