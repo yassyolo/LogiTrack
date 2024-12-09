@@ -13,8 +13,6 @@ namespace LogiTrack.Core.ViewModels.Driver
         public string LicenseExpiryDate { get; set; } = string.Empty;
         public string AverageDeliveryTime { get; set; } = string.Empty;
         public string AverageDeliveryDistance { get; set; } = string.Empty;
-        public int InternatinalDeliveries { get; set; }
-        public int DomesticDeliveries { get; set; }
         public string Username { get; set; } = string.Empty;
         public string Salary { get; set; } = string.Empty;
         public string Age { get; set; } = string.Empty;
