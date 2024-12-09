@@ -1,443 +1,305 @@
 ﻿@model LogiTrack.Core.ViewModels.CashRegister.CashRegisterStatisticsViewModel
 @{
-    Layout = null;
+    ViewData["Title"] = "Cash registers statistics";
+    Layout = "~/Views/Shared/_AccountantLayout.cshtml";
 }
-<!DOCTYPE html>
-<html lang="en">
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Driver Dashboard</title>
-    <link rel="stylesheet" href="~/css/site.css" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-    <script src="~/js/site.js"></script>
-    <style>
-        .card h3 {
-            margin: 0;
-            font-size: 1.1rem;
-            color: #00aa87;
-        }
-
-        .chart-container {
-            background-color: white;
-            width: 100%;
-            max-width: 1100px;
-            margin: 0 auto;
-        }
-
-        .chart {
-            flex: 1;
-            max-width: 300px;
-            max-height: 400px;
-        }
-
-        .monthy-deliveries {
-            flex: 1;
-            max-width: 500px;
-            height: 500px;
-            margin-top: 50px;
-        }
-
-        .first-row {
-            display: flex;
-            justify-content: space-between;
-            width: 100%;
-            max-width: 1000px;
-        }
-
-        .chart-container, .delay-time-container {
-            padding: 10px;
-        }
-
-        .chart-container {
-            margin-right: 30px;
-        }
-
-        h4, .stat-text {
-            text-align: center;
-            color: #00aa87;
-        }
-
-        .delay {
-            display: flex;
-            flex-direction: row;
-            justify-content: space-between;
-        }
-
-        .second-row {
-            margin-top: 50px;
-            width: 70%;
-            align-content: center;
-            margin-left: 300px;
-        }
-    </style>
-
-</head>
-
-<body>
-    <header class="header">
-        <div class="logo-name">
-            <div class="company-logo">
-                <img src="https://via.placeholder.com/50" alt="Company Logo">
-            </div>
-            <div class="company-name">LogiTrack</div>
-        </div>
-        <div class="profile-dropdown">
-            <button onclick="toggleDropdown()">
-                <i class="bi bi-person-circle"></i>
-                <span class="arrow">&#x25BC;</span>
-            </button>
-            <div class="profile-dropdown-menu" id="profileDropdown">
-                <a asp-action="Logout" asp-controller="Home">Logout</a>
+<div class="chart-container">
+    <div class="cards-container">
+        <div class="card" id="locationCard">
+            <div class="card-content">
+                <h3>Total cash registers</h3>
+                <p><b>@Model.TotalCashRegisters</b></p>
             </div>
         </div>
-    </header>
-    <aside class="sidebar">
-        <ul>
-            <li>
-                <a asp-action="Dashboard" asp-controller="Accountant">
-                    <i class="bi bi-house-door"></i> Dashboard
-                </a>
-            </li>
-            <li>
-                <a asp-action="SearchDeliveries" asp-controller="Accountant">
-                    <i class="bi bi-truck"></i> Deliveries <span class="arrow">></span>
-                </a>
-                <div class="dropdown-menu">
-                    <ul>
-                        <li><a asp-action="SearchDeliveries" asp-controller="Accountant"><i class="bi bi-list"></i> All</a></li>
-                        <li><a asp-action="SearchDelivery" asp-controller="Accountant"><i class="bi bi-search"></i> Search</a></li>
-                    </ul>
-                </div>
-            </li>
-            <li>
-                <a asp-action="SearchCashRegisters" asp-controller="Accountant">
-                    <i class="bi bi-cash"></i> Cash registers <span class="arrow">></span>
-                </a>
-                <div class="dropdown-menu">
-                    <ul>
-                        <li><a asp-action="SearchCashRegisters" asp-controller="Accountant"><i class="bi bi-list"></i> All</a></li>
-                        <li><a asp-action="CashRegistersStatistics" asp-controller="Accountant"><i class="bi bi-bar-chart"></i> Statistics</a></li>
-                    </ul>
-                </div>
-            </li>
-            <li>
-                <a asp-action="SearchInvoices" asp-controller="Accountant">
-                    <i class="bi bi-receipt"></i> Invoices <span class="arrow">></span>
-                </a>
-                <div class="dropdown-menu">
-                    <ul>
-                        <li><a asp-action="SearchInvoices" asp-controller="Accountant"><i class="bi bi-list"></i> All</a></li>
-                        <li><a asp-action="InvoicesStatistics" asp-controller="Accountant"><i class="bi bi-bar-chart"></i> Statistics</a></li>
-                    </ul>
-                </div>
-            </li>
-        </ul>
-    </aside>
-
-    <div class="main-content">
-        <div class="chart-container">
-            <div class="cards-container">
-                <div class="card" id="locationCard">
-                    <div class="card-content">
-                        <h3>Total cash registers</h3>
-                        <p><b>@Model.TotalCashRegisters</b></p>
-                    </div>
-                </div>
-                <div class="card" id="locationCard">
-                    <div class="card-content">
-                        <h3>Total aditional costs</h3>
-                        <p><b>@Model.TotalAdditionalCosts BGN</b></p>
-                    </div>
-                </div>
-                <div class="card" id="locationCard">
-                    <div class="card-content">
-                        <h3>Deliveries with additional costs</h3>
-                        <p><b>@Model.DeliveriesWithAdditionalCosts</b></p>
-                    </div>
-                </div>
-                <div class="card" id="locationCard">
-                    <div class="card-content">
-                        <h3>Delivery with additional costs ratio</h3>
-                        <p><b>@Model.DeliveriesWithAdditionalCostsRatio / @Model.DeliveriesWithAdditionalCosts</b></p>
-                    </div>
-                </div>
+        <div class="card" id="locationCard">
+            <div class="card-content">
+                <h3>Total aditional costs</h3>
+                <p><b>@Model.TotalAdditionalCosts BGN</b></p>
             </div>
-
-            <div class="first-row">
-                <div class="chart-container">
-                    <h4>Cash register types</h4>
-                    <canvas style="margin-left: 150px;" id="cashRegisterChart" class="chart"></canvas>
-                </div>
-                <div class="delay-time-container">
-                    <h4>Additional costs for delivery</h4>
-                    <canvas id="additionalCostChart" class="chart"></canvas>
-                </div>
+        </div>
+        <div class="card" id="locationCard">
+            <div class="card-content">
+                <h3>Deliveries with additional costs</h3>
+                <p><b>@Model.DeliveriesWithAdditionalCosts</b></p>
             </div>
-            <div class="first-row">
-                <div class="chart-container">
-                    <h4>Additional costs for deliveries by destination type</h4>
-                    <canvas style="margin-left: 50px;" id="totalCostChart" class="chart"></canvas>
-                </div>
-
-                <div class="chart-container">
-                    <h4>Correlation between distance and additional costs</h4>
-                    <canvas style="margin-left: 100px;"id="distanceCostScatter" class="chart"></canvas>
-                </div>
+        </div>
+        <div class="card" id="locationCard">
+            <div class="card-content">
+                <h3>Delivery with additional costs ratio</h3>
+                <p><b>@Model.DeliveriesWithAdditionalCostsRatio / @Model.DeliveriesWithAdditionalCosts</b></p>
             </div>
-            <div class="chart-container">
-                <h4>Top 10 deliveries with additional costs</h4>
-                <canvas style="margin-left:310px;" id="top10DeliveriesBarChart" class="chart"></canvas>
-            </div>
-
         </div>
     </div>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-gauge"></script>
+
+    <div class="first-row">
+        <div class="chart-container">
+            <h4>Cash register types</h4>
+            <canvas style="margin-left: 150px;" id="cashRegisterChart" class="chart"></canvas>
+        </div>
+        <div class="delay-time-container">
+            <h4>Additional costs for delivery</h4>
+            <canvas id="additionalCostChart" class="chart"></canvas>
+        </div>
+    </div>
+    <div class="first-row">
+        <div class="chart-container">
+            <h4>Additional costs for deliveries by destination type</h4>
+            <canvas style="margin-left: 50px;" id="totalCostChart" class="chart"></canvas>
+        </div>
+
+        <div class="chart-container">
+            <h4>Correlation between distance and additional costs</h4>
+            <canvas style="margin-left: 100px;" id="distanceCostScatter" class="chart"></canvas>
+        </div>
+    </div>
+    <div class="chart-container">
+        <h4>Top 10 deliveries with additional costs</h4>
+        <canvas style="margin-left:310px;" id="top10DeliveriesBarChart" class="chart"></canvas>
+    </div>
+
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-chart-gauge"></script>
 
 
-    <script>
-        document.addEventListener("DOMContentLoaded", async () => {
-            await renderCashRegisterTypesDistribution();
-            await renderAdditionalCostChart();
-            await renderTotalAdditionalCostsByDeliveryType();
-            await renderDistanceCostScatterChart();
-            await renderTop10DeliveriesBarChart();
-        });
+<script>
+    document.addEventListener("DOMContentLoaded", async () => {
+        await renderCashRegisterTypesDistribution();
+        await renderAdditionalCostChart();
+        await renderTotalAdditionalCostsByDeliveryType();
+        await renderDistanceCostScatterChart();
+        await renderTop10DeliveriesBarChart();
+    });
 
-        async function renderCashRegisterTypesDistribution() {
-            try {
-                const response = await fetch('/Accountant/GetCashRegisterTypesDistribution');
-                if (!response.ok) throw new Error('Failed to fetch data');
-                const data = await response.json();
+    async function renderCashRegisterTypesDistribution() {
+        try {
+            const response = await fetch('/Accountant/GetCashRegisterTypesDistribution');
+            if (!response.ok) throw new Error('Failed to fetch data');
+            const data = await response.json();
 
-                const types = Object.keys(data);
-                const counts = Object.values(data);
+            const types = Object.keys(data);
+            const counts = Object.values(data);
 
-                const ctx = document.getElementById('cashRegisterChart').getContext('2d');
-                new Chart(ctx, {
-                    type: 'doughnut',
-                    data: {
-                        labels: types,
-                        datasets: [{
-                            data: counts,
-                            backgroundColor: ['#FF6384', '#00aa87', '#FFCE56'],
-                            hoverBackgroundColor: ['#FF6384', '#00aa87', '#FFCE56']
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        plugins: {
-                            legend: { display: true, position: 'bottom' },
-                            tooltip: {
-                                callbacks: {
-                                    label: function (tooltipItem) {
-                                        return `${types[tooltipItem.dataIndex]}: ${counts[tooltipItem.dataIndex]}`;
-                                    }
+            const ctx = document.getElementById('cashRegisterChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: types,
+                    datasets: [{
+                        data: counts,
+                        backgroundColor: ['#FF6384', '#00aa87', '#FFCE56'],
+                        hoverBackgroundColor: ['#FF6384', '#00aa87', '#FFCE56']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: true, position: 'bottom' },
+                        tooltip: {
+                            callbacks: {
+                                label: function (tooltipItem) {
+                                    return `${types[tooltipItem.dataIndex]}: ${counts[tooltipItem.dataIndex]}`;
                                 }
                             }
                         }
                     }
-                });
-            } catch (error) {
-                console.error('Error fetching cash register types data:', error);
-            }
+                }
+            });
+        } catch (error) {
+            console.error('Error fetching cash register types data:', error);
         }
+    }
 
-        async function renderAdditionalCostChart() {
-            try {
-                const response = await fetch('/Accountant/AdditionalCostsForCashRegisters');
-                const data = await response.json();
+    async function renderAdditionalCostChart() {
+        try {
+            const response = await fetch('/Accountant/AdditionalCostsForCashRegisters');
+            const data = await response.json();
 
-                const maxCost = data.maxAdditionalCost;
-                const avgCost = data.averageAdditionalCost;
+            const maxCost = data.maxAdditionalCost;
+            const avgCost = data.averageAdditionalCost;
 
-                const ctx = document.getElementById('additionalCostChart').getContext('2d');
-                new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: ['Max additional cost', 'Average additional cost'],
-                        datasets: [{
-                            label: 'Additional Cost',
-                            data: [maxCost, avgCost],
-                            backgroundColor: ['#FF6384', '#00aa87'],
-                            borderColor: ['#FF6384', '#00aa87'],
-                            borderWidth: 1
-                        }]
+            const ctx = document.getElementById('additionalCostChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Max additional cost', 'Average additional cost'],
+                    datasets: [{
+                        label: 'Additional Cost',
+                        data: [maxCost, avgCost],
+                        backgroundColor: ['#FF6384', '#00aa87'],
+                        borderColor: ['#FF6384', '#00aa87'],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { stepSize: 1 }
+                        }
                     },
-                    options: {
-                        responsive: true,
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                ticks: { stepSize: 1 }
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function (tooltipItem) {
+                                    return `${tooltipItem.label}: $${tooltipItem.raw.toFixed(2)}`;
+                                }
                             }
+                        }
+                    }
+                }
+            });
+        } catch (error) {
+            console.error('Error fetching additional cost data:', error);
+        }
+    }
+
+    async function renderTotalAdditionalCostsByDeliveryType() {
+        try {
+            const response = await fetch('/Accountant/GetTotalAdditionalCostsByDeliveryType');
+            const data = await response.json();
+
+            const types = Object.keys(data);
+            const costs = Object.values(data);
+
+            const ctx = document.getElementById('totalCostChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: types,
+                    datasets: [{
+                        label: 'Total additional cost',
+                        data: costs,
+                        backgroundColor: ['#FF6384', '#00aa87'],
+                        borderColor: ['#FF6384', '#00aa87'],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function (tooltipItem) {
+                                    return `${tooltipItem.label}: $${tooltipItem.raw.toFixed(2)}`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+        } catch (error) {
+            console.error('Error fetching total additional costs by delivery type:', error);
+        }
+    }
+
+    async function renderDistanceCostScatterChart() {
+        try {
+            const response = await fetch('/Logistics/GetDistanceAdditionalCostData');
+            const data = await response.json();
+
+            const scatterData = Object.entries(data).map(([distance, cost]) => ({
+                x: parseFloat(distance),
+                y: parseFloat(cost)
+            }));
+
+            const ctx = document.getElementById('distanceCostScatter').getContext('2d');
+            new Chart(ctx, {
+                type: 'scatter',
+                data: {
+                    datasets: [{
+                        label: 'Distance vs. Additional Cost',
+                        data: scatterData,
+                        backgroundColor: '#00aa87',
+                        borderColor: '#00aa87',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: { display: true, text: '' },
+                        tooltip: {
+                            callbacks: {
+                                label: function (context) {
+                                    return `Distance: ${context.raw.x} km, Cost: $${context.raw.y}`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            type: 'linear',
+                            position: 'bottom',
+                            title: { display: true, text: 'Distance (km)' }
                         },
-                        plugins: {
-                            legend: { display: false },
-                            tooltip: {
-                                callbacks: {
-                                    label: function (tooltipItem) {
-                                        return `${tooltipItem.label}: $${tooltipItem.raw.toFixed(2)}`;
-                                    }
+                        y: {
+                            title: { display: true, text: 'Additional Cost ($)' }
+                        }
+                    }
+                }
+            });
+        } catch (error) {
+            console.error('Error fetching distance and cost data:', error);
+        }
+    }
+
+    async function renderTop10DeliveriesBarChart() {
+        try {
+            const response = await fetch('/logistics/gettop10deliveriesbyadditionalcost');
+            const data = await response.json();
+
+            const labels = Object.keys(data);
+            const values = Object.values(data);
+
+            const ctx = document.getElementById('top10DeliveriesBarChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Additional Cost ($)',
+                        data: values,
+                        backgroundColor: 'rgba(255, 99, 132, 0.6)',
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: { display: true, text: 'Top 10 Deliveries with the Highest Additional Costs' },
+                        tooltip: {
+                            callbacks: {
+                                label: function (context) {
+                                    return `Additional Cost: $${context.raw}`;
                                 }
                             }
                         }
-                    }
-                });
-            } catch (error) {
-                console.error('Error fetching additional cost data:', error);
-            }
-        }
-
-        async function renderTotalAdditionalCostsByDeliveryType() {
-            try {
-                const response = await fetch('/Accountant/GetTotalAdditionalCostsByDeliveryType');
-                const data = await response.json();
-
-                const types = Object.keys(data);
-                const costs = Object.values(data);
-
-                const ctx = document.getElementById('totalCostChart').getContext('2d');
-                new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: types,
-                        datasets: [{
-                            label: 'Total additional cost',
-                            data: costs,
-                            backgroundColor: ['#FF6384', '#00aa87'],
-                            borderColor: ['#FF6384', '#00aa87'],
-                            borderWidth: 1
-                        }]
                     },
-                    options: {
-                        responsive: true,
-                        plugins: {
-                            legend: { display: false },
-                            tooltip: {
-                                callbacks: {
-                                    label: function (tooltipItem) {
-                                        return `${tooltipItem.label}: $${tooltipItem.raw.toFixed(2)}`;
-                                    }
-                                }
-                            }
-                        },
-                        scales: {
-                            y: { beginAtZero: true }
+                    scales: {
+                        x: { title: { display: true, text: 'Delivery' } },
+                        y: {
+                            title: { display: true, text: 'Additional Cost ($)' },
+                            beginAtZero: true
                         }
                     }
-                });
-            } catch (error) {
-                console.error('Error fetching total additional costs by delivery type:', error);
-            }
+                }
+            });
+        } catch (error) {
+            console.error('Error fetching top 10 deliveries data:', error);
         }
+    }
+</script>
 
-        async function renderDistanceCostScatterChart() {
-            try {
-                const response = await fetch('/Logistics/GetDistanceAdditionalCostData');
-                const data = await response.json();
-
-                const scatterData = Object.entries(data).map(([distance, cost]) => ({
-                    x: parseFloat(distance),
-                    y: parseFloat(cost)
-                }));
-
-                const ctx = document.getElementById('distanceCostScatter').getContext('2d');
-                new Chart(ctx, {
-                    type: 'scatter',
-                    data: {
-                        datasets: [{
-                            label: 'Distance vs. Additional Cost',
-                            data: scatterData,
-                            backgroundColor: '#00aa87',
-                            borderColor: '#00aa87',
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        plugins: {
-                            title: { display: true, text: '' },
-                            tooltip: {
-                                callbacks: {
-                                    label: function (context) {
-                                        return `Distance: ${context.raw.x} km, Cost: $${context.raw.y}`;
-                                    }
-                                }
-                            }
-                        },
-                        scales: {
-                            x: {
-                                type: 'linear',
-                                position: 'bottom',
-                                title: { display: true, text: 'Distance (km)' }
-                            },
-                            y: {
-                                title: { display: true, text: 'Additional Cost ($)' }
-                            }
-                        }
-                    }
-                });
-            } catch (error) {
-                console.error('Error fetching distance and cost data:', error);
-            }
-        }
-
-        async function renderTop10DeliveriesBarChart() {
-            try {
-                const response = await fetch('/logistics/gettop10deliveriesbyadditionalcost');
-                const data = await response.json();
-
-                const labels = Object.keys(data);
-                const values = Object.values(data);
-
-                const ctx = document.getElementById('top10DeliveriesBarChart').getContext('2d');
-                new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: labels,
-                        datasets: [{
-                            label: 'Additional Cost ($)',
-                            data: values,
-                            backgroundColor: 'rgba(255, 99, 132, 0.6)',
-                            borderColor: 'rgba(255, 99, 132, 1)',
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        plugins: {
-                            title: { display: true, text: 'Top 10 Deliveries with the Highest Additional Costs' },
-                            tooltip: {
-                                callbacks: {
-                                    label: function (context) {
-                                        return `Additional Cost: $${context.raw}`;
-                                    }
-                                }
-                            }
-                        },
-                        scales: {
-                            x: { title: { display: true, text: 'Delivery' } },
-                            y: {
-                                title: { display: true, text: 'Additional Cost ($)' },
-                                beginAtZero: true
-                            }
-                        }
-                    }
-                });
-            } catch (error) {
-                console.error('Error fetching top 10 deliveries data:', error);
-            }
-        }
-    </script>
-</body>
-
-</html>
 
 

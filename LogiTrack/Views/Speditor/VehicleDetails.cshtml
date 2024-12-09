@@ -1,0 +1,765 @@
+﻿@model LogiTrack.Core.ViewModels.Vehicle.VehicleDetailsViewModel
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Driver Dashboard</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap">
+    <link rel="stylesheet" href="~/css/site.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css">
+    <script src="~/js/site.js"></script>
+    <style>
+        .details-container {
+            width: 85%;
+        }
+
+        .details-card {
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 0 25px 1px #0000000f !important;
+            padding: 17px;
+            background-color: white;
+        }
+
+        .details-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .delivery-image {
+            width: 50px;
+            height: auto;
+        }
+
+        p {
+            font-size: 14px;
+            color: black;
+            opacity: 80%;
+        }
+
+        h4 {
+            margin: 10px 0;
+            color: #00aa87;
+            font-size: 1.1rem;
+        }
+
+        .metrics-header {
+            display: flex;
+            flex-direction: row;
+            gap: 300px;
+            margin-bottom: 20px;
+        }
+
+        .status-header {
+            display: flex;
+            flex-direction: row;
+            gap: 180px;
+            margin-bottom: 20px;
+        }
+
+        .metrics {
+            margin-top: 50px;
+        }
+
+        .metrics-header {
+            display: flex;
+            flex-direction: row;
+            gap: 300px;
+            margin-bottom: 20px;
+        }
+
+        .metrics {
+            margin-top: 50px;
+        }
+
+        .standart-metrics-header-row {
+            display: flex;
+            flex-direction: row;
+            margin-left: 40px;
+            justify-content: space-between;
+            width: 90%;
+        }
+
+        .standart-metrics-info-row {
+            display: flex;
+            flex-direction: row;
+            background-color: #fbfbfb;
+            margin-left: 40px;
+            gap: 100px;
+            white-space: nowrap;
+            font-weight: 300;
+            font-size: 14px;
+            opacity: 80%;
+            justify-content: space-between;
+            width: 90%;
+        }
+
+        .non-standart-metrics-header-row {
+            display: flex;
+            flex-direction: row;
+            margin-left: 40px;
+            justify-content: space-between;
+            width: 90%;
+        }
+
+        .non-standart-metrics-info-row {
+            display: flex;
+            flex-direction: row;
+            background-color: #fbfbfb;
+            margin-left: 40px;
+            gap: 100px;
+            font-weight: 300;
+            font-size: 14px;
+            opacity: 80%;
+            justify-content: space-between;
+            width: 90%;
+        }
+
+        .more-header-row {
+            display: flex;
+            flex-direction: row;
+            margin-left: 40px;
+            gap: 50px;
+        }
+
+       
+        .delivery-header {
+            display: flex;
+            justify-content: space-between;
+            background-color: #ffffff;
+            padding: 30px;
+            font-weight: bold;
+            font-size: 0.90rem;
+            width: 90%;
+        }
+
+        .delivery-card {
+            background-color: white;
+            font-size: 0.80rem;
+            display: flex;
+            flex-direction: column;
+            transition: background-color 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+            .delivery-card:nth-child(even) {
+                background-color: #F5F5F7;
+            }
+
+        .delivery-metrics {
+            display: none;
+            margin-top: 10px;
+            background-color: #f1f8ff;
+            width: 100%;
+            transition: background-color 0.3s ease;
+        }
+
+            .delivery-metrics p {
+                margin-left: 210px;
+            }
+
+        
+        .address {
+            width: 140px;
+            flex-wrap: wrap;
+        }
+
+        .divider-line {
+            height: 1px;
+            background-color: #e0e0e0;
+            margin: 10px 0;
+        }
+
+        
+
+        .card h3 {
+            margin: 0;
+            font-size: 1.1rem;
+            color: #00aa87;
+        }
+
+        .column{
+			display: flex;
+			flex-direction: column;
+        }
+
+        .row{
+            display: flex;
+            flex-direction: row;
+            justify-content:space-between; 
+            width: 80%;
+        }
+
+    </style>
+
+</head>
+
+<body>
+    <header class="header">
+        <div class="logo-name">
+            <div class="company-logo">
+                <img src="https://via.placeholder.com/50" alt="Company Logo">
+            </div>
+            <div class="company-name">LogiTrack</div>
+        </div>
+        <div class="profile-dropdown">
+            <button onclick="toggleDropdown()">
+                <i class="bi bi-person-circle"></i>
+                <span class="arrow">&#x25BC;</span>
+            </button>
+            <div class="profile-dropdown-menu" id="profileDropdown">
+                <a asp-action="Details" asp-controller="Driver">Personal details</a>
+                <a asp-action="LicenseDetails" asp-controller="Driver">License</a>
+                <a asp-action="Logout" asp-controller="Home">Logout</a>
+            </div>
+        </div>
+    </header>
+    <aside class="sidebar">
+        <ul>
+            <li>
+                <a asp-action="Dashboard" asp-controller="Logistics">
+                    <i class="bi bi-house-door"></i> Dashboard
+                </a>
+            </li>
+            <li>
+                <a href="#">
+                    <i class="bi bi-people"></i> Clients <span class="arrow">></span>
+                </a>
+                <div class="dropdown-menu">
+                    <ul>
+                        <li><a asp-action="GetPendingRegistrations" asp-controller="Logistics"><i class="bi bi-person-plus"></i> New registrations</a></li>
+                        <li><a asp-action="ClientsRegister" asp-controller="Logistics"><i class="bi bi-journal-text"></i> Clients register</a></li>
+                        <li><a asp-action="SearchCompany" asp-controller="Logistics"><i class="bi bi-search"></i> Search</a></li>
+                        <li><a asp-action="ClientsStatistics" asp-controller="Logistics"><i class="bi bi-bar-chart-line"></i> Statistics</a></li>
+                    </ul>
+                </div>
+            </li>
+            <li>
+                <a asp-action="VehiclesRegister" asp-controller="Logistics">
+                    <i class="bi bi-truck"></i> Vehicles <span class="arrow">></span>
+                </a>
+                <div class="dropdown-menu">
+                    <ul>
+                        <li><a asp-action="SearchVehicle" asp-controller="Logistics"><i class="bi bi-search"></i> Search</a></li>
+                        <li><a asp-action="VehiclesRegister" asp-controller="Logistics"><i class="bi bi-list-task"></i> Vehicles Register</a></li>
+                        <li><a asp-action="VehicleStatistics" asp-controller="Logistics"><i class="bi bi-bar-chart"></i> Statistics</a></li>
+                    </ul>
+                </div>
+            </li>
+            <li>
+                <a asp-action="DriversRegister" asp-controller="Logistics">
+                    <i class="bi bi-person-badge"></i> Drivers <span class="arrow">></span>
+                </a>
+                <div class="dropdown-menu">
+                    <ul>
+                        <li><a asp-action="SearchDriver" asp-controller="Logistics"><i class="bi bi-search"></i> Search</a></li>
+                        <li><a asp-action="DriversRegister" asp-controller="Logistics"><i class="bi bi-people-fill"></i> Drivers Register</a></li>
+                        <li><a asp-action="DriverStatistics" asp-controller="Logistics"><i class="bi bi-bar-chart-line"></i> Statistics</a></li>
+                    </ul>
+                </div>
+            </li>
+            <li>
+                <a asp-action="RequestsRegister" asp-controller="Logistics">
+                    <i class="bi bi-card-list"></i> Requests <span class="arrow">></span>
+                </a>
+                <div class="dropdown-menu">
+                    <ul>
+                        <li><a asp-action="SearchRequest" asp-controller="Logistics"><i class="bi bi-search"></i> Search</a></li>
+                        <li><a asp-action="RequestsRegister" asp-controller="Logistics"><i class="bi bi-journal"></i> Requests Register</a></li>
+                        <li><a asp-action="RequestsStatistics" asp-controller="Logistics"><i class="bi bi-bar-chart"></i> Statistics</a></li>
+                    </ul>
+                </div>
+            </li>
+            <li>
+                <a asp-action="OffersRegister" asp-controller="Logistics">
+                    <i class="bi bi-file-earmark-text"></i> Offers <span class="arrow">></span>
+                </a>
+                <div class="dropdown-menu">
+                    <ul>
+                        <li><a asp-action="SearchOffer" asp-controller="Logistics"><i class="bi bi-search"></i> Search</a></li>
+                        <li><a asp-action="OffersRegister" asp-controller="Logistics"><i class="bi bi-journal-text"></i> Offers Register</a></li>
+                        <li><a asp-action="OfferStatistics" asp-controller="Logistics"><i class="bi bi-bar-chart"></i> Statistics</a></li>
+                    </ul>
+                </div>
+            </li>
+            <li>
+                <a asp-action="DeliveriesRegister" asp-controller="Logistics">
+                    <i class="bi bi-box-seam"></i> Deliveries <span class="arrow">></span>
+                </a>
+                <div class="dropdown-menu">
+                    <ul>
+                        <li><a asp-action="SearchDelivery" asp-controller="Logistics"><i class="bi bi-search"></i> Search</a></li>
+                        <li><a asp-action="DeliveriesRegister" asp-controller="Logistics"><i class="bi bi-journal"></i> Deliveries Register</a></li>
+                        <li><a asp-action="DeliveryStatistics" asp-controller="Logistics"><i class="bi bi-bar-chart"></i> Statistics</a></li>
+                    </ul>
+                </div>
+            </li>
+            <li>
+                <a asp-action="InvoicesRegister" asp-controller="Logistics">
+                    <i class="bi bi-receipt"></i> Invoices register <span class="arrow">></span>
+                </a>
+                <div class="dropdown-menu">
+                    <ul>
+                        <li><a asp-action="InvoicesRegister" asp-controller="Logistics"><i class="bi bi-journal"></i> Invoices Register</a></li>
+                        <li><a asp-action="InvoicesStatistics" asp-controller="Logistics"><i class="bi bi-bar-chart-line"></i> Statistics</a></li>
+                    </ul>
+                </div>
+            </li>
+            <li>
+                <a asp-action="SearchCashRegisters" asp-controller="Logistics">
+                    <i class="bi bi-cash-stack"></i> Cash registers <span class="arrow">></span>
+                </a>
+                <div class="dropdown-menu">
+                    <ul>
+                        <li><a asp-action="SearchCashRegisters" asp-controller="Logistics"><i class="bi bi-journal"></i> Cash Register</a></li>
+                        <li><a asp-action="CashRegisterStatistics" asp-controller="Logistics"><i class="bi bi-bar-chart-line"></i> Statistics</a></li>
+                    </ul>
+                </div>
+            </li>
+        </ul>
+    </aside>
+
+    <div class="main-content">
+        <div class="details-container">
+            <div class="details-card">
+                <div class="details-header">
+                    <div class="delivery-image">
+                        <i class="bi bi-truck" style="font-size: 40px; color: #00aa87;"></i>
+                    </div>
+                    <h3><b>@Model.RegistrationNumber</b></h3>
+                </div>
+
+                <div class="button-tabs">
+                    <button class="tab-button" id="vehicleBtn">INFO</button>
+                    <button class="tab-button" id="priceBtn">PRICES</button>
+                    <button class="tab-button" id="addressesBtn">DELIVERIES</button>
+                    <button class="tab-button" id="statusBtn">MAINTENANCE</button>
+                    <button class="tab-button" id="metricsBtn">METRICS</button>
+                    <button class="tab-button" id="statisticsBtn">STATISTICS</button>
+                </div>
+
+                <div id="vehicleSection" class="section d-none">
+                    <div class="row">
+                        <div class="column">
+                        <h4><b>General details</b></h4>
+                        <p><strong>Registration Number:</strong> @Model.RegistrationNumber</p>
+                        <p><strong>Vehicle Type:</strong> @Model.VehicleType</p>
+                        </div>
+                        <div class="column">
+                        <h4><b>Status</b></h4>
+                        <p><strong>Vehicle Type:</strong> @Model.VehicleStatus</p>
+                        </div>
+                    </div>
+                    
+                </div>
+
+                <div id="priceSection" class="section d-none">
+                    <h4><b>Prices</b></h4>
+                    <div class="row">
+                    <p><strong>Purchase price:</strong> @Model.PurchasePrice BGN</p>
+                    <p><strong>Constant expenses:</strong> @Model.ContantsExpenses BGN</p>
+                    </div>
+                    <div class="divider-line"></div>
+                    <h4 style="margin-left:300px;"><b>Quotients for prices</b></h4>
+                    <div class="row" >
+                        <div class="column">
+                            <h4><b>Domestic deliveries</b></h4>
+                            <p><strong>Shared truck:</strong> @Model.QuotientForDomesticSharedTruck</p>
+                            <p><strong>Not shared truck:</strong> @Model.QuotientForDomesticNotSharedTruck</p>
+                        </div>
+                        <div class="column">
+                            <h4><b>International deliveries</b></h4>
+                            <p><strong>Shared truck:</strong> @Model.QuotientForInternationalSharedTruck</p>
+                            <p><strong>Not shared truck:</strong> @Model.QuotientForInternationalNotSharedTruck</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="addressesSection" class="section d-none">
+                    <div class="cards-container">
+                        <div class="card" id="locationCard">
+                            <div class="card-content">
+                                <h3>Last month</h3>
+                                <p><b>@Model.DeliveriesLastMonth</b></p>
+                            </div>
+                        </div>
+                        <div class="card" id="locationCard">
+                            <div class="card-content">
+                                <h3>Not on time</h3>
+                                <p><b>@Model.NotOnTimeDeliveries</b></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="filtered-deliveries-container">
+                        <div class="delivery-header">
+                            <span>Ref No</span>
+                            <span>Origin</span>
+                            <span>Destination</span>
+                            <span>Expected Date</span>
+                            <span>Price</span>
+                            <span>Delivered</span>
+                            <span>Paid</span>
+                        </div>
+                        @if (Model.Deliveries.Any())
+                        {
+                            <div class="delivery-list">
+                                @foreach (var delivery in Model.Deliveries)
+                                {
+                                    <div class="delivery-card">
+                                        <div class="delivery-info">
+                                            <a asp-action="DeliveryDetails" asp-controller="Accountant" asp-route-id="@delivery.Id" style="text-decoration:none; color:inherit;"><span>@delivery.ReferenceNumber</span></a>
+                                            <span class="address">@delivery.PickupAddress</span>
+                                            <span class="address">@delivery.DeliveryAddress</span>
+
+                                            <span>@delivery.ExpectedDeliveryDate</span>
+                                            <span>@delivery.FinalPrice</span>
+                                            <span>
+                                                @if (delivery.IsDelivered)
+                                                {
+                                                    <i class="bi bi-check-circle-fill" style="color: #00aa87;"></i>
+                                                }
+                                            </span>
+                                            <span>
+                                                @if (delivery.IsPaid)
+                                                {
+                                                    <i class="bi bi-check-circle-fill" style="color: #00aa87;"></i>
+                                                }
+                                            </span>
+                                        </div>
+                                        <div class="delivery-metrics">
+                                            <p><b>Packs:</b> @delivery.TotalItems</p>
+                                            <p><b>Weight:</b> @delivery.TotalWeight</p>
+                                            <p><b>Volume:</b> @delivery.TotalVolume</p>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <p class="no-found">No deliveries found matching the search criteria.</p>
+                        }
+                    </div>
+                </div>
+
+                <div id="metricsSection" class="section  d-none">
+                    <div class="metrics-header">
+                        <div class="metrics-header-row">
+                            <h4><b>Fuel consumption per 100km</b></h4>
+                            <p>@Model.FuelConsumptionPer100Km l/100km</p>
+                        </div>
+                        <div class="metrics-header-row">
+                            <h4><b>Emission factor</b></h4>
+                            <p>@Model.EmisionFactor M3</p>
+                        </div>
+                    </div>
+                    <div class="metrics">
+                        <h4><b>Standard Metrics</b></h4>
+                    </div>
+                    <div class="standart-metrics-header-row">
+                        <p><b>Length</b></p>
+                        <p><b>Width</b></p>
+                        <p><b>Height</b></p>
+                        <p><b>Volume</b></p>
+                        <p><b>Max weight capacity</b></p>
+                    </div>
+                    <div class="standart-metrics-info-row">
+                        <p>@Model.Length cm</p>
+                        <p>@Model.Width cm</p>
+                        <p>@Model.Height cm</p>
+                        <p>@Model.Volume m3</p>
+                        <p>@Model.MaxWeightCapacity kg</p>
+                    </div>
+                    <div class="metrics">
+                        <h4><b>Non-Standart Metrics</b></h4>
+                    </div>
+                    <div class="non-standart-metrics-header-row">
+                        <p><b>Euro pallet capacity</b></p>
+                        <p><b>Industrial pallet capacity</b></p>
+                        <p><b>Stackable</b></p>
+                    </div>
+                    <div class="non-standart-metrics-info-row">
+                        <p>@Model.EuroPalletCapacity</p>
+                        <p>@Model.IndustrialPalletCapacity</p>
+                        @if (Model.ArePalletsStackable)
+                        {
+                            <p>Yes</p>
+                        }
+                        else
+                        {
+                            <p>No</p>
+                        }
+                    </div>
+                </div>
+
+                <div id="statusSection" class="section d-none">
+                    <h4><b>Yearly maintenance</b></h4>
+
+                    <div class="row">
+                        <div class="status-header-row">
+                            <p><strong>Last year</strong></p>
+                            <p>@Model.LastYearMaintenance</p>
+                        </div>
+                        <div class="status-header-row">
+                            <p><strong>Days till next</strong></p>
+                            <p>@Model.DaysTillMaintenance days</p>
+                        </div>
+                        @if(Model.DaysTillMaintenance <= 100)
+                        {
+                             <div class="alert alert-danger">
+                            Yearly maintenace due!
+                            </div>
+                        }
+                       
+                    </div>
+                    <div class="divider-line"></div>
+                    <h4><b>Kilometers</b></h4>
+                    <div class="row">
+                        <div class="status-header-row">
+                            <p><strong>Kms driven</strong></p>
+                            <p>@Model.KilometersDriven KM</p>
+                        </div>
+                        <div class="status-header-row">
+                            <p><strong>Kms till part changing</strong></p>
+                            <p>@Model.KilometersLeftToChangeParts KM</p>
+                        </div>  
+                        @if (Model.KilometersLeftToChangeParts <= 1000)
+                        {
+                            <div class="alert alert-danger">
+                                Changing parts due!
+                            </div>
+                        }
+                    </div>
+                </div>
+                <div id="statisticsSection" class="section  d-none">
+                    <div class="chart-container">
+                        <div class="cards-container">
+                            <div class="card" id="locationCard">
+                                <div class="card-content">
+                                    <h3>Adittional costs</h3>
+                                    <p><b>@Model.AdditionalCost BGN</b></p>
+                                </div>
+                            </div>
+                            <div class="card" id="locationCard">
+                                <div class="card-content">
+                                    <h3>Average additional cost per delivery</h3>
+                                    <p><b>@Model.AverageAdditionalCost BGN</b></p>
+                                </div>
+                            </div>
+                            <div class="card" id="locationCard">
+                                <div class="card-content">
+                                    <h3>Average distance per delivery</h3>
+                                    <p><b>@Model.AverageKilometers KM</b></p>
+                                </div>
+                            </div>
+                            <div class="card" id="locationCard">
+                                <div class="card-content">
+                                    <h3>Emission factor</h3>
+                                    <p><b>@Model.EmissionFactorFrAllDeliveries M3</b></p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="first-row">
+                            <div class="first-row">
+                                <div class="chart-container">
+                                    <h4>Delivery types ratio</h4>
+                                    <canvas id="vehicleCostsChart" class="chart"></canvas>
+                                </div>
+                                <div class="chart-container">
+                                    <h4>Distance</h4>
+                                    <canvas id="distanceDeliveriesChart" class="chart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#vehicleBtn').click(function () {
+                showSection('#vehicleSection');
+            });
+            $('#addressesBtn').click(function () {
+                showSection('#addressesSection');
+            });
+            $('#priceBtn').click(function () {
+                showSection('#priceSection');
+            });
+            $('#metricsBtn').click(function () {
+                showSection('#metricsSection');
+            });
+            $('#statusBtn').click(function () {
+                showSection('#statusSection');
+            });
+            $('#statisticsBtn').click(function () {
+                showSection('#statisticsSection');
+            });
+
+            function showSection(sectionId) {
+                $('.section').addClass('d-none');
+                $(sectionId).removeClass('d-none');
+            }
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            async function fetchVehicleCosts(vehicleId) {
+                try {
+                    const response = await fetch(`/Logistics/GetVehicleCostsDataForVehicle/${vehicleId}`);
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch vehicle costs data.');
+                    }
+
+                    const data = await response.json();
+                    console.log('Fetched vehicle costs data:', data);
+
+                    const totalCosts = data.totalCosts || 0;
+                    const numDeliveries = data.numDeliveries || 1;
+                    const avgCostPerDelivery = totalCosts / numDeliveries;
+
+                    const ctx = document.getElementById('vehicleCostsChart').getContext('2d');
+                    new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: ['Total Costs', 'Average Cost per Delivery'],
+                            datasets: [{
+                                label: 'Vehicle Costs',
+                                data: [totalCosts, avgCostPerDelivery],
+                                backgroundColor: ['#00aa87', '#FF6384'],
+                                borderColor: ['#00aa87', '#FF6384'],
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    title: {
+                                        display: true,
+                                        text: 'Costs (in currency)'
+                                    }
+                                }
+                            },
+                            plugins: {
+                                legend: {
+                                    display: false
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function (tooltipItem) {
+                                            return `${tooltipItem.dataset.label}: ${tooltipItem.raw}`;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                } catch (error) {
+                    console.error('Error fetching vehicle costs data:', error);
+                }
+            }
+
+
+            document.addEventListener('DOMContentLoaded', function () {
+                async function fetchDistanceAndDeliveriesData(vehicleId) {
+                    try {
+                        const response = await fetch(`/Logistics/GetDistanceAndDeliveriesForVehicle/${vehicleId}`);
+                        if (!response.ok) {
+                            throw new Error('Failed to fetch distance and deliveries data.');
+                        }
+
+                        const data = await response.json();
+
+                        // Debugging output
+                        console.log('Fetched distance and deliveries data:', data);
+
+                        // Extract data
+                        const labels = data.months || []; // Safely handle undefined or missing data
+                        const totalDistance = data.totalDistance || 0;
+                        const totalDeliveries = data.totalDeliveries || 0;
+
+                        const ctx = document.getElementById('distanceDeliveriesChart').getContext('2d');
+                        new Chart(ctx, {
+                            type: 'line',
+                            data: {
+                                labels: labels, // Array of months
+                                datasets: [
+                                    {
+                                        label: 'Total Distance Travelled (km)',
+                                        data: labels.map((_, index) => (index === 4 ? totalDistance : 0)), // Assign data for May (index 4)
+                                        borderColor: '#3498db',
+                                        backgroundColor: 'rgba(52, 152, 219, 0.2)',
+                                        fill: true,
+                                        tension: 0.4
+                                    },
+                                    {
+                                        label: 'Total Deliveries',
+                                        data: labels.map((_, index) => (index === 4 ? totalDeliveries : 0)), // Assign data for May (index 4)
+                                        borderColor: '#e74c3c',
+                                        backgroundColor: 'rgba(231, 76, 60, 0.2)',
+                                        fill: true,
+                                        tension: 0.4
+                                    }
+                                ]
+                            },
+                            options: {
+                                responsive: true,
+                                scales: {
+                                    y: {
+                                        beginAtZero: true,
+                                        title: {
+                                            display: true,
+                                            text: 'Values'
+                                        }
+                                    },
+                                    x: {
+                                        title: {
+                                            display: true,
+                                            text: 'Months'
+                                        }
+                                    }
+                                },
+                                plugins: {
+                                    legend: {
+                                        display: true,
+                                        position: 'top'
+                                    },
+                                    tooltip: {
+                                        callbacks: {
+                                            label: function (tooltipItem) {
+                                                return `${tooltipItem.dataset.label}: ${tooltipItem.raw}`;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                    } catch (error) {
+                        console.error('Error fetching distance and deliveries data:', error);
+                    }
+                }
+
+                const vehicleId = '@Model.Id'; // Replace with actual vehicle ID dynamically
+                fetchDistanceAndDeliveriesData(vehicleId);
+            });
+    </script>
+
+</body>
+</html>
+

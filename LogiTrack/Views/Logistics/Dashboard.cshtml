@@ -1,429 +1,275 @@
 ﻿@model LogiTrack.Core.ViewModels.Logistics.LogisticsDashboardViewModel
 @{
-    Layout = null;
+    ViewData["Title"] = "Add Cash Register";
+    Layout = "~/Views/Shared/_LogisticsLayout.cshtml";
 }
 
-<!DOCTYPE html>
-<html lang="en">
+<div class="cards-container">
+    <div class="card" id="locationCard">
+        <div class="card-icon">
+            <i class="bi bi-person-plus" style="font-size: 50px; color: #00aa87;"></i>
+        </div>
+        <div class="card-content">
+            <h3>NEW REGISTRATIONS</h3>
+            <p>@Model.PendingRegistrationsCount</p>
+        </div>
+        <div class="card-button-info">
+            <a asp-action="GetPendingRegistrations" asp-controller="Logistics" class="card-button">+ SEE</a>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-icon">
+            <i class="bi bi-box-seam" style="font-size: 50px; color: #00aa87;"></i>
+        </div>
+        <div class="card-content">
+            <h3>DELIVERIES</h3>
+            <p>@Model.DeliveriesCount</p>
+        </div>
+        <div class="card-button-info">
+            <a asp-action="DeliveriesRegister" asp-controller="Logistics" class="card-button">+ SEE</a>
+            <p>@Model.DeliveriesLastWeekCount last month</p>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-icon">
+            <i class="bi bi-card-list" style="font-size: 50px; color: #00aa87;"></i>
+        </div>
+        <div class="card-content">
+            <h3>REQUESTS</h3>
+            <p>@Model.RequestsCount</p>
+        </div>
+        <div class="card-button-info">
+            <a asp-action="RequestsRegister" asp-controller="Logistics" class="card-button">+ ALL</a>
+            <p>@Model.RequestsLastWeekCount last month</p>
+        </div>
+    </div>
+</div>
+<div class="diagrams">
+    <div class="diagram">
+        <div class="diagram-header">
+            <h3>Last booked offers</h3>
+            <a asp-action="OffersRegister" asp-controller="Logistics" class="see-all">See All</a>
+        </div>
+        <div class="invoice-header">
+            <p><b>Addresses</b></p>
+            <p><b>Amount</b></p>
+            <p><b>Client</b></p>
+        </div>
+        @foreach (var item in Model.Last5BookedOffers)
+        {
+            <a asp-action="DeliveryDetails" class="delivery" asp-controller="Logistics" asp-route-id="@item.Id" style="color:black;">
+                <div class="delivery-info">
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Driver Dashboard</title>
-    <link rel="stylesheet" href="~/css/site.css" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css">
-    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet" />
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
-    <script src="~/js/site.js"></script>
-    <style>
-        .diagram-header {
-            display: flex;
-            gap: 30px;
-            align-items: center;
+                    <img src="~/dashboard_books_dots.svg" alt="Road" class="road-icon">
+                    <div class="addresses">
+                        <p class="pickup-address">@item.PickupAddress</p>
+                        <p class="delivery-address">@item.DeliveryAddress</p>
+                    </div>
+                </div>
+                <p> @item.Price BGN</p>
+                <p>'@item.ClientName'</p>
+            </a>
         }
+    </div>
+    <div class="diagram">
+        <div class="diagram-header">
+            <h3>Track</h3>
+            <a asp-action="DeliveriesRegister" asp-controller="Logistics" class="see-all">See All</a>
+        </div>
+        <div class="invoice-header">
+            <p><b>Ref No</b></p>
+            <p><b>Addresses</b></p>
+            <p><b>Status</b></p>
+            <p><b>Vehicle number</b></p>
+        </div>
+        @foreach (var item in Model.DeliveresWithVehicles)
+        {
+            <div class="delivery-tracking">
 
-            .diagram-header h3 {
-                font-size: 1.1rem;
-                color: #00aa87;
-                letter-spacing: revert;
+                <a asp-action="DeliveryDetails" asp-controller="Logistics" asp-route-id="@item.Id" class="ref-num">
+                    @item.ReferenceNumber
+                    <div class="delivery-info">
+                        <a asp-action="DeliveryDetails" asp-controller="Logistics" asp-route-id="@item.Id"></a>
+                        <img src="~/dashboard_books_dots.svg" alt="Road" class="road-icon">
+                        <div class="addresses">
+                            <p class="pickup-address">@item.PickupAddress</p>
+                            <p class="delivery-address">@item.DeliveryAddress</p>
+                        </div>
+                    </div>
+                </a>
+
+                <div class="tracking-line">
+                    <div class="dot" style="background-color: @(item.DeliveryStep >= 1 ? "#00aa87" : "gray")"></div>
+                    <div class="line" style="background-color: @(item.DeliveryStep >= 2 ? "#00aa87" : "gray")"></div>
+                    <div class="dot" style="background-color: @(item.DeliveryStep >= 2 ? "#00aa87" : "gray")"></div>
+                    <div class="line" style="background-color: @(item.DeliveryStep >= 3 ? "#00aa87" : "gray")"></div>
+                    <div class="dot" style="background-color: @(item.DeliveryStep >= 3 ? "#00aa87" : "gray")"></div>
+                    <div class="line" style="background-color: @(item.DeliveryStep >= 4 ? "#00aa87" : "gray")"></div>
+                    <div class="dot" style="background-color: @(item.DeliveryStep >= 4 ? "#00aa87" : "gray")"></div>
+                </div>
+                <p class="ref-num">@item.VehicleRegistrationNumber</p>
+            </div>
+        }
+    </div>
+    <div class="diagram" style="margin-left: 290px;">
+        <div id="calendar" class="calendar"></div>
+        <div id="event-details" class="event-details"></div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    $(document).ready(function () {
+        $.ajax({
+            url: '/Logistics/GetCalendarEvents',
+            type: 'GET',
+            success: function (events) {
+                events = events || [];
+
+                var calendarEl = document.getElementById('calendar');
+                var calendar = new FullCalendar.Calendar(calendarEl, {
+                    initialView: 'dayGridMonth',
+                    headerToolbar: {
+                        left: 'prev,next today',
+                        center: 'title',
+                        right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                    },
+                    events: events.map(function (event) {
+                        return {
+                            id: event.id,
+                            title: event.title,
+                            start: event.date.split("T")[0],
+                            backgroundColor: getColor(event.type)
+                        };
+                    }),
+                    dateClick: function (info) {
+                        var dateEvents = events.filter(event => event.date.split("T")[0] === info.dateStr);
+                        if (dateEvents.length > 0) {
+                            $('#event-details').html('<h4 class="event-details">Events on ' + info.dateStr + ':</h4><ul>' +
+                                dateEvents.map(e => '<li>' + e.title + '</li>').join('') +
+                                '</ul>');
+                        } else {
+                            $('#event-details').html('<h4>No events on ' + info.dateStr + '.</h4>');
+                        }
+                    }
+                });
+
+                calendar.render();
+
+                if (events.length === 0) {
+                    $('#event-details').html('<p>No events available for this calendar.</p>');
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error('Error fetching calendar events:', error);
+                $('#calendar').html('<p>Error loading calendar events. Please try again later.</p>');
             }
+        });
 
-        .invoice-header {
-            display: flex;
-            flex-direction: row;
-            width: 90%;
-            justify-content: space-between;
-        }
-
-        .delivery {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 10px;
-            margin-bottom: 15px;
-        }
-
-        .delivery-info {
-            display: flex;
-            align-items: center;
-            font-size: 0.85rem;
-        }
-
-            .delivery-info p {
-                margin: 0;
+        function getColor(type) {
+            switch (type) {
+                case 'Delivered':
+                    return 'green';
+                case 'Pickup':
+                    return 'blue';
+                case 'Paid':
+                    return '#00aa87';
+                default:
+                    return 'gray';
             }
-
-        .delivery-tracking {
-            display: flex;
-            margin-top: 10px;
-            flex-direction: row;
-            margin-bottom: 15px;
         }
+    });
+</script>
+<style>
 
-        .addresses {
-            margin-left: 10px;
-            font-size: 14px;
-            width: 90%;
-        }
 
-        .road-icon {
-            width: 35px;
-            height: 35px;
-            margin: 0 10px;
-        }
+    .invoice-header {
+        display: flex;
+        flex-direction: row;
+        width: 90%;
+        justify-content: space-between;
+    }
 
-        .pickup-address,
-        .delivery-address {
+    .delivery {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 10px;
+        margin-bottom: 15px;
+    }
+
+    .delivery-info {
+        display: flex;
+        align-items: center;
+        font-size: 0.85rem;
+    }
+
+        .delivery-info p {
             margin: 0;
         }
 
-        .client-company {
-            font-size: 0.85rem;
-        }
+    .delivery-tracking {
+        display: flex;
+        margin-top: 10px;
+        flex-direction: row;
+        margin-bottom: 15px;
+    }
 
-        .ref-num {
-            text-decoration: none;
-            color: black;
-            text-rendering: optimizelegibility;
-            font-size: 0.80rem;
-            margin-top: 10px;
-        }
+    .addresses {
+        margin-left: 10px;
+        font-size: 14px;
+        width: 90%;
+    }
 
-        .tracking-line {
-            display: flex;
-            align-items: center;
-            margin-top: 10px;
-            width: 20%;
-            margin-left: 20px;
-            margin-right: 20px;
-        }
+    .road-icon {
+        width: 35px;
+        height: 35px;
+        margin: 0 10px;
+    }
 
-        .dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-        }
+    .pickup-address,
+    .delivery-address {
+        margin: 0;
+    }
 
-        .line {
-            flex: 1;
-            height: 3px;
-        }
+    .client-company {
+        font-size: 0.85rem;
+    }
 
-        a {
-            text-decoration: none;
-        }
+    .ref-num {
+        text-decoration: none;
+        color: black;
+        text-rendering: optimizelegibility;
+        font-size: 0.80rem;
+        margin-top: 10px;
+    }
 
-        p {
-            font-size: 14px;
-        }
-    </style>
+    .tracking-line {
+        display: flex;
+        align-items: center;
+        margin-top: 10px;
+        width: 20%;
+        margin-left: 20px;
+        margin-right: 20px;
+    }
 
-</head>
+    .dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+    }
 
-<body>
-    <header class="header">
-        <div class="logo-name">
-            <div class="company-logo">
-                <img src="https://via.placeholder.com/50" alt="Company Logo">
-            </div>
-            <div class="company-name">LogiTrack</div>
-        </div>
-        <div class="profile-dropdown">
-            <button onclick="toggleDropdown()">
-                <i class="bi bi-person-circle"></i>
-                <span class="arrow">&#x25BC;</span>
-            </button>
-            <div class="profile-dropdown-menu" id="profileDropdown">
-                <a asp-action="CompanyDetails" asp-controller="Logistics">Company details</a>
+    .line {
+        flex: 1;
+        height: 3px;
+    }
 
-                <a asp-action="Logout" asp-controller="Home">Logout</a>
-            </div>
-        </div>
-    </header>
-    <aside class="sidebar">
-        <ul>
-            <li>
-                <a asp-action="Dashboard" asp-controller="Logistics">
-                    <i class="bi bi-house-door"></i> Dashboard
-                </a>
-            </li>
-            <li>
-                <a href="#">
-                    <i class="bi bi-people"></i> Clients <span class="arrow">></span>
-                </a>
-                <div class="dropdown-menu">
-                    <ul>
-                        <li><a asp-action="GetPendingRegistrations" asp-controller="Logistics"><i class="bi bi-person-plus"></i> New registrations</a></li>
-                        <li><a asp-action="ClientsRegister" asp-controller="Logistics"><i class="bi bi-journal-text"></i> Clients register</a></li>
-                        <li><a asp-action="SearchCompany" asp-controller="Logistics"><i class="bi bi-search"></i> Search</a></li>
-                        <li><a asp-action="ClientsStatistics" asp-controller="Logistics"><i class="bi bi-bar-chart-line"></i> Statistics</a></li>
-                    </ul>
-                </div>
-            </li>
-            <li>
-                <a asp-action="VehiclesRegister" asp-controller="Logistics">
-                    <i class="bi bi-truck"></i> Vehicles <span class="arrow">></span>
-                </a>
-                <div class="dropdown-menu">
-                    <ul>
-                        <li><a asp-action="SearchVehicle" asp-controller="Logistics"><i class="bi bi-search"></i> Search</a></li>
-                        <li><a asp-action="VehiclesRegister" asp-controller="Logistics"><i class="bi bi-list-task"></i> Vehicles Register</a></li>
-                        <li><a asp-action="VehicleStatistics" asp-controller="Logistics"><i class="bi bi-bar-chart"></i> Statistics</a></li>
-                    </ul>
-                </div>
-            </li>
-            <li>
-                <a asp-action="DriversRegister" asp-controller="Logistics">
-                    <i class="bi bi-person-badge"></i> Drivers <span class="arrow">></span>
-                </a>
-                <div class="dropdown-menu">
-                    <ul>
-                        <li><a asp-action="SearchDriver" asp-controller="Logistics"><i class="bi bi-search"></i> Search</a></li>
-                        <li><a asp-action="DriversRegister" asp-controller="Logistics"><i class="bi bi-people-fill"></i> Drivers Register</a></li>
-                        <li><a asp-action="DriverStatistics" asp-controller="Logistics"><i class="bi bi-bar-chart-line"></i> Statistics</a></li>
-                    </ul>
-                </div>
-            </li>
-            <li>
-                <a asp-action="RequestsRegister" asp-controller="Logistics">
-                    <i class="bi bi-card-list"></i> Requests <span class="arrow">></span>
-                </a>
-                <div class="dropdown-menu">
-                    <ul>
-                        <li><a asp-action="SearchRequest" asp-controller="Logistics"><i class="bi bi-search"></i> Search</a></li>
-                        <li><a asp-action="RequestsRegister" asp-controller="Logistics"><i class="bi bi-journal"></i> Requests Register</a></li>
-                        <li><a asp-action="RequestsStatistics" asp-controller="Logistics"><i class="bi bi-bar-chart"></i> Statistics</a></li>
-                    </ul>
-                </div>
-            </li>
-            <li>
-                <a asp-action="OffersRegister" asp-controller="Logistics">
-                    <i class="bi bi-file-earmark-text"></i> Offers <span class="arrow">></span>
-                </a>
-                <div class="dropdown-menu">
-                    <ul>
-                        <li><a asp-action="SearchOffer" asp-controller="Logistics"><i class="bi bi-search"></i> Search</a></li>
-                        <li><a asp-action="OffersRegister" asp-controller="Logistics"><i class="bi bi-journal-text"></i> Offers Register</a></li>
-                        <li><a asp-action="OfferStatistics" asp-controller="Logistics"><i class="bi bi-bar-chart"></i> Statistics</a></li>
-                    </ul>
-                </div>
-            </li>
-            <li>
-                <a asp-action="DeliveriesRegister" asp-controller="Logistics">
-                    <i class="bi bi-box-seam"></i> Deliveries <span class="arrow">></span>
-                </a>
-                <div class="dropdown-menu">
-                    <ul>
-                        <li><a asp-action="SearchDelivery" asp-controller="Logistics"><i class="bi bi-search"></i> Search</a></li>
-                        <li><a asp-action="DeliveriesRegister" asp-controller="Logistics"><i class="bi bi-journal"></i> Deliveries Register</a></li>
-                        <li><a asp-action="DeliveryStatistics" asp-controller="Logistics"><i class="bi bi-bar-chart"></i> Statistics</a></li>
-                    </ul>
-                </div>
-            </li>
-            <li>
-                <a asp-action="InvoicesRegister" asp-controller="Logistics">
-                    <i class="bi bi-receipt"></i> Invoices register <span class="arrow">></span>
-                </a>
-                <div class="dropdown-menu">
-                    <ul>
-                        <li><a asp-action="InvoicesRegister" asp-controller="Logistics"><i class="bi bi-journal"></i> Invoices Register</a></li>
-                        <li><a asp-action="InvoicesStatistics" asp-controller="Logistics"><i class="bi bi-bar-chart-line"></i> Statistics</a></li>
-                    </ul>
-                </div>
-            </li>
-            <li>
-                <a asp-action="SearchCashRegisters" asp-controller="Logistics">
-                    <i class="bi bi-cash-stack"></i> Cash registers <span class="arrow">></span>
-                </a>
-                <div class="dropdown-menu">
-                    <ul>
-                        <li><a asp-action="SearchCashRegisters" asp-controller="Logistics"><i class="bi bi-journal"></i> Cash Register</a></li>
-                        <li><a asp-action="CashRegisterStatistics" asp-controller="Logistics"><i class="bi bi-bar-chart-line"></i> Statistics</a></li>
-                    </ul>
-                </div>
-            </li>
-        </ul>
-    </aside>
-    <div class="main-content">
-        <div class="cards-container">
-            <div class="card" id="locationCard">
-                <div class="card-icon">
-                    <i class="bi bi-person-plus" style="font-size: 50px; color: #00aa87;"></i>
-                </div>
-                <div class="card-content">
-                    <h3>NEW REGISTRATIONS</h3>
-                    <p>@Model.PendingRegistrationsCount</p>
-                </div>
-                <div class="card-button-info">
-                    <a asp-action="GetPendingRegistrations" asp-controller="Logistics" class="card-button">+ SEE</a>
-                </div>
-            </div>
-            <div class="card">
-                <div class="card-icon">
-                    <i class="bi bi-box-seam" style="font-size: 50px; color: #00aa87;"></i>
-                </div>
-                <div class="card-content">
-                    <h3>DELIVERIES</h3>
-                    <p>@Model.DeliveriesCount</p>
-                </div>
-                <div class="card-button-info">
-                    <a asp-action="DeliveriesRegister" asp-controller="Logistics" class="card-button">+ SEE</a>
-                    <p>@Model.DeliveriesLastWeekCount last month</p>
-                </div>
-            </div>
-            <div class="card">
-                <div class="card-icon">
-                    <i class="bi bi-card-list" style="font-size: 50px; color: #00aa87;"></i>
-                </div>
-                <div class="card-content">
-                    <h3>REQUESTS</h3>
-                    <p>@Model.RequestsCount</p>
-                </div>
-                <div class="card-button-info">
-                    <a asp-action="RequestsRegister" asp-controller="Logistics" class="card-button">+ ALL</a>
-                    <p>@Model.RequestsLastWeekCount last month</p>
-                </div>
-            </div>
-        </div>
-        <div class="diagrams">
-            <div class="diagram">
-                <div class="diagram-header">
-                    <h3>Last booked offers</h3>
-                    <a asp-action="OffersRegister" asp-controller="Logistics" class="see-all">See All</a>
-                </div>
-                <div class="invoice-header">
-                    <p><b>Addresses</b></p>
-                    <p><b>Amount</b></p>
-                    <p><b>Client</b></p>
-                </div>
-                @foreach (var item in Model.Last5BookedOffers)
-                {
-                    <a asp-action="DeliveryDetails" class="delivery" asp-controller="Logistics" asp-route-id="@item.Id" style="color:black;">
-                        <div class="delivery-info">
+    a {
+        text-decoration: none;
+    }
 
-                            <img src="~/dashboard_books_dots.svg" alt="Road" class="road-icon">
-                            <div class="addresses">
-                                <p class="pickup-address">@item.PickupAddress</p>
-                                <p class="delivery-address">@item.DeliveryAddress</p>
-                            </div>
-                        </div>
-                        <p> @item.Price BGN</p>
-                        <p>'@item.ClientName'</p>
-                    </a>
-                }
-            </div>
-            <div class="diagram">
-                <div class="diagram-header">
-                    <h3>Track</h3>
-                    <a asp-action="DeliveriesRegister" asp-controller="Logistics" class="see-all">See All</a>
-                </div>
-                <div class="invoice-header">
-                    <p><b>Ref No</b></p>
-                    <p><b>Addresses</b></p>
-                    <p><b>Status</b></p>
-                    <p><b>Vehicle number</b></p>
-                </div>
-                @foreach (var item in Model.DeliveresWithVehicles)
-                {
-                    <div class="delivery-tracking">
-
-                        <a asp-action="DeliveryDetails" asp-controller="Logistics" asp-route-id="@item.Id" class="ref-num">
-                            @item.ReferenceNumber
-                            <div class="delivery-info">
-                                <a asp-action="DeliveryDetails" asp-controller="Logistics" asp-route-id="@item.Id"></a>
-                                <img src="~/dashboard_books_dots.svg" alt="Road" class="road-icon">
-                                <div class="addresses">
-                                    <p class="pickup-address">@item.PickupAddress</p>
-                                    <p class="delivery-address">@item.DeliveryAddress</p>
-                                </div>
-                            </div>
-                        </a>
-
-                        <div class="tracking-line">
-                            <div class="dot" style="background-color: @(item.DeliveryStep >= 1 ? "#00aa87" : "gray")"></div>
-                            <div class="line" style="background-color: @(item.DeliveryStep >= 2 ? "#00aa87" : "gray")"></div>
-                            <div class="dot" style="background-color: @(item.DeliveryStep >= 2 ? "#00aa87" : "gray")"></div>
-                            <div class="line" style="background-color: @(item.DeliveryStep >= 3 ? "#00aa87" : "gray")"></div>
-                            <div class="dot" style="background-color: @(item.DeliveryStep >= 3 ? "#00aa87" : "gray")"></div>
-                            <div class="line" style="background-color: @(item.DeliveryStep >= 4 ? "#00aa87" : "gray")"></div>
-                            <div class="dot" style="background-color: @(item.DeliveryStep >= 4 ? "#00aa87" : "gray")"></div>
-                        </div>
-                        <p class="ref-num">@item.VehicleRegistrationNumber</p>
-                    </div>
-                }
-            </div>
-            <div class="diagram" style="margin-left: 290px;">
-                <div id="calendar" class="calendar"></div>
-                <div id="event-details" class="event-details"></div>
-            </div>
-        </div>
-    </div>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-    <script>
-        $(document).ready(function () {
-            $.ajax({
-                url: '/Logistics/GetCalendarEvents',
-                type: 'GET',
-                success: function (events) {
-                    events = events || [];
-
-                    var calendarEl = document.getElementById('calendar');
-                    var calendar = new FullCalendar.Calendar(calendarEl, {
-                        initialView: 'dayGridMonth',
-                        headerToolbar: {
-                            left: 'prev,next today',
-                            center: 'title',
-                            right: 'dayGridMonth,timeGridWeek,timeGridDay'
-                        },
-                        events: events.map(function (event) {
-                            return {
-                                id: event.id,
-                                title: event.title,
-                                start: event.date.split("T")[0],
-                                backgroundColor: getColor(event.type)
-                            };
-                        }),
-                        dateClick: function (info) {
-                            var dateEvents = events.filter(event => event.date.split("T")[0] === info.dateStr);
-                            if (dateEvents.length > 0) {
-                                $('#event-details').html('<h4 class="event-details">Events on ' + info.dateStr + ':</h4><ul>' +
-                                    dateEvents.map(e => '<li>' + e.title + '</li>').join('') +
-                                    '</ul>');
-                            } else {
-                                $('#event-details').html('<h4>No events on ' + info.dateStr + '.</h4>');
-                            }
-                        }
-                    });
-
-                    calendar.render();
-
-                    if (events.length === 0) {
-                        $('#event-details').html('<p>No events available for this calendar.</p>');
-                    }
-                },
-                error: function (xhr, status, error) {
-                    console.error('Error fetching calendar events:', error);
-                    $('#calendar').html('<p>Error loading calendar events. Please try again later.</p>');
-                }
-            });
-
-            function getColor(type) {
-                switch (type) {
-                    case 'Delivered':
-                        return 'green';
-                    case 'Pickup':
-                        return 'blue';
-                    case 'Paid':
-                        return '#00aa87';
-                    default:
-                        return 'gray';
-                }
-            }
-        });
-    </script>
-</body>
-
-</html>
+    p {
+        font-size: 14px;
+    }
+</style>

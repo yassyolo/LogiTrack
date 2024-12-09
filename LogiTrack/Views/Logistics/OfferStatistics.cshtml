@@ -1,380 +1,249 @@
 ﻿@model LogiTrack.Core.ViewModels.Offer.OfferStatisticsForClientViewModel
 @{
-    Layout = null;
+    ViewData["Title"] = "Add Cash Register";
+    Layout = "~/Views/Shared/_LogisticsLayout.cshtml";
 }
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Driver Dashboard</title>
-    <link rel="stylesheet" href="~/css/site.css" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-    <script src="~/js/site.js"></script>
-    <style>
-        .card h3 {
-            margin: 0;
-            font-size: 1.1rem;
-            color: #00aa87;
-        }
-        .chart-container {
-            background: white;
-            padding: 20px;
-        }
-
-            .chart-container h4 {
-                margin-bottom: 20px;
-                font-size: 1.2em;
-                color: #00aa87;
-                text-align: center;
-            }
-
-        .chart {
-            max-width: 100%;
-            max-height: 300px;
-        }
-
-        .first-row {
-            display: flex;
-            width: 90%;
-            margin-bottom: 50px;
-            justify-content: space-between;
-        }
-
-        .second-row {
-            display: flex;
-            justify-content: center;
-            gap: 40px;
-            width: 90%;
-            margin-bottom: 30px;
-        }
-
-            .second-row .chart-container {
-                width: 600px;
-            }
-
-        .delay {
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-        }
-    </style>
-
-</head>
-
-<body>
-    <header class="header">
-        <div class="logo-name">
-            <div class="company-logo">
-                <img src="https://via.placeholder.com/50" alt="Company Logo">
-            </div>
-            <div class="company-name">LogiTrack</div>
-        </div>
-        <div class="profile-dropdown">
-            <button onclick="toggleDropdown()">
-                <i class="bi bi-person-circle"></i>
-                <span class="arrow">&#x25BC;</span>
-            </button>
-            <div class="profile-dropdown-menu" id="profileDropdown">
-                <a asp-action="CompanyDetails" asp-controller="Clients">Company details</a>
-                <a asp-action="ContactDetails" asp-controller="Clients">Contact details</a>
-                <a asp-action="Logout" asp-controller="Home">Logout</a>
+<div class="chart-container">
+    <div class="cards-container">
+        <div class="card" id="locationCard">
+            <div class="card-content">
+                <h3>Average weight</h3>
+                <p><b>@Model.AverageWeight KG</b></p>
             </div>
         </div>
-    </header>
-    <aside class="sidebar">
-        <ul>
-            <li><a asp-action="Dashboard" asp-controller="Clients"><i class="bi bi-house-door"></i> Dashboard</a></li>
-            <li>
-                <a asp-action="MyRequests" asp-controller="Clients"><i class="bi bi-clipboard-check"></i> Requests <span class="arrow">></span></a>
-                <div class="dropdown-menu">
-                    <ul>
-                        <li><a asp-action="MakeRequest" asp-controller="Clients"><i class="bi bi-plus-circle"></i> New</a></li>
-                        <li><a asp-action="MyRequests" asp-controller="Clients"><i class="bi bi-search"></i> Search</a></li>
-                        <li><a asp-action="RequestStatistics" asp-controller="Clients"><i class="bi bi-bar-chart"></i> Statistics</a></li>
-                    </ul>
-                </div>
-            </li>
-            <li>
-                <a asp-action="MyOffers" asp-controller="Clients"><i class="bi bi-file-earmark-text"></i> Offers <span class="arrow">></span></a>
-                <div class="dropdown-menu">
-                    <ul>
-                        <li><a asp-action="HaveOffer" asp-controller="Clients"><i class="bi bi-calendar-check"></i> Book</a></li>
-                        <li><a asp-action="MyOffers" asp-controller="Clients"><i class="bi bi-search"></i> Search</a></li>
-                        <li><a asp-action="OfferStatistics" asp-controller="Clients"><i class="bi bi-bar-chart"></i> Statistics</a></li>
-                    </ul>
-                </div>
-            </li>
-            <li>
-                <a asp-action="MyDeliveries" asp-controller="Clients"><i class="bi bi-truck"></i> Deliveries <span class="arrow">></span></a>
-                <div class="dropdown-menu">
-                    <ul>
-                        <li><a asp-action="SearchDelivery" asp-controller="Clients"><i class="bi bi-binoculars"></i> Track</a></li>
-                        <li><a asp-action="MyDeliveries" asp-controller="Clients"><i class="bi bi-search"></i> Search</a></li>
-                        <li><a asp-action="DeliveryStatistics" asp-controller="Clients"><i class="bi bi-bar-chart"></i> Statistics</a></li>
-                    </ul>
-                </div>
-            </li>
-            <li>
-                <a asp-action="MyInvoices" asp-controller="Clients"><i class="bi bi-receipt"></i> Invoices <span class="arrow">></span></a>
-                <div class="dropdown-menu">
-                    <ul>
-                        <li><a asp-action="MyInvoices" asp-controller="Clients"><i class="bi bi-search"></i> Search</a></li>
-                        <li><a asp-action="InvoicesStatistics" asp-controller="Clients"><i class="bi bi-bar-chart"></i> Statistics</a></li>
-                    </ul>
-                </div>
-            </li>
-        </ul>
-    </aside>
-    <div class="main-content">
-        <div class="chart-container">
-            <div class="cards-container">
-                <div class="card" id="locationCard">
-                    <div class="card-content">
-                        <h3>Average weight</h3>
-                        <p><b>@Model.AverageWeight KG</b></p>
-                    </div>
-                </div>
-                <div class="card" id="locationCard">
-                    <div class="card-content">
-                        <h3>Average volume</h3>
-                        <p><b>@Model.AverageVolume M3</b></p>
-                    </div>
-                </div>
-                <div class="card" id="locationCard">
-                    <div class="card-content">
-                        <h3>Average price</h3>
-                        <p><b>@Model.AveragePrice BGN</b></p>
-                    </div>
-                </div>
-                <div class="card" id="locationCard">
-                    <div class="card-content">
-                        <h3>Total pallets</h3>
-                        <p><b>@Model.TotalPallets</b></p>
-                    </div>
-                </div>
+        <div class="card" id="locationCard">
+            <div class="card-content">
+                <h3>Average volume</h3>
+                <p><b>@Model.AverageVolume M3</b></p>
             </div>
-
-            <div class="first-row">
-                <div class="chart-container">
-                    <h4>Offer acceptance rate</h4>
-                    <canvas id="offerAcceptanceRateChart" class="chart"></canvas>
-                </div>
-                <div class="chart-container">
-                    <h4>Differences in approximate prices and final prices</h4>
-                    <div class="delay">
-                        <canvas id="dualAxisChart" class="chart"></canvas>
-                    </div>
-                </div>
+        </div>
+        <div class="card" id="locationCard">
+            <div class="card-content">
+                <h3>Average price</h3>
+                <p><b>@Model.AveragePrice BGN</b></p>
             </div>
-
-            <div class="second-row">
-                <div class="chart-container">
-                    <h4>Cargo type ratio</h4>
-                    <canvas id="cargoRatioChart" class="chart"></canvas>
-                </div>
+        </div>
+        <div class="card" id="locationCard">
+            <div class="card-content">
+                <h3>Total pallets</h3>
+                <p><b>@Model.TotalPallets</b></p>
             </div>
         </div>
     </div>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    <script>
-        async function fetchAndRenderOfferAcceptanceBarChart(apiUrl, elementId) {
-            try {
-                const response = await fetch(apiUrl);
-                if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
+    <div class="first-row">
+        <div class="chart-container">
+            <h4>Offer acceptance rate</h4>
+            <canvas id="offerAcceptanceRateChart" class="chart"></canvas>
+        </div>
+        <div class="chart-container">
+            <h4>Differences in approximate prices and final prices</h4>
+            <div class="delay">
+                <canvas id="dualAxisChart" class="chart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="second-row">
+        <div class="chart-container">
+            <h4>Cargo type ratio</h4>
+            <canvas id="cargoRatioChart" class="chart"></canvas>
+        </div>
+    </div>
+</div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    async function fetchAndRenderOfferAcceptanceBarChart(apiUrl, elementId) {
+        try {
+            const response = await fetch(apiUrl);
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            const data = await response.json();
+
+            let accepted = data.accepted || 0;
+            let rejected = data.rejected || 0;
+
+            const labels = [];
+            const dataset = [];
+
+            if (accepted > 0) {
+                labels.push("Accepted");
+                dataset.push(accepted);
+            }
+
+            if (rejected > 0) {
+                labels.push("Rejected");
+                dataset.push(rejected);
+            }
+
+            if (labels.length === 0) {
+                labels.push("No Data");
+                dataset.push(1);
+            }
+
+            const offerData = {
+                labels: labels,
+                datasets: [
+                    {
+                        data: dataset,
+                        backgroundColor: ["#00aa87", "#ff4d4d"],
+                        borderColor: ["#00aa87", "#ff4d4d"],
+                        borderWidth: 1
+                    }
+                ]
+            };
+
+            const offerConfig = {
+                type: "bar",
+                data: offerData,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function (tooltipItem) {
+                                    const label = offerData.labels[tooltipItem.dataIndex];
+                                    const value = offerData.datasets[0].data[tooltipItem.dataIndex];
+                                    return `${label}: ${value}`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Count'
+                            }
+                        }
+                    }
                 }
-                const data = await response.json();
+            };
 
-                let accepted = data.accepted || 0;
-                let rejected = data.rejected || 0;
+            const ctx = document.getElementById(elementId).getContext("2d");
+            new Chart(ctx, offerConfig);
+        } catch (error) {
+            console.error("Error fetching or rendering the chart:", error);
+        }
+    }
 
-                const labels = [];
-                const dataset = [];
+    async function fetchAndRenderDualAxisChart(apiUrl, chart) {
+        try {
+            const response = await fetch(apiUrl);
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            const data = await response.json();
 
-                if (accepted > 0) {
-                    labels.push("Accepted");
-                    dataset.push(accepted);
-                }
+            chart.data.labels = data.offers;
+            chart.data.datasets[0].data = data.clientPrices;
+            chart.data.datasets[1].data = data.companyPrices;
 
-                if (rejected > 0) {
-                    labels.push("Rejected");
-                    dataset.push(rejected);
-                }
+            chart.update();
+        } catch (error) {
+            console.error('Error fetching data for dual axis chart:', error);
+        }
+    }
 
-                if (labels.length === 0) {
-                    labels.push("No Data");
-                    dataset.push(1);
-                }
+    async function fetchAndRenderCargoRatioChart(apiUrl, chart) {
+        try {
+            const response = await fetch(apiUrl);
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            const data = await response.json();
 
-                const offerData = {
-                    labels: labels,
+            chart.data.datasets[0].data = [data.standardCount, data.nonStandardCount];
+            chart.update();
+        } catch (error) {
+            console.error('Error fetching data for cargo ratio chart:', error);
+        }
+    }
+
+    window.onload = async function () {
+        try {
+            await fetchAndRenderOfferAcceptanceBarChart("/Logistics/GetOffersAcceptanceRate", "offerAcceptanceRateChart");
+
+            const dualAxisCtx = document.getElementById('dualAxisChart').getContext('2d');
+            const dualAxisChart = new Chart(dualAxisCtx, {
+                type: 'bar',
+                data: {
+                    labels: [],
                     datasets: [
                         {
-                            data: dataset,
-                            backgroundColor: ["#00aa87", "#ff4d4d"],
-                            borderColor: ["#00aa87", "#ff4d4d"],
+                            label: 'Approximate prices',
+                            data: [],
+                            backgroundColor: '#FF6384',
+                            borderColor: '#FF6384',
+                            borderWidth: 1,
+                            yAxisID: 'y-axis-client'
+                        },
+                        {
+                            label: 'Final prices',
+                            data: [],
+                            backgroundColor: '#00aa87',
+                            borderColor: '#00aa87',
+                            borderWidth: 1,
+                            yAxisID: 'y-axis-company'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: { beginAtZero: true },
+                        'y-axis-client': {
+                            type: 'linear',
+                            position: 'left',
+                            title: { display: true, text: 'Approximate prices' }
+                        },
+                        'y-axis-company': {
+                            type: 'linear',
+                            position: 'right',
+                            title: { display: true, text: 'Final prices' }
+                        }
+                    }
+                }
+            });
+            await fetchAndRenderDualAxisChart('/Logistics/GetDifferencesInOfferPrices', dualAxisChart);
+
+            const cargoRatioCtx = document.getElementById('cargoRatioChart').getContext('2d');
+            const cargoRatioChart = new Chart(cargoRatioCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Standard Cargo', 'Non-Standard Cargo'],
+                    datasets: [
+                        {
+                            label: 'Cargo Count',
+                            data: [],
+                            backgroundColor: ['#00aa87', '#FF6384'],
+                            borderColor: ['rgba(75, 192, 192, 1)', 'rgba(255, 159, 64, 1)'],
                             borderWidth: 1
                         }
                     ]
-                };
-
-                const offerConfig = {
-                    type: "bar",
-                    data: offerData,
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: { display: false },
-                            tooltip: {
-                                callbacks: {
-                                    label: function (tooltipItem) {
-                                        const label = offerData.labels[tooltipItem.dataIndex];
-                                        const value = offerData.datasets[0].data[tooltipItem.dataIndex];
-                                        return `${label}: ${value}`;
-                                    }
-                                }
-                            }
-                        },
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                title: {
-                                    display: true,
-                                    text: 'Count'
-                                }
-                            }
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: { display: true, text: 'Count' }
                         }
                     }
-                };
-
-                const ctx = document.getElementById(elementId).getContext("2d");
-                new Chart(ctx, offerConfig);
-            } catch (error) {
-                console.error("Error fetching or rendering the chart:", error);
-            }
-        }
-
-        async function fetchAndRenderDualAxisChart(apiUrl, chart) {
-            try {
-                const response = await fetch(apiUrl);
-                if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
                 }
-                const data = await response.json();
-
-                chart.data.labels = data.offers;
-                chart.data.datasets[0].data = data.clientPrices;
-                chart.data.datasets[1].data = data.companyPrices;
-
-                chart.update();
-            } catch (error) {
-                console.error('Error fetching data for dual axis chart:', error);
-            }
+            });
+            await fetchAndRenderCargoRatioChart('/Logistics/GetCargoRatios', cargoRatioChart);
+        } catch (error) {
+            console.error("Error during chart initialization:", error);
         }
+    };
+</script>
 
-        async function fetchAndRenderCargoRatioChart(apiUrl, chart) {
-            try {
-                const response = await fetch(apiUrl);
-                if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                }
-                const data = await response.json();
-
-                chart.data.datasets[0].data = [data.standardCount, data.nonStandardCount];
-                chart.update();
-            } catch (error) {
-                console.error('Error fetching data for cargo ratio chart:', error);
-            }
-        }
-
-        window.onload = async function () {
-            try {
-                await fetchAndRenderOfferAcceptanceBarChart("/Logistics/GetOffersAcceptanceRate", "offerAcceptanceRateChart");
-
-                const dualAxisCtx = document.getElementById('dualAxisChart').getContext('2d');
-                const dualAxisChart = new Chart(dualAxisCtx, {
-                    type: 'bar',
-                    data: {
-                        labels: [],
-                        datasets: [
-                            {
-                                label: 'Approximate prices',
-                                data: [],
-                                backgroundColor: '#FF6384',
-                                borderColor: '#FF6384',
-                                borderWidth: 1,
-                                yAxisID: 'y-axis-client'
-                            },
-                            {
-                                label: 'Final prices',
-                                data: [],
-                                backgroundColor: '#00aa87',
-                                borderColor: '#00aa87',
-                                borderWidth: 1,
-                                yAxisID: 'y-axis-company'
-                            }
-                        ]
-                    },
-                    options: {
-                        responsive: true,
-                        scales: {
-                            y: { beginAtZero: true },
-                            'y-axis-client': {
-                                type: 'linear',
-                                position: 'left',
-                                title: { display: true, text: 'Approximate prices' }
-                            },
-                            'y-axis-company': {
-                                type: 'linear',
-                                position: 'right',
-                                title: { display: true, text: 'Final prices' }
-                            }
-                        }
-                    }
-                });
-                await fetchAndRenderDualAxisChart('/Logistics/GetDifferencesInOfferPrices', dualAxisChart);
-
-                const cargoRatioCtx = document.getElementById('cargoRatioChart').getContext('2d');
-                const cargoRatioChart = new Chart(cargoRatioCtx, {
-                    type: 'bar',
-                    data: {
-                        labels: ['Standard Cargo', 'Non-Standard Cargo'],
-                        datasets: [
-                            {
-                                label: 'Cargo Count',
-                                data: [],
-                                backgroundColor: ['#00aa87', '#FF6384'],
-                                borderColor: ['rgba(75, 192, 192, 1)', 'rgba(255, 159, 64, 1)'],
-                                borderWidth: 1
-                            }
-                        ]
-                    },
-                    options: {
-                        responsive: true,
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                title: { display: true, text: 'Count' }
-                            }
-                        }
-                    }
-                });
-                await fetchAndRenderCargoRatioChart('/Logistics/GetCargoRatios', cargoRatioChart);
-            } catch (error) {
-                console.error("Error during chart initialization:", error);
-            }
-        };
-    </script>
-</body>
-
-</html>
 
 

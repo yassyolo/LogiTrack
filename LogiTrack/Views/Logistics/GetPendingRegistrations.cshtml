@@ -1,254 +1,93 @@
 ﻿@model List<LogiTrack.Core.ViewModels.Clients.PendingRegistrationsViewModel>
 @{
-    Layout = null;
+    ViewData["Title"] = "Add Cash Register";
+    Layout = "~/Views/Shared/_LogisticsLayout.cshtml";
 }
 
-<!DOCTYPE html>
-<html lang="en">
+<div class="search-container">
+    <div class="search-header">
+        <div class="card-icon">
+            <i class="bi bi-person-plus " style="font-size: 40px; color:#00aa87;"></i>
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Driver Dashboard</title>
-    <link rel="stylesheet" href="~/css/site.css" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css">
-    <script src="~/js/site.js"></script>
-    <style>
-        .search-container {
-            background-color: #fff;
-            padding: 20px;
-            box-shadow: 0 0 25px 1px #0000000f !important;
-        }
-
-        .search-header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 30px;
-            border-bottom: 1px solid #ccc;
-        }
-
-        .search-icon {
-            width: 40px;
-            margin-right: 10px;
-            margin-bottom: 30px;
-        }
-
-        .search-title {
-            font-size: 1.1rem;
-            font-weight: 500;
-        }
-
-        .registration {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 20px;
-            flex-direction: row;
-            border-bottom: 1px solid #ccc;
-            width: 100%;
-        }
-
-        .photo-header {
-            display: flex;
-            align-items: center;
-            flex-direction: row;
-        }
-
-        .photo-info {
-            margin-bottom: 10px;
-        }
-
-        .user-photo {
-            width: 100px;
-            margin-right: 20px;
-            margin-bottom: 10px;
-        }
-
-        .btn-div {
-            margin-top: 45px;
-        }
-
-        .btn {
-            text-decoration: none;
-            background-color: #00aa87;
-            width: 110px;
-            height: 35px;
-            color: white;
-            border: none;
-            border-radius: 3px;
-            padding: 10px 15px;
-            cursor: pointer;
-            margin-left: 10px;
-            box-shadow: 0 3px 1px -2px #0003, 0 2px 2px 0 #00000024, 0 1px 5px 0 #0000001f;
-        }
-
-            .btn:hover {
-                opacity: 0.9;
-            }
-    </style>
-
-</head>
-
-<body>
-    <header class="header">
-        <div class="logo-name">
-            <div class="company-logo">
-                <img src="https://via.placeholder.com/50" alt="Company Logo">
-            </div>
-            <div class="company-name">LogiTrack</div>
         </div>
-        <div class="profile-dropdown">
-            <button onclick="toggleDropdown()">
-                <i class="bi bi-person-circle"></i>
-                <span class="arrow">&#x25BC;</span>
-            </button>
-            <div class="profile-dropdown-menu" id="profileDropdown">
-                <a asp-action="CompanyDetails" asp-controller="Logistics">Company details</a>
-
-                <a asp-action="Logout" asp-controller="Home">Logout</a>
-            </div>
-        </div>
-    </header>
-    <aside class="sidebar">
-        <ul>
-            <li>
-                <a asp-action="Dashboard" asp-controller="Logistics">
-                    <i class="bi bi-house-door"></i> Dashboard
-                </a>
-            </li>
-            <li>
-                <a href="#">
-                    <i class="bi bi-people"></i> Clients <span class="arrow">></span>
-                </a>
-                <div class="dropdown-menu">
-                    <ul>
-                        <li><a asp-action="GetPendingRegistrations" asp-controller="Logistics"><i class="bi bi-person-plus"></i> New registrations</a></li>
-                        <li><a asp-action="ClientsRegister" asp-controller="Logistics"><i class="bi bi-journal-text"></i> Clients register</a></li>
-                        <li><a asp-action="SearchCompany" asp-controller="Logistics"><i class="bi bi-search"></i> Search</a></li>
-                        <li><a asp-action="ClientsStatistics" asp-controller="Logistics"><i class="bi bi-bar-chart-line"></i> Statistics</a></li>
-                    </ul>
-                </div>
-            </li>
-            <li>
-                <a asp-action="VehiclesRegister" asp-controller="Logistics">
-                    <i class="bi bi-truck"></i> Vehicles <span class="arrow">></span>
-                </a>
-                <div class="dropdown-menu">
-                    <ul>
-                        <li><a asp-action="SearchVehicle" asp-controller="Logistics"><i class="bi bi-search"></i> Search</a></li>
-                        <li><a asp-action="VehiclesRegister" asp-controller="Logistics"><i class="bi bi-list-task"></i> Vehicles Register</a></li>
-                        <li><a asp-action="VehicleStatistics" asp-controller="Logistics"><i class="bi bi-bar-chart"></i> Statistics</a></li>
-                    </ul>
-                </div>
-            </li>
-            <li>
-                <a asp-action="DriversRegister" asp-controller="Logistics">
-                    <i class="bi bi-person-badge"></i> Drivers <span class="arrow">></span>
-                </a>
-                <div class="dropdown-menu">
-                    <ul>
-                        <li><a asp-action="SearchDriver" asp-controller="Logistics"><i class="bi bi-search"></i> Search</a></li>
-                        <li><a asp-action="DriversRegister" asp-controller="Logistics"><i class="bi bi-people-fill"></i> Drivers Register</a></li>
-                        <li><a asp-action="DriverStatistics" asp-controller="Logistics"><i class="bi bi-bar-chart-line"></i> Statistics</a></li>
-                    </ul>
-                </div>
-            </li>
-            <li>
-                <a asp-action="RequestsRegister" asp-controller="Logistics">
-                    <i class="bi bi-card-list"></i> Requests <span class="arrow">></span>
-                </a>
-                <div class="dropdown-menu">
-                    <ul>
-                        <li><a asp-action="SearchRequest" asp-controller="Logistics"><i class="bi bi-search"></i> Search</a></li>
-                        <li><a asp-action="RequestsRegister" asp-controller="Logistics"><i class="bi bi-journal"></i> Requests Register</a></li>
-                        <li><a asp-action="RequestsStatistics" asp-controller="Logistics"><i class="bi bi-bar-chart"></i> Statistics</a></li>
-                    </ul>
-                </div>
-            </li>
-            <li>
-                <a asp-action="OffersRegister" asp-controller="Logistics">
-                    <i class="bi bi-file-earmark-text"></i> Offers <span class="arrow">></span>
-                </a>
-                <div class="dropdown-menu">
-                    <ul>
-                        <li><a asp-action="SearchOffer" asp-controller="Logistics"><i class="bi bi-search"></i> Search</a></li>
-                        <li><a asp-action="OffersRegister" asp-controller="Logistics"><i class="bi bi-journal-text"></i> Offers Register</a></li>
-                        <li><a asp-action="OfferStatistics" asp-controller="Logistics"><i class="bi bi-bar-chart"></i> Statistics</a></li>
-                    </ul>
-                </div>
-            </li>
-            <li>
-                <a asp-action="DeliveriesRegister" asp-controller="Logistics">
-                    <i class="bi bi-box-seam"></i> Deliveries <span class="arrow">></span>
-                </a>
-                <div class="dropdown-menu">
-                    <ul>
-                        <li><a asp-action="SearchDelivery" asp-controller="Logistics"><i class="bi bi-search"></i> Search</a></li>
-                        <li><a asp-action="DeliveriesRegister" asp-controller="Logistics"><i class="bi bi-journal"></i> Deliveries Register</a></li>
-                        <li><a asp-action="DeliveryStatistics" asp-controller="Logistics"><i class="bi bi-bar-chart"></i> Statistics</a></li>
-                    </ul>
-                </div>
-            </li>
-            <li>
-                <a asp-action="InvoicesRegister" asp-controller="Logistics">
-                    <i class="bi bi-receipt"></i> Invoices register <span class="arrow">></span>
-                </a>
-                <div class="dropdown-menu">
-                    <ul>
-                        <li><a asp-action="InvoicesRegister" asp-controller="Logistics"><i class="bi bi-journal"></i> Invoices Register</a></li>
-                        <li><a asp-action="InvoicesStatistics" asp-controller="Logistics"><i class="bi bi-bar-chart-line"></i> Statistics</a></li>
-                    </ul>
-                </div>
-            </li>
-            <li>
-                <a asp-action="SearchCashRegisters" asp-controller="Logistics">
-                    <i class="bi bi-cash-stack"></i> Cash registers <span class="arrow">></span>
-                </a>
-                <div class="dropdown-menu">
-                    <ul>
-                        <li><a asp-action="SearchCashRegisters" asp-controller="Logistics"><i class="bi bi-journal"></i> Cash Register</a></li>
-                        <li><a asp-action="CashRegisterStatistics" asp-controller="Logistics"><i class="bi bi-bar-chart-line"></i> Statistics</a></li>
-                    </ul>
-                </div>
-            </li>
-        </ul>
-    </aside>
-    <div class="main-content">
-        <div class="search-container">
-            <div class="search-header">
-                <div class="card-icon">
-                    <i class="bi bi-person-plus " style="font-size: 40px; color:#00aa87;"></i>
-
-                </div>
-                <h3 class="search-title"><b>Pending Registration</b></h3>
-            </div>
-            @foreach (var item in Model)
-            {
-                <div class="registration">
-                    <div class="photo-header">
-                        <div class="user-photo">
-                            <i class="bi bi-person-circle " style="font-size: 40px; margin-left: 20px;"></i>
-                        </div>
-                        <div class="photo-info">
-                            <h3>@item.Name</h3>
-                            <p><b>Registration number:</b> @item.RegistrationNumber</p>
-                        </div>
-                    </div>
-                    <div class="info">
-                        <p><b>Email:</b> @item.Email</p>
-                        <p><b>Phone:</b> @item.PhoneNumber</p>
-                        <p><b>Created At:</b> @item.CreatedAt</p>
-                    </div>
-                    <div class="btn-div">
-                        <a asp-action="NewCompanyDetails" asp-controller="Logistics" asp-route-id="@item.Id" class="btn">
-                            <i class="bi bi-eye"></i> SEE
-                        </a>
-                    </div>
-                </div>
-            }
-        </div>
+        <h3 class="search-title"><b>Pending Registration</b></h3>
     </div>
+    @foreach (var item in Model)
+    {
+        <div class="registration">
+            <div class="photo-header">
+                <div class="user-photo">
+                    <i class="bi bi-person-circle " style="font-size: 40px; margin-left: 20px;"></i>
+                </div>
+                <div class="photo-info">
+                    <h3>@item.Name</h3>
+                    <p><b>Registration number:</b> @item.RegistrationNumber</p>
+                </div>
+            </div>
+            <div class="info">
+                <p><b>Email:</b> @item.Email</p>
+                <p><b>Phone:</b> @item.PhoneNumber</p>
+                <p><b>Created At:</b> @item.CreatedAt</p>
+            </div>
+            <div class="btn-div">
+                <a asp-action="NewCompanyDetails" asp-controller="Logistics" asp-route-id="@item.Id" class="btn">
+                    <i class="bi bi-eye"></i> SEE
+                </a>
+            </div>
+        </div>
+    }
+</div>
+<style>
+    .search-container {
+        background-color: #fff;
+        padding: 20px;
+        box-shadow: 0 0 25px 1px #0000000f !important;
+    }
 
-</body>
+    .search-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 30px;
+        border-bottom: 1px solid #ccc;
+    }
 
-</html>
+    .search-icon {
+        width: 40px;
+        margin-right: 10px;
+        margin-bottom: 30px;
+    }
+
+    .search-title {
+        font-size: 1.1rem;
+        font-weight: 500;
+    }
+
+    .registration {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 20px;
+        flex-direction: row;
+        border-bottom: 1px solid #ccc;
+        width: 100%;
+    }
+
+    .photo-header {
+        display: flex;
+        align-items: center;
+        flex-direction: row;
+    }
+
+    .photo-info {
+        margin-bottom: 10px;
+    }
+
+    .user-photo {
+        width: 100px;
+        margin-right: 20px;
+        margin-bottom: 10px;
+    }
+
+    .btn-div {
+        margin-top: 45px;
+    }
+</style>

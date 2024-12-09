@@ -1,344 +1,221 @@
 ﻿@model LogiTrack.Core.ViewModels.Invoice.InvoiceStatisticsForClientViewModel
 @{
-    Layout = null;
+    ViewData["Title"] = "Add Status";
+    Layout = "~/Views/Shared/_ClientsLayout.cshtml";
 }
-<!DOCTYPE html>
-<html lang="en">
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Driver Dashboard</title>
-    <link rel="stylesheet" href="~/css/site.css" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-    <script src="~/js/site.js"></script>
-    <style>
-        .card h3 {
-            margin: 0;
-            font-size: 1.1rem;
-            color: #00aa87;
-        }
-
-        .chart-container {
-            background: white;
-            padding: 20px;
-        }
-
-            .chart-container h4 {
-                margin-bottom: 20px;
-                font-size: 1.2em;
-                color: #00aa87;
-                text-align: center;
-            }
-
-        .chart {
-            max-width: 100%;
-            height: auto;
-        }
-
-        .first-row {
-            display: flex;
-            width: 90%;
-            margin-bottom: 50px;
-            justify-content: space-between;
-        }
-
-        .second-row {
-            display: flex;
-            justify-content: center;
-            gap: 40px;
-            width: 90%;
-            margin-bottom: 30px;
-        }
-
-            .second-row .chart-container {
-                width: 600px;
-            }
-    </style>
-
-</head>
-
-<body>
-    <header class="header">
-        <div class="logo-name">
-            <div class="company-logo">
-                <img src="https://via.placeholder.com/50" alt="Company Logo">
-            </div>
-            <div class="company-name">LogiTrack</div>
-        </div>
-        <div class="profile-dropdown">
-            <button onclick="toggleDropdown()">
-                <i class="bi bi-person-circle"></i>
-                <span class="arrow">&#x25BC;</span>
-            </button>
-            <div class="profile-dropdown-menu" id="profileDropdown">
-                <a asp-action="CompanyDetails" asp-controller="Clients">Company details</a>
-                <a asp-action="ContactDetails" asp-controller="Clients">Contact details</a>
-                <a asp-action="Logout" asp-controller="Home">Logout</a>
+<div class="chart-container">
+    <div class="cards-container">
+        <div class="card" id="locationCard">
+            <div class="card-content">
+                <h3>Paid invoices- amount</h3>
+                <p><b>@Model.PaidInvoices - @Model.PaidAmount BGN</b></p>
             </div>
         </div>
-    </header>
-    <aside class="sidebar">
-        <ul>
-            <li><a asp-action="Dashboard" asp-controller="Clients"><i class="bi bi-house-door"></i> Dashboard</a></li>
-            <li>
-                <a asp-action="MyRequests" asp-controller="Clients"><i class="bi bi-clipboard-check"></i> Requests <span class="arrow">></span></a>
-                <div class="dropdown-menu">
-                    <ul>
-                        <li><a asp-action="MakeRequest" asp-controller="Clients"><i class="bi bi-plus-circle"></i> New</a></li>
-                        <li><a asp-action="MyRequests" asp-controller="Clients"><i class="bi bi-search"></i> Search</a></li>
-                        <li><a asp-action="RequestStatistics" asp-controller="Clients"><i class="bi bi-bar-chart"></i> Statistics</a></li>
-                    </ul>
-                </div>
-            </li>
-            <li>
-                <a asp-action="MyOffers" asp-controller="Clients"><i class="bi bi-file-earmark-text"></i> Offers <span class="arrow">></span></a>
-                <div class="dropdown-menu">
-                    <ul>
-                        <li><a asp-action="HaveOffer" asp-controller="Clients"><i class="bi bi-calendar-check"></i> Book</a></li>
-                        <li><a asp-action="MyOffers" asp-controller="Clients"><i class="bi bi-search"></i> Search</a></li>
-                        <li><a asp-action="OfferStatistics" asp-controller="Clients"><i class="bi bi-bar-chart"></i> Statistics</a></li>
-                    </ul>
-                </div>
-            </li>
-            <li>
-                <a asp-action="MyDeliveries" asp-controller="Clients"><i class="bi bi-truck"></i> Deliveries <span class="arrow">></span></a>
-                <div class="dropdown-menu">
-                    <ul>
-                        <li><a asp-action="SearchDelivery" asp-controller="Clients"><i class="bi bi-binoculars"></i> Track</a></li>
-                        <li><a asp-action="MyDeliveries" asp-controller="Clients"><i class="bi bi-search"></i> Search</a></li>
-                        <li><a asp-action="DeliveryStatistics" asp-controller="Clients"><i class="bi bi-bar-chart"></i> Statistics</a></li>
-                    </ul>
-                </div>
-            </li>
-            <li>
-                <a asp-action="MyInvoices" asp-controller="Clients"><i class="bi bi-receipt"></i> Invoices <span class="arrow">></span></a>
-                <div class="dropdown-menu">
-                    <ul>
-                        <li><a asp-action="MyInvoices" asp-controller="Clients"><i class="bi bi-search"></i> Search</a></li>
-                        <li><a asp-action="InvoicesStatistics" asp-controller="Clients"><i class="bi bi-bar-chart"></i> Statistics</a></li>
-                    </ul>
-                </div>
-            </li>
-        </ul>
-    </aside>
-    <div class="main-content">
-        <div class="chart-container">
-            <div class="cards-container">
-                <div class="card" id="locationCard">
-                    <div class="card-content">
-                        <h3>Paid invoices- amount</h3>
-                        <p><b>@Model.PaidInvoices - @Model.PaidAmount BGN</b></p>
-                    </div>
-                </div>
-                <div class="card" id="locationCard">
-                    <div class="card-content">
-                        <h3>Pending invoices- amount</h3>
-                        <p><b>@Model.PendingInvoices - @Model.PendingAmount BGN</b></p>
-                    </div>
-                </div>
-                <div class="card" id="locationCard">
-                    <div class="card-content">
-                        <h3>Overdue invoices- amount</h3>
-                        <p><b>@Model.OverdueInvoices - @Model.OverdueAmount BGN</b></p>
-                    </div>
-                </div>
-                <div class="card" id="locationCard">
-                    <div class="card-content">
-                        <h3>Average payment time</h3>
-                        <p><b>@Model.AveragePaymentTime days</b></p>
-                    </div>
-                </div>
+        <div class="card" id="locationCard">
+            <div class="card-content">
+                <h3>Pending invoices- amount</h3>
+                <p><b>@Model.PendingInvoices - @Model.PendingAmount BGN</b></p>
             </div>
-
-            <div class="first-row">
-
-                <div class="chart-container">
-                        <h4>Invoices status ratio</h4>
-                        <canvas id="invoiceStatusChart" class="chart"></canvas>
-                    </div>
-                    <div class="chart-container">
-                        <h4>Total amount spent on services</h4>
-                        <canvas id="totalSpendingChartContainer" class="chart"></canvas>
-                    </div>
-                
-
+        </div>
+        <div class="card" id="locationCard">
+            <div class="card-content">
+                <h3>Overdue invoices- amount</h3>
+                <p><b>@Model.OverdueInvoices - @Model.OverdueAmount BGN</b></p>
             </div>
-            <div class="chart-container">
-                <h4>Approximate price to final price differences</h4>
-                <canvas id="priceDifferenceChart" class="chart"></canvas>
+        </div>
+        <div class="card" id="locationCard">
+            <div class="card-content">
+                <h3>Average payment time</h3>
+                <p><b>@Model.AveragePaymentTime days</b></p>
             </div>
         </div>
     </div>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', async function () {
-            try {
-                await Promise.all([
-                    renderInvoiceStatusDistribution(),
-                    renderTotalSpendingChart(),
-                    renderPriceDifferenceChart()
-                ]);
-            } catch (error) {
-                console.error('Error initializing charts:', error);
+    <div class="first-row">
+
+        <div class="chart-container">
+            <h4>Invoices status ratio</h4>
+            <canvas id="invoiceStatusChart" class="chart"></canvas>
+        </div>
+        <div class="chart-container">
+            <h4>Total amount spent on services</h4>
+            <canvas id="totalSpendingChartContainer" class="chart"></canvas>
+        </div>
+
+
+    </div>
+    <div class="chart-container">
+        <h4>Approximate price to final price differences</h4>
+        <canvas id="priceDifferenceChart" class="chart"></canvas>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', async function () {
+        try {
+            await Promise.all([
+                renderInvoiceStatusDistribution(),
+                renderTotalSpendingChart(),
+                renderPriceDifferenceChart()
+            ]);
+        } catch (error) {
+            console.error('Error initializing charts:', error);
+        }
+    });
+
+    async function renderInvoiceStatusDistribution() {
+        try {
+            const response = await fetch('/Clients/GetInvoicesStatusDistribution');
+            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+            const data = await response.json();
+
+            const statuses = Object.keys(data.statusCounts || {});
+            const counts = Object.values(data.statusCounts || {});
+
+            if (!statuses.length) {
+                console.warn('No data available for Invoice Status Distribution');
+                return;
             }
-        });
 
-        async function renderInvoiceStatusDistribution() {
-            try {
-                const response = await fetch('/Clients/GetInvoicesStatusDistribution');
-                if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-                const data = await response.json();
-
-                const statuses = Object.keys(data.statusCounts || {});
-                const counts = Object.values(data.statusCounts || {});
-
-                if (!statuses.length) {
-                    console.warn('No data available for Invoice Status Distribution');
-                    return;
+            const ctx = document.getElementById('invoiceStatusChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: statuses,
+                    datasets: [{
+                        data: counts,
+                        backgroundColor: ['#4CAF50', '#00aa87', '#FF6384'],
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'bottom'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: (tooltipItem) => `${statuses[tooltipItem.dataIndex]}: ${counts[tooltipItem.dataIndex]}`
+                            }
+                        }
+                    }
                 }
+            });
+        } catch (error) {
+            console.error('Error rendering Invoice Status Distribution:', error);
+        }
+    }
 
-                const ctx = document.getElementById('invoiceStatusChart').getContext('2d');
-                new Chart(ctx, {
-                    type: 'doughnut',
-                    data: {
-                        labels: statuses,
-                        datasets: [{
-                            data: counts,
-                            backgroundColor: ['#4CAF50', '#00aa87', '#FF6384'],
-                        }]
+    async function renderTotalSpendingChart() {
+        try {
+            const response = await fetch('/Clients/GetTotalSpending');
+            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+            const data = await response.json();
+
+            const totalSpent = data.totalSpent || 0;
+
+            const ctx = document.getElementById('totalSpendingChartContainer').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Total Money Spent'],
+                    datasets: [{
+                        label: 'Money Spent ($)',
+                        data: [totalSpent],
+                        backgroundColor: ['#00aa87'],
+                        borderColor: ['#00aa87'],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: (tooltipItem) => `$${tooltipItem.raw.toFixed(2)}`
+                            }
+                        }
                     },
-                    options: {
-                        responsive: true,
-                        plugins: {
-                            legend: {
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
                                 display: true,
-                                position: 'bottom'
-                            },
-                            tooltip: {
-                                callbacks: {
-                                    label: (tooltipItem) => `${statuses[tooltipItem.dataIndex]}: ${counts[tooltipItem.dataIndex]}`
-                                }
+                                text: 'Amount ($)'
                             }
                         }
                     }
-                });
-            } catch (error) {
-                console.error('Error rendering Invoice Status Distribution:', error);
-            }
+                }
+            });
+        } catch (error) {
+            console.error('Error rendering Total Spending Chart:', error);
         }
+    }
 
-        async function renderTotalSpendingChart() {
-            try {
-                const response = await fetch('/Clients/GetTotalSpending');
-                if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-                const data = await response.json();
+    async function renderPriceDifferenceChart() {
+        try {
+            const response = await fetch('/Clients/GetRequestPriceDifferences');
+            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+            const data = await response.json();
+            console.log('API Response:', data);
 
-                const totalSpent = data.totalSpent || 0;
+            const labels = data.map(item => item.offerReference || 'Unknown');
+            const approxPrices = data.map(item => item.approximatePrice || 0);
+            const finalPrices = data.map(item => item.finalPrice || 0);
 
-                const ctx = document.getElementById('totalSpendingChartContainer').getContext('2d');
-                new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: ['Total Money Spent'],
-                        datasets: [{
-                            label: 'Money Spent ($)',
-                            data: [totalSpent],
-                            backgroundColor: ['#00aa87'],
-                            borderColor: ['#00aa87'],
+            const ctx = document.getElementById('priceDifferenceChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Approximate Price',
+                            data: approxPrices,
+                            backgroundColor: '#00aa87',
+                            borderColor: '#00aa87',
                             borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        plugins: {
-                            legend: {
-                                display: false
-                            },
-                            tooltip: {
-                                callbacks: {
-                                    label: (tooltipItem) => `$${tooltipItem.raw.toFixed(2)}`
-                                }
-                            }
                         },
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                title: {
-                                    display: true,
-                                    text: 'Amount ($)'
-                                }
+                        {
+                            label: 'Final Price',
+                            data: finalPrices,
+                            backgroundColor: '#FF6384',
+                            borderColor: '#FF6384',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Price ($)'
                             }
                         }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        }
                     }
-                });
-            } catch (error) {
-                console.error('Error rendering Total Spending Chart:', error);
-            }
+                }
+            });
+        } catch (error) {
+            console.error('Error rendering Price Difference Chart:', error);
         }
+    }</script>
 
-        async function renderPriceDifferenceChart() {
-            try {
-                const response = await fetch('/Clients/GetRequestPriceDifferences');
-                if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-                const data = await response.json();
-                console.log('API Response:', data); 
-
-                const labels = data.map(item => item.offerReference || 'Unknown');
-                const approxPrices = data.map(item => item.approximatePrice || 0);
-                const finalPrices = data.map(item => item.finalPrice || 0);
-
-                const ctx = document.getElementById('priceDifferenceChart').getContext('2d');
-                new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: labels,
-                        datasets: [
-                            {
-                                label: 'Approximate Price',
-                                data: approxPrices,
-                                backgroundColor: '#00aa87',
-                                borderColor: '#00aa87',
-                                borderWidth: 1
-                            },
-                            {
-                                label: 'Final Price',
-                                data: finalPrices,
-                                backgroundColor: '#FF6384',
-                                borderColor: '#FF6384',
-                                borderWidth: 1
-                            }
-                        ]
-                    },
-                    options: {
-                        responsive: true,
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                title: {
-                                    display: true,
-                                    text: 'Price ($)'
-                                }
-                            }
-                        },
-                        plugins: {
-                            legend: {
-                                position: 'top'
-                            }
-                        }
-                    }
-                });
-            } catch (error) {
-                console.error('Error rendering Price Difference Chart:', error);
-            }
-        }</script>
-</body>
-
-</html>
 
 

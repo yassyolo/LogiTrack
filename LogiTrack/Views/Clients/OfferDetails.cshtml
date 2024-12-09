@@ -1,353 +1,268 @@
 ﻿@model LogiTrack.Core.ViewModels.Offer.OfferViewModel
 @{
-    Layout = null;
+    ViewData["Title"] = "Add Status";
+    Layout = "~/Views/Shared/_ClientsLayout.cshtml";
 }
 
 
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Driver Dashboard</title>
-    <link rel="stylesheet" href="~/css/site.css" />
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
-
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css">
-    <script src="~/js/site.js"></script>
-    <style>
-        .details-container {
-            width: 85%;
-        }
-
-        .details-card {
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 0 25px 1px #0000000f !important;
-            padding: 17px;
-            background-color: white;
-        }
-
-        .details-header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-
-        .delivery-image {
-            width: 50px;
-            height: auto;
-            margin-right: 20px;
-        }
-
-        .card-contents {
-            display: flex;
-            flex-direction: row;
-            padding: 10px;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-left: 50px;
-        }
-
-        .request-details-column {
-            width: 30%;
-            margin-bottom: 20px;
-        }
-
-            .request-details-column p {
-                color: darkslategrey;
-                font-size: 0.9rem;
-            }
-
-
-        .header-image-div {
-            display: flex;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .header-image-div {
-            color: #00aa87;
-            font-size: 1.2rem;
-        }
-
-        .image-div {
-            width: 40px;
-            margin-right: 10px;
-        }
-
-
-        .road-icon {
-            width: 20px;
-            margin-right: 10px;
-            height: 200px;
-        }
-
-
-        .dot-line {
-            display: flex;
-            align-items: center;
-        }
-
-        .adress-div {
-            display: flex;
-            flex-direction: column;
-            flex-wrap: wrap;
-            width: 120px;
-        }
-
-        .common-metrics {
-            display: flex;
-            flex-direction: row;
-            gap: 30px;
-        }
-
-        .title-details i {
-            margin-left: 30px;
-        }
-
-        .title {
-            margin: 0;
-        }
-
-        .title-details {
-            margin-bottom: 10px;
-        }
-
-        .address {
-            width: 180px;
-        }
-
-
-    </style>
-
-</head>
-
-<body>
-    <header class="header">
-        <div class="logo-name">
-            <div class="company-logo">
-                <img src="https://via.placeholder.com/50" alt="Company Logo">
+<div class="details-container">
+    <div class="details-card">
+        <div class="details-header">
+            <div class="delivery-image">
+                <i class="fas fa-tags" style="font-size: 30px; color: #00aa87;"></i>
             </div>
-            <div class="company-name">LogiTrack</div>
+
+            <h2><b>@Model.ReferenceNumber</b></h2>
         </div>
-        <div class="profile-dropdown">
-            <button onclick="toggleDropdown()">
-                <i class="bi bi-person-circle"></i>
-                <span class="arrow">&#x25BC;</span>
-            </button>
-            <div class="profile-dropdown-menu" id="profileDropdown">
-                <a asp-action="CompanyDetails" asp-controller="Clients">Company details</a>
-                <a asp-action="ContactDetails" asp-controller="Clients">Contact details</a>
-                <a asp-action="Logout" asp-controller="Home">Logout</a>
+        <div class="card-contents">
+            <div class="request-details-column">
+                <div class="header-image-div">
+                    <div class="header-image">
+                        <i class="fas fa-file-alt" style="font-size: 2rem; color: #00aa87; margin-right: 10px;"></i>
+                    </div>
+                    <h5>Details</h5>
+                </div>
+                <div class="title-details">
+                    <h5 class="title">Expected delivery date</h5>
+                    <p>@Model.ExpectedDeliveryDate</p>
+                </div>
+                <div class="title-details">
+                    <h5 class="title">Special instructions</h5>
+                    <p>@Model.SpecialInstructions</p>
+                </div>
+                <div class="adress-details">
+                    <div class="dot-line">
+                        <img src="~/dashboard_books_dots.svg" alt="Road" class="road-icon">
+                        <div class="adress-div">
+                            <div class="title-details">
+                                <h5 class="title">Origin</h5>
+                                <p>@Model.PickupAddress</p>
+                            </div>
+                            <div class="title-details">
+                                <h5 class="title">Destination</h5>
+                                <p>@Model.DeliveryAddress</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
-    </header>
-    <aside class="sidebar">
-        <ul>
-            <li><a asp-action="Dashboard" asp-controller="Clients"><i class="bi bi-house-door"></i> Dashboard</a></li>
-            <li>
-                <a asp-action="MyRequests" asp-controller="Clients"><i class="bi bi-clipboard-check"></i> Requests <span class="arrow">></span></a>
-                <div class="dropdown-menu">
-                    <ul>
-                        <li><a asp-action="MakeRequest" asp-controller="Clients"><i class="bi bi-plus-circle"></i> New</a></li>
-                        <li><a asp-action="MyRequests" asp-controller="Clients"><i class="bi bi-search"></i> Search</a></li>
-                        <li><a asp-action="RequestStatistics" asp-controller="Clients"><i class="bi bi-bar-chart"></i> Statistics</a></li>
-                    </ul>
+            <div class="request-details-column">
+                <div class="header-image-div">
+                    <div class="header-image">
+                        <i class="fas fa-balance-scale" style="font-size: 2rem; color: #00aa87; margin-right: 10px;"></i>
+                    </div>
+                    <h5>Metrics</h5>
                 </div>
-            </li>
-            <li>
-                <a asp-action="MyOffers" asp-controller="Clients"><i class="bi bi-file-earmark-text"></i> Offers <span class="arrow">></span></a>
-                <div class="dropdown-menu">
-                    <ul>
-                        <li><a asp-action="HaveOffer" asp-controller="Clients"><i class="bi bi-calendar-check"></i> Book</a></li>
-                        <li><a asp-action="MyOffers" asp-controller="Clients"><i class="bi bi-search"></i> Search</a></li>
-                        <li><a asp-action="OfferStatistics" asp-controller="Clients"><i class="bi bi-bar-chart"></i> Statistics</a></li>
-                    </ul>
-                </div>
-            </li>
-            <li>
-                <a asp-action="MyDeliveries" asp-controller="Clients"><i class="bi bi-truck"></i> Deliveries <span class="arrow">></span></a>
-                <div class="dropdown-menu">
-                    <ul>
-                        <li><a asp-action="SearchDelivery" asp-controller="Clients"><i class="bi bi-binoculars"></i> Track</a></li>
-                        <li><a asp-action="MyDeliveries" asp-controller="Clients"><i class="bi bi-search"></i> Search</a></li>
-                        <li><a asp-action="DeliveryStatistics" asp-controller="Clients"><i class="bi bi-bar-chart"></i> Statistics</a></li>
-                    </ul>
-                </div>
-            </li>
-            <li>
-                <a asp-action="MyInvoices" asp-controller="Clients"><i class="bi bi-receipt"></i> Invoices <span class="arrow">></span></a>
-                <div class="dropdown-menu">
-                    <ul>
-                        <li><a asp-action="MyInvoices" asp-controller="Clients"><i class="bi bi-search"></i> Search</a></li>
-                        <li><a asp-action="InvoicesStatistics" asp-controller="Clients"><i class="bi bi-bar-chart"></i> Statistics</a></li>
-                    </ul>
-                </div>
-            </li>
-        </ul>
-    </aside>
-    <div class="main-content">
-        <div class="details-container">
-            <div class="details-card">
-                <div class="details-header">
-                    <div class="delivery-image">
-                        <i class="fas fa-tags" style="font-size: 30px; color: #00aa87;"></i>
-                        </div>
-
-                    <h2><b>@Model.ReferenceNumber</b></h2>
-                </div>
-                    <div class="card-contents">
-                        <div class="request-details-column">
-                            <div class="header-image-div">
-                                <div class="header-image">
-                                <i class="fas fa-file-alt" style="font-size: 2rem; color: #00aa87; margin-right: 10px;"></i>
-                            </div>
-                                <h5>Details</h5>
-                            </div>
-                            <div class="title-details">
-                                <h5 class="title">Expected delivery date</h5>
-                                <p>@Model.ExpectedDeliveryDate</p>
-                            </div>
-                        <div class="title-details">
-                            <h5 class="title">Special instructions</h5>
-                            <p>@Model.SpecialInstructions</p>
-                        </div>
-                            <div class="adress-details">
-                                <div class="dot-line">
-                                    <img src="~/dashboard_books_dots.svg" alt="Road" class="road-icon">
-                                    <div class="adress-div">
-                                        <div class="title-details">
-                                            <h5 class="title">Origin</h5>
-                                            <p>@Model.PickupAddress</p>
-                                        </div>
-                                        <div class="title-details">
-                                            <h5 class="title">Destination</h5>
-                                            <p>@Model.DeliveryAddress</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="request-details-column">
-                            <div class="header-image-div">
-                                <div class="header-image">
-                                <i class="fas fa-balance-scale" style="font-size: 2rem; color: #00aa87; margin-right: 10px;"></i>
-                            </div>
-                                <h5>Metrics</h5>
-                            </div>
-                            <div class="title-details">
-                                <h5 class="title">Pack</h5>
-                                @if (Model.PalletsCount != string.Empty)
-                                {
-                                    <p>@Model.PalletsCount X @Model.CargoType</p>
-                                    <p>@Model.PalletsLength cm X @Model.PalletsWidth cm X @Model.PalletsHeight cm</p>
-                                }
-                                else
-                                {
-                                    <p>@Model.NumberOfNonStandartGoods</p>
-                                    foreach (var item in Model.NonStandardCargo)
-                                    {
-                                        <p>@item.Length cm X @item.Width cm X @item.Height cm</p>
-                                    }
-                                }
-
-                            </div>
-                            <div class="title-details">
-                                <h5 class="title">Weight</h5>
-                                <p>@Model.TotalWeight kg</p>
-                            </div>
-                            <div class="title-details">
-                                <h5 class="title">Volume</h5>
-                                <p>@Model.TotalVolume m3</p>
-                            </div>
-                            <div class="common-metrics">
-                                <div class="title-details">
-                                    <h5 class="title">Refrigerated:</h5>
-                                    @if (Model.IsRefrigerated)
-                                    {
-                                        <i class="bi bi-check-circle-fill" style="color: #00aa87;"></i>
-                                    }
-                                else
-                                {
-                                    <p style="color: #00aa87;">No</p>
-                                }
-                                </div>
-                                <div class="title-details">
-                                    <h5 class="title">Shared truck:</h5>
-                                    @if (Model.SharedTruck)
-                                    {
-                                        <i class="bi bi-check-circle-fill" style="color: #00aa87;"></i>
-                                    }
-                                else
-                                {
-                                    <p style="color: #00aa87;">No</p>
-                                }
-                                </div>
-                            </div>
-                        </div>
-                    <div class="request-details-column">
-                            <div class="header-image-div">
-                                <div class="header-image">
-                                <i class="fas fa-info-circle" style="font-size: 2rem; color: #00aa87; margin-right: 10px;"></i>
-                            </div>
-                                <h5>Request</h5>
-                            </div>
-                        <div class="title-details">
-                            <h5 class="title">Created on</h5>
-                            <p>@Model.CreatedAt</p>
-                        </div>
-
-                        <div class="title-details">
-                            <h5 class="title">Given price</h5>
-                            <p>@Model.ApproximatePrice</p>
-                        </div>
-                        <div class="title-details">
-                            <h5 class="title">Status</h5>
-                            <p>@Model.Status</p>
-                        </div>
-                        @if (Model.Status == "Approved")
+                <div class="title-details">
+                    <h5 class="title">Pack</h5>
+                    @if (Model.PalletsCount != string.Empty)
+                    {
+                        <p>@Model.PalletsCount X @Model.CargoType</p>
+                        <p>@Model.PalletsLength cm X @Model.PalletsWidth cm X @Model.PalletsHeight cm</p>
+                    }
+                    else
+                    {
+                        <p>@Model.NumberOfNonStandartGoods</p>
+                        foreach (var item in Model.NonStandardCargo)
                         {
-                            <a asp-action="RequestDetails" asp-controller="Clients" asp-route-id="@Model.RequestId" style="color:#00aa87;" class="btn btn-clear">See reques</a>
+                            <p>@item.Length cm X @item.Width cm X @item.Height cm</p>
+                        }
+                    }
+
+                </div>
+                <div class="title-details">
+                    <h5 class="title">Weight</h5>
+                    <p>@Model.TotalWeight kg</p>
+                </div>
+                <div class="title-details">
+                    <h5 class="title">Volume</h5>
+                    <p>@Model.TotalVolume m3</p>
+                </div>
+                <div class="common-metrics">
+                    <div class="title-details">
+                        <h5 class="title">Refrigerated:</h5>
+                        @if (Model.IsRefrigerated)
+                        {
+                            <i class="bi bi-check-circle-fill" style="color: #00aa87;"></i>
+                        }
+                        else
+                        {
+                            <p style="color: #00aa87;">No</p>
                         }
                     </div>
-                    <div class="request-details-column">
-                            <div class="header-image-div">
-                                <div class="header-image">
-                                <i class="fas fa-hand-holding-usd" style="font-size: 2rem; color: #00aa87; margin-right: 10px;"></i>
-                            </div>
-                                <h5>Offer</h5>
-                            </div>
-                        <div class="title-details">
-                            <h5 class="title">Created on</h5>
-                            <p>@Model.OfferDate</p>
-                        </div>
-
-                        <div class="title-details">
-                            <h5 class="title">Final price</h5>
-                            <p>@Model.FinalPrice BGN</p>
-                        </div>
-                        <div class="title-details">
-                            <h5 class="title">Status:</h5>
-                            <p>@Model.OfferStatus</p>
-                        </div>
-                        @if (Model.OfferStatus == "Approved")
+                    <div class="title-details">
+                        <h5 class="title">Shared truck:</h5>
+                        @if (Model.SharedTruck)
                         {
-                            <a asp-action="DeliveryDetails" asp-controller="Clients" asp-route-id="@Model.DeliveryId" style="color:#00aa87;" class="btn btn-clear">See delivery</a>
+                            <i class="bi bi-check-circle-fill" style="color: #00aa87;"></i>
                         }
-                        else if (Model.OfferStatus == "Pending")
-						{
-                            <h5 class="title">Actions:</h5>
-							<a asp-action="AcceptOffer" asp-controller="Clients" asp-route-id="@Model.Id" style="color:#00aa87;" class="btn btn-clear">BOOK</a>
-						}
-                    </div>
+                        else
+                        {
+                            <p style="color: #00aa87;">No</p>
+                        }
                     </div>
                 </div>
+            </div>
+            <div class="request-details-column">
+                <div class="header-image-div">
+                    <div class="header-image">
+                        <i class="fas fa-info-circle" style="font-size: 2rem; color: #00aa87; margin-right: 10px;"></i>
+                    </div>
+                    <h5>Request</h5>
+                </div>
+                <div class="title-details">
+                    <h5 class="title">Created on</h5>
+                    <p>@Model.CreatedAt</p>
+                </div>
+
+                <div class="title-details">
+                    <h5 class="title">Given price</h5>
+                    <p>@Model.ApproximatePrice</p>
+                </div>
+                <div class="title-details">
+                    <h5 class="title">Status</h5>
+                    <p>@Model.Status</p>
+                </div>
+                @if (Model.Status == "Approved")
+                {
+                    <a asp-action="RequestDetails" asp-controller="Clients" asp-route-id="@Model.RequestId" style="color:#00aa87;" class="btn btn-clear">See reques</a>
+                }
+            </div>
+            <div class="request-details-column">
+                <div class="header-image-div">
+                    <div class="header-image">
+                        <i class="fas fa-hand-holding-usd" style="font-size: 2rem; color: #00aa87; margin-right: 10px;"></i>
+                    </div>
+                    <h5>Offer</h5>
+                </div>
+                <div class="title-details">
+                    <h5 class="title">Created on</h5>
+                    <p>@Model.OfferDate</p>
+                </div>
+
+                <div class="title-details">
+                    <h5 class="title">Final price</h5>
+                    <p>@Model.FinalPrice BGN</p>
+                </div>
+                <div class="title-details">
+                    <h5 class="title">Status:</h5>
+                    <p>@Model.OfferStatus</p>
+                </div>
+                @if (Model.OfferStatus == "Approved")
+                {
+                    <a asp-action="DeliveryDetails" asp-controller="Clients" asp-route-id="@Model.DeliveryId" style="color:#00aa87;" class="btn btn-clear">See delivery</a>
+                }
+                else if (Model.OfferStatus == "Pending")
+                {
+                    <h5 class="title">Actions:</h5>
+                    <a asp-action="AcceptOffer" asp-controller="Clients" asp-route-id="@Model.Id" style="color:#00aa87;" class="btn btn-clear">BOOK</a>
+                }
             </div>
         </div>
     </div>
-</body>
+</div>
+        </div>
+<style>
+    .details-container {
+        width: 85%;
+    }
 
-</html>
+    .details-card {
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 0 25px 1px #0000000f !important;
+        padding: 17px;
+        background-color: white;
+    }
+
+    .details-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+
+    .delivery-image {
+        width: 50px;
+        height: auto;
+        margin-right: 20px;
+    }
+
+    .card-contents {
+        display: flex;
+        flex-direction: row;
+        padding: 10px;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-left: 50px;
+    }
+
+    .request-details-column {
+        width: 30%;
+        margin-bottom: 20px;
+    }
+
+        .request-details-column p {
+            color: darkslategrey;
+            font-size: 0.9rem;
+        }
+
+
+    .header-image-div {
+        display: flex;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .header-image-div {
+        color: #00aa87;
+        font-size: 1.2rem;
+    }
+
+    .image-div {
+        width: 40px;
+        margin-right: 10px;
+    }
+
+
+    .road-icon {
+        width: 20px;
+        margin-right: 10px;
+        height: 200px;
+    }
+
+
+    .dot-line {
+        display: flex;
+        align-items: center;
+    }
+
+    .adress-div {
+        display: flex;
+        flex-direction: column;
+        flex-wrap: wrap;
+        width: 120px;
+    }
+
+    .common-metrics {
+        display: flex;
+        flex-direction: row;
+        gap: 30px;
+    }
+
+    .title-details i {
+        margin-left: 30px;
+    }
+
+    .title {
+        margin: 0;
+    }
+
+    .title-details {
+        margin-bottom: 10px;
+    }
+
+    .address {
+        width: 180px;
+    }
+
+</style>

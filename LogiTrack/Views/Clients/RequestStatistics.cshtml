@@ -1,337 +1,214 @@
 ﻿@model LogiTrack.Core.ViewModels.Request.RequestStatisticsForClientViewModel
 @{
-    Layout = null;
+    ViewData["Title"] = "Add Status";
+    Layout = "~/Views/Shared/_ClientsLayout.cshtml";
 }
-<!DOCTYPE html>
-<html lang="en">
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Driver Dashboard</title>
-    <link rel="stylesheet" href="~/css/site.css" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-matrix"></script>
-
-    <style>
-        .card h3 {
-            margin: 0;
-            font-size: 1.1rem;
-            color: #00aa87;
-        }
-        .chart-container {
-            background: white;
-            padding: 20px;
-        }
-
-            .chart-container h4 {
-                margin-bottom: 20px;
-                font-size: 1.2em;
-                color: #00aa87;
-                text-align: center;
-            }
-
-        .chart {
-            max-width: 100%;
-            height: auto;
-        }
-
-        .first-row {
-            display: flex;
-            width: 90%;
-            margin-bottom: 50px;
-            justify-content: space-between;
-        }
-
-        .second-row {
-            display: flex;
-            justify-content: center;
-            gap: 40px;
-            width: 90%;
-            margin-bottom: 30px;
-        }
-
-            .second-row .chart-container {
-                width: 600px;
-            }
-    </style>
-</head>
-
-<body>
-    <header class="header">
-        <div class="logo-name">
-            <div class="company-logo">
-                <img src="https://via.placeholder.com/50" alt="Company Logo">
-            </div>
-            <div class="company-name">LogiTrack</div>
-        </div>
-        <div class="profile-dropdown">
-            <button onclick="toggleDropdown()">
-                <i class="bi bi-person-circle"></i>
-                <span class="arrow">&#x25BC;</span>
-            </button>
-            <div class="profile-dropdown-menu" id="profileDropdown">
-                <a asp-action="CompanyDetails" asp-controller="Clients">Company details</a>
-                <a asp-action="ContactDetails" asp-controller="Clients">Contact details</a>
-                <a asp-action="Logout" asp-controller="Home">Logout</a>
+<div class="chart-container">
+    <div class="cards-container">
+        <div class="card" id="locationCard">
+            <div class="card-content">
+                <h3>Requests</h3>
+                <p><b>@Model.TotalRequests</b></p>
             </div>
         </div>
-    </header>
-    <aside class="sidebar">
-        <ul>
-            <li><a asp-action="Dashboard" asp-controller="Clients"><i class="bi bi-house-door"></i> Dashboard</a></li>
-            <li>
-                <a asp-action="MyRequests" asp-controller="Clients"><i class="bi bi-clipboard-check"></i> Requests <span class="arrow">></span></a>
-                <div class="dropdown-menu">
-                    <ul>
-                        <li><a asp-action="MakeRequest" asp-controller="Clients"><i class="bi bi-plus-circle"></i> New</a></li>
-                        <li><a asp-action="MyRequests" asp-controller="Clients"><i class="bi bi-search"></i> Search</a></li>
-                        <li><a asp-action="RequestStatistics" asp-controller="Clients"><i class="bi bi-bar-chart"></i> Statistics</a></li>
-                    </ul>
-                </div>
-            </li>
-            <li>
-                <a asp-action="MyOffers" asp-controller="Clients"><i class="bi bi-file-earmark-text"></i> Offers <span class="arrow">></span></a>
-                <div class="dropdown-menu">
-                    <ul>
-                        <li><a asp-action="HaveOffer" asp-controller="Clients"><i class="bi bi-calendar-check"></i> Book</a></li>
-                        <li><a asp-action="MyOffers" asp-controller="Clients"><i class="bi bi-search"></i> Search</a></li>
-                        <li><a asp-action="OfferStatistics" asp-controller="Clients"><i class="bi bi-bar-chart"></i> Statistics</a></li>
-                    </ul>
-                </div>
-            </li>
-            <li>
-                <a asp-action="MyDeliveries" asp-controller="Clients"><i class="bi bi-truck"></i> Deliveries <span class="arrow">></span></a>
-                <div class="dropdown-menu">
-                    <ul>
-                        <li><a asp-action="SearchDelivery" asp-controller="Clients"><i class="bi bi-binoculars"></i> Track</a></li>
-                        <li><a asp-action="MyDeliveries" asp-controller="Clients"><i class="bi bi-search"></i> Search</a></li>
-                        <li><a asp-action="DeliveryStatistics" asp-controller="Clients"><i class="bi bi-bar-chart"></i> Statistics</a></li>
-                    </ul>
-                </div>
-            </li>
-            <li>
-                <a asp-action="MyInvoices" asp-controller="Clients"><i class="bi bi-receipt"></i> Invoices <span class="arrow">></span></a>
-                <div class="dropdown-menu">
-                    <ul>
-                        <li><a asp-action="MyInvoices" asp-controller="Clients"><i class="bi bi-search"></i> Search</a></li>
-                        <li><a asp-action="InvoicesStatistics" asp-controller="Clients"><i class="bi bi-bar-chart"></i> Statistics</a></li>
-                    </ul>
-                </div>
-            </li>
-        </ul>
-    </aside>
-    <div class="main-content">
-        <div class="chart-container">
-            <div class="cards-container">
-                <div class="card" id="locationCard">
-                    <div class="card-content">
-                        <h3>Requests</h3>
-                        <p><b>@Model.TotalRequests</b></p>
-                    </div>
-                </div>
-                <div class="card" id="locationCard">
-                    <div class="card-content">
-                        <h3>Requests with offer</h3>
-                        <p><b>@Model.TotalRequestsWithOffers </b></p>
-                    </div>
-                </div>
-                <div class="card" id="locationCard">
-                    <div class="card-content">
-                        <h3>Average price given by you</h3>
-                        <p><b>@Model.AveragePrice BGN</b></p>
-                    </div>
-                </div>
-                <div class="card" id="locationCard">
-                    <div class="card-content">
-                        <h3>Average weight</h3>
-                        <p><b>@Model.AverageWeight KG</b></p>
-                    </div>
-                </div>
-                <div class="card" id="locationCard">
-                    <div class="card-content">
-                        <h3>Average weight</h3>
-                        <p><b>@Model.AverageVolume M3</b></p>
-                    </div>
-                </div>
+        <div class="card" id="locationCard">
+            <div class="card-content">
+                <h3>Requests with offer</h3>
+                <p><b>@Model.TotalRequestsWithOffers </b></p>
             </div>
-
-            <div class="first-row">
-                <div class="chart-container">
-                    <h4>My requests status ratio</h4>
-                    <canvas id="requestStatusChart" class="chart"></canvas>
-                </div>
-
-                <div class="chart-container">
-                    <h4>Response time for requests</h4>
-                    <canvas id="responseTimeGauge" class="chart"></canvas>
-                </div>
-
+        </div>
+        <div class="card" id="locationCard">
+            <div class="card-content">
+                <h3>Average price given by you</h3>
+                <p><b>@Model.AveragePrice BGN</b></p>
             </div>
-            <div class="first-row">
-                <div class="chart-container">
-                    <h4>Requests this month</h4>
-                    <canvas id="heatMapChart" class="chart"></canvas>
-                </div>
-               
+        </div>
+        <div class="card" id="locationCard">
+            <div class="card-content">
+                <h3>Average weight</h3>
+                <p><b>@Model.AverageWeight KG</b></p>
+            </div>
+        </div>
+        <div class="card" id="locationCard">
+            <div class="card-content">
+                <h3>Average weight</h3>
+                <p><b>@Model.AverageVolume M3</b></p>
             </div>
         </div>
     </div>
 
-    <script>
-        async function fetchRequestStatusDistribution() {
-            try {
-                const response = await fetch('/Clients/GetRequestStatusDistribution');
-                const data = await response.json();
+    <div class="first-row">
+        <div class="chart-container">
+            <h4>My requests status ratio</h4>
+            <canvas id="requestStatusChart" class="chart"></canvas>
+        </div>
 
-                const labels = Object.keys(data.statusCounts);
-                const counts = Object.values(data.statusCounts);
+        <div class="chart-container">
+            <h4>Response time for requests</h4>
+            <canvas id="responseTimeGauge" class="chart"></canvas>
+        </div>
 
-                const ctx = document.getElementById('requestStatusChart').getContext('2d');
-                new Chart(ctx, {
-                    type: 'doughnut',
-                    data: {
-                        labels: labels,
-                        datasets: [{
-                            data: counts,
-                            backgroundColor: [
-                                '#00aa87', '#FF6384', '#3498db', '#f1c40f', '#9b59b6'
-                            ],
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        plugins: {
-                            legend: {
-                                position: 'bottom'
-                            }
+    </div>
+    <div class="first-row">
+        <div class="chart-container">
+            <h4>Requests this month</h4>
+            <canvas id="heatMapChart" class="chart"></canvas>
+        </div>
+
+    </div>
+</div>
+
+
+<script>
+    async function fetchRequestStatusDistribution() {
+        try {
+            const response = await fetch('/Clients/GetRequestStatusDistribution');
+            const data = await response.json();
+
+            const labels = Object.keys(data.statusCounts);
+            const counts = Object.values(data.statusCounts);
+
+            const ctx = document.getElementById('requestStatusChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: counts,
+                        backgroundColor: [
+                            '#00aa87', '#FF6384', '#3498db', '#f1c40f', '#9b59b6'
+                        ],
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
                         }
-                    }
-                });
-            } catch (error) {
-                console.error('Error fetching request status distribution:', error);
-            }
-        }
-
-        async function fetchAverageResponseTime() {
-            try {
-                const response = await fetch('/Logistics/GetAverageResponseTime');
-                const data = await response.json();
-
-                const ctx = document.getElementById('responseTimeGauge').getContext('2d');
-                new Chart(ctx, {
-                    type: 'doughnut',
-                    data: {
-                        labels: ['Average Response Time (Hours)'],
-                        datasets: [{
-                            data: [data.averageResponseTime, 24 - data.averageResponseTime],
-                            backgroundColor: ['#00aa87', '#e0e0e0'],
-                            hoverOffset: 4
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        rotation: -90,
-                        circumference: 180,
-                        plugins: {
-                            tooltip: {
-                                callbacks: {
-                                    label: function (tooltipItem) {
-                                        return `Average Response Time: ${data.averageResponseTime.toFixed(2)} hours`;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                });
-            } catch (error) {
-                console.error('Error fetching average response time:', error);
-            }
-        }
-
-        async function renderHeatMap() {
-            try {
-                const response = await fetch('/Clients/GetMonthlyRequestPatterns');
-                const data = await response.json();
-
-                const daysInMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate();
-                const dailyCounts = Array(daysInMonth).fill(0);
-
-                for (const [day, count] of Object.entries(data.data)) {
-                    const dayIndex = parseInt(day, 10) - 1;
-                    if (dayIndex >= 0 && dayIndex < daysInMonth) {
-                        dailyCounts[dayIndex] = count;
                     }
                 }
+            });
+        } catch (error) {
+            console.error('Error fetching request status distribution:', error);
+        }
+    }
 
-                const heatmapData = dailyCounts.map((count, index) => ({
-                    x: index + 1,
-                    y: count,
-                    v: count
-                }));
+    async function fetchAverageResponseTime() {
+        try {
+            const response = await fetch('/Logistics/GetAverageResponseTime');
+            const data = await response.json();
 
-                new Chart(document.getElementById('heatMapChart'), {
-                    type: 'scatter',
-                    data: {
-                        datasets: [{
-                            label: 'Requests per Day',
-                            data: heatmapData,
-                            pointStyle: 'rect',
-                            pointRadius: 10,
-                            backgroundColor(context) {
-                                const value = context.raw.v;
-                                const colorIntensity = Math.min(value * 15, 255);
-                                return `#FF6384`;
-                            },
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        scales: {
-                            x: {
-                                type: 'linear',
-                                position: 'bottom',
-                                title: { display: true, text: 'Day of the Month' },
-                                ticks: {
-                                    stepSize: 1,
-                                    min: 1,
-                                    max: daysInMonth
-                                }
-                            },
-                            y: {
-                                title: { display: true, text: 'Request Count' },
-                                beginAtZero: true,
-                                ticks: {
-                                    stepSize: 1,
-                                    callback: function (value) { return Number.isInteger(value) ? value : null; }
-                                }
-                            }
-                        },
-                        plugins: {
-                            tooltip: {
-                                callbacks: {
-                                    label: function (context) {
-                                        return `Day ${context.raw.x}: ${context.raw.y} request(s)`;
-                                    }
+            const ctx = document.getElementById('responseTimeGauge').getContext('2d');
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Average Response Time (Hours)'],
+                    datasets: [{
+                        data: [data.averageResponseTime, 24 - data.averageResponseTime],
+                        backgroundColor: ['#00aa87', '#e0e0e0'],
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    rotation: -90,
+                    circumference: 180,
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function (tooltipItem) {
+                                    return `Average Response Time: ${data.averageResponseTime.toFixed(2)} hours`;
                                 }
                             }
                         }
                     }
-                });
-            } catch (error) {
-                console.error('Error fetching heat map data:', error);
-            }
+                }
+            });
+        } catch (error) {
+            console.error('Error fetching average response time:', error);
         }
+    }
 
-        window.onload = async function () {
-            await fetchRequestStatusDistribution();
-            await fetchAverageResponseTime();
-            await renderHeatMap();
-        };
-    </script>
-</body>
+    async function renderHeatMap() {
+        try {
+            const response = await fetch('/Clients/GetMonthlyRequestPatterns');
+            const data = await response.json();
 
-</html>
+            const daysInMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate();
+            const dailyCounts = Array(daysInMonth).fill(0);
+
+            for (const [day, count] of Object.entries(data.data)) {
+                const dayIndex = parseInt(day, 10) - 1;
+                if (dayIndex >= 0 && dayIndex < daysInMonth) {
+                    dailyCounts[dayIndex] = count;
+                }
+            }
+
+            const heatmapData = dailyCounts.map((count, index) => ({
+                x: index + 1,
+                y: count,
+                v: count
+            }));
+
+            new Chart(document.getElementById('heatMapChart'), {
+                type: 'scatter',
+                data: {
+                    datasets: [{
+                        label: 'Requests per Day',
+                        data: heatmapData,
+                        pointStyle: 'rect',
+                        pointRadius: 10,
+                        backgroundColor(context) {
+                            const value = context.raw.v;
+                            const colorIntensity = Math.min(value * 15, 255);
+                            return `#FF6384`;
+                        },
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: {
+                            type: 'linear',
+                            position: 'bottom',
+                            title: { display: true, text: 'Day of the Month' },
+                            ticks: {
+                                stepSize: 1,
+                                min: 1,
+                                max: daysInMonth
+                            }
+                        },
+                        y: {
+                            title: { display: true, text: 'Request Count' },
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1,
+                                callback: function (value) { return Number.isInteger(value) ? value : null; }
+                            }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function (context) {
+                                    return `Day ${context.raw.x}: ${context.raw.y} request(s)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        } catch (error) {
+            console.error('Error fetching heat map data:', error);
+        }
+    }
+
+    window.onload = async function () {
+        await fetchRequestStatusDistribution();
+        await fetchAverageResponseTime();
+        await renderHeatMap();
+    };
+</script>
+

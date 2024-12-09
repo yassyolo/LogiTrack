@@ -1,216 +1,42 @@
 ﻿@model LogiTrack.Core.ViewModels.Offer.SearchOfferByOfferNumberViewModel
 @{
-    Layout = null;
+    ViewData["Title"] = "Search Offer";
+    Layout = "~/Views/Shared/_ClientsLayout.cshtml";
 }
 
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Custom Accountant Dashboard</title>
-    <link rel="stylesheet" href="~/css/site.css" />
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
-
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css">
-    <script src="~/js/site.js"></script>
-    <style>
-        .search-container {
-            background-color: #fff;
-            padding: 20px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .search-header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .search-icon {
-            width: 40px;
-            margin-right: 10px;
-        }
-
-        .search-title {
-            font-size: 1.1rem;
-            font-weight: 500;
-        }
-
-        .search-container h3 {
-            margin-top: 30px;
-            font-size: 0.9rem;
-            margin-bottom: 50px;
-            font-weight: 500;
-        }
-
-        .form-group {
-            margin-bottom: 15px;
-        }
-
-        .form-control {
-            width: 50%;
-            padding: 10px;
-            border: 1px solid #ccc;
-        }
-
-        .btn-primary {
-            background-color: #00aa87;
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-            box-shadow: 0 3px 1px -2px #0003, 0 2px 2px 0 #00000024, 0 1px 5px 0 #0000001f;
-        }
-
-            .btn-primary:hover {
-                background-color: #00aa87;
-                box-shadow: 0 3px 1px -2px #0003, 0 2px 2px 0 #00000024, 0 1px 5px 0 #0000001f;
-            }
-
-        label {
-            display: block;
-            font-size: 13px;
-            margin-bottom: 5px;
-            font-weight: 200;
-        }
-
-        input[type="text"],
-        input[type="date"] {
-            width: 25%;
-            border: none;
-            border-bottom: 1.4px solid grey;
-            padding: 8px 0;
-            margin-bottom: 15px;
-        }
-
-            input[type="text"]:focus,
-            input[type="date"]:focus {
-                outline: none;
-                border-bottom-color: #00aa87;
-            }
-
-        .alert {
-            padding: 15px;
-            margin-bottom: 20px;
-            border: 1px solid transparent;
-            border-radius: 4px;
-        }
-
-        .alert-danger {
-            color: #a94442;
-            background-color: #f2dede;
-            border-color: #ebccd1;
-        }
-    </style>
-
-</head>
-
-<body>
-    <header class="header">
-        <div class="logo-name">
-            <div class="company-logo">
-                <img src="https://via.placeholder.com/50" alt="Company Logo">
-            </div>
-            <div class="company-name">LogiTrack</div>
+<div class="search-item">
+    <div class="search-header">
+        <div class="search-icon">
+            <i class="fas fa-tags" style="font-size: 30px; color: #00aa87;"></i>
         </div>
-        <div class="profile-dropdown">
-            <button onclick="toggleDropdown()">
-                <i class="bi bi-person-circle"></i>
-                <span class="arrow">&#x25BC;</span>
-            </button>
-            <div class="profile-dropdown-menu" id="profileDropdown">
-                <a asp-action="CompanyDetails" asp-controller="Clients">Company details</a>
-                <a asp-action="ContactDetails" asp-controller="Clients">Contact details</a>
-                <a asp-action="Logout" asp-controller="Home">Logout</a>
-            </div>
-        </div>
-    </header>
-    <aside class="sidebar">
-        <ul>
-            <li><a asp-action="Dashboard" asp-controller="Clients"><i class="bi bi-house-door"></i> Dashboard</a></li>
-            <li>
-                <a asp-action="MyRequests" asp-controller="Clients"><i class="bi bi-clipboard-check"></i> Requests <span class="arrow">></span></a>
-                <div class="dropdown-menu">
-                    <ul>
-                        <li><a asp-action="MakeRequest" asp-controller="Clients"><i class="bi bi-plus-circle"></i> New</a></li>
-                        <li><a asp-action="MyRequests" asp-controller="Clients"><i class="bi bi-search"></i> Search</a></li>
-                        <li><a asp-action="RequestStatistics" asp-controller="Clients"><i class="bi bi-bar-chart"></i> Statistics</a></li>
-                    </ul>
-                </div>
-            </li>
-            <li>
-                <a asp-action="MyOffers" asp-controller="Clients"><i class="bi bi-file-earmark-text"></i> Offers <span class="arrow">></span></a>
-                <div class="dropdown-menu">
-                    <ul>
-                        <li><a asp-action="HaveOffer" asp-controller="Clients"><i class="bi bi-calendar-check"></i> Book</a></li>
-                        <li><a asp-action="MyOffers" asp-controller="Clients"><i class="bi bi-search"></i> Search</a></li>
-                        <li><a asp-action="OfferStatistics" asp-controller="Clients"><i class="bi bi-bar-chart"></i> Statistics</a></li>
-                    </ul>
-                </div>
-            </li>
-            <li>
-                <a asp-action="MyDeliveries" asp-controller="Clients"><i class="bi bi-truck"></i> Deliveries <span class="arrow">></span></a>
-                <div class="dropdown-menu">
-                    <ul>
-                        <li><a asp-action="SearchDelivery" asp-controller="Clients"><i class="bi bi-binoculars"></i> Track</a></li>
-                        <li><a asp-action="MyDeliveries" asp-controller="Clients"><i class="bi bi-search"></i> Search</a></li>
-                        <li><a asp-action="DeliveryStatistics" asp-controller="Clients"><i class="bi bi-bar-chart"></i> Statistics</a></li>
-                    </ul>
-                </div>
-            </li>
-            <li>
-                <a asp-action="MyInvoices" asp-controller="Clients"><i class="bi bi-receipt"></i> Invoices <span class="arrow">></span></a>
-                <div class="dropdown-menu">
-                    <ul>
-                        <li><a asp-action="MyInvoices" asp-controller="Clients"><i class="bi bi-search"></i> Search</a></li>
-                        <li><a asp-action="InvoicesStatistics" asp-controller="Clients"><i class="bi bi-bar-chart"></i> Statistics</a></li>
-                    </ul>
-                </div>
-            </li>
-        </ul>
-    </aside>
-    <div class="main-content">
-        <div class="search-container">
-            <div class="search-header">
-                <div class="search-icon">
-                    <i class="fas fa-tags" style="font-size: 30px; color: #00aa87;"></i>
-                </div>
-                <h2 class="search-title"><b>Search offer</b></h2>
-            </div>
-
-            <h3>Please enter your offer number</h3>
-
-            @if (TempData["NotFound"] != null)
-            {
-                <div class="alert alert-danger">
-                    Offer not found!
-                </div>
-            }
-
-            @if (TempData["NotAuthorized"] != null)
-            {
-                <div class="alert alert-danger">
-                    You are not authorized to view this offer!
-                </div>
-            }
-
-            <form asp-action="SearchOffer" asp-controller="Clients" method="post">
-                <div class="form-group">
-                    <label asp-for="OfferNumber"><b>Offer number</b></label>
-                    <input asp-for="OfferNumber" type="text" id="ReferenceNumber" class="form-control" placeholder="Please enter" />
-                    <span asp-validation-for="OfferNumber" class="text-danger" id="ReferenceNumberError"></span>
-                </div>
-
-                <button type="submit" class="btn btn-primary"><b>SEARCH</b></button>
-            </form>
-        </div>
+        <h2 class="search-title"><b>Search offer</b></h2>
     </div>
 
-</body>
+    <h3>Please enter your offer number</h3>
 
-</html>
+    @if (TempData["NotFound"] != null)
+    {
+        <div class="alert alert-danger">
+            Offer not found!
+        </div>
+    }
+
+    @if (TempData["NotAuthorized"] != null)
+    {
+        <div class="alert alert-danger">
+            You are not authorized to view this offer!
+        </div>
+    }
+
+    <form asp-action="SearchOffer" asp-controller="Clients" method="post">
+        <div class="form-group">
+            <label asp-for="OfferNumber"><b>Offer number</b></label>
+            <input asp-for="OfferNumber" type="text" id="ReferenceNumber" class="form-control" placeholder="Please enter" />
+            <span asp-validation-for="OfferNumber" class="text-danger" id="ReferenceNumberError"></span>
+        </div>
+
+        <button type="submit" class="btn btn-primary"><b>SEARCH</b></button>
+    </form>
+</div>
+
+

@@ -1,72 +1,289 @@
 ﻿@model LogiTrack.Core.ViewModels.Request.MakeRequestViewModel
 @{
-    Layout = null;
+    ViewData["Title"] = "Make Request";
+    Layout = "~/Views/Shared/_ClientsLayout.cshtml";
 }
 
-<!DOCTYPE html>
-<html lang="en">
+<div class="search-item">
+    <div class="search-header">
+        <div class="search-icon">
+            <i class="fas fa-paper-plane" style="color:#00aa87; font-size:30px;"></i>
+        </div>
+        <h2 class="search-title"><b>New request</b></h2>
+    </div>
+    <h3>Make request now!</h3>
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Driver Dashboard</title>
-    <link rel="stylesheet" href="~/css/site.css" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <form method="post" asp-action="MakeRequest" asp-controller="Clients">
+        <h4>Goods</h4>
+        <div class="form-group">
+            <label asp-for="TypeOfGoods"><b>Type of goods</b></label>
+            <input type="text" asp-for="TypeOfGoods" class="form-control" placeholder="Please enter" />
+        </div>
+        <h4>Cargo</h4>
+        <div class="form-group">
+            <label asp-for="CargoType"><b>Cargo type</b></label>
+            <input asp-for="CargoType" placeholder="Please select or enter" list="cargoTypeOptions" class="form-control" onchange="toggleCargoFields()" />
+            <datalist id="cargoTypeOptions">
+                <option value="Standard"></option>
+                <option value="Non-Standard"></option>
+            </datalist>
+        </div>
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css">
-    <script src="~/js/site.js"></script>
-    <style>
-        .search-container {
-            background-color: #fff;
-            padding: 20px;
-            box-shadow: 0 0 25px 1px #0000000f !important;
+        <div id="standardFields" style="display: none;">
+            <h4>Standard Cargo</h4>
+            <div class="pallet-info">
+                <div class="form-group">
+                    <label asp-for="TypeOfPallet"><b>Type of pallet</b></label>
+                    <input asp-for="TypeOfPallet" placeholder="Please select" list="palletTypeOptions" class="form-control" onchange="toggleCargoFields()" />
+                    <datalist id="palletTypeOptions">
+                        <option value="Euro"></option>
+                        <option value="Industrial"></option>
+                    </datalist>
+                </div>
+                <div class="form-group">
+                    <label asp-for="NumberOfPallets"><b>Count</b></label>
+                    <input type="text" asp-for="NumberOfPallets" class="form-control" placeholder="Please enter" />
+                </div>
+                <div class="form-group">
+                    <label asp-for="PalletsAreStackable"><b>Stackable</b></label>
+                    <input type="checkbox" asp-for="PalletsAreStackable" />
+                </div>
+            </div>
+            <div class="pallet-metrics">
+                <div class="form-group">
+                    <label asp-for="PalletLength"><b>Length (cm)</b></label>
+                    <input type="text" asp-for="PalletLength" class="form-control" placeholder="Please enter" />
+                </div>
+                <div class="form-group">
+                    <label asp-for="PalletWidth"><b>Width (cm)</b> </label>
+                    <input type="text" asp-for="PalletWidth" class="form-control" placeholder="Please enter" />
+                </div>
+                <div class="form-group">
+                    <label asp-for="PalletHeight"><b>Height (cm)</b></label>
+                    <input type="text" asp-for="PalletHeight" class="form-control" placeholder="Please enter" />
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="WeightOfPallets"><b>Weight per pallet (kg)</b></label>
+                    <input type="text" asp-for="WeightOfPallets" class="form-control" placeholder="Please enter" />
+                </div>
+            </div>
+
+        </div>
+
+        <div id="nonStandardFields" style="display: none;">
+            <h4>Non-Standard cargo items</h4>
+            <div class="form-group">
+                <label><b>Number of non-standard goods</b></label>
+                <input asp-for="NumberOfNonStandartGoods" type="text" id="itemCount" class="form-control" min="1" max="10" onchange="loadCargoForms()" placeholder="Please enter" />
+            </div>
+
+            <div id="cargoItemsContainer"></div>
+        </div>
+        <h4>Additional requirements</h4>
+        <div class="refrigerated-shared">
+            <div class="form-group">
+                <label><b>Shared truck</b></label>
+                <input type="checkbox" asp-for="SharedTruck" />
+            </div>
+            <div class="form-group">
+                <label><b>Refrigerated</b></label>
+                <input type="checkbox" asp-for="IsRefrigerated" />
+            </div>
+            <div class="form-group">
+                <label><b>Special instructions</b></label>
+                <textarea asp-for="SpecialInstructions" class="form-control" placeholder="Please enter"></textarea>
+            </div>
+
+        </div>
+        <h4>Delivery date</h4>
+        <div class="form-group">
+            <label asp-for="ExpectedDeliveryDate"><b>Expected delivery date</b></label>
+            <input type="date" id="StartDate" asp-for="ExpectedDeliveryDate" class="flatpickr" placeholder="Please enter">
+        </div>
+
+        <h4>Addresses</h4>
+        <div class="addresses">
+            <div class="form-group">
+                <label asp-for="Type"><b>Destination type</b></label>
+                <input asp-for="Type" placeholder="Please select or enter type" list="requestTypeOptions" class="form-control" />
+                <datalist id="requestTypeOptions">
+                    <option value="Domestic"></option>
+                    <option value="International"></option>
+                </datalist>
+            </div>
+            <div class="pickup-origin">
+                <div class="address">
+                    <div class="form-group">
+                        <label asp-for="PickupStreet"><b>Origin street</b></label>
+                        <input type="text" asp-for="PickupStreet" class="form-control" placeholder="Please enter" />
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="PickupCity"><b>Origin city</b></label>
+                        <input type="text" asp-for="PickupCity" class="form-control" placeholder="Please enter" />
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="PickupCountry"><b>Origin country</b></label>
+                        <input type="text" asp-for="PickupCountry" class="form-control" placeholder="Please enter" />
+                    </div>
+                </div>
+                <div class="address">
+                    <div class="form-group">
+                        <label asp-for="DeliveryStreet"><b>Destination street</b></label>
+                        <input type="text" asp-for="DeliveryStreet" class="form-control" placeholder="Please enter" />
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="DeliveryCity"><b>Destination city</b></label>
+                        <input type="text" asp-for="DeliveryCity" class="form-control" placeholder="Please enter" />
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="DeliveryCountry"><b>Destination country</b></label>
+                        <input type="text" asp-for="DeliveryCountry" class="form-control" placeholder="Please enter" />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <h4>Price</h4>
+        <div class="form-group">
+            <label asp-for="ApproximatePrice"><b>Approximate price</b></label>
+            <input type="text" asp-for="ApproximatePrice" class="form-control" placeholder="Please enter" />
+        </div>
+
+        <button type="submit" class="btn-primary"><b>SUBMIT</b></button>
+    </form>
+</div>
+
+
+<script>
+    function toggleCargoFields() {
+        const cargoType = document.querySelector('input[name="CargoType"]').value;
+        document.getElementById('standardFields').style.display = cargoType === 'Standard' ? 'block' : 'none';
+        document.getElementById('nonStandardFields').style.display = cargoType === 'Non-Standard' ? 'block' : 'none';
+        if (cargoType === 'Non-Standard') loadCargoForms();
+    }
+
+    function loadCargoForms() {
+        const count = parseInt(document.getElementById('itemCount').value) || 0;
+        const container = document.getElementById('cargoItemsContainer');
+        container.innerHTML = '';
+
+        for (let i = 0; i < count; i++) {
+            const itemDiv = document.createElement('div');
+            itemDiv.innerHTML = `<div class="non-metrics-container" style="border: 1px solid #00aa87;">
+                            <div class="non-metrics">
+                        <div class="form-group">
+                            <label>Length (cm)</label>
+                            <input type="text" name="Length[${i}]" class="form-control" required placeholder="Please enter" />
+                        </div>
+                        <div class="form-group">
+                            <label>Width (cm)</label>
+                            <input type="text" name="Width[${i}]" class="form-control" required placeholder="Please enter" />
+                        </div>
+                        <div class="form-group">
+                            <label>Height (cm)</label>
+                            <input type="text" name="Height[${i}]" class="form-control" required placeholder="Please enter" />
+                        </div>
+                        <div class="form-group">
+                            <label>Weight (kg)</label>
+                            <input type="text" name="Weight[${i}]" class="form-control" required placeholder="Please enter" />
+                        </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Description</label>
+                            <input type="text" name="Description[${i}]" class="form-control" required placeholder="Please enter" />
+                        </div>
+                    </div>`;
+
+            container.appendChild(itemDiv);
         }
+    }
 
-            .search-container h3 {
-                margin-top: 30px;
-                font-size: 0.9rem;
-                margin-bottom: 50px;
-                font-weight: 500;
-            }
+    document.addEventListener('DOMContentLoaded', toggleCargoFields);
+    document.addEventListener('DOMContentLoaded', function () {
+        flatpickr(".flatpickr", {
+            dateFormat: "Y-m-d",
+        });
+    });
+</script>
+<style>
+    .row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 15px;
+    }
 
-        .search-header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 20px;
-        }
+    .form-group {
+        margin-bottom: 19px;
+    }
+    
+    h4 {
+        color: #00aa87;
+        border-bottom: 15px;
+        margin-top: 0;
+    }
 
-        .search-icon {
-            width: 40px;
-            margin-right: 10px;
-        }
+    .pallet-info {
+        display: flex;
+        gap: 120px;
+        margin-bottom: 30px;
+    }
 
-        .search-title {
-            font-size: 1.1rem;
-            font-weight: 500;
-        }
-
-        .row {
-            display: flex;
-            justify-content: space-between;
+        .pallet-info input[type="text"] {
+            width: 120%;
+            border: none;
+            border-bottom: 1.4px solid grey;
+            padding: 8px 0;
             margin-bottom: 15px;
         }
 
-        .form-group {
-            margin-bottom: 19px;
+            .pallet-info input[type="text"]:focus {
+                outline: none;
+                border-bottom-color: #00aa87;
+            }
+
+    .pallet-metrics {
+        display: flex;
+        gap: 120px;
+    }
+
+        .pallet-metrics input[type="text"] {
+            width: 120%;
+            border: none;
+            border-bottom: 1.4px solid grey;
+            padding: 8px 0;
+            margin-bottom: 15px;
         }
 
-        label {
-            display: block;
-            font-size: 13px;
-            margin-bottom: 5px;
-            font-weight: 200;
+            .pallet-metrics input[type="text"]:focus {
+                outline: none;
+                border-bottom-color: #00aa87;
+            }
+
+    .refrigerated-shared {
+        display: flex;
+        gap: 80px;
+        margin-top: 30px;
+    }
+
+    textarea.form-control {
+        width: 170%;
+        border: none;
+        border-bottom: 1.4px solid grey;
+        padding: 8px 0;
+        margin-bottom: 15px;
+    }
+
+        textarea.form-control:focus {
+            outline: none;
+            border-bottom-color: #00aa87;
         }
 
-        input[type="text"] {
+    .addresses {
+        display: flex;
+        flex-direction: column;
+    }
+
+        .addresses input[type="text"] {
             width: 25%;
             border: none;
             border-bottom: 1.4px solid grey;
@@ -74,429 +291,54 @@
             margin-bottom: 15px;
         }
 
-            input[type="text"]:focus {
+            .addresses input[type="text"]:focus {
                 outline: none;
                 border-bottom-color: #00aa87;
             }
 
-        .form-control {
-            width: 50%;
-            padding: 10px;
-            border: 1px solid #ccc;
-        }
+    .pickup-origin {
+        display: flex;
+        gap: 320px;
+        flex-direction: row;
+    }
 
-        .btn-primary {
-            background-color: #00aa87;
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-            box-shadow: 0 3px 1px -2px #0003, 0 2px 2px 0 #00000024, 0 1px 5px 0 #0000001f;
-        }
-
-            .btn-primary:hover {
-                background-color: #00aa87;
-                box-shadow: 0 3px 1px -2px #0003, 0 2px 2px 0 #00000024, 0 1px 5px 0 #0000001f;
-            }
-
-        h4 {
-            color: #00aa87;
-            border-bottom: 15px;
-            margin-top: 0;
-        }
-
-        .pallet-info {
-            display: flex;
-            gap: 120px;
-            margin-bottom: 30px;
-        }
-
-            .pallet-info input[type="text"] {
-                width: 120%;
-                border: none;
-                border-bottom: 1.4px solid grey;
-                padding: 8px 0;
-                margin-bottom: 15px;
-            }
-
-                .pallet-info input[type="text"]:focus {
-                    outline: none;
-                    border-bottom-color: #00aa87;
-                }
-
-        .pallet-metrics {
-            display: flex;
-            gap: 120px;
-        }
-
-            .pallet-metrics input[type="text"] {
-                width: 120%;
-                border: none;
-                border-bottom: 1.4px solid grey;
-                padding: 8px 0;
-                margin-bottom: 15px;
-            }
-
-                .pallet-metrics input[type="text"]:focus {
-                    outline: none;
-                    border-bottom-color: #00aa87;
-                }
-
-        .refrigerated-shared {
-            display: flex;
-            gap: 80px;
-            margin-top: 30px;
-        }
-
-        textarea.form-control {
-            width: 170%;
+        .pickup-origin input[type="text"] {
+            width: 175%;
             border: none;
             border-bottom: 1.4px solid grey;
             padding: 8px 0;
             margin-bottom: 15px;
         }
 
-            textarea.form-control:focus {
+    #nonStandardFields h4 {
+        margin-top: 20px;
+    }
+
+    .non-metrics-container {
+        border: 1px solid #00aa87;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        padding: 10px;
+        margin-bottom: 10px;
+    }
+
+    .non-metrics {
+        display: flex;
+        gap: 120px;
+        flex-direction: row;
+    }
+
+        .non-metrics input {
+            width: 120%;
+            border: none;
+            border-bottom: 1.4px solid grey;
+            padding: 8px 0;
+            margin-bottom: 15px;
+        }
+
+            .non-metrics input:focus {
                 outline: none;
                 border-bottom-color: #00aa87;
             }
-
-        .addresses {
-            display: flex;
-            flex-direction: column;
-        }
-
-            .addresses input[type="text"] {
-                width: 25%;
-                border: none;
-                border-bottom: 1.4px solid grey;
-                padding: 8px 0;
-                margin-bottom: 15px;
-            }
-
-                .addresses input[type="text"]:focus {
-                    outline: none;
-                    border-bottom-color: #00aa87;
-                }
-
-        .pickup-origin {
-            display: flex;
-            gap: 320px;
-            flex-direction: row;
-        }
-
-            .pickup-origin input[type="text"] {
-                width: 175%;
-                border: none;
-                border-bottom: 1.4px solid grey;
-                padding: 8px 0;
-                margin-bottom: 15px;
-            }
-
-        #nonStandardFields h4 {
-            margin-top: 20px;
-        }
-
-        .non-metrics-container {
-            border: 1px solid #00aa87;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            padding: 10px;
-            margin-bottom: 10px;
-        }
-
-        .non-metrics {
-            display: flex;
-            gap: 120px;
-            flex-direction: row;
-        }
-
-            .non-metrics input {
-                width: 120%;
-                border: none;
-                border-bottom: 1.4px solid grey;
-                padding: 8px 0;
-                margin-bottom: 15px;
-            }
-
-                .non-metrics input:focus {
-                    outline: none;
-                    border-bottom-color: #00aa87;
-                }
-
-    </style>
-
-</head>
-
-<body>
-    <header class="header">
-        <div class="logo-name">
-            <div class="company-logo">
-                <img src="https://via.placeholder.com/50" alt="Company Logo">
-            </div>
-            <div class="company-name">LogiTrack</div>
-        </div>
-        <div class="profile-dropdown">
-            <button onclick="toggleDropdown()">
-                <i class="bi bi-person-circle"></i>
-                <span class="arrow">&#x25BC;</span>
-            </button>
-            <div class="profile-dropdown-menu" id="profileDropdown">
-                <a asp-action="CompanyDetails" asp-controller="Clients">Company details</a>
-                <a asp-action="ContactDetails" asp-controller="Clients">Contact details</a>
-                <a asp-action="Logout" asp-controller="Home">Logout</a>
-            </div>
-        </div>
-    </header>
-    <aside class="sidebar">
-        <ul>
-            <li><a asp-action="Dashboard" asp-controller="Clients"><i class="bi bi-house-door"></i> Dashboard</a></li>
-            <li>
-                <a asp-action="MyRequests" asp-controller="Clients"><i class="bi bi-clipboard-check"></i> Requests <span class="arrow">></span></a>
-                <div class="dropdown-menu">
-                    <ul>
-                        <li><a asp-action="MakeRequest" asp-controller="Clients"><i class="bi bi-plus-circle"></i> New</a></li>
-                        <li><a asp-action="MyRequests" asp-controller="Clients"><i class="bi bi-search"></i> Search</a></li>
-                        <li><a asp-action="RequestStatistics" asp-controller="Clients"><i class="bi bi-bar-chart"></i> Statistics</a></li>
-                    </ul>
-                </div>
-            </li>
-            <li>
-                <a asp-action="MyOffers" asp-controller="Clients"><i class="bi bi-file-earmark-text"></i> Offers <span class="arrow">></span></a>
-                <div class="dropdown-menu">
-                    <ul>
-                        <li><a asp-action="HaveOffer" asp-controller="Clients"><i class="bi bi-calendar-check"></i> Book</a></li>
-                        <li><a asp-action="MyOffers" asp-controller="Clients"><i class="bi bi-search"></i> Search</a></li>
-                        <li><a asp-action="OfferStatistics" asp-controller="Clients"><i class="bi bi-bar-chart"></i> Statistics</a></li>
-                    </ul>
-                </div>
-            </li>
-            <li>
-                <a asp-action="MyDeliveries" asp-controller="Clients"><i class="bi bi-truck"></i> Deliveries <span class="arrow">></span></a>
-                <div class="dropdown-menu">
-                    <ul>
-                        <li><a asp-action="SearchDelivery" asp-controller="Clients"><i class="bi bi-binoculars"></i> Track</a></li>
-                        <li><a asp-action="MyDeliveries" asp-controller="Clients"><i class="bi bi-search"></i> Search</a></li>
-                        <li><a asp-action="DeliveryStatistics" asp-controller="Clients"><i class="bi bi-bar-chart"></i> Statistics</a></li>
-                    </ul>
-                </div>
-            </li>
-            <li>
-                <a asp-action="MyInvoices" asp-controller="Clients"><i class="bi bi-receipt"></i> Invoices <span class="arrow">></span></a>
-                <div class="dropdown-menu">
-                    <ul>
-                        <li><a asp-action="MyInvoices" asp-controller="Clients"><i class="bi bi-search"></i> Search</a></li>
-                        <li><a asp-action="InvoicesStatistics" asp-controller="Clients"><i class="bi bi-bar-chart"></i> Statistics</a></li>
-                    </ul>
-                </div>
-            </li>
-        </ul>
-    </aside>
-    <div class="main-content">
-        <div class="search-container">
-            <div class="search-header">
-                <div class="search-icon">
-                    <i class="fas fa-paper-plane" style="color:#00aa87; font-size:30px;"></i>
-                </div>
-                <h2 class="search-title"><b>New request</b></h2>
-            </div>
-            <h3>Make request now!</h3>
-
-            <form method="post" asp-action="MakeRequest" asp-controller="Clients">
-                <h4>Goods</h4>
-                <div class="form-group">
-                    <label asp-for="TypeOfGoods"><b>Type of goods</b></label>
-                    <input type="text" asp-for="TypeOfGoods" class="form-control" placeholder="Please enter" />
-                </div>
-                <h4>Cargo</h4>
-                <div class="form-group">
-                    <label asp-for="CargoType"><b>Cargo type</b></label>
-                    <input asp-for="CargoType" placeholder="Please select or enter" list="cargoTypeOptions" class="form-control" onchange="toggleCargoFields()" />
-                    <datalist id="cargoTypeOptions">
-                        <option value="Standard"></option>
-                        <option value="Non-Standard"></option>
-                    </datalist>
-                </div>
-
-                <div id="standardFields" style="display: none;">
-                    <h4>Standard Cargo</h4>
-                    <div class="pallet-info">
-                        <div class="form-group">
-                            <label asp-for="TypeOfPallet"><b>Type of pallet</b></label>
-                            <input asp-for="TypeOfPallet" placeholder="Please select" list="palletTypeOptions" class="form-control" onchange="toggleCargoFields()" />
-                            <datalist id="palletTypeOptions">
-                                <option value="Euro"></option>
-                                <option value="Industrial"></option>
-                            </datalist>
-                        </div>
-                        <div class="form-group">
-                            <label asp-for="NumberOfPallets"><b>Count</b></label>
-                            <input type="text" asp-for="NumberOfPallets" class="form-control" placeholder="Please enter" />
-                        </div>
-                        <div class="form-group">
-                            <label asp-for="PalletsAreStackable"><b>Stackable</b></label>
-                            <input type="checkbox" asp-for="PalletsAreStackable" />
-                        </div>
-                    </div>
-                    <div class="pallet-metrics">
-                        <div class="form-group">
-                            <label asp-for="PalletLength"><b>Length (cm)</b></label>
-                            <input type="text" asp-for="PalletLength" class="form-control" placeholder="Please enter" />
-                        </div>
-                        <div class="form-group">
-                            <label asp-for="PalletWidth"><b>Width (cm)</b> </label>
-                            <input type="text" asp-for="PalletWidth" class="form-control" placeholder="Please enter" />
-                        </div>
-                        <div class="form-group">
-                            <label asp-for="PalletHeight"><b>Height (cm)</b></label>
-                            <input type="text" asp-for="PalletHeight" class="form-control" placeholder="Please enter" />
-                        </div>
-
-                        <div class="form-group">
-                            <label asp-for="WeightOfPallets"><b>Weight per pallet (kg)</b></label>
-                            <input type="text" asp-for="WeightOfPallets" class="form-control" placeholder="Please enter" />
-                        </div>
-                    </div>
-
-                </div>
-
-                <div id="nonStandardFields" style="display: none;">
-                    <h4>Non-Standard cargo items</h4>
-                    <div class="form-group">
-                        <label><b>Number of non-standard goods</b></label>
-                        <input asp-for="NumberOfNonStandartGoods" type="text" id="itemCount" class="form-control" min="1" max="10" onchange="loadCargoForms()" placeholder="Please enter" />
-                    </div>
-
-                    <div id="cargoItemsContainer"></div>
-                </div>
-                <h4>Additional requirements</h4>
-                <div class="refrigerated-shared">
-                    <div class="form-group">
-                        <label><b>Shared truck</b></label>
-                        <input type="checkbox" asp-for="SharedTruck" />
-                    </div>
-                    <div class="form-group">
-                        <label><b>Refrigerated</b></label>
-                        <input type="checkbox" asp-for="IsRefrigerated" />
-                    </div>
-                    <div class="form-group">
-                        <label><b>Special instructions</b></label>
-                        <textarea asp-for="SpecialInstructions" class="form-control" placeholder="Please enter"></textarea>
-                    </div>
-
-                </div>
-                <h4>Delivery date</h4>
-                <div class="form-group">
-                    <label asp-for="ExpectedDeliveryDate"><b>Expected delivery date</b></label>
-                    <input type="date" id="StartDate" asp-for="ExpectedDeliveryDate" class="flatpickr" placeholder="Please enter">
-                </div>
-
-                <h4>Addresses</h4>
-                <div class="addresses">
-                    <div class="form-group">
-                        <label asp-for="Type"><b>Destination type</b></label>
-                        <input asp-for="Type" placeholder="Please select or enter type" list="requestTypeOptions" class="form-control" />
-                        <datalist id="requestTypeOptions">
-                            <option value="Domestic"></option>
-                            <option value="International"></option>
-                        </datalist>
-                    </div>
-                    <div class="pickup-origin">
-                        <div class="address">
-                            <div class="form-group">
-                                <label asp-for="PickupStreet"><b>Origin street</b></label>
-                                <input type="text" asp-for="PickupStreet" class="form-control" placeholder="Please enter" />
-                            </div>
-                            <div class="form-group">
-                                <label asp-for="PickupCity"><b>Origin city</b></label>
-                                <input type="text" asp-for="PickupCity" class="form-control" placeholder="Please enter" />
-                            </div>
-                            <div class="form-group">
-                                <label asp-for="PickupCountry"><b>Origin country</b></label>
-                                <input type="text" asp-for="PickupCountry" class="form-control" placeholder="Please enter" />
-                            </div>
-                        </div>
-                        <div class="address">
-                            <div class="form-group">
-                                <label asp-for="DeliveryStreet"><b>Destination street</b></label>
-                                <input type="text" asp-for="DeliveryStreet" class="form-control" placeholder="Please enter" />
-                            </div>
-                            <div class="form-group">
-                                <label asp-for="DeliveryCity"><b>Destination city</b></label>
-                                <input type="text" asp-for="DeliveryCity" class="form-control" placeholder="Please enter" />
-                            </div>
-                            <div class="form-group">
-                                <label asp-for="DeliveryCountry"><b>Destination country</b></label>
-                                <input type="text" asp-for="DeliveryCountry" class="form-control" placeholder="Please enter" />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <h4>Price</h4>
-                <div class="form-group">
-                    <label asp-for="ApproximatePrice"><b>Approximate price</b></label>
-                    <input type="text" asp-for="ApproximatePrice" class="form-control" placeholder="Please enter" />
-                </div>
-
-                <button type="submit" class="btn-primary"><b>SUBMIT</b></button>
-            </form>
-        </div>
-    </div>
-
-    <script>
-        function toggleCargoFields() {
-            const cargoType = document.querySelector('input[name="CargoType"]').value;
-            document.getElementById('standardFields').style.display = cargoType === 'Standard' ? 'block' : 'none';
-            document.getElementById('nonStandardFields').style.display = cargoType === 'Non-Standard' ? 'block' : 'none';
-            if (cargoType === 'Non-Standard') loadCargoForms();
-        }
-
-        function loadCargoForms() {
-            const count = parseInt(document.getElementById('itemCount').value) || 0;
-            const container = document.getElementById('cargoItemsContainer');
-            container.innerHTML = '';
-
-            for (let i = 0; i < count; i++) {
-                const itemDiv = document.createElement('div');
-                itemDiv.innerHTML = `<div class="non-metrics-container" style="border: 1px solid #00aa87;">
-                        <div class="non-metrics">
-                    <div class="form-group">
-                        <label>Length (cm)</label>
-                        <input type="text" name="Length[${i}]" class="form-control" required placeholder="Please enter" />
-                    </div>
-                    <div class="form-group">
-                        <label>Width (cm)</label>
-                        <input type="text" name="Width[${i}]" class="form-control" required placeholder="Please enter" />
-                    </div>
-                    <div class="form-group">
-                        <label>Height (cm)</label>
-                        <input type="text" name="Height[${i}]" class="form-control" required placeholder="Please enter" />
-                    </div>
-                    <div class="form-group">
-                        <label>Weight (kg)</label>
-                        <input type="text" name="Weight[${i}]" class="form-control" required placeholder="Please enter" />
-                    </div>
-                    </div>
-                    <div class="form-group">
-                        <label>Description</label>
-                        <input type="text" name="Description[${i}]" class="form-control" required placeholder="Please enter" />
-                    </div>
-                </div>`;
-
-                container.appendChild(itemDiv);
-            }
-        }
-
-        document.addEventListener('DOMContentLoaded', toggleCargoFields);
-        document.addEventListener('DOMContentLoaded', function () {
-            flatpickr(".flatpickr", {
-                dateFormat: "Y-m-d",
-            });
-        });
-    </script>
-</body>
-
-</html>
+</style>

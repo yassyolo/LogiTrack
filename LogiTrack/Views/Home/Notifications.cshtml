@@ -1,0 +1,199 @@
+﻿@model List<LogiTrack.Core.ViewModels.Notifications.NotificationViewModel>
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Driver Dashboard</title>
+    <link rel="stylesheet" href="~/css/site.css" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css">
+    <script src="~/js/site.js"></script>
+    <style>
+        .company-container {
+            width: 800px;
+            background-color: #ffffff;
+            box-shadow: 0 0 25px 1px #0000000f !important;
+            display: block;
+        }
+
+        .company-title {
+            font-size: 23px;
+            font-weight: 700;
+            color: #000;
+            margin-bottom: 10px;
+            padding: 20px;
+        }
+
+        .divider-line {
+            height: 1px;
+            background-color: #e0e0e0;
+            margin: 10px 0;
+        }
+        h4{
+            font-size: 18px;
+            color: #00aa87;
+            font-weight: 600;
+            margin:0;
+        }
+        .general-details {
+            font-size: 18px;
+            color: #00aa87;
+            font-weight: 600;
+            margin-bottom: 25px;
+            margin-top: 10px;
+        }
+
+        .company-row {
+           width: 70%;
+            font-size: 16px;
+            color: #333;
+            padding: 10px 0;
+            margin-left: 10px;
+        }
+
+            .company-row span {
+                color: black;
+                font-size: 15px;
+                flex: 1;
+            }
+
+                .company-row span:first-child {
+                    width: 150px;
+                    font-weight: bold;
+                }
+
+        .details-info {
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+        }
+
+        .date-btn {
+            display: flex;
+            flex-direction: row;
+            margin-top: 20px;
+            width: 80%;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .btn {
+            background-color: #00aa87;
+            width: 110px;
+            height: 35px;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            padding: 6px 9px;
+            cursor: pointer;
+            margin-left: 10px;
+            box-shadow: 0 3px 1px -2px #0003, 0 2px 2px 0 #00000024, 0 1px 5px 0 #0000001f;
+        }
+
+            .btn:hover {
+                opacity: 0.9;
+            }        
+    </style>
+
+</head>
+
+<body>
+    <header class="header">
+        <div class="logo-name">
+            <div class="company-logo">
+                <img src="https://via.placeholder.com/50" alt="Company Logo">
+            </div>
+            <div class="company-name">LogiTrack</div>
+        </div>
+        <div class="profile-dropdown">
+            <button onclick="toggleDropdown()">
+                <i class="bi bi-person-circle"></i>
+                <span class="arrow">&#x25BC;</span>
+            </button>
+            <div class="profile-dropdown-menu" id="profileDropdown">
+                <a asp-action="CompanyDetails" asp-controller="Clients">Company details</a>
+                <a asp-action="ContactDetails" asp-controller="Clients">Contact details</a>
+                <a asp-action="Logout" asp-controller="Home">Logout</a>
+            </div>
+        </div>
+    </header>
+    <aside class="sidebar">
+        <ul>
+            <li><a asp-action="Dashboard" asp-controller="Clients"><i class="bi bi-house-door"></i> Dashboard</a></li>
+            <li>
+                <a asp-action="MyRequests" asp-controller="Clients"><i class="bi bi-clipboard-check"></i> Requests <span class="arrow">></span></a>
+                <div class="dropdown-menu">
+                    <ul>
+                        <li><a asp-action="MakeRequest" asp-controller="Clients"><i class="bi bi-plus-circle"></i> New</a></li>
+                        <li><a asp-action="MyRequests" asp-controller="Clients"><i class="bi bi-search"></i> Search</a></li>
+                        <li><a asp-action="RequestStatistics" asp-controller="Clients"><i class="bi bi-bar-chart"></i> Statistics</a></li>
+                    </ul>
+                </div>
+            </li>
+            <li>
+                <a asp-action="MyOffers" asp-controller="Clients"><i class="bi bi-file-earmark-text"></i> Offers <span class="arrow">></span></a>
+                <div class="dropdown-menu">
+                    <ul>
+                        <li><a asp-action="HaveOffer" asp-controller="Clients"><i class="bi bi-calendar-check"></i> Book</a></li>
+                        <li><a asp-action="MyOffers" asp-controller="Clients"><i class="bi bi-search"></i> Search</a></li>
+                        <li><a asp-action="OfferStatistics" asp-controller="Clients"><i class="bi bi-bar-chart"></i> Statistics</a></li>
+                    </ul>
+                </div>
+            </li>
+            <li>
+                <a asp-action="MyDeliveries" asp-controller="Clients"><i class="bi bi-truck"></i> Deliveries <span class="arrow">></span></a>
+                <div class="dropdown-menu">
+                    <ul>
+                        <li><a asp-action="SearchDelivery" asp-controller="Clients"><i class="bi bi-binoculars"></i> Track</a></li>
+                        <li><a asp-action="MyDeliveries" asp-controller="Clients"><i class="bi bi-search"></i> Search</a></li>
+                        <li><a asp-action="DeliveryStatistics" asp-controller="Clients"><i class="bi bi-bar-chart"></i> Statistics</a></li>
+                    </ul>
+                </div>
+            </li>
+            <li>
+                <a asp-action="MyInvoices" asp-controller="Clients"><i class="bi bi-receipt"></i> Invoices <span class="arrow">></span></a>
+                <div class="dropdown-menu">
+                    <ul>
+                        <li><a asp-action="MyInvoices" asp-controller="Clients"><i class="bi bi-search"></i> Search</a></li>
+                        <li><a asp-action="InvoicesStatistics" asp-controller="Clients"><i class="bi bi-bar-chart"></i> Statistics</a></li>
+                    </ul>
+                </div>
+            </li>
+        </ul>
+    </aside>
+    <div class="main-content">
+        <div class="company-container">
+            <div class="general-details">Notifications</div>
+            <div class="divider-line"></div>
+            @foreach (var item in Model)
+            {
+                <div class="company-row">
+                    <h4>@item.Title</h4>
+                    
+=                        <span>@item.Message</span>
+                   
+					<div class="date-btn">
+                        <div class="column">
+                        <span>@item.Date</span>
+                        </div>
+                        <div class="column">
+                            <a asp-action="MarkAsRead" asp-controller="Home" asp-route-id="@item.Id" class="btn" style="text-decoration:none;">READ</a>
+                        </div>
+                    </div>
+                    <div class="divider-line"></div>
+
+                </div>
+            }
+            
+        </div>
+    </div>
+
+</body>
+
+</html>
+

@@ -1,316 +1,172 @@
 ﻿@model LogiTrack.Core.ViewModels.Clients.NewCompanyDetailsForLogisticsViewModel
 @{
-    Layout = null;
+    ViewData["Title"] = "Add Cash Register";
+    Layout = "~/Views/Shared/_LogisticsLayout.cshtml";
 }
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Driver Dashboard</title>
-    <link rel="stylesheet" href="~/css/site.css" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css">
-    <script src="~/js/site.js"></script>
-    <style>
-        .license-container {
-            width: 800px;
-            background-color: #ffffff;
-            box-shadow: 0 0 25px 1px #0000000f !important;
-            display: block;
-        }
-
-        .license-title {
-            font-size: 23px;
-            font-weight: 700;
-            color: #000;
-            margin-bottom: 10px;
-            padding: 20px;
-        }
-
-        .divider-line {
-            height: 1px;
-            background-color: #e0e0e0;
-            margin: 10px 0;
-        }
-
-        .general-details {
-            font-size: 18px;
-            color: #00aa87;
-            font-weight: 600;
-            margin-bottom: 25px;
-        }
-
-        .license-row {
-            display: flex;
-            justify-content: space-between;
-            font-size: 16px;
-            color: #333;
-            padding: 10px 0;
-            margin-left: 10px;
-        }
-
-            .license-row span {
-                color: black;
-                font-size: 15px;
-                flex: 1;
-            }
-
-                .license-row span:first-child {
-                    width: 150px;
-                    font-weight: bold;
-                }
-
-        .details-info {
-            padding: 20px;
-        }
-
-        .title-button {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
-            flex-direction: row;
-            width: 90%;
-        }
-
-        .btns {
-            display: flex;
-            flex-direction: row;
-            gap: 20px;
-            margin-top: 10px;
-        }
-
-        .btn {
-            background-color: #00aa87;
-            height: 15px;
-            text-decoration: none;
-            margin-top: 15px;
-            color: white;
-            border: none;
-            border-radius: 3px;
-            padding: 10px 15px;
-            cursor: pointer;
-            margin-left: 10px;
-            box-shadow: 0 3px 1px -2px #0003, 0 2px 2px 0 #00000024, 0 1px 5px 0 #0000001f;
-        }
-
-            .btn:hover {
-                opacity: 0.9;
-            }
-
-        .btn-clear {
-            width: 80px;
-            text-align: center;
-            height: 15px;
-            text-decoration: none;
-            background-color: white;
-            color: #00aa87;
-            border: 1px solid #00aa87;
-            border-radius: 3px;
-            padding: 10px 15px;
-            cursor: pointer;
-            margin-left: 10px;
-            margin-top: 15px;
-            box-shadow: 0 3px 1px -2px #0003, 0 2px 2px 0 #00000024, 0 1px 5px 0 #0000001f;
-        }
-
-            .btn-clear:hover {
-                opacity: 0.8;
-            }
-    </style>
-
-</head>
-
-<body>
-    <header class="header">
-        <div class="logo-name">
-            <div class="company-logo">
-                <img src="https://via.placeholder.com/50" alt="Company Logo">
-            </div>
-            <div class="company-name">LogiTrack</div>
-        </div>
-        <div class="profile-dropdown">
-            <button onclick="toggleDropdown()">
-                <i class="bi bi-person-circle"></i>
-                <span class="arrow">&#x25BC;</span>
-            </button>
-            <div class="profile-dropdown-menu" id="profileDropdown">
-                <a asp-action="Details" asp-controller="Driver">Personal details</a>
-                <a asp-action="LicenseDetails" asp-controller="Driver">License</a>
-                <a asp-action="Logout" asp-controller="Home">Logout</a>
-            </div>
-        </div>
-    </header>
-
-    <aside class="sidebar">
-        <ul>
-            <li>
-                <a asp-action="Dashboard" asp-controller="Logistics">
-                    <i class="bi bi-house-door"></i> Dashboard
-                </a>
-            </li>
-            <li>
-                <a href="#">
-                    <i class="bi bi-people"></i> Clients <span class="arrow">></span>
-                </a>
-                <div class="dropdown-menu">
-                    <ul>
-                        <li><a asp-action="GetPendingRegistrations" asp-controller="Logistics"><i class="bi bi-person-plus"></i> New registrations</a></li>
-                        <li><a asp-action="ClientsRegister" asp-controller="Logistics"><i class="bi bi-journal-text"></i> Clients register</a></li>
-                        <li><a asp-action="SearchCompany" asp-controller="Logistics"><i class="bi bi-search"></i> Search</a></li>
-                        <li><a asp-action="ClientsStatistics" asp-controller="Logistics"><i class="bi bi-bar-chart-line"></i> Statistics</a></li>
-                    </ul>
-                </div>
-            </li>
-            <li>
-                <a asp-action="VehiclesRegister" asp-controller="Logistics">
-                    <i class="bi bi-truck"></i> Vehicles <span class="arrow">></span>
-                </a>
-                <div class="dropdown-menu">
-                    <ul>
-                        <li><a asp-action="SearchVehicle" asp-controller="Logistics"><i class="bi bi-search"></i> Search</a></li>
-                        <li><a asp-action="VehiclesRegister" asp-controller="Logistics"><i class="bi bi-list-task"></i> Vehicles Register</a></li>
-                        <li><a asp-action="VehicleStatistics" asp-controller="Logistics"><i class="bi bi-bar-chart"></i> Statistics</a></li>
-                    </ul>
-                </div>
-            </li>
-            <li>
-                <a asp-action="DriversRegister" asp-controller="Logistics">
-                    <i class="bi bi-person-badge"></i> Drivers <span class="arrow">></span>
-                </a>
-                <div class="dropdown-menu">
-                    <ul>
-                        <li><a asp-action="SearchDriver" asp-controller="Logistics"><i class="bi bi-search"></i> Search</a></li>
-                        <li><a asp-action="DriversRegister" asp-controller="Logistics"><i class="bi bi-people-fill"></i> Drivers Register</a></li>
-                        <li><a asp-action="DriverStatistics" asp-controller="Logistics"><i class="bi bi-bar-chart-line"></i> Statistics</a></li>
-                    </ul>
-                </div>
-            </li>
-            <li>
-                <a asp-action="RequestsRegister" asp-controller="Logistics">
-                    <i class="bi bi-card-list"></i> Requests <span class="arrow">></span>
-                </a>
-                <div class="dropdown-menu">
-                    <ul>
-                        <li><a asp-action="SearchRequest" asp-controller="Logistics"><i class="bi bi-search"></i> Search</a></li>
-                        <li><a asp-action="RequestsRegister" asp-controller="Logistics"><i class="bi bi-journal"></i> Requests Register</a></li>
-                        <li><a asp-action="RequestsStatistics" asp-controller="Logistics"><i class="bi bi-bar-chart"></i> Statistics</a></li>
-                    </ul>
-                </div>
-            </li>
-            <li>
-                <a asp-action="OffersRegister" asp-controller="Logistics">
-                    <i class="bi bi-file-earmark-text"></i> Offers <span class="arrow">></span>
-                </a>
-                <div class="dropdown-menu">
-                    <ul>
-                        <li><a asp-action="SearchOffer" asp-controller="Logistics"><i class="bi bi-search"></i> Search</a></li>
-                        <li><a asp-action="OffersRegister" asp-controller="Logistics"><i class="bi bi-journal-text"></i> Offers Register</a></li>
-                        <li><a asp-action="OfferStatistics" asp-controller="Logistics"><i class="bi bi-bar-chart"></i> Statistics</a></li>
-                    </ul>
-                </div>
-            </li>
-            <li>
-                <a asp-action="DeliveriesRegister" asp-controller="Logistics">
-                    <i class="bi bi-box-seam"></i> Deliveries <span class="arrow">></span>
-                </a>
-                <div class="dropdown-menu">
-                    <ul>
-                        <li><a asp-action="SearchDelivery" asp-controller="Logistics"><i class="bi bi-search"></i> Search</a></li>
-                        <li><a asp-action="DeliveriesRegister" asp-controller="Logistics"><i class="bi bi-journal"></i> Deliveries Register</a></li>
-                        <li><a asp-action="DeliveryStatistics" asp-controller="Logistics"><i class="bi bi-bar-chart"></i> Statistics</a></li>
-                    </ul>
-                </div>
-            </li>
-            <li>
-                <a asp-action="InvoicesRegister" asp-controller="Logistics">
-                    <i class="bi bi-receipt"></i> Invoices register <span class="arrow">></span>
-                </a>
-                <div class="dropdown-menu">
-                    <ul>
-                        <li><a asp-action="InvoicesRegister" asp-controller="Logistics"><i class="bi bi-journal"></i> Invoices Register</a></li>
-                        <li><a asp-action="InvoicesStatistics" asp-controller="Logistics"><i class="bi bi-bar-chart-line"></i> Statistics</a></li>
-                    </ul>
-                </div>
-            </li>
-            <li>
-                <a asp-action="SearchCashRegisters" asp-controller="Logistics">
-                    <i class="bi bi-cash-stack"></i> Cash registers <span class="arrow">></span>
-                </a>
-                <div class="dropdown-menu">
-                    <ul>
-                        <li><a asp-action="SearchCashRegisters" asp-controller="Logistics"><i class="bi bi-journal"></i> Cash Register</a></li>
-                        <li><a asp-action="CashRegisterStatistics" asp-controller="Logistics"><i class="bi bi-bar-chart-line"></i> Statistics</a></li>
-                    </ul>
-                </div>
-            </li>
-        </ul>
-    </aside>
-    <div class="main-content">
-        <div class="license-container">
-            <div class="title-button">
-                <div class="license-title">Company details</div>
-                <div class="btns">
-                    <a asp-action="RejectPendingRegistration" class="btn-clear" asp-controller="Logistics" asp-route-id="@Model.Id">REJECT</a>
-
-                    <a asp-action="ApprovePendingRegistration" class="btn" asp-controller="Logistics" asp-route-id="@Model.Id">APPROVE</a>
-                </div>
-            </div>
-            <div class="divider-line"></div>
-            <div class="details-info">
-                <div class="general-details">General Information</div>
-                <div class="license-row">
-                    <span><b>Name</b></span>
-                    <span>@Model.Name</span>
-                </div>
-                <div class="license-row">
-                    <span><b>Registration number</b></span>
-                    <span>@Model.RegistrationNumber</span>
-                </div>
-                <div class="license-row">
-                    <span><b>Industry</b></span>
-                    <span>@Model.Industry</span>
-                </div>
-                <div class="divider-line"></div>
-                <div class="general-details">Address</div>
-                <div class="license-row">
-                    <span><b>City</b></span>
-                    <span>@Model.City, @Model.PostalCode</span>
-                </div>
-                <div class="license-row">
-                    <span><b>Country</b></span>
-                    <span>@Model.Country</span>
-                </div>
-                <div class="license-row">
-                    <span><b>Street</b></span>
-                    <span>@Model.Street</span>
-                </div>
-            </div>
-            <div class="divider-line"></div>
-            <div class="details-info">
-                <div class="general-details">Contact Information</div>
-                <div class="license-row">
-                    <span><b>Email</b></span>
-                    <span>@Model.Email</span>
-                </div>
-                <div class="license-row">
-                    <span><b>Contact person</b></span>
-                    <span>@Model.ContactPerson</span>
-                </div>
-                <div class="license-row">
-                    <span><b>Phone number</b></span>
-                    <span>@Model.PhoneNumber</span>
-                </div>
-                <div class="license-row">
-                    <span><b>Alternative phone number</b></span>
-                    <span>@Model.AlternativePhoneNumber</span>
-                </div>
-            </div>
+<div class="license-container">
+    <div class="title-button">
+        <div class="license-title">Company details</div>
+        <div class="btns">
+            <a asp-action="RejectPendingRegistration" class="btn-clear" asp-controller="Logistics" asp-route-id="@Model.Id">REJECT</a>
+            <a asp-action="ApprovePendingRegistration" class="btn" asp-controller="Logistics" asp-route-id="@Model.Id">APPROVE</a>
         </div>
     </div>
+    <div class="divider-line"></div>
+    <div class="details-info">
+        <div class="general-details">General Information</div>
+        <div class="license-row">
+            <span><b>Name</b></span>
+            <span>@Model.Name</span>
+        </div>
+        <div class="license-row">
+            <span><b>Registration number</b></span>
+            <span>@Model.RegistrationNumber</span>
+        </div>
+        <div class="license-row">
+            <span><b>Industry</b></span>
+            <span>@Model.Industry</span>
+        </div>
+        <div class="divider-line"></div>
+        <div class="general-details">Address</div>
+        <div class="license-row">
+            <span><b>City</b></span>
+            <span>@Model.City, @Model.PostalCode</span>
+        </div>
+        <div class="license-row">
+            <span><b>Country</b></span>
+            <span>@Model.Country</span>
+        </div>
+        <div class="license-row">
+            <span><b>Street</b></span>
+            <span>@Model.Street</span>
+        </div>
+    </div>
+    <div class="divider-line"></div>
+    <div class="details-info">
+        <div class="general-details">Contact Information</div>
+        <div class="license-row">
+            <span><b>Email</b></span>
+            <span>@Model.Email</span>
+        </div>
+        <div class="license-row">
+            <span><b>Contact person</b></span>
+            <span>@Model.ContactPerson</span>
+        </div>
+        <div class="license-row">
+            <span><b>Phone number</b></span>
+            <span>@Model.PhoneNumber</span>
+        </div>
+        <div class="license-row">
+            <span><b>Alternative phone number</b></span>
+            <span>@Model.AlternativePhoneNumber</span>
+        </div>
+    </div>
+</div>
+<style>
+    .license-container {
+        width: 800px;
+        background-color: #ffffff;
+        box-shadow: 0 0 25px 1px #0000000f !important;
+        display: block;
+    }
 
-</body>
+    .license-title {
+        font-size: 23px;
+        font-weight: 700;
+        color: #000;
+        margin-bottom: 10px;
+        padding: 20px;
+    }
 
-</html>
+    .divider-line {
+        height: 1px;
+        background-color: #e0e0e0;
+        margin: 10px 0;
+    }
+
+    .general-details {
+        font-size: 18px;
+        color: #00aa87;
+        font-weight: 600;
+        margin-bottom: 25px;
+    }
+
+    .license-row {
+        display: flex;
+        justify-content: space-between;
+        font-size: 16px;
+        color: #333;
+        padding: 10px 0;
+        margin-left: 10px;
+    }
+
+        .license-row span {
+            color: black;
+            font-size: 15px;
+            flex: 1;
+        }
+
+            .license-row span:first-child {
+                width: 150px;
+                font-weight: bold;
+            }
+
+    .details-info {
+        padding: 20px;
+    }
+
+    .title-button {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+        flex-direction: row;
+        width: 90%;
+    }
+
+    .btns {
+        display: flex;
+        flex-direction: row;
+        gap: 20px;
+        margin-top: 10px;
+    }
+
+    .btn {
+        background-color: #00aa87;
+        height: 15px;
+        text-decoration: none;
+        margin-top: 15px;
+        color: white;
+        border: none;
+        border-radius: 3px;
+        padding: 10px 15px;
+        cursor: pointer;
+        margin-left: 10px;
+        box-shadow: 0 3px 1px -2px #0003, 0 2px 2px 0 #00000024, 0 1px 5px 0 #0000001f;
+    }
+
+        .btn:hover {
+            opacity: 0.9;
+        }
+
+    .btn-clear {
+        width: 80px;
+        text-align: center;
+        height: 15px;
+        text-decoration: none;
+        background-color: white;
+        color: #00aa87;
+        border: 1px solid #00aa87;
+        border-radius: 3px;
+        padding: 10px 15px;
+        cursor: pointer;
+        margin-left: 10px;
+        margin-top: 15px;
+        box-shadow: 0 3px 1px -2px #0003, 0 2px 2px 0 #00000024, 0 1px 5px 0 #0000001f;
+    }
+
+        .btn-clear:hover {
+            opacity: 0.8;
+        }
+</style>
+
 

@@ -1,383 +1,300 @@
 ﻿@model LogiTrack.Core.ViewModels.Clients.ClientsDashboardViewModel
 @{
-Layout = null;
+    ViewData["Title"] = "Add Status";
+    Layout = "~/Views/Shared/_ClientsLayout.cshtml";
 }
 
-<!DOCTYPE html>
-<html lang="en">
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Driver Dashboard</title>
-    <link rel="stylesheet" href="~/css/site.css" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css">
-    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet" />
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-
-    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
-    <script src="~/js/site.js"></script>
-    <style>
-        .delivery {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 10px;
-        }
-
-        .delivery-info {
-            display: flex;
-            align-items: center;
-            font-size: 0.85rem;
-        }
-
-            .delivery-info p {
-                margin: 0;
-            }
-
-        .delivery-tracking {
-            display: flex;
-            flex-direction: row;
-            margin-bottom: 25px;
-            margin-top: 10px;
-        }
-
-        .addresses {
-            margin-left: 10px;
-            font-size: 0.85rem;
-            width: 75%;
-            flex-wrap: wrap;
-        }
-
-        .pickup-address, .delivery-address {
-            margin: 0;
-        }
-
-        .client-company {
-            font-size: 0.85rem;
-        }
-
-        .road-icon {
-            width: 30px;
-            height: 30px;
-            margin: 0 10px;
-        }
-
-        .ref-num {
-            text-decoration: none;
-            color: black;
-            text-rendering: optimizelegibility;
-            font-size: 0.80rem;
-            margin-top: 10px;
-        }
-
-        .card-button-info {
-            display: flex;
-            flex-direction: column;
-        }
-
-            .card-button-info p {
-                font-size: 0.8rem;
-                color: #666;
-                margin-top: 10px;
-            }
-
-        .tracking-line {
-            display: flex;
-            align-items: center;
-            margin-top: 10px;
-            width: 30%;
-            margin-left: 35px;
-           
-        }
-
-        .dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-        }
-
-        .line {
-            flex: 1;
-            height: 3px;
-        }
-        
-        p {
-            font-size: 14px;
-        }
-
-        .date{
-width:60px;
-flex-wrap: wrap;
-        }
-        .invoice{
-            width:90%;
-        }
-    </style>
-
-</head>
-
-<body>
-    <header class="header">
-        <div class="logo-name">
-            <div class="company-logo">
-                <img src="https://via.placeholder.com/50" alt="Company Logo">
-            </div>
-            <div class="company-name">LogiTrack</div>
+<div class="cards-container">
+    <div class="card" id="locationCard">
+        <div class="card-icon">
+            <i class="fas fa-file-alt" style="font-size: 50px; color:#00aa87;"></i>
         </div>
-        <div class="profile-dropdown">
-            <button onclick="toggleDropdown()">
-                <i class="bi bi-person-circle"></i>
-                <span class="arrow">&#x25BC;</span>
-            </button>
-            <div class="profile-dropdown-menu" id="profileDropdown">
-                <a asp-action="CompanyDetails" asp-controller="Clients">Company details</a>
-                <a asp-action="ContactDetails" asp-controller="Clients">Contact details</a>
-                <a asp-action="Logout" asp-controller="Home">Logout</a>
-            </div>
+        <div class="card-content">
+            <h3>Requests</h3>
+            <p><b>@Model.RequestsCount</b></p>
         </div>
-    </header>
-    <aside class="sidebar">
-        <ul>
-            <li><a asp-action="Dashboard" asp-controller="Clients"><i class="bi bi-house-door"></i> Dashboard</a></li>
-            <li>
-                <a asp-action="MyRequests" asp-controller="Clients"><i class="bi bi-clipboard-check"></i> Requests <span class="arrow">></span></a>
-                <div class="dropdown-menu">
-                    <ul>
-                        <li><a asp-action="MakeRequest" asp-controller="Clients"><i class="bi bi-plus-circle"></i> New</a></li>
-                        <li><a asp-action="MyRequests" asp-controller="Clients"><i class="bi bi-search"></i> Search</a></li>
-                        <li><a asp-action="RequestStatistics" asp-controller="Clients"><i class="bi bi-bar-chart"></i> Statistics</a></li>
-                    </ul>
-                </div>
-            </li>
-            <li>
-                <a asp-action="MyOffers" asp-controller="Clients"><i class="bi bi-file-earmark-text"></i> Offers <span class="arrow">></span></a>
-                <div class="dropdown-menu">
-                    <ul>
-                        <li><a asp-action="HaveOffer" asp-controller="Clients"><i class="bi bi-calendar-check"></i> Book</a></li>
-                        <li><a asp-action="MyOffers" asp-controller="Clients"><i class="bi bi-search"></i> Search</a></li>
-                        <li><a asp-action="OfferStatistics" asp-controller="Clients"><i class="bi bi-bar-chart"></i> Statistics</a></li>
-                    </ul>
-                </div>
-            </li>
-            <li>
-                <a asp-action="MyDeliveries" asp-controller="Clients"><i class="bi bi-truck"></i> Deliveries <span class="arrow">></span></a>
-                <div class="dropdown-menu">
-                    <ul>
-                        <li><a asp-action="SearchDelivery" asp-controller="Clients"><i class="bi bi-binoculars"></i> Track</a></li>
-                        <li><a asp-action="MyDeliveries" asp-controller="Clients"><i class="bi bi-search"></i> Search</a></li>
-                        <li><a asp-action="DeliveryStatistics" asp-controller="Clients"><i class="bi bi-bar-chart"></i> Statistics</a></li>
-                    </ul>
-                </div>
-            </li>
-            <li>
-                <a asp-action="MyInvoices" asp-controller="Clients"><i class="bi bi-receipt"></i> Invoices <span class="arrow">></span></a>
-                <div class="dropdown-menu">
-                    <ul>
-                        <li><a asp-action="MyInvoices" asp-controller="Clients"><i class="bi bi-search"></i> Search</a></li>
-                        <li><a asp-action="InvoicesStatistics" asp-controller="Clients"><i class="bi bi-bar-chart"></i> Statistics</a></li>
-                    </ul>
-                </div>
-            </li>
-        </ul>
-    </aside>
-
-    <div class="main-content">
-        <div class="cards-container">
-            <div class="card" id="locationCard">
-                <div class="card-icon">
-                    <i class="fas fa-file-alt" style="font-size: 50px; color:#00aa87;"></i>
-                </div>
-                <div class="card-content">
-                    <h3>Requests</h3>
-                    <p><b>@Model.RequestsCount</b></p>
-                </div>
-                <div class="card-button-info">
-                    <a asp-action="MakeRequest" asp-controller="Clients" class="card-button">+ NEW</a>
-                    <p>@Model.RequestsLastMonthCount last month</p>
-                </div>
-            </div>
-            <div class="card">
-                <div class="card-icon">
-                    <i class="fas fa-box" style="font-size: 50px; color:#00aa87;"></i>
-                </div>
-                <div class="card-content">
-                    <h3>Offers</h3>
-                    <p><b>@Model.BookedOffersCount</b></p>
-                </div>
-                <div class="card-button-info">
-                    <a asp-action="MyOffers" asp-controller="Clients" class="card-button">+ BOOK</a>
-                    <p>@Model.BookedOffersLastMonthCount last month</p>
-                </div>
-            </div>
-            <div class="card">
-                <div class="card-icon">
-                    <i class="fas fa-file-invoice" style="font-size: 50px; color:#00aa87;"></i>
-                </div>
-                <div class="card-content">
-                    <h3>Invoices</h3>
-                    <p><b>@Model.InvoicesCount</b></p>
-                </div>
-                <div class="card-button-info">
-                    <a asp-action="MyInvoices" asp-controller="Clients" class="card-button">+ ALL</a>
-                    <p>@Model.InvoiceLastMonthCount last month</p>
-                </div>
-            </div>
-
-        </div>
-
-        <div class="diagrams">
-            <div class="diagram">
-                <div class="diagram-header">
-                    <h3>Offers</h3>
-                    <a asp-action="MyOffers" asp-controller="Clients" class="see-all">See All</a>
-                </div>
-                <div class="invoice-header">
-                    <p><b>Ref No</b></p>
-                    <p><b>Addresses</b></p>
-                    <p><b>Amount</b></p>
-                    <p><b>Action</b></p>
-                </div>
-                @foreach (var item in Model.LastFivePendingOffers)
-                {
-                    <div class="delivery">
-                        <div class="delivery-info">
-                            <a asp-action="OfferDetails" asp-controller="Clients" asp-route-id="@item.Id" class="ref-num">@item.ReferenceNumber</a>
-                            <img src="~/dashboard_books_dots.svg" alt="Road" class="road-icon">
-                            <div class="addresses">
-                                <p class="pickup-address">@item.PickupAddress</p>
-                                <p class="delivery-address">@item.DeliveryAddress</p>
-                            </div>
-                        </div>
-                        <p> @item.Price BGN</p>
-                        <a asp-action="SearchOffer" asp-controller="Clients" class="card-button"><b>BOOK</b></a>
-                    </div>
-                }
-            </div>
-            <div class="diagram">
-                <div class="diagram-header">
-                    <h3>Track</h3>
-                    <a asp-action="MyDeliveries" asp-controller="Clients" class="see-all">See All</a>
-                </div>
-
-                @foreach (var item in Model.LastFiveDeliveries)
-                {
-                    <div class="delivery-tracking">
-
-                        <a asp-action="DeliveryDetails" asp-controller="Clients" asp-route-id="@item.Id" class="ref-num">@item.ReferenceNumber</a>
-
-                        <div class="delivery-info">
-                            <a asp-action="DeliveryDetails" asp-controller="Driver"></a>
-                            <img src="~/dashboard_books_dots.svg" alt="Road" class="road-icon">
-                            <div class="addresses">
-                                <p class="pickup-address">@item.PickupAddress</p>
-                                <p class="delivery-address">@item.DeliveryAddress</p>
-                            </div>
-                        </div>
-
-                        <div class="tracking-line">
-                            <div class="dot" style="background-color: @(item.DeliveryStep >= 1 ? "#00aa87" : "gray")"></div>
-                            <div class="line" style="background-color: @(item.DeliveryStep >= 2 ? "#00aa87" : "gray")"></div>
-                            <div class="dot" style="background-color: @(item.DeliveryStep >= 2 ? "#00aa87" : "gray")"></div>
-                            <div class="line" style="background-color: @(item.DeliveryStep >= 3 ? "#00aa87" : "gray")"></div>
-                            <div class="dot" style="background-color: @(item.DeliveryStep >= 3 ? "#00aa87" : "gray")"></div>
-                            <div class="line" style="background-color: @(item.DeliveryStep >= 4 ? "#00aa87" : "gray")"></div>
-                            <div class="dot" style="background-color: @(item.DeliveryStep >= 4 ? "#00aa87" : "gray")"></div>
-                        </div>
-                    </div>
-                }
-            </div>
-            <div class="diagram">
-                <div class="diagram-header">
-                    <h3>Invoices</h3>
-                    <a asp-action="MyInvoices" asp-controller="Clients" class="see-all">See All</a>
-                    <h3>Due amount:</h3>
-                    <p style=" color: #707070;">@Model.DueAmountForDeliveries BGN</p>
-                </div>
-                <div class="invoice-header">
-                    <p><b>Invoice No</b></p>
-                    <p><b>Current date</b></p>
-                    <p><b>Creation date</b></p>
-                    <p><b>Amount</b></p>
-                    <p><b>Paid</b></p>
-                </div>
-                @foreach (var invoice in Model.LastFiveInvoices)
-                {
-                    <div class="invoice">
-                        <p>@invoice.InvoiceNumber</p>
-                        <p class="date">@invoice.Date</p>
-                        <p class="date">@invoice.CreationDate</p>
-                        <p>@invoice.Amount BGN</p>
-                        @if(invoice.IsPaid){
-                        <i class="bi bi-check-circle-fill" style="color: #00aa87; margin-top: 10px;"></i>
-                        }
-                        else{
-                            <p style="color: #00aa87;">No</p>
-                        }
-                    </div>
-                }
-            </div>
-            <div class="diagram">
-                <div id="calendar" class="calendar"></div>
-                <div id="event-details" class="event-details"></div>
-            </div>
+        <div class="card-button-info">
+            <a asp-action="MakeRequest" asp-controller="Clients" class="card-button">+ NEW</a>
+            <p>@Model.RequestsLastMonthCount last month</p>
         </div>
     </div>
-    <script>
-        $(document).ready(function () {
-            $.ajax({
-                url: '/Clients/GetCalendarEvents',
-                type: 'GET',
-                success: function (events) {
-                    var calendarEl = document.getElementById('calendar');
-                    var calendar = new FullCalendar.Calendar(calendarEl, {
-                        initialView: 'dayGridMonth',
-                        headerToolbar: {
-                            left: 'prev,next today',
-                            center: 'title',
-                            right: 'dayGridMonth,timeGridWeek,timeGridDay'
-                        },
-                        events: events.map(function (event) {
-                            return {
-                                id: event.id,
-                                title: event.title,
-                                start: event.date.split("T")[0],
-                                backgroundColor: getColor(event.type)
-                            };
-                        }),
-                        dateClick: function (info) {
-                            var dateEvents = events.filter(event => event.date.split("T")[0] === info.dateStr);
-                            if (dateEvents.length > 0) {
-                                $('#event-details').html('<h4 class="event-details">Events on ' + info.dateStr + ':</h4><ul>' +
-                                    dateEvents.map(e => '<li>' + e.title + '</li>').join('') +
-                                    '</ul>');
-                            } else {
-                                $('#event-details').html('<h4>No events on ' + info.dateStr + '.</h4>');
-                            }
+    <div class="card">
+        <div class="card-icon">
+            <i class="fas fa-box" style="font-size: 50px; color:#00aa87;"></i>
+        </div>
+        <div class="card-content">
+            <h3>Offers</h3>
+            <p><b>@Model.BookedOffersCount</b></p>
+        </div>
+        <div class="card-button-info">
+            <a asp-action="MyOffers" asp-controller="Clients" class="card-button">+ BOOK</a>
+            <p>@Model.BookedOffersLastMonthCount last month</p>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-icon">
+            <i class="fas fa-file-invoice" style="font-size: 50px; color:#00aa87;"></i>
+        </div>
+        <div class="card-content">
+            <h3>Invoices</h3>
+            <p><b>@Model.InvoicesCount</b></p>
+        </div>
+        <div class="card-button-info">
+            <a asp-action="MyInvoices" asp-controller="Clients" class="card-button">+ ALL</a>
+            <p>@Model.InvoiceLastMonthCount last month</p>
+        </div>
+    </div>
+
+</div>
+
+<div class="diagrams">
+    <div class="diagram">
+        <div class="diagram-header">
+            <h3>Offers</h3>
+            <a asp-action="MyOffers" asp-controller="Clients" class="see-all">See All</a>
+        </div>
+        <div class="invoice-header">
+            <p><b>Ref No</b></p>
+            <p><b>Addresses</b></p>
+            <p><b>Amount</b></p>
+            <p><b>Action</b></p>
+        </div>
+        @foreach (var item in Model.LastFivePendingOffers)
+        {
+            <div class="delivery">
+                <div class="delivery-info">
+                    <a asp-action="OfferDetails" asp-controller="Clients" asp-route-id="@item.Id" class="ref-num">@item.ReferenceNumber</a>
+                    <img src="~/dashboard_books_dots.svg" alt="Road" class="road-icon">
+                    <div class="addresses">
+                        <p class="pickup-address">@item.PickupAddress</p>
+                        <p class="delivery-address">@item.DeliveryAddress</p>
+                    </div>
+                </div>
+                <p> @item.Price BGN</p>
+                <a asp-action="SearchOffer" asp-controller="Clients" class="card-button"><b>BOOK</b></a>
+            </div>
+        }
+    </div>
+    <div class="diagram">
+        <div class="diagram-header">
+            <h3>Track</h3>
+            <a asp-action="MyDeliveries" asp-controller="Clients" class="see-all">See All</a>
+        </div>
+
+        @foreach (var item in Model.LastFiveDeliveries)
+        {
+            <div class="delivery-tracking">
+
+                <a asp-action="DeliveryDetails" asp-controller="Clients" asp-route-id="@item.Id" class="ref-num">@item.ReferenceNumber</a>
+
+                <div class="delivery-info">
+                    <a asp-action="DeliveryDetails" asp-controller="Driver"></a>
+                    <img src="~/dashboard_books_dots.svg" alt="Road" class="road-icon">
+                    <div class="addresses">
+                        <p class="pickup-address">@item.PickupAddress</p>
+                        <p class="delivery-address">@item.DeliveryAddress</p>
+                    </div>
+                </div>
+
+                <div class="tracking-line">
+                    <div class="dot" style="background-color: @(item.DeliveryStep >= 1 ? "#00aa87" : "gray")"></div>
+                    <div class="line" style="background-color: @(item.DeliveryStep >= 2 ? "#00aa87" : "gray")"></div>
+                    <div class="dot" style="background-color: @(item.DeliveryStep >= 2 ? "#00aa87" : "gray")"></div>
+                    <div class="line" style="background-color: @(item.DeliveryStep >= 3 ? "#00aa87" : "gray")"></div>
+                    <div class="dot" style="background-color: @(item.DeliveryStep >= 3 ? "#00aa87" : "gray")"></div>
+                    <div class="line" style="background-color: @(item.DeliveryStep >= 4 ? "#00aa87" : "gray")"></div>
+                    <div class="dot" style="background-color: @(item.DeliveryStep >= 4 ? "#00aa87" : "gray")"></div>
+                </div>
+            </div>
+        }
+    </div>
+    <div class="diagram">
+        <div class="diagram-header">
+            <h3>Invoices</h3>
+            <a asp-action="MyInvoices" asp-controller="Clients" class="see-all">See All</a>
+            <h3>Due amount:</h3>
+            <p style=" color: #707070;">@Model.DueAmountForDeliveries BGN</p>
+        </div>
+        <div class="invoice-header">
+            <p><b>Invoice No</b></p>
+            <p><b>Current date</b></p>
+            <p><b>Creation date</b></p>
+            <p><b>Amount</b></p>
+            <p><b>Paid</b></p>
+        </div>
+        @foreach (var invoice in Model.LastFiveInvoices)
+        {
+            <div class="invoice">
+                <p>@invoice.InvoiceNumber</p>
+                <p class="date">@invoice.Date</p>
+                <p class="date">@invoice.CreationDate</p>
+                <p>@invoice.Amount BGN</p>
+                @if (invoice.IsPaid)
+                {
+                    <i class="bi bi-check-circle-fill" style="color: #00aa87; margin-top: 10px;"></i>
+                }
+                else
+                {
+                    <p style="color: #00aa87;">No</p>
+                }
+            </div>
+        }
+    </div>
+    <div class="diagram">
+        <div id="calendar" class="calendar"></div>
+        <div id="event-details" class="event-details"></div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $.ajax({
+            url: '/Clients/GetCalendarEvents',
+            type: 'GET',
+            success: function (events) {
+                var calendarEl = document.getElementById('calendar');
+                var calendar = new FullCalendar.Calendar(calendarEl, {
+                    initialView: 'dayGridMonth',
+                    headerToolbar: {
+                        left: 'prev,next today',
+                        center: 'title',
+                        right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                    },
+                    events: events.map(function (event) {
+                        return {
+                            id: event.id,
+                            title: event.title,
+                            start: event.date.split("T")[0],
+                            backgroundColor: getColor(event.type)
+                        };
+                    }),
+                    dateClick: function (info) {
+                        var dateEvents = events.filter(event => event.date.split("T")[0] === info.dateStr);
+                        if (dateEvents.length > 0) {
+                            $('#event-details').html('<h4 class="event-details">Events on ' + info.dateStr + ':</h4><ul>' +
+                                dateEvents.map(e => '<li>' + e.title + '</li>').join('') +
+                                '</ul>');
+                        } else {
+                            $('#event-details').html('<h4>No events on ' + info.dateStr + '.</h4>');
                         }
-                    });
+                    }
+                });
 
-                    calendar.render();
-                }
-            });
-
-            function getColor(type) {
-                switch (type) {
-                    case 'Delivered':
-                        return 'green';
-                    case 'Pickup':
-                        return 'blue';
-                    case 'Paid':
-                        return '#00aa87';
-                    default:
-                        return 'gray';
-                }
+                calendar.render();
             }
         });
 
-    </script>
-</body>
+        function getColor(type) {
+            switch (type) {
+                case 'Delivered':
+                    return 'green';
+                case 'Pickup':
+                    return 'blue';
+                case 'Paid':
+                    return '#00aa87';
+                default:
+                    return 'gray';
+            }
+        }
+    });
 
-</html>
+</script>
+
+<style>
+    .delivery {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 10px;
+    }
+
+    .delivery-info {
+        display: flex;
+        align-items: center;
+        font-size: 0.85rem;
+    }
+
+        .delivery-info p {
+            margin: 0;
+        }
+
+    .delivery-tracking {
+        display: flex;
+        flex-direction: row;
+        margin-bottom: 25px;
+        margin-top: 10px;
+    }
+
+    .addresses {
+        margin-left: 10px;
+        font-size: 0.85rem;
+        width: 75%;
+        flex-wrap: wrap;
+    }
+
+    .pickup-address, .delivery-address {
+        margin: 0;
+    }
+
+    .client-company {
+        font-size: 0.85rem;
+    }
+
+    .road-icon {
+        width: 30px;
+        height: 30px;
+        margin: 0 10px;
+    }
+
+    .ref-num {
+        text-decoration: none;
+        color: black;
+        text-rendering: optimizelegibility;
+        font-size: 0.80rem;
+        margin-top: 10px;
+    }
+
+    .card-button-info {
+        display: flex;
+        flex-direction: column;
+    }
+
+        .card-button-info p {
+            font-size: 0.8rem;
+            color: #666;
+            margin-top: 10px;
+        }
+
+    .tracking-line {
+        display: flex;
+        align-items: center;
+        margin-top: 10px;
+        width: 30%;
+        margin-left: 35px;
+    }
+
+    .dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+    }
+
+    .line {
+        flex: 1;
+        height: 3px;
+    }
+
+    p {
+        font-size: 14px;
+    }
+
+    .date {
+        width: 60px;
+        flex-wrap: wrap;
+    }
+
+    .invoice {
+        width: 90%;
+    }
+</style>

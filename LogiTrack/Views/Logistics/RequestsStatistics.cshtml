@@ -1,315 +1,253 @@
 ﻿@model LogiTrack.Core.ViewModels.Request.RequestStatisticsForClientViewModel
 @{
-    Layout = null;
+    ViewData["Title"] = "Add Cash Register";
+    Layout = "~/Views/Shared/_LogisticsLayout.cshtml";
 }
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Driver Dashboard</title>
-    <link rel="stylesheet" href="~/css/site.css" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-matrix"></script> 
-
-    <style>
-        .card h3 {
-            margin: 0;
-            font-size: 1.1rem;
-            color: #00aa87;
-        }
-
-        .chart-container {
-            background-color: white;
-            width: 100%;
-            max-width: 1100px;
-            margin: 0 auto;
-        }
-
-        .chart {
-            flex: 1;
-            max-width: 300px;
-            max-height: 400px;
-        }
-
-        .monthy-deliveries {
-            flex: 1;
-            max-width: 500px;
-            height: 500px;
-            margin-top: 50px;
-        }
-
-        .first-row {
-            display: flex;
-            justify-content: space-between;
-            width: 100%;
-            max-width: 1000px;
-        }
-
-        .chart-container, .delay-time-container {
-            padding: 10px;
-        }
-
-        .chart-container {
-            margin-right: 30px;
-        }
-
-             .stat-text,  h4 {
-                text-align: center;
-                color: #00aa87;
-            }
-
-        .delay {
-            display: flex;
-            flex-direction: row;
-            justify-content: space-between;
-        }
-    </style>
-</head>
-
-<body>
-    <header class="header">
-        <div class="logo-name">
-            <div class="company-logo">
-                <img src="https://via.placeholder.com/50" alt="Company Logo">
-            </div>
-            <div class="company-name">LogiTrack</div>
-        </div>
-        <div class="profile-dropdown">
-            <button onclick="toggleDropdown()">
-                <i class="bi bi-person-circle"></i>
-                <span class="arrow">&#x25BC;</span>
-            </button>
-            <div class="profile-dropdown-menu" id="profileDropdown">
-                <a asp-action="CompanyDetails" asp-controller="Logistics">Company details</a>
-
-                <a asp-action="Logout" asp-controller="Home">Logout</a>
+<div class="chart-container">
+    <div class="cards-container">
+        <div class="card" id="locationCard">
+            <div class="card-content">
+                <h3>Requests</h3>
+                <p><b>@Model.TotalRequests</b></p>
             </div>
         </div>
-    </header>
-    <aside class="sidebar">
-        <ul>
-            <li>
-                <a asp-action="Dashboard" asp-controller="Logistics">
-                    <i class="bi bi-house-door"></i> Dashboard
-                </a>
-            </li>
-            <li>
-                <a href="#">
-                    <i class="bi bi-people"></i> Clients <span class="arrow">></span>
-                </a>
-                <div class="dropdown-menu">
-                    <ul>
-                        <li><a asp-action="GetPendingRegistrations" asp-controller="Logistics"><i class="bi bi-person-plus"></i> New registrations</a></li>
-                        <li><a asp-action="ClientsRegister" asp-controller="Logistics"><i class="bi bi-journal-text"></i> Clients register</a></li>
-                        <li><a asp-action="SearchCompany" asp-controller="Logistics"><i class="bi bi-search"></i> Search</a></li>
-                        <li><a asp-action="ClientsStatistics" asp-controller="Logistics"><i class="bi bi-bar-chart-line"></i> Statistics</a></li>
-                    </ul>
-                </div>
-            </li>
-            <li>
-                <a asp-action="VehiclesRegister" asp-controller="Logistics">
-                    <i class="bi bi-truck"></i> Vehicles <span class="arrow">></span>
-                </a>
-                <div class="dropdown-menu">
-                    <ul>
-                        <li><a asp-action="SearchVehicle" asp-controller="Logistics"><i class="bi bi-search"></i> Search</a></li>
-                        <li><a asp-action="VehiclesRegister" asp-controller="Logistics"><i class="bi bi-list-task"></i> Vehicles Register</a></li>
-                        <li><a asp-action="VehicleStatistics" asp-controller="Logistics"><i class="bi bi-bar-chart"></i> Statistics</a></li>
-                    </ul>
-                </div>
-            </li>
-            <li>
-                <a asp-action="DriversRegister" asp-controller="Logistics">
-                    <i class="bi bi-person-badge"></i> Drivers <span class="arrow">></span>
-                </a>
-                <div class="dropdown-menu">
-                    <ul>
-                        <li><a asp-action="SearchDriver" asp-controller="Logistics"><i class="bi bi-search"></i> Search</a></li>
-                        <li><a asp-action="DriversRegister" asp-controller="Logistics"><i class="bi bi-people-fill"></i> Drivers Register</a></li>
-                        <li><a asp-action="DriverStatistics" asp-controller="Logistics"><i class="bi bi-bar-chart-line"></i> Statistics</a></li>
-                    </ul>
-                </div>
-            </li>
-            <li>
-                <a asp-action="RequestsRegister" asp-controller="Logistics">
-                    <i class="bi bi-card-list"></i> Requests <span class="arrow">></span>
-                </a>
-                <div class="dropdown-menu">
-                    <ul>
-                        <li><a asp-action="SearchRequest" asp-controller="Logistics"><i class="bi bi-search"></i> Search</a></li>
-                        <li><a asp-action="RequestsRegister" asp-controller="Logistics"><i class="bi bi-journal"></i> Requests Register</a></li>
-                        <li><a asp-action="RequestsStatistics" asp-controller="Logistics"><i class="bi bi-bar-chart"></i> Statistics</a></li>
-                    </ul>
-                </div>
-            </li>
-            <li>
-                <a asp-action="OffersRegister" asp-controller="Logistics">
-                    <i class="bi bi-file-earmark-text"></i> Offers <span class="arrow">></span>
-                </a>
-                <div class="dropdown-menu">
-                    <ul>
-                        <li><a asp-action="SearchOffer" asp-controller="Logistics"><i class="bi bi-search"></i> Search</a></li>
-                        <li><a asp-action="OffersRegister" asp-controller="Logistics"><i class="bi bi-journal-text"></i> Offers Register</a></li>
-                        <li><a asp-action="OfferStatistics" asp-controller="Logistics"><i class="bi bi-bar-chart"></i> Statistics</a></li>
-                    </ul>
-                </div>
-            </li>
-            <li>
-                <a asp-action="DeliveriesRegister" asp-controller="Logistics">
-                    <i class="bi bi-box-seam"></i> Deliveries <span class="arrow">></span>
-                </a>
-                <div class="dropdown-menu">
-                    <ul>
-                        <li><a asp-action="SearchDelivery" asp-controller="Logistics"><i class="bi bi-search"></i> Search</a></li>
-                        <li><a asp-action="DeliveriesRegister" asp-controller="Logistics"><i class="bi bi-journal"></i> Deliveries Register</a></li>
-                        <li><a asp-action="DeliveryStatistics" asp-controller="Logistics"><i class="bi bi-bar-chart"></i> Statistics</a></li>
-                    </ul>
-                </div>
-            </li>
-            <li>
-                <a asp-action="InvoicesRegister" asp-controller="Logistics">
-                    <i class="bi bi-receipt"></i> Invoices register <span class="arrow">></span>
-                </a>
-                <div class="dropdown-menu">
-                    <ul>
-                        <li><a asp-action="InvoicesRegister" asp-controller="Logistics"><i class="bi bi-journal"></i> Invoices Register</a></li>
-                        <li><a asp-action="InvoicesStatistics" asp-controller="Logistics"><i class="bi bi-bar-chart-line"></i> Statistics</a></li>
-                    </ul>
-                </div>
-            </li>
-            <li>
-                <a asp-action="SearchCashRegisters" asp-controller="Logistics">
-                    <i class="bi bi-cash-stack"></i> Cash registers <span class="arrow">></span>
-                </a>
-                <div class="dropdown-menu">
-                    <ul>
-                        <li><a asp-action="SearchCashRegisters" asp-controller="Logistics"><i class="bi bi-journal"></i> Cash Register</a></li>
-                        <li><a asp-action="CashRegisterStatistics" asp-controller="Logistics"><i class="bi bi-bar-chart-line"></i> Statistics</a></li>
-                    </ul>
-                </div>
-            </li>
-        </ul>
-    </aside>
-    <div class="main-content">
-        <div class="chart-container">
-            <div class="cards-container">
-                <div class="card" id="locationCard">
-                    <div class="card-content">
-                        <h3>Requests</h3>
-                        <p><b>@Model.TotalRequests</b></p>
-                    </div>
-                </div>
-                <div class="card" id="locationCard">
-                    <div class="card-content">
-                        <h3>Requests with offer</h3>
-                        <p><b>@Model.TotalRequestsWithOffers BGN</b></p>
-                    </div>
-                </div>
-                <div class="card" id="locationCard">
-                    <div class="card-content">
-                        <h3>Average price by request</h3>
-                        <p><b>@Model.AveragePrice.ToString("F2") BGN</b></p>
-                    </div>
-                </div>
-                <div class="card" id="locationCard">
-                    <div class="card-content">
-                        <h3>Average volume</h3>
-                        <p><b>@Model.AverageVolume M3</b></p>
-                    </div>
-                </div>
-                <div class="card" id="locationCard">
-                    <div class="card-content">
-                        <h3>Average weight</h3>
-                        <p><b>@Model.AverageWeight kG</b></p>
-                    </div>
-                </div>
+        <div class="card" id="locationCard">
+            <div class="card-content">
+                <h3>Requests with offer</h3>
+                <p><b>@Model.TotalRequestsWithOffers BGN</b></p>
             </div>
-
-            <div class="first-row">
-                <div class="chart-container">
-                    <h4>Requests status ratio</h4>
-                    <canvas id="requestStatusChart" class="chart"></canvas>
-                </div>
-                <div class="chart-container">
-                    <h4>Response time for requests</h4>
-                    <canvas id="responseTimeChart" class="chart"></canvas>                  
-                </div>
-
+        </div>
+        <div class="card" id="locationCard">
+            <div class="card-content">
+                <h3>Average price by request</h3>
+                <p><b>@Model.AveragePrice.ToString("F2") BGN</b></p>
             </div>
-            <div class="first-row">
-                <div class="chart-container">
-                <h4>Requests this month</h4>
-                <canvas id="heatMapChart" class="chart"></canvas>
-                </div>
-                <div class="chart-container">
-                    <h4>Top 10 clients with most requests</h4>
-                    <canvas id="topClientsChart" class="chart"></canvas>
-                </div>
+        </div>
+        <div class="card" id="locationCard">
+            <div class="card-content">
+                <h3>Average volume</h3>
+                <p><b>@Model.AverageVolume M3</b></p>
             </div>
-
+        </div>
+        <div class="card" id="locationCard">
+            <div class="card-content">
+                <h3>Average weight</h3>
+                <p><b>@Model.AverageWeight kG</b></p>
+            </div>
         </div>
     </div>
 
-    <script>
-        async function fetchRequestStatusDistribution() {
-            try {
-                const response = await fetch('/Logistics/GetRequestStatusDistribution');
-                const data = await response.json();
+    <div class="first-row">
+        <div class="chart-container">
+            <h4>Requests status ratio</h4>
+            <canvas id="requestStatusChart" class="chart"></canvas>
+        </div>
+        <div class="chart-container">
+            <h4>Response time for requests</h4>
+            <canvas id="responseTimeChart" class="chart"></canvas>
+        </div>
 
-                const labels = Object.keys(data.statusCounts); 
-                const counts = Object.values(data.statusCounts); 
+    </div>
+    <div class="first-row">
+        <div class="chart-container">
+            <h4>Requests this month</h4>
+            <canvas id="heatMapChart" class="chart"></canvas>
+        </div>
+        <div class="chart-container">
+            <h4>Top 10 clients with most requests</h4>
+            <canvas id="topClientsChart" class="chart"></canvas>
+        </div>
+    </div>
 
-                const ctx = document.getElementById('requestStatusChart').getContext('2d');
-                new Chart(ctx, {
-                    type: 'doughnut',
-                    data: {
-                        labels: labels,
-                        datasets: [{
-                            data: counts,
-                            backgroundColor: [
-                                '#00aa87', '#FF6384', '#3498db', '#f1c40f', '#9b59b6'
-                            ],
-                        }]
+</div>
+
+<script>
+    async function fetchRequestStatusDistribution() {
+        try {
+            const response = await fetch('/Logistics/GetRequestStatusDistribution');
+            const data = await response.json();
+
+            const labels = Object.keys(data.statusCounts);
+            const counts = Object.values(data.statusCounts);
+
+            const ctx = document.getElementById('requestStatusChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: counts,
+                        backgroundColor: [
+                            '#00aa87', '#FF6384', '#3498db', '#f1c40f', '#9b59b6'
+                        ],
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        } catch (error) {
+            console.error('Error fetching request status distribution:', error);
+        }
+    }
+    async function fetchResponseTimes() {
+        try {
+            const response = await fetch('/Logistics/GetAverageResponseTime');
+            const data = await response.json();
+
+            console.log('Fetched data:', data);
+
+            const labels = ['Max Response Time', 'Average Response Time'];
+            const values = [data.maxResponseTime, data.averageResponseTime];
+
+            const ctx = document.getElementById('responseTimeChart').getContext('2d');
+
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Response Time (minutes)',
+                        data: values,
+                        backgroundColor: ['#FF6384', '#00aa87'],
+                        borderColor: ['#FF6384', '#00aa87'],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Time (minutes)'
+                            },
+                            ticks: {
+                                stepSize: 10
+                            }
+                        }
                     },
-                    options: {
-                        responsive: true,
-                        plugins: {
-                            legend: {
-                                position: 'bottom'
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function (tooltipItem) {
+                                    return `${tooltipItem.label}: ${tooltipItem.raw} minutes`;
+                                }
                             }
                         }
                     }
-                });
-            } catch (error) {
-                console.error('Error fetching request status distribution:', error);
-            }
+                }
+            });
+        } catch (error) {
+            console.error('Error fetching response times:', error);
         }
-        async function fetchResponseTimes() {
+    }
+    async function renderHeatMap() {
+        try {
+            const response = await fetch('/Logistics/GetMonthlyRequestPatterns');
+            const data = await response.json();
+
+            const daysInMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate();
+            const dailyCounts = Array(daysInMonth).fill(0);
+
+            for (const [day, count] of Object.entries(data.data)) {
+                const dayIndex = parseInt(day, 10) - 1;
+                if (dayIndex >= 0 && dayIndex < daysInMonth) {
+                    dailyCounts[dayIndex] = count;
+                }
+            }
+
+            const heatmapData = dailyCounts.map((count, index) => ({
+                x: index + 1,
+                y: count,
+                v: count
+            }));
+
+            new Chart(document.getElementById('heatMapChart'), {
+                type: 'scatter',
+                data: {
+                    datasets: [{
+                        label: 'Requests per Day',
+                        data: heatmapData,
+                        pointStyle: 'rect',
+                        pointRadius: 10,
+                        backgroundColor(context) {
+                            const value = context.raw.v;
+                            const colorIntensity = Math.min(value * 15, 255);
+                            return `#FF6384`;
+                        },
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: {
+                            type: 'linear',
+                            position: 'bottom',
+                            title: { display: true, text: 'Day of the Month' },
+                            ticks: {
+                                stepSize: 1,
+                                min: 1,
+                                max: daysInMonth
+                            }
+                        },
+                        y: {
+                            title: { display: true, text: 'Request Count' },
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1,
+                                callback: function (value) { return Number.isInteger(value) ? value : null; }
+                            }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function (context) {
+                                    return `Day ${context.raw.x}: ${context.raw.y} request(s)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        } catch (error) {
+            console.error('Error fetching heat map data:', error);
+        }
+    }
+    document.addEventListener('DOMContentLoaded', function () {
+        async function fetchTopClients() {
             try {
-                const response = await fetch('/Logistics/GetAverageResponseTime');
+                const response = await fetch('/Logistics/GetTopClients');
+                if (!response.ok) {
+                    throw new Error('Failed to fetch top clients data.');
+                }
+
                 const data = await response.json();
+                console.log('Fetched top clients data:', data);
 
-                console.log('Fetched data:', data);
+                const labels = Object.keys(data);
+                const requestCounts = Object.values(data);
 
-                const labels = ['Max Response Time', 'Average Response Time'];
-                const values = [data.maxResponseTime, data.averageResponseTime];
-
-                const ctx = document.getElementById('responseTimeChart').getContext('2d');
-
+                const ctx = document.getElementById('topClientsChart').getContext('2d');
                 new Chart(ctx, {
                     type: 'bar',
                     data: {
                         labels: labels,
                         datasets: [{
-                            label: 'Response Time (minutes)',
-                            data: values,
-                            backgroundColor: ['#FF6384', '#00aa87'],
-                            borderColor: ['#FF6384', '#00aa87'],
+                            label: 'Number of Requests',
+                            data: requestCounts,
+                            backgroundColor: '#00aa87',
+                            borderColor: '#00aa87',
                             borderWidth: 1
                         }]
                     },
@@ -320,10 +258,17 @@
                                 beginAtZero: true,
                                 title: {
                                     display: true,
-                                    text: 'Time (minutes)'
+                                    text: 'Number of Requests'
+                                }
+                            },
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Client Companies'
                                 },
                                 ticks: {
-                                    stepSize: 10
+                                    maxRotation: 45,
+                                    minRotation: 0
                                 }
                             }
                         },
@@ -334,7 +279,7 @@
                             tooltip: {
                                 callbacks: {
                                     label: function (tooltipItem) {
-                                        return `${tooltipItem.label}: ${tooltipItem.raw} minutes`;
+                                        return `${tooltipItem.label}: ${tooltipItem.raw} requests`;
                                     }
                                 }
                             }
@@ -342,158 +287,17 @@
                     }
                 });
             } catch (error) {
-                console.error('Error fetching response times:', error);
+                console.error('Error fetching top clients data:', error);
             }
         }
-        async function renderHeatMap() {
-            try {
-                const response = await fetch('/Logistics/GetMonthlyRequestPatterns');
-                const data = await response.json();
 
-                const daysInMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate();
-                const dailyCounts = Array(daysInMonth).fill(0);
+        fetchTopClients();
+    });
 
-                for (const [day, count] of Object.entries(data.data)) {
-                    const dayIndex = parseInt(day, 10) - 1;
-                    if (dayIndex >= 0 && dayIndex < daysInMonth) {
-                        dailyCounts[dayIndex] = count;
-                    }
-                }
+    window.onload = async function () {
+        await fetchRequestStatusDistribution();
+        await fetchResponseTimes();
+        await renderHeatMap();
+    };
+</script>
 
-                const heatmapData = dailyCounts.map((count, index) => ({
-                    x: index + 1,
-                    y: count,
-                    v: count
-                }));
-
-                new Chart(document.getElementById('heatMapChart'), {
-                    type: 'scatter',
-                    data: {
-                        datasets: [{
-                            label: 'Requests per Day',
-                            data: heatmapData,
-                            pointStyle: 'rect',
-                            pointRadius: 10,
-                            backgroundColor(context) {
-                                const value = context.raw.v;
-                                const colorIntensity = Math.min(value * 15, 255);
-                                return `#FF6384`;
-                            },
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        scales: {
-                            x: {
-                                type: 'linear',
-                                position: 'bottom',
-                                title: { display: true, text: 'Day of the Month' },
-                                ticks: {
-                                    stepSize: 1,
-                                    min: 1,
-                                    max: daysInMonth
-                                }
-                            },
-                            y: {
-                                title: { display: true, text: 'Request Count' },
-                                beginAtZero: true,
-                                ticks: {
-                                    stepSize: 1,
-                                    callback: function (value) { return Number.isInteger(value) ? value : null; }
-                                }
-                            }
-                        },
-                        plugins: {
-                            tooltip: {
-                                callbacks: {
-                                    label: function (context) {
-                                        return `Day ${context.raw.x}: ${context.raw.y} request(s)`;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                });
-            } catch (error) {
-                console.error('Error fetching heat map data:', error);
-            }
-        }
-        document.addEventListener('DOMContentLoaded', function () {
-            async function fetchTopClients() {
-                try {
-                    const response = await fetch('/Logistics/GetTopClients');
-                    if (!response.ok) {
-                        throw new Error('Failed to fetch top clients data.');
-                    }
-
-                    const data = await response.json();
-                    console.log('Fetched top clients data:', data);
-
-                    const labels = Object.keys(data); 
-                    const requestCounts = Object.values(data); 
-
-                    const ctx = document.getElementById('topClientsChart').getContext('2d');
-                    new Chart(ctx, {
-                        type: 'bar',
-                        data: {
-                            labels: labels, 
-                            datasets: [{
-                                label: 'Number of Requests',
-                                data: requestCounts, 
-                                backgroundColor: '#00aa87',
-                                borderColor: '#00aa87',
-                                borderWidth: 1
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            scales: {
-                                y: {
-                                    beginAtZero: true,
-                                    title: {
-                                        display: true,
-                                        text: 'Number of Requests'
-                                    }
-                                },
-                                x: {
-                                    title: {
-                                        display: true,
-                                        text: 'Client Companies'
-                                    },
-                                    ticks: {
-                                        maxRotation: 45,
-                                        minRotation: 0
-                                    }
-                                }
-                            },
-                            plugins: {
-                                legend: {
-                                    display: false
-                                },
-                                tooltip: {
-                                    callbacks: {
-                                        label: function (tooltipItem) {
-                                            return `${tooltipItem.label}: ${tooltipItem.raw} requests`;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    });
-                } catch (error) {
-                    console.error('Error fetching top clients data:', error);
-                }
-            }
-
-            fetchTopClients();
-        });
-
-        window.onload = async function () {
-            await fetchRequestStatusDistribution();
-            await fetchResponseTimes();
-            await renderHeatMap();
-        };
-    </script>
-</body>
-
-</html>

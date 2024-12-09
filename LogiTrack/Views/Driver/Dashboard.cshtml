@@ -1,366 +1,268 @@
 ﻿@model LogiTrack.Core.ViewModels.Driver.DriverDashboardViewModel
 @{
-    Layout = null;
+    ViewData["Title"] = "Driver Dashboard";
+    Layout = "~/Views/Shared/_DriverLayout.cshtml";
 }
 
-<!DOCTYPE html>
-<html lang="en">
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Driver Dashboard</title>
-    <link rel="stylesheet" href="~/css/site.css" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css">
-    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet" />
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
-
-    <script src="~/js/site.js"></script>
-    <style>
-        .diagram-header {
-            display: flex;
-            gap: 30px;
-            align-items: center;
+<div class="cards-container">
+    <div class="card" id="locationCard">
+        <div class="card-icon">
+            <i class="fas fa-map-marker-alt" style="font-size:50px; color:#00aa87;"></i>
+        </div>
+        <div class="card-content">
+            <h3>LOCATION</h3>
+            <p id="location" style="font-size:0.9rem;">Fetching location...</p>
+        </div>
+        <div class="card-button-info">
+            <button class="card-button" onclick="getCurrentLocation()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-clockwise" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2z" />
+                    <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466" />
+                </svg>
+            </button>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-icon">
+            <i class="fas fa-truck" style="font-size:50px; color:#00aa87;"></i>
+        </div>
+        <div class="card-content">
+            <h3>NEW DELIVERIES</h3>
+            <p><b>@Model.NewDeliveriesCount</b></p>
+        </div>
+        <div class="card-button-info">
+            <a asp-action="SearchDeliveries" asp-controller="Driver" class="card-button"><b>SEE ALL</b></a>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-icon">
+            <i class="fas fa-road" style="font-size:50px; color:#00aa87;"></i>
+        </div>
+        <div class="card-content">
+            <h3>KILOMETERS</h3>
+            <p><b>@Model.KilometersDriven</b></p>
+        </div>
+        <div class="card-button-info">
+            <p>@Model.KilometersDrivenlastMonth last month</p>
+        </div>
+    </div>
+</div>
+<div class="diagrams">
+    <div class="diagram">
+        <div class="diagram-header">
+            <h3>Deliveries</h3>
+            <a asp-action="SearchDeliveries" asp-controller="Driver" class="see-all">See all</a>
+        </div>
+        @foreach (var item in Model.LastDeliveries)
+        {
+            <div class="delivery">
+                <div class="delivery-info">
+                    <a asp-action="DeliveryDetails" asp-controller="Driver" asp-route-id="@item.Id" class="ref-num">@item.ReferenceNumber</a>
+                    <img src="~/dashboard_books_dots.svg" alt="Road" class="road-icon">
+                    <div class="addresses">
+                        <p class="pickup-address">@item.PickupAddress</p>
+                        <p class="delivery-address">@item.DeliveryAddress</p>
+                    </div>
+                </div>
+                <p class="client-company">@item.ClientCompanyName</p>
+            </div>
         }
 
-            .diagram-header h3 {
-                font-size: 1.1rem;
-                color: #00aa87;
-                letter-spacing: revert;
+    </div>
+
+    <div class="diagram">
+        <div class="diagram-header">
+            <h3>New Deliveries</h3>
+            <a asp-action="SearchDeliveries" asp-controller="Driver" class="see-all">See all</a>
+        </div>
+        @foreach (var item in Model.NewDeliveries)
+        {
+            <div class="delivery">
+                <div class="delivery-info">
+                    <a asp-action="DeliveryDetails" asp-asp-controller="Driver" asp-route-id="@item.Id" class="ref-num">@item.ReferenceNumber</a>
+                    <img src="~/dashboard_books_dots.svg" alt="Road" class="road-icon">
+                    <div class="addresses">
+                        <p class="pickup-address">@item.PickupAddress</p>
+                        <p class="delivery-address">@item.DeliveryAddress</p>
+                    </div>
+                </div>
+                <p class="client-company">@item.ClientCompanyName</p>
+            </div>
+            <a asp-controller="Driver" asp-action="SearchDelivery" class="diagram-button"><b>Add status</b></a>
+        }
+    </div>
+
+    <div class="diagram" style="margin-left: 290px;">
+        <div id="calendar" class="calendar"></div>
+        <div id="event-details" class="event-details"></div>
+    </div>
+</div>
+
+
+<script>
+    $(document).ready(function () {
+        $.ajax({
+            url: '/Driver/GetCalendarEvents',
+            type: 'GET',
+            success: function (events) {
+                events = events || [];
+
+                var calendarEl = document.getElementById('calendar');
+                var calendar = new FullCalendar.Calendar(calendarEl, {
+                    initialView: 'dayGridMonth',
+                    headerToolbar: {
+                        left: 'prev,next today',
+                        center: 'title',
+                        right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                    },
+                    events: events.map(function (event) {
+                        return {
+                            id: event.id,
+                            title: event.title,
+                            start: event.date.split("T")[0],
+                            backgroundColor: getColor(event.type)
+                        };
+                    }),
+                    dateClick: function (info) {
+                        var dateEvents = events.filter(event => event.date.split("T")[0] === info.dateStr);
+                        if (dateEvents.length > 0) {
+                            $('#event-details').html('<h4 class="event-details">Events on ' + info.dateStr + ':</h4><ul>' +
+                                dateEvents.map(e => '<li>' + e.title + '</li>').join('') +
+                                '</ul>');
+                        } else {
+                            $('#event-details').html('<h4>No events on ' + info.dateStr + '.</h4>');
+                        }
+                    }
+                });
+
+                calendar.render();
+
+                if (events.length === 0) {
+                    $('#event-details').html('<p>No events available for this calendar.</p>');
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error('Error fetching calendar events:', error);
+                $('#calendar').html('<p>Error loading calendar events. Please try again later.</p>');
             }
+        });
 
-        .delivery {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 10px;
-        }
-
-        .delivery-info {
-            display: flex;
-            align-items: center;
-            font-size: 0.85rem;
-        }
-
-            .delivery-info p {
-                margin: 0;
+        function getColor(type) {
+            switch (type) {
+                case 'Delivered':
+                    return 'green';
+                case 'Pickup':
+                    return 'blue';
+                case 'Paid':
+                    return '#00aa87';
+                default:
+                    return 'gray';
             }
+        }
+    });
+    async function getCurrentLocation() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(showPosition, showError);
+        } else {
+            document.getElementById('location').textContent = "Geolocation is not supported by this browser.";
+        }
+    }
 
-        .addresses {
-            margin-left: 10px;
-            font-size: 14px;
-            width: 90%;
+    function showPosition(position) {
+        const lat = position.coords.latitude;
+        const long = position.coords.longitude;
+        fetchLocation(lat, long);
+    }
+
+    async function fetchLocation(lat, long) {
+        const apiKey = 'AIzaSyDfA3_DsCdEYZeSpUwLBSenw1Gyp1VGIp4';
+        const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${long}&key=${apiKey}`;
+
+        try {
+            const response = await fetch(url);
+            const data = await response.json();
+
+            if (data.results && data.results.length > 0) {
+                const address = data.results[0].formatted_address;
+                document.getElementById('location').textContent = address;
+            } else {
+                document.getElementById('location').textContent = "Unable to retrieve location.";
+            }
+        } catch (error) {
+            console.error("Error fetching location:", error);
+            document.getElementById('location').textContent = "Error fetching location.";
         }
 
-        .road-icon {
-            width: 35px;
-            height: 35px;
-            margin: 0 10px;
-        }
+        showCurrentTime();
+    }
 
-        .pickup-address,
-        .delivery-address {
+    function showError(error) {
+        switch (error.code) {
+            case error.PERMISSION_DENIED:
+                document.getElementById('location').textContent = "User denied the request for Geolocation.";
+                break;
+            case error.POSITION_UNAVAILABLE:
+                document.getElementById('location').textContent = "Location information is unavailable.";
+                break;
+            case error.TIMEOUT:
+                document.getElementById('location').textContent = "The request to get user location timed out.";
+                break;
+            case error.UNKNOWN_ERROR:
+                document.getElementById('location').textContent = "An unknown error occurred.";
+                break;
+        }
+    }
+
+    window.onload = getCurrentLocation;
+</script>
+
+<style>
+    
+    .delivery {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 10px;
+    }
+
+    .delivery-info {
+        display: flex;
+        align-items: center;
+        font-size: 0.85rem;
+    }
+
+        .delivery-info p {
             margin: 0;
         }
 
-        .ref-num {
-            text-decoration: none;
-            color: black;
-            text-rendering: optimizelegibility;
-            font-size: 0.80rem;
-        }
+    .addresses {
+        margin-left: 10px;
+        font-size: 14px;
+        width: 90%;
+    }
 
-        .diagram-button {
-            display: block;
-            color: #00aa87;
-            border: 1px solid #00aa87;
-            padding: 5px 10px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-            margin-top: 50px;
-            text-align: center;
-            font-size: 0.8rem;
-            width: 90%;
-            text-decoration: none;
-        }
+    .road-icon {
+        width: 35px;
+        height: 35px;
+        margin: 0 10px;
+    }
 
-        p {
-            font-size: 14px;
-        }
-    </style>
+    .pickup-address,
+    .delivery-address {
+        margin: 0;
+    }
 
-</head>
+    .ref-num {
+        text-decoration: none;
+        color: black;
+        text-rendering: optimizelegibility;
+        font-size: 0.80rem;
+    }
 
-<body>
-    <header class="header">
-        <div class="logo-name">
-            <div class="company-logo">
-                <img src="https://via.placeholder.com/50" alt="Company Logo">
-            </div>
-            <div class="company-name">LogiTrack</div>
-        </div>
-        <div class="profile-dropdown">
-            <button onclick="toggleDropdown()">
-                <i class="bi bi-person-circle"></i>
-                <span class="arrow">&#x25BC;</span>
-            </button>
-            <div class="profile-dropdown-menu" id="profileDropdown">
-                <a asp-action="Details" asp-controller="Driver">Personal details</a>
-                <a asp-action="LicenseDetails" asp-controller="Driver">License</a>
-                <a asp-action="Logout" asp-controller="Home">Logout</a>
-            </div>
-        </div>
-    </header>
-    <aside class="sidebar">
-        <ul>
-            <li>
-                <a asp-action="Dashboard" asp-controller="Driver">
-                    <i class="bi bi-house-door"></i> Dashboard
-                </a>
-            </li>
-            <li>
-                <a asp-action="SearchDelivery" asp-controller="Driver">
-                    <i class="bi bi-plus-circle"></i> New delivery
-                </a>
-            </li>
-            <li>
-                <a asp-action="SearchDeliveries" asp-controller="Driver">
-                    <i class="bi bi-truck"></i> Deliveries <span class="arrow">></span>
-                </a>
-                <div class="dropdown-menu">
-                    <ul>
-                        <li>
-                            <a asp-action="SearchDeliveries" asp-controller="Driver">
-                                <i class="bi bi-box"></i> My deliveries
-                            </a>
-                        </li>
-                        <li>
-                            <a asp-action="DeliveryStatistics" asp-controller="Driver">
-                                <i class="bi bi-graph-up"></i> Statistics
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </li>
-        </ul>
-    </aside>
-    <div class="main-content">
-        <div class="cards-container">
-            <div class="card" id="locationCard">
-                <div class="card-icon">
-                    <i class="fas fa-map-marker-alt" style="font-size:50px; color:#00aa87;"></i>
-                </div>
-                <div class="card-content">
-                    <h3>LOCATION</h3>
-                    <p id="location" style="font-size:0.9rem;">Fetching location...</p>
-                </div>
-                <div class="card-button-info">
-                    <button class="card-button" onclick="getCurrentLocation()">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-clockwise" viewBox="0 0 16 16">
-                            <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2z" />
-                            <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466" />
-                        </svg>
-                    </button>
-                </div>
-            </div>
-            <div class="card">
-                <div class="card-icon">
-                    <i class="fas fa-truck" style="font-size:50px; color:#00aa87;"></i>
-                </div>
-                <div class="card-content">
-                    <h3>NEW DELIVERIES</h3>
-                    <p><b>@Model.NewDeliveriesCount</b></p>
-                </div>
-                <div class="card-button-info">
-                    <a asp-action="SearchDeliveries" asp-controller="Driver" class="card-button"><b>SEE ALL</b></a>
-                </div>
-            </div>
-            <div class="card">
-                <div class="card-icon" >
-                    <i class="fas fa-road" style="font-size:50px; color:#00aa87;"></i>
-                </div>
-                <div class="card-content">
-                    <h3>KILOMETERS</h3>
-                    <p><b>@Model.KilometersDriven</b></p>
-                </div>
-                <div class="card-button-info">
-                    <p>@Model.KilometersDrivenlastMonth last month</p>
-                </div>
-            </div>
-        </div>
-        <div class="diagrams">
-            <div class="diagram">
-                <div class="diagram-header">
-                    <h3>Deliveries</h3>
-                    <a asp-action="SearchDeliveries" asp-controller="Driver" class="see-all">See all</a>
-                </div>
-                @foreach (var item in Model.LastDeliveries)
-                {
-                    <div class="delivery">
-                        <div class="delivery-info">
-                            <a asp-action="DeliveryDetails" asp-controller="Driver" asp-route-id="@item.Id" class="ref-num">@item.ReferenceNumber</a>
-                            <img src="~/dashboard_books_dots.svg" alt="Road" class="road-icon">
-                            <div class="addresses">
-                                <p class="pickup-address">@item.PickupAddress</p>
-                                <p class="delivery-address">@item.DeliveryAddress</p>
-                            </div>
-                        </div>
-                        <p class="client-company">@item.ClientCompanyName</p>
-                    </div>
-                }
 
-            </div>
+    p {
+        font-size: 14px;
+    }
+</style>
 
-            <div class="diagram">
-                <div class="diagram-header">
-                    <h3>New Deliveries</h3>
-                    <a asp-action="SearchDeliveries" asp-controller="Driver" class="see-all">See all</a>
-                </div>
-                @foreach (var item in Model.NewDeliveries)
-                {
-                    <div class="delivery">
-                        <div class="delivery-info">
-                            <a asp-action="DeliveryDetails" asp-asp-controller="Driver" asp-route-id="@item.Id" class="ref-num">@item.ReferenceNumber</a>
-                            <img src="~/dashboard_books_dots.svg" alt="Road" class="road-icon">
-                            <div class="addresses">
-                                <p class="pickup-address">@item.PickupAddress</p>
-                                <p class="delivery-address">@item.DeliveryAddress</p>
-                            </div>
-                        </div>
-                        <p class="client-company">@item.ClientCompanyName</p>
-                    </div>
-                    <a asp-controller="Driver" asp-action="SearchDelivery" class="diagram-button"><b>Add status</b></a>
-                }
-            </div>
-
-            <div class="diagram" style="margin-left: 290px;">
-                <div id="calendar" class="calendar"></div>
-                <div id="event-details" class="event-details"></div>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        $(document).ready(function () {
-            $.ajax({
-                url: '/Driver/GetCalendarEvents',
-                type: 'GET',
-                success: function (events) {
-                    events = events || [];
-
-                    var calendarEl = document.getElementById('calendar');
-                    var calendar = new FullCalendar.Calendar(calendarEl, {
-                        initialView: 'dayGridMonth',
-                        headerToolbar: {
-                            left: 'prev,next today',
-                            center: 'title',
-                            right: 'dayGridMonth,timeGridWeek,timeGridDay'
-                        },
-                        events: events.map(function (event) {
-                            return {
-                                id: event.id,
-                                title: event.title,
-                                start: event.date.split("T")[0],
-                                backgroundColor: getColor(event.type)
-                            };
-                        }),
-                        dateClick: function (info) {
-                            var dateEvents = events.filter(event => event.date.split("T")[0] === info.dateStr);
-                            if (dateEvents.length > 0) {
-                                $('#event-details').html('<h4 class="event-details">Events on ' + info.dateStr + ':</h4><ul>' +
-                                    dateEvents.map(e => '<li>' + e.title + '</li>').join('') +
-                                    '</ul>');
-                            } else {
-                                $('#event-details').html('<h4>No events on ' + info.dateStr + '.</h4>');
-                            }
-                        }
-                    });
-
-                    calendar.render();
-
-                    if (events.length === 0) {
-                        $('#event-details').html('<p>No events available for this calendar.</p>');
-                    }
-                },
-                error: function (xhr, status, error) {
-                    console.error('Error fetching calendar events:', error);
-                    $('#calendar').html('<p>Error loading calendar events. Please try again later.</p>');
-                }
-            });
-
-            function getColor(type) {
-                switch (type) {
-                    case 'Delivered':
-                        return 'green';
-                    case 'Pickup':
-                        return 'blue';
-                    case 'Paid':
-                        return '#00aa87';
-                    default:
-                        return 'gray';
-                }
-            }
-        });
-        async function getCurrentLocation() {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(showPosition, showError);
-            } else {
-                document.getElementById('location').textContent = "Geolocation is not supported by this browser.";
-            }
-        }
-
-        function showPosition(position) {
-            const lat = position.coords.latitude;
-            const long = position.coords.longitude;
-            fetchLocation(lat, long);
-        }
-
-        async function fetchLocation(lat, long) {
-            const apiKey = 'test';
-            const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${long}&key=${apiKey}`;
-
-            try {
-                const response = await fetch(url);
-                const data = await response.json();
-
-                if (data.results && data.results.length > 0) {
-                    const address = data.results[0].formatted_address;
-                    document.getElementById('location').textContent = address;
-                } else {
-                    document.getElementById('location').textContent = "Unable to retrieve location.";
-                }
-            } catch (error) {
-                console.error("Error fetching location:", error);
-                document.getElementById('location').textContent = "Error fetching location.";
-            }
-
-            showCurrentTime();
-        }
-
-        function showError(error) {
-            switch (error.code) {
-                case error.PERMISSION_DENIED:
-                    document.getElementById('location').textContent = "User denied the request for Geolocation.";
-                    break;
-                case error.POSITION_UNAVAILABLE:
-                    document.getElementById('location').textContent = "Location information is unavailable.";
-                    break;
-                case error.TIMEOUT:
-                    document.getElementById('location').textContent = "The request to get user location timed out.";
-                    break;
-                case error.UNKNOWN_ERROR:
-                    document.getElementById('location').textContent = "An unknown error occurred.";
-                    break;
-            }
-        }
-
-        window.onload = getCurrentLocation;
-    </script>
-
-</body>
-
-</html>

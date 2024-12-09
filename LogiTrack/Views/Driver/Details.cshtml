@@ -1,165 +1,95 @@
 ﻿@model LogiTrack.Core.ViewModels.Driver.DriverViewModel
 @{
-	Layout = null;
+    ViewData["Title"] = "Driver details";
+    Layout = "~/Views/Shared/_DriverLayout.cshtml";
 }
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Driver Dashboard</title>
-    <link rel="stylesheet" href="~/css/site.css" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css">
-    <script src="~/js/site.js"></script>
-    <style>
-        .details-container {
-            width: 800px;
-            background-color: #ffffff;
-            box-shadow: 0 0 25px 1px #0000000f !important;
-            display: block;
-        }
-
-        .details-title {
-            font-size: 23px;
-            font-weight: 700;
-            color: #000;
-            margin-bottom: 10px;
-            padding:20px;
-            
-        }
-
-        .divider-line {
-            height: 1px;
-            background-color: #e0e0e0;
-            margin: 10px 0;
-        }
 
 
-        .details-info {
-            padding: 20px;
-        }
-
-        .general-details {
-            font-size: 18px;
-            color: #00aa87;
-            font-weight: 600;
-            margin-bottom: 25px;
-        }
-
-        .details-row {
-            display: flex;
-            justify-content: space-between;
-            font-size: 16px;
-            color: #333;
-            padding: 10px 0;
-            margin-left: 10px;
-        }
-
-            .details-row span {
-                color: black;
-                font-size: 15px;
-                flex: 1; 
-                opacity: 80%;
-            }
-
-                .details-row span:first-child {
-                    width: 150px; 
-                    font-weight: bold;
-                }
-    </style>
-
-</head>
-
-<body>
-    <header class="header">
-        <div class="logo-name">
-            <div class="company-logo">
-                <img src="https://via.placeholder.com/50" alt="Company Logo">
-            </div>
-            <div class="company-name">LogiTrack</div>
+<div class="details-container">
+    <div class="details-title">Driver Details</div>
+    <div class="divider-line"></div>
+    <div class="details-info">
+        <div class="general-details">General Information</div>
+        <div class="details-row">
+            <span><b>Name</b></span>
+            <span>@Model.Name</span>
         </div>
-        <div class="profile-dropdown">
-            <button onclick="toggleDropdown()">
-                <i class="bi bi-person-circle"></i>
-                <span class="arrow">&#x25BC;</span>
-            </button>
-            <div class="profile-dropdown-menu" id="profileDropdown">
-                <a asp-action="Details" asp-controller="Driver">Personal details</a>
-                <a asp-action="LicenseDetails" asp-controller="Driver">License</a>
-                <a asp-action="Logout" asp-controller="Home">Logout</a>
-            </div>
+        <div class="details-row">
+            <span><b>Username</b></span>
+            <span>@Model.Username</span>
         </div>
-    </header>
-    <aside class="sidebar">
-        <ul>
-            <li>
-                <a asp-action="Dashboard" asp-controller="Driver">
-                    <i class="bi bi-house-door"></i> Dashboard
-                </a>
-            </li>
-            <li>
-                <a asp-action="SearchDelivery" asp-controller="Driver">
-                    <i class="bi bi-plus-circle"></i> New delivery
-                </a>
-            </li>
-            <li>
-                <a asp-action="SearchDeliveries" asp-controller="Driver">
-                    <i class="bi bi-truck"></i> Deliveries <span class="arrow">></span>
-                </a>
-                <div class="dropdown-menu">
-                    <ul>
-                        <li>
-                            <a asp-action="SearchDeliveries" asp-controller="Driver">
-                                <i class="bi bi-box"></i> My deliveries
-                            </a>
-                        </li>
-                        <li>
-                            <a asp-action="DeliveryStatistics" asp-controller="Driver">
-                                <i class="bi bi-graph-up"></i> Statistics
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </li>
-        </ul>
-    </aside>
-    <div class="main-content">
-        <div class="details-container">
-            <div class="details-title">Driver Details</div>
-            <div class="divider-line"></div>
-            <div class="details-info">
-                <div class="general-details">General Information</div>
-                <div class="details-row">
-                    <span><b>Name</b></span>
-                    <span>@Model.Name</span>
-                </div>
-                <div class="details-row">
-                    <span><b>Username</b></span>
-                    <span>@Model.Username</span>
-                </div>
-                <div class="details-row">
-                    <span><b>Age</b></span>
-                    <span>@Model.Age</span>
-                </div>
-                <div class="details-row">
-                    <span><b>Salary</b></span>
-                    <span>$@Model.Salary / month</span>
-                </div>
-                <div class="details-row">
-                    <span><b>Experience</b></span>
-                    <span>@Model.YearOfExperience years, @Model.MonthsOfExperience months</span>
-                </div>
-                <div class="details-row">
-                    <span><b>Preferences</b></span>
-                    <span>@Model.Preferrences</span>
-                </div>
-            </div>
+        <div class="details-row">
+            <span><b>Age</b></span>
+            <span>@Model.Age</span>
+        </div>
+        <div class="details-row">
+            <span><b>Salary</b></span>
+            <span>$@Model.Salary / month</span>
+        </div>
+        <div class="details-row">
+            <span><b>Experience</b></span>
+            <span>@Model.YearOfExperience years, @Model.MonthsOfExperience months</span>
+        </div>
+        <div class="details-row">
+            <span><b>Preferences</b></span>
+            <span>@Model.Preferrences</span>
         </div>
     </div>
+</div>
+<style>
+    .details-container {
+        width: 800px;
+        background-color: #ffffff;
+        box-shadow: 0 0 25px 1px #0000000f !important;
+        display: block;
+    }
 
-</body>
+    .details-title {
+        font-size: 23px;
+        font-weight: 700;
+        color: #000;
+        margin-bottom: 10px;
+        padding: 20px;
+    }
 
-</html>
+    .divider-line {
+        height: 1px;
+        background-color: #e0e0e0;
+        margin: 10px 0;
+    }
+
+
+    .details-info {
+        padding: 20px;
+    }
+
+    .general-details {
+        font-size: 18px;
+        color: #00aa87;
+        font-weight: 600;
+        margin-bottom: 25px;
+    }
+
+    .details-row {
+        display: flex;
+        justify-content: space-between;
+        font-size: 16px;
+        color: #333;
+        padding: 10px 0;
+        margin-left: 10px;
+    }
+
+        .details-row span {
+            color: black;
+            font-size: 15px;
+            flex: 1;
+            opacity: 80%;
+        }
+
+            .details-row span:first-child {
+                width: 150px;
+                font-weight: bold;
+            }
+</style>
+
 

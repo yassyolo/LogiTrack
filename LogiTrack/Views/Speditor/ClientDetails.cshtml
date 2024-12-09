@@ -1,0 +1,862 @@
+﻿@model LogiTrack.Core.ViewModels.Clients.ClientDetailsViewModel
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Driver Dashboard</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap">
+    <link rel="stylesheet" href="~/css/site.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css">
+    <script src="~/js/site.js"></script>
+    <style>
+        .delivery-details-container {
+            width: 100%;
+        }
+
+        .details-card {
+            box-shadow: 0 0 15px 1px #0000000f !important;
+            padding: 17px;
+            background-color: white;
+        }
+
+        .details-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+
+        .delivery-image {
+            width: 50px;
+            height: auto;
+        }
+
+        h4 {
+            margin: 10px 0;
+            color: #00aa87;
+            font-size: 1.1rem;
+        }
+
+        .contact-container {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            width: 98%;
+        }
+
+            .contact-container p {
+                font-size: 0.9rem;
+                opacity: 90%;
+            }
+
+        .divider-line {
+            height: 1px;
+            background-color: #e0e0e0;
+            margin: 10px 0;
+        }
+
+        
+
+        .delivery-header {
+            display: flex;
+            justify-content: space-between;
+            background-color: #ffffff;
+            padding: 30px;
+            font-weight: bold;
+            font-size: 0.90rem;
+            width: 90%;
+        }
+
+        .delivery-card {
+            background-color: white;
+            font-size: 0.80rem;
+            display: flex;
+            flex-direction: column;
+            transition: background-color 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+            .delivery-card:nth-child(even) {
+                background-color: #F5F5F7;
+            }
+
+
+        .delivery-metrics {
+            display: none;
+            margin-top: 10px;
+            background-color: #f1f8ff;
+            width: 100%;
+            transition: background-color 0.3s ease;
+        }
+
+            .delivery-metrics p {
+                margin-left: 210px;
+            }
+
+       
+        .address {
+            width: 140px;
+            flex-wrap: wrap;
+        }
+
+        p {
+            font-size: 14px;
+            color: black;
+            opacity: 80%;
+        }
+
+        
+        .card h3 {
+            margin: 0;
+            font-size: 1.1rem;
+            color: #00aa87;
+        }
+    </style>
+
+</head>
+
+<body>
+    <header class="header">
+        <div class="logo-name">
+            <div class="company-logo">
+                <img src="https://via.placeholder.com/50" alt="Company Logo">
+            </div>
+            <div class="company-name">LogiTrack</div>
+        </div>
+        <div class="profile-dropdown">
+            <button onclick="toggleDropdown()">
+                <i class="bi bi-person-circle"></i>
+                <span class="arrow">&#x25BC;</span>
+            </button>
+            <div class="profile-dropdown-menu" id="profileDropdown">
+                <a asp-action="Details" asp-controller="Driver">Personal details</a>
+                <a asp-action="LicenseDetails" asp-controller="Driver">License</a>
+                <a asp-action="Logout" asp-controller="Home">Logout</a>
+            </div>
+        </div>
+    </header>
+    <aside class="sidebar">
+        <ul>
+            <li>
+                <a asp-action="Dashboard" asp-controller="Speditor">
+                    <i class="bi bi-house-door"></i> Dashboard
+                </a>
+            </li>
+            <li>
+                <a href="#">
+                    <i class="bi bi-people"></i> Clients <span class="arrow">></span>
+                </a>
+                <div class="dropdown-menu">
+                    <ul>
+                        <li><a asp-action="ClientsRegister" asp-controller="Speditor"><i class="bi bi-journal-text"></i> Clients register</a></li>
+                        <li><a asp-action="SearchCompany" asp-controller="Speditor"><i class="bi bi-search"></i> Search</a></li>
+                    </ul>
+                </div>
+            </li>
+            <li>
+                <a asp-action="FuelPricesRegister" asp-controller="Speditor">
+                    <i class="bi bi-droplet"></i> Fuel <span class="arrow">></span>
+                </a>
+                <div class="dropdown-menu">
+                    <ul>
+                        <li><a asp-action="AddFuelPrice" asp-controller="Speditor"><i class="bi bi-plus-circle"></i> Add</a></li>
+                        <li><a asp-action="FuelPricesRegister" asp-controller="Speditor"><i class="bi bi-card-list"></i> Fuel price register</a></li>
+                        <li> <a asp-action="FuelPricesStatistics" asp-controller="Speditor"><i class="bi bi-bar-chart-line"></i> Statistics</a></li>
+                    </ul>
+                </div>
+            </li>
+            <li>
+                <a asp-action="VehiclesRegister" asp-controller="Speditor">
+                    <i class="bi bi-truck"></i> Vehicles <span class="arrow">></span>
+                </a>
+                <div class="dropdown-menu">
+                    <ul>
+                        <li><a asp-action="SearchVehicle" asp-controller="Speditor"><i class="bi bi-search"></i> Search</a></li>
+                        <li><a asp-action="AddVehicle" asp-controller="Speditor"><i class="bi bi-plus-circle"></i> Add</a></li>
+                        <li><a asp-action="VehiclesRegister" asp-controller="Speditor"><i class="bi bi-list-task"></i> Vehicles Register</a></li>
+                        <li><a asp-action="VehicleStatistics" asp-controller="Speditor"><i class="bi bi-bar-chart"></i> Statistics</a></li>
+                    </ul>
+                </div>
+            </li>
+            <li>
+                <a asp-action="DriversRegister" asp-controller="Logistics">
+                    <i class="bi bi-person-badge"></i> Drivers <span class="arrow">></span>
+                </a>
+                <div class="dropdown-menu">
+                    <ul>
+                        <li><a asp-action="SearchDriver" asp-controller="Speditor"><i class="bi bi-search"></i> Search</a></li>
+                        <li><a asp-action="AddDriver" asp-controller="Speditor"><i class="bi bi-plus-circle"></i> Add</a></li>
+                        <li><a asp-action="DriversRegister" asp-controller="Speditor"><i class="bi bi-people-fill"></i> Drivers Register</a></li>
+                        <li><a asp-action="DriverStatistics" asp-controller="Speditor"><i class="bi bi-bar-chart-line"></i> Statistics</a></li>
+                    </ul>
+                </div>
+            </li>
+            <li>
+                <a asp-action="RequestsRegister" asp-controller="Speditor">
+                    <i class="bi bi-card-list"></i> Requests <span class="arrow">></span>
+                </a>
+                <div class="dropdown-menu">
+                    <ul>
+                        <li><a asp-action="GetPendingRequests" asp-controller="Speditor"><i class="bi bi-search"></i> New requests</a></li>
+                        <li><a asp-action="SearchRequest" asp-controller="Speditor"><i class="bi bi-search"></i> Search</a></li>
+                        <li><a asp-action="RequestsRegister" asp-controller="Speditor"><i class="bi bi-journal"></i> Requests Register</a></li>
+                        <li><a asp-action="RequestsStatistics" asp-controller="Speditor"><i class="bi bi-bar-chart"></i> Statistics</a></li>
+                    </ul>
+                </div>
+            </li>
+            <li>
+                <a asp-action="OffersRegister" asp-controller="Speditor">
+                    <i class="bi bi-file-earmark-text"></i> Offers <span class="arrow">></span>
+                </a>
+                <div class="dropdown-menu">
+                    <ul>
+                        <li><a asp-action="SearchOffer" asp-controller="Speditor"><i class="bi bi-search"></i> Search</a></li>
+                        <li><a asp-action="OffersRegister" asp-controller="Speditor"><i class="bi bi-journal-text"></i> Offers Register</a></li>
+                        <li><a asp-action="OfferStatistics" asp-controller="Speditor"><i class="bi bi-bar-chart"></i> Statistics</a></li>
+                    </ul>
+                </div>
+            </li>
+            <li>
+                <a asp-action="DeliveriesRegister" asp-controller="Speditor">
+                    <i class="bi bi-box-seam"></i> Deliveries <span class="arrow">></span>
+                </a>
+                <div class="dropdown-menu">
+                    <ul>
+                        <li><a asp-action="SearchDelivery" asp-controller="Speditor"><i class="bi bi-search"></i> Search</a></li>
+                        <li><a asp-action="DeliveriesRegister" asp-controller="Speditor"><i class="bi bi-journal"></i> Deliveries Register</a></li>
+                        <li><a asp-action="DeliveryStatistics" asp-controller="Speditor"><i class="bi bi-bar-chart"></i> Statistics</a></li>
+                    </ul>
+                </div>
+            </li>
+        </ul>
+    </aside>
+
+    <div class="main-content">
+        <div class="delivery-details-container">
+            <div class="details-card">
+                <div class="details-header">
+                    <div class="delivery-image">
+                        <i class="bi bi-person-circle " style="font-size: 40px; color:#00aa87;"></i>
+                    </div>
+                    <h3><b>@Model.Name</b></h3>
+                </div>
+
+                <div class="button-tabs">
+                    <button class="tab-button" id="infoBtn">INFO</button>
+                    <button class="tab-button" id="deliveriesBtn">DELIVERIES</button>
+                    <button class="tab-button" id="statisticsBtn">STATISTICS</button>
+                </div>
+
+                <div id="vehicleSection" class="section d-none">
+                    <h4><b>Company details</b></h4>
+                    <div class="column-container">
+                        <div class="column">
+                            <p><strong>Name:</strong> @Model.Name</p>
+                            <p><strong>Registration number:</strong> @Model.RegistrationNumber</p>
+                            <p><strong>Industry:</strong> @Model.Industry</p>
+                            <p><strong>Created:</strong> @Model.CreatedAt</p>
+                        </div>
+                        <div class="column">
+                            <p><strong>Street:</strong> @Model.Street</p>
+                            <p><strong>City:</strong> @Model.City, @Model.PostalCode</p>
+                            <p><strong>Country:</strong> @Model.Country</p>
+                        </div>
+                    </div>
+                    <div class="divider-line"></div>
+
+                    <h4><b>Contact details</b></h4>
+                    <div class="contact-container">
+                        <p><strong>Username:</strong> @Model.Username</p>
+                        <div class="contact">
+                            <p><strong>Contact person:</strong> @Model.ContactPerson</p>
+                            <p><strong>Email:</strong> @Model.Email</p>
+                            <p><strong>Phone:</strong> @Model.PhoneNumber, <strong>Alternative phone:</strong> @Model.AlternativePhoneNumber</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="addressesSection" class="section d-none">
+                    <div class="cards-container">
+                        <div class="card" id="locationCard">
+                            <div class="card-content">
+                                <h3>Last month</h3>
+                                <p><b>@Model.DeliveriesLastMonth</b></p>
+                            </div>
+                        </div>
+                        <div class="card" id="locationCard">
+                            <div class="card-content">
+                                <h3>Not paid</h3>
+                                <p><b>@Model.NotPaidDeliveries</b></p>
+                            </div>
+                        </div>
+                        <div class="card" id="locationCard">
+                            <div class="card-content">
+                                <h3>Late</h3>
+                                <p><b>@Model.NotOnTimeDeliveries</b></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="filtered-deliveries-container">
+
+                        <div class="delivery-header">
+                            <span>Ref No</span>
+                            <span>Origin</span>
+                            <span>Destination</span>
+                            <span>Expected Date</span>
+                            <span>Price</span>
+                            <span>Delivered</span>
+                            <span>Paid</span>
+                        </div>
+                        @if (Model.Deliveries.Any())
+                        {
+                            <div class="delivery-list">
+                                @foreach (var delivery in Model.Deliveries)
+                                {
+                                    <div class="delivery-card">
+                                        <div class="delivery-info">
+                                            <a asp-action="DeliveryDetails" asp-controller="Logistics" asp-route-id="@delivery.Id" style="text-decoration:none; color:inherit;"><span>@delivery.ReferenceNumber</span></a>
+                                            <span class="address">@delivery.PickupAddress</span>
+                                            <span class="address">@delivery.DeliveryAddress</span>
+
+                                            <span>@delivery.ExpectedDeliveryDate</span>
+                                            <span>@delivery.FinalPrice BGN</span>
+                                            <span>
+                                                @if (delivery.IsDelivered)
+                                                {
+                                                    <i class="bi bi-check-circle-fill" style="color: #00aa87;"></i>
+                                                }
+                                            </span>
+                                            <span>
+                                                @if (delivery.IsPaid)
+                                                {
+                                                    <i class="bi bi-check-circle-fill" style="color: #00aa87;"></i>
+                                                }
+                                            </span>
+                                        </div>
+                                        <div class="delivery-metrics">
+                                            <p><b>Packs:</b> @delivery.TotalItems</p>
+                                            <p><b>Weight:</b> @delivery.TotalWeight</p>
+                                            <p><b>Volume:</b> @delivery.TotalVolume</p>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <p class="no-found">No deliveries found for the company.</p>
+                        }
+                    </div>
+                </div>
+
+                <div id="metricsSection" class="section  d-none">
+                    <div class="chart-container">
+                        <div class="cards-container">
+                            <div class="card" id="locationCard">
+                                <div class="card-content">
+                                    <h3>Deliveries</h3>
+                                    <p><b>@Model.TotalDeliveries</b></p>
+                                </div>
+                            </div>
+                            <div class="card" id="locationCard">
+                                <div class="card-content">
+                                    <h3>Profit</h3>
+                                    <p><b>@Model.TotalProfit BGN</b></p>
+                                </div>
+                            </div>
+                            <div class="card" id="locationCard">
+                                <div class="card-content">
+                                    <h3>Satisfactory deliveries</h3>
+                                    <p><b>@Model.TotalSatisfactionDeliveries</b></p>
+                                </div>
+                            </div>
+                            <div class="card" id="locationCard">
+                                <div class="card-content">
+                                    <h3>Requests</h3>
+                                    <p><b> @Model.TotalRequests</b></p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <h4>Deliveries</h4>
+                        <div class="first-row">
+                            <div class="chart-container">
+                                <h4>Delivery types ratio</h4>
+                                <canvas id="deliveryChart" class="chart"></canvas>
+                            </div>
+                            <div class="chart-container">
+                                <h4>Deliveries last year</h4>
+                                <canvas id="monthlyDeliveryChart" class="chart"></canvas>
+                            </div>
+                        </div>
+                        <div class="first-row">
+                            <div class="chart-container">
+                                <h4>Cost per delivery</h4>
+                                <canvas id="deliveryCostChart"></canvas>
+                            </div>
+                            <div class="chart-container">
+                                <h4>Deliveries made on time</h4>
+                                <div class="delay">
+                                    <canvas id="successRateChart" class="chart"></canvas>
+                                    <p style="color: #00aa87; width: 100px;" id="averageDelay" class="stat-text"></p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <h4>Prices</h4>
+                        <div class="first-row">
+                            <div class="chart-container">
+                                <h4>Revenue</h4>
+                                <canvas id="revenueBarChart" class="chart"></canvas>
+                            </div>
+                            <input type="hidden" id="clientId" value="@Model.Id" />
+
+                            <div class="chart-container">
+                                <h4>Approximate price to final price differences</h4>
+                                <canvas id="priceDifferenceChart" class="chart"></canvas>
+                            </div>
+                        </div>
+
+                        <h4>Requests</h4>
+                        <div class="chart-container">
+                            <h4>Request to delivery conversion rate</h4>
+                            <canvas style="margin-left:150px;" id="singleClientConversionChart" class="chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#infoBtn').click(function () {
+                showSection('#vehicleSection');
+            });
+            $('#deliveriesBtn').click(function () {
+                showSection('#addressesSection');
+            });
+            $('#statisticsBtn').click(function () {
+                showSection('#metricsSection');
+            });
+            $('#statusBtn').click(function () {
+                showSection('#statusSection');
+            });
+
+            function showSection(sectionId) {
+                $('.section').addClass('d-none');
+                $(sectionId).removeClass('d-none');
+            }
+        });
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", async () => {
+            try {
+                await fetchDeliveryCounts();
+                await fetchMonthlyDeliveries();
+                await fetchRevenueData();
+                await fetchSingleClientConversionRate("@Model.Id");
+                await fetchClientDeliveryCostStatistics();
+                await renderPriceDifferenceChart();
+                await fetchDeliverySuccessRate();
+            } catch (error) {
+                console.error("Error during chart rendering:", error);
+            }
+        });
+
+        async function fetchDeliveryCounts() {
+            try {
+                const response = await fetch('/Logistics/GetDeliveryTypes');
+                const data = await response.json();
+
+                const domesticCount = data.domestic ?? 0;
+                const internationalCount = data.international ?? 0;
+
+                const ctx = document.getElementById('deliveryChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'pie',
+                    data: {
+                        labels: ['Domestic', 'International'],
+                        datasets: [{
+                            label: 'Deliveries',
+                            data: [domesticCount, internationalCount],
+                            backgroundColor: ['#00aa87', '#FF6384'],
+                            hoverOffset: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                            }
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error('Error fetching delivery counts:', error);
+            }
+        }
+        async function fetchMonthlyDeliveries() {
+            try {
+                const response = await fetch('/Logistics/GetDeliveryCountsForCompany/@Model.Id');
+                const data = await response.json();
+
+                while (data.deliveries.length < data.months.length) {
+                    data.deliveries.push(0);
+                }
+
+                if (window.monthlyDeliveryChart && typeof window.monthlyDeliveryChart.destroy === 'function') {
+                    window.monthlyDeliveryChart.destroy();
+                }
+
+                const ctx = document.getElementById('monthlyDeliveryChart').getContext('2d');
+                window.monthlyDeliveryChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: data.months,
+                        datasets: [{
+                            label: 'Deliveries per Month',
+                            data: data.deliveries,
+                            backgroundColor: '#00aa87',
+                            borderColor: '#00aa87',
+                            borderWidth: 1,
+                            borderSkipped: false
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            x: {
+                                ticks: {
+                                    autoSkip: false
+                                },
+                                title: {
+                                    display: true,
+                                    text: 'Months'
+                                }
+                            },
+                            y: {
+                                beginAtZero: true,
+                                min: 0,
+                                max: 1,
+                                ticks: {
+                                    stepSize: 1
+                                },
+                                title: {
+                                    display: true,
+                                    text: 'Deliveries'
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function (tooltipItem) {
+                                        return 'Deliveries: ' + tooltipItem.raw;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error('Error fetching monthly deliveries:', error);
+            }
+        }
+        async function fetchRevenueData() {
+            try {
+                const response = await fetch('/Logistics/GetRevenueDataForCompany/@Model.Id');
+                const data = await response.json();
+                console.log("Fetched data:", data);
+
+                let totalRevenue = data.totalRevenue;
+
+                if (typeof totalRevenue === 'string') {
+                    totalRevenue = parseFloat(totalRevenue);
+                }
+
+                if (isNaN(totalRevenue)) {
+                    totalRevenue = 0;
+                    console.warn("Total Revenue is not a valid number, defaulting to 0.");
+                }
+
+                console.log("Total Revenue after conversion:", totalRevenue);
+
+                const canvas = document.getElementById('revenueBarChart');
+                if (!canvas) {
+                    console.error("Canvas element with ID 'revenueBarChart' not found.");
+                    return;
+                }
+
+                const ctx = canvas.getContext('2d');
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Total Revenue'],
+                        datasets: [{
+                            label: 'Revenue',
+                            data: [totalRevenue],
+                            backgroundColor: ['#00aa87'],
+                            borderColor: ['#00aa87'],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        indexAxis: 'y',
+                        scales: {
+                            x: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Revenue ($)'
+                                }
+                            },
+                            y: {
+                                title: {
+                                    display: true,
+                                    text: 'Category'
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function (tooltipItem) {
+                                        return `${tooltipItem.label}: $${tooltipItem.raw.toFixed(2)}`;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error('Error fetching revenue data:', error);
+            }
+        }
+        async function fetchSingleClientConversionRate(clientId) {
+            try {
+                const response = await fetch(`/Logistics/GetClientRequestToDeliveryConversionRate/${clientId}`);
+                if (!response.ok) {
+                    console.error("Failed to fetch conversion rate data.");
+                    return;
+                }
+
+                const data = await response.json();
+
+                const deliveries = parseInt(data.deliveries, 10) || 0;
+                const requests = parseInt(data.requests, 10) || 0;
+
+                const remainingRequests = Math.max(0, requests - deliveries);
+
+
+                const ctx = document.getElementById('singleClientConversionChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Deliveries', 'Remaining Requests'],
+                        datasets: [{
+                            data: [deliveries, remainingRequests],
+                            backgroundColor: ['#00aa87', '#FF6384']
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'top'
+                            },
+                            title: {
+                                display: true,
+                                text: 'Client Request-to-Delivery Conversion Rate'
+                            }
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error('Error fetching client conversion rate:', error);
+            }
+        }
+        async function fetchClientDeliveryCostStatistics() {
+            try {
+                const url = `/logistics/GetClientDeliveryCostStatistics/@Model.Id`;
+                const response = await fetch(url);
+
+                if (!response.ok) {
+                    throw new Error("Failed to fetch delivery cost statistics.");
+                }
+
+                const data = await response.json();
+                console.log("Fetched data:", data);
+
+                const maxCost = parseFloat(data.maxCost) || 0;
+                const avgCost = parseFloat(data.avgCost) || 0;
+
+                console.log("Max Cost:", maxCost, "Avg Cost:", avgCost);
+
+                const ctx = document.getElementById("deliveryCostChart").getContext("2d");
+                new Chart(ctx, {
+                    type: "bar",
+                    data: {
+                        labels: ["Max Cost", "Avg Cost"],
+                        datasets: [{
+                            label: "Delivery Costs",
+                            data: [maxCost, avgCost],
+                            backgroundColor: ["#FF6384", "#00aa87"],
+                            borderColor: ["#FF6384", "#00aa87"],
+                            borderWidth: 1,
+                        }],
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                display: false,
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: (context) => `Cost: ${context.raw.toFixed(2)} USD`,
+                                },
+                            },
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: "Cost (USD)",
+                                },
+                            },
+                        },
+                    },
+                });
+            } catch (error) {
+                console.error("Error fetching delivery cost statistics:", error.message);
+            }
+        }
+        async function renderPriceDifferenceChart() {
+            try {
+                const response = await fetch(`/Logistics/GetRequestPriceDifferences/@Model.Id`);
+                if (!response.ok) {
+                    console.error(`Fetch failed with status: ${response.status}`);
+                    console.error(await response.text());
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                const data = await response.json();
+                console.log('API Response:', data);
+
+
+                const labels = data.map(item => item.offerReference || 'Unknown');
+                const approxPrices = data.map(item => item.approximatePrice || 0);
+                const finalPrices = data.map(item => item.finalPrice || 0);
+
+                const ctx = document.getElementById('priceDifferenceChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [
+                            {
+                                label: 'Approximate Price',
+                                data: approxPrices,
+                                backgroundColor: '#FF6384',
+                                borderColor: '#FF6384',
+                                borderWidth: 1
+                            },
+                            {
+                                label: 'Final Price',
+                                data: finalPrices,
+                                backgroundColor: '#00aa87',
+                                borderColor: '#00aa87',
+                                borderWidth: 1
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Price ($)'
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                position: 'top'
+                            }
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error('Error rendering Price Difference Chart:', error);
+            }
+        }
+        async function fetchDeliverySuccessRate() {
+            try {
+                const response = await fetch('/Logistics/GetDeliveryTimes/@Model.Id');
+                const data = await response.json();
+
+                const successRate = data.successRate || 0;
+                const failureRate = 100 - successRate;
+                const averageDelay = data.averageDelay || 0;
+
+                const ctx = document.getElementById('successRateChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'radar',
+                    data: {
+                        labels: ['Success', 'Failure'],
+                        datasets: [{
+                            label: 'Delivery Rates',
+                            data: [successRate, failureRate],
+                            backgroundColor: '#FF6384',
+                            borderColor: '#FF6384',
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            r: {
+                                angleLines: {
+                                    display: true
+                                },
+                                beginAtZero: true
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                            }
+                        }
+                    }
+                });
+
+                document.getElementById('averageDelay').innerText =
+                    `Average delay time: ${averageDelay.toFixed(2)} hrs`;
+
+            } catch (error) {
+                console.error('Error fetching delivery success rate:', error);
+            }
+        }
+    </script>
+</body>
+</html>
+
