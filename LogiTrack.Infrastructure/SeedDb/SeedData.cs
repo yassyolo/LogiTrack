@@ -87,8 +87,6 @@ namespace LogiTrack.Infrastructure.SeedDb
         public Invoice Invoice1 { get; set; } = null!;
         public Invoice Invoice2 { get; set; } = null!;
         public Invoice Invoice3 { get; set; } = null!;
-        public Invoice Invoice4 { get; set; } = null!;
-        public Invoice Invoice5 { get; set; } = null!;
        
         public DeliveryTracking DeliveryTracking1 { get; set; } = null!;
         public DeliveryTracking DeliveryTracking2 { get; set; } = null!;
@@ -106,16 +104,16 @@ namespace LogiTrack.Infrastructure.SeedDb
             SeedRoles();
             SeedUserRoles();
             SeedAddresses();
-            SeedClientCompanies();                   
-            SeedRequests();
-            SeedStandartCargos();
+            SeedClientCompanies();
+			SeedStandartCargos();
+			SeedRequests();
             SeedNonStandartCargos();
             SeedOffers();      
             SeedDrivers();
             SeedVehicles();
-            SeedDeliveries();
+			SeedInvoices();
+			SeedDeliveries();
             SeedFuelPrices();
-            SeedInvoices();
             SeedCashRegisters();
             SeedPricesPerSize();
             SeedDeliveryTrackings();
@@ -302,7 +300,7 @@ namespace LogiTrack.Infrastructure.SeedDb
             {
                 Id = 2,
                 Name = "Client Company 2",
-                //UserId = ClientCompany2User.Id,
+                UserId = ClientCompany2User.Id,
                 RegistrationStatus = "Pending",
                 ContactPerson = "Jane Smith",
                 AlternativePhoneNumber = "9876543210",
@@ -311,15 +309,56 @@ namespace LogiTrack.Infrastructure.SeedDb
                 AddressId = 2,
                 CreatedAt = DateTime.Now.AddDays(-10),
             };
-        }      
-        private void SeedRequests()
+        }
+		private void SeedStandartCargos()
+		{
+			StandartCargo1 = new StandartCargo
+			{
+				Id = 1,
+				TypeOfPallet = "Euro",
+				NumberOfPallets = 5,
+				PalletLength = 120,
+				PalletWidth = 80,
+				PalletHeight = 100,
+				PalletVolume = 0.96,
+				WeightOfPallets = 500,
+				PalletsAreStackable = true
+			};
+
+			StandartCargo2 = new StandartCargo
+			{
+				Id = 2,
+				TypeOfPallet = "Industrial",
+				NumberOfPallets = 3,
+				PalletLength = 130,
+				PalletWidth = 90,
+				PalletHeight = 110,
+				PalletVolume = 1.29,
+				WeightOfPallets = 700,
+				PalletsAreStackable = false
+			};
+
+			StandartCargo3 = new StandartCargo
+			{
+				Id = 3,
+				TypeOfPallet = "Standard",
+				NumberOfPallets = 4,
+				PalletLength = 120,
+				PalletWidth = 80,
+				PalletHeight = 100,
+				PalletVolume = 0.96,
+				WeightOfPallets = 450,
+				PalletsAreStackable = true
+			};
+		}
+		private void SeedRequests()
         {          
             Request1 = new Request
             {
                 Id = 1,
                 RerefenceNumber = "R0001",
-                ClientCompanyId = 1,
-                CargoType = "Standard",
+				ClientCompanyId = ClientCompany1.Id,
+				CargoType = "Standard",
                 TypeOfGoods = "Electronics",
                 Type = "Domestic",
                 PickupAddressId = 3,              
@@ -332,148 +371,108 @@ namespace LogiTrack.Infrastructure.SeedDb
                 SpecialInstructions = "Handle with care",
                 IsRefrigerated = false,
                 CreatedAt = DateTime.Now.AddDays(-20),
-                StandartCargoId = 1,
+                StandartCargoId = StandartCargo1.Id,
                 TotalWeight = 300,
                 TotalVolume = 12,
                 Kilometers = 500
             };
 
-        Request2 = new Request
-        {
-            Id = 2,
-            ClientCompanyId = 1,
-            RerefenceNumber = "R0002",
-            CargoType = "Standard",
-            TypeOfGoods = "Furniture",
-            Type = "International",
-            PickupAddressId = 5,
-            DeliveryAddressId = 6,
-            SharedTruck = true,
-            ApproximatePrice = 1200,
-            CalculatedPrice = 1150,
-            ExpectedDeliveryDate = DateTime.Now.AddDays(10),
-            Status = "Accepted",
-            SpecialInstructions = "Keep dry",
-            IsRefrigerated = false,
-            CreatedAt = DateTime.Now.AddDays(-21),
-            StandartCargoId = 2,
-            TotalWeight = 500,
-            TotalVolume = 20,
-            Kilometers = 1000
-        };
+			Request2 = new Request
+			{
+				Id = 2,
+				ClientCompanyId = ClientCompany1.Id,
+				RerefenceNumber = "R0002",
+				CargoType = "Standard",
+				TypeOfGoods = "Furniture",
+				Type = "International",
+				PickupAddressId = 5,
+				DeliveryAddressId = 6,
+				SharedTruck = true,
+				ApproximatePrice = 1200,
+				CalculatedPrice = 1150,
+				ExpectedDeliveryDate = DateTime.Now.AddDays(10),
+				Status = "Accepted",
+				SpecialInstructions = "Keep dry",
+				IsRefrigerated = false,
+				CreatedAt = DateTime.Now.AddDays(-21),
+				StandartCargoId = StandartCargo2.Id,
+				TotalWeight = 500,
+				TotalVolume = 20,
+				Kilometers = 1000
+			};
 
-        Request3 = new Request
-        {
-            Id = 3,
-            ClientCompanyId = 1,
-            RerefenceNumber = "R0003",
-            CargoType = "Non-Standard",
-            TypeOfGoods = "Machinery",
-            Type = "Domestic",
-            PickupAddressId = 7,
-            DeliveryAddressId = 8,
-            SharedTruck = false,
-            ApproximatePrice = 2000,
-            CalculatedPrice = 1900,
-            ExpectedDeliveryDate = DateTime.Now.AddDays(5),
-            Status = "Pending",
-            SpecialInstructions = "Requires crane",
-            IsRefrigerated = false,
-            CreatedAt = DateTime.Now.AddDays(-22),
-            TotalWeight = 2000,
-            TotalVolume = 50,
-            Kilometers = 2000
-        };
+			Request3 = new Request
+			{
+				Id = 3,
+				ClientCompanyId = ClientCompany1.Id,
+				RerefenceNumber = "R0003",
+				CargoType = "Non-Standard",
+				TypeOfGoods = "Machinery",
+				Type = "Domestic",
+				PickupAddressId = 7,
+				DeliveryAddressId = 8,
+				SharedTruck = false,
+				ApproximatePrice = 2000,
+				CalculatedPrice = 1900,
+				ExpectedDeliveryDate = DateTime.Now.AddDays(5),
+				Status = "Pending",
+				SpecialInstructions = "Requires crane",
+				IsRefrigerated = false,
+                StandartCargoId = default,
+				CreatedAt = DateTime.Now.AddDays(-22),
+				TotalWeight = 2000,
+				TotalVolume = 50,
+				Kilometers = 2000
+			};
 
-        Request4  = new Request
-        {
-            Id = 4,
-            RerefenceNumber = "R0004",
-            ClientCompanyId = 1,
-            CargoType = "Standard",
-            TypeOfGoods = "Textiles",
-            Type = "Domestic",
-            PickupAddressId = 9,
-            DeliveryAddressId = 10,
-            SharedTruck = true,
-            ApproximatePrice = 350,
-            CalculatedPrice = 340,
-            ExpectedDeliveryDate = DateTime.Now.AddDays(-3),
-            Status = "Pending",
-            SpecialInstructions = "Do not compress",
-            IsRefrigerated = false,
-            CreatedAt = DateTime.Now.AddDays(-23),
-            StandartCargoId = 3,
-            TotalWeight = 150,
-            TotalVolume = 8,
-            Kilometers = 500
-        };
+			Request4 = new Request
+			{
+				Id = 4,
+                StandartCargoId = StandartCargo3.Id,
+				RerefenceNumber = "R0004",
+				ClientCompanyId = 1,
+				CargoType = "Standard",
+				TypeOfGoods = "Textiles",
+				Type = "Domestic",
+				PickupAddressId = 9,
+				DeliveryAddressId = 10,
+				SharedTruck = true,
+				ApproximatePrice = 350,
+				CalculatedPrice = 340,
+				ExpectedDeliveryDate = DateTime.Now.AddDays(-3),
+				Status = "Pending",
+				SpecialInstructions = "Do not compress",
+				IsRefrigerated = false,
+				CreatedAt = DateTime.Now.AddDays(-23),
+				TotalWeight = 150,
+				TotalVolume = 8,
+				Kilometers = 500
+			};
 
-        Request5 = new Request
-        {
-            Id = 5,
-            RerefenceNumber = "R0005",
-            ClientCompanyId = 1,
-            CargoType = "Standard",
-            TypeOfGoods = "Books",
-            Type = "International",
-            PickupAddressId = 11,
-            DeliveryAddressId = 12,
-            SharedTruck = false,
-            ApproximatePrice = 220,
-            CalculatedPrice = 210,
-            ExpectedDeliveryDate = DateTime.Now.AddDays(-5),
-            Status = "Pending",
-            SpecialInstructions = "Fragile binding",
-            IsRefrigerated = false,
-            CreatedAt = DateTime.Now.AddDays(-24),
-            StandartCargoId = 4,
-            TotalWeight = 300,
-            TotalVolume = 1.8,
-            Kilometers = 1000
-        };
-    }
-        private void SeedStandartCargos()
-        {
-            StandartCargo1 = new StandartCargo
-            {
-                Id = 1,
-                TypeOfPallet = "Euro",
-                NumberOfPallets = 5,
-                PalletLength = 120,
-                PalletWidth = 80,
-                PalletHeight = 100,
-                PalletVolume = 0.96,
-                WeightOfPallets = 500,
-                PalletsAreStackable = true
-            };
-
-            StandartCargo2 = new StandartCargo
-            {
-                Id = 2,
-                TypeOfPallet = "Industrial",
-                NumberOfPallets = 3,
-                PalletLength = 130,
-                PalletWidth = 90,
-                PalletHeight = 110,
-                PalletVolume = 1.29,
-                WeightOfPallets = 700,
-                PalletsAreStackable = false
-            };
-
-            StandartCargo3 = new StandartCargo
-            {
-                Id = 3,
-                TypeOfPallet = "Standard",
-                NumberOfPallets = 4,
-                PalletLength = 120,
-                PalletWidth = 80,
-                PalletHeight = 100,
-                PalletVolume = 0.96,
-                WeightOfPallets = 450,
-                PalletsAreStackable = true
-            };
-        }
+			Request5 = new Request
+			{
+				Id = 5,
+				RerefenceNumber = "R0005",
+				ClientCompanyId = 1,
+				CargoType = "Non Standard",
+				TypeOfGoods = "Books",
+				Type = "International",
+				PickupAddressId = 11,
+				DeliveryAddressId = 12,
+				SharedTruck = false,
+				ApproximatePrice = 220,
+				CalculatedPrice = 210,
+				ExpectedDeliveryDate = DateTime.Now.AddDays(-5),
+				Status = "Pending",
+				SpecialInstructions = "Fragile binding",
+				IsRefrigerated = false,
+				CreatedAt = DateTime.Now.AddDays(-24),
+				StandartCargoId = default,
+				TotalWeight = 300,
+				TotalVolume = 1.8,
+				Kilometers = 1000
+			};
+		}      
         private void SeedNonStandartCargos()
         {
             NonStandardCargo1 = new NonStandardCargo
@@ -485,7 +484,7 @@ namespace LogiTrack.Infrastructure.SeedDb
                 Volume = 1.8,
                 Weight = 300,
                 Description = "Large industrial machine",
-                RequestId = 3
+                RequestId = Request3.Id
             };
 
             NonStandardCargo2 = new NonStandardCargo
@@ -497,7 +496,7 @@ namespace LogiTrack.Infrastructure.SeedDb
                 Volume = 0.6,
                 Weight = 120,
                 Description = "Auxiliary machine part",
-                RequestId = 3
+                RequestId = Request3.Id
             };
 
             NonStandardCargo3 = new NonStandardCargo
@@ -509,8 +508,9 @@ namespace LogiTrack.Infrastructure.SeedDb
                 Volume = 1.2,
                 Weight = 450,
                 Description = "High-pressure pump",
-                RequestId = 3
+                RequestId = Request3.Id
             };
+
             NonStandardCargo4 = new NonStandardCargo
             {
                 Id = 4,
@@ -657,12 +657,51 @@ namespace LogiTrack.Infrastructure.SeedDb
                 ContantsExpenses = 2000.0m
             };
         }
-        private void SeedDeliveries()
+		private void SeedInvoices()
+		{
+			Invoice1 = new Invoice
+			{
+				Id = 1,
+				PaidOnTime = true,
+				PaidDate = DateTime.Now.AddDays(-5),
+				InvoiceNumber = "INV001",
+				InvoiceDate = DateTime.Now.AddDays(-10),
+				Description = "Invoice for Delivery 1",
+				FileId = "1hcVFpCA0Mh1txKh0KbCbDR5N_QAoTFLq",
+				Status = "Paid",
+				IsPaid = true
+			};
+
+			Invoice2 = new Invoice
+			{
+				Id = 2,
+				InvoiceNumber = "INV004",
+				PaidOnTime = false,
+				FileId = "1hcVFpCA0Mh1txKh0KbCbDR5N_QAoTFLq",
+				InvoiceDate = DateTime.Now.AddDays(-7),
+				Description = "Invoice for Delivery 4",
+				Status = "Paid",
+				IsPaid = false
+			};
+			Invoice3 = new Invoice
+			{
+				Id = 3,
+				PaidOnTime = false,
+				InvoiceNumber = "INV005",
+				InvoiceDate = DateTime.Now.AddDays(-6),
+				FileId = "1hcVFpCA0Mh1txKh0KbCbDR5N_QAoTFLq",
+				Description = "Invoice for Delivery 5",
+				Status = "Overdue",
+				IsPaid = true
+			};
+		}
+		private void SeedDeliveries()
          {
             Delivery1 = new Delivery
             {
                 Id = 1,
                 CarbonEmission = 38.7,
+                InvoiceId = Invoice1.Id,
                 VehicleId = 1,
                 DriverId = 1,
                 OfferId = 1,
@@ -713,12 +752,14 @@ namespace LogiTrack.Infrastructure.SeedDb
                 Profit = 780.00m,
                 ReferenceNumber = "DEL0004",
                 DeliveryStep = 2,
+                InvoiceId = Invoice3.Id,
                 ActualDeliveryDate = DateTime.Now.AddDays(-4)
             };
             Delivery5 = new Delivery
             {
                 Id = 5,
                 VehicleId = 1,
+                InvoiceId = Invoice2.Id,
                 CarbonEmission = 50.0,
                 DriverId = 1,
                 OfferId = 5,
@@ -728,74 +769,8 @@ namespace LogiTrack.Infrastructure.SeedDb
                 ReferenceNumber = "DEL0005",
                 DeliveryStep = 3,
                 ActualDeliveryDate = DateTime.Now.AddDays(-5)
-
             };
-         }
-        private void SeedInvoices()
-        {
-            Invoice1 = new Invoice
-            {
-                Id = 1,
-                PaidOnTime = true,
-                PaidDate = DateTime.Now.AddDays(-5),
-                DeliveryId = 1,
-                InvoiceNumber = "INV001",
-                InvoiceDate = DateTime.Now.AddDays(-10),
-                Description = "Invoice for Delivery 1",
-                FileId = "1hcVFpCA0Mh1txKh0KbCbDR5N_QAoTFLq",
-                Status = "Paid",
-                IsPaid = true
-            };
-            Invoice2 = new Invoice
-            {
-                Id = 2,
-                DeliveryId = 2,
-
-                InvoiceNumber = "INV002",
-                FileId = "1hcVFpCA0Mh1txKh0KbCbDR5N_QAoTFLq",
-                InvoiceDate = DateTime.Now.AddDays(-9),
-                Description = "Invoice for Delivery 2",
-                Status = "Pending",
-                IsPaid = false
-            };
-            Invoice3 = new Invoice
-            {
-                Id = 3,
-                DeliveryId = 3,
-                PaidOnTime = true,
-                PaidDate = DateTime.Now.AddDays(-6),
-                InvoiceNumber = "INV003",
-                InvoiceDate = DateTime.Now.AddDays(-8),
-                FileId = "1hcVFpCA0Mh1txKh0KbCbDR5N_QAoTFLq",
-                Description = "Invoice for Delivery 3",
-                Status = "Paid",
-                IsPaid = true
-            };
-            Invoice4 = new Invoice
-            {
-                Id = 4,
-                DeliveryId = 4,
-                InvoiceNumber = "INV004",
-                PaidOnTime = false,
-                FileId = "1hcVFpCA0Mh1txKh0KbCbDR5N_QAoTFLq",
-                InvoiceDate = DateTime.Now.AddDays(-7),
-                Description = "Invoice for Delivery 4",
-                Status = "Paid",
-                IsPaid = false
-            };
-            Invoice5 = new Invoice
-            {
-                Id = 5,
-                DeliveryId = 5,
-                PaidOnTime = false,
-                InvoiceNumber = "INV005",
-                InvoiceDate = DateTime.Now.AddDays(-6),
-                FileId = "1hcVFpCA0Mh1txKh0KbCbDR5N_QAoTFLq",
-                Description = "Invoice for Delivery 5",
-                Status = "Overdue",
-                IsPaid = true
-            };
-        }
+         }     
         private void SeedCashRegisters()
          {
             CashRegister1 = new CashRegister
@@ -865,7 +840,7 @@ namespace LogiTrack.Infrastructure.SeedDb
             PricesPerSize1 = new PricesPerSize
             {
                 Id = 1,
-                VehicleId = 1, 
+                VehicleId = Vehicle1.Id, 
                 QuotientForDomesticNotSharedTruck = 1.2,
                 QuotientForDomesticSharedTruck = 0.9,
                 QuotientForInternationalNotSharedTruck = 1.5,
@@ -874,7 +849,7 @@ namespace LogiTrack.Infrastructure.SeedDb
             PricesPerSize2 = new PricesPerSize
             {
                 Id = 2,
-                VehicleId = 2,
+                VehicleId = Vehicle2.Id,
                 QuotientForDomesticNotSharedTruck = 1.3,
                 QuotientForDomesticSharedTruck = 0.85,
                 QuotientForInternationalNotSharedTruck = 1.6,

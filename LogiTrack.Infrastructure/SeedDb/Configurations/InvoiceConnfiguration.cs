@@ -1,4 +1,5 @@
 ﻿using LogisticsSystem.Infrastructure.Data.DataModels;
+using LogiTrack.Infrastructure.Data.DataModels;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -10,13 +11,13 @@ namespace LogiTrack.Infrastructure.SeedDb.Configurations
         {
             builder.HasOne(x => x.Delivery)
                 .WithOne(x => x.Invoice)
-                .HasForeignKey<Invoice>(x => x.Id)
+                .HasForeignKey<Delivery>(x => x.InvoiceId)
                 .OnDelete(DeleteBehavior.Restrict);
 
            builder.Ignore("ClientCompanyId1");
 
             var data = new SeedData();
-            builder.HasData(new Invoice[] { data.Invoice1, data.Invoice2, data.Invoice3, data.Invoice4, data.Invoice5 });
+            builder.HasData(new Invoice[] { data.Invoice1, data.Invoice2, data.Invoice3 });
         }
     }
 }

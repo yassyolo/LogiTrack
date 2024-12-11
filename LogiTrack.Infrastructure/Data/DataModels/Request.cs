@@ -102,7 +102,7 @@ namespace LogisticsSystem.Infrastructure.Data.DataModels
         public IEnumerable<NonStandardCargo>? NonStandardCargos { get; set; } = new List<NonStandardCargo>();
 
         [Comment("Standart cargo identifier")]
-        public int StandartCargoId { get; set; }
+        public int? StandartCargoId { get; set; }
 
         [Comment("Standart cargo")]
         [ForeignKey(nameof(StandartCargoId))]

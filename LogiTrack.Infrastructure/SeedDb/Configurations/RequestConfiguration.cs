@@ -12,6 +12,7 @@ namespace LogiTrack.Infrastructure.SeedDb.Configurations
                 .WithMany(x => x.Requests)
                 .HasForeignKey(x => x.ClientCompanyId)
                 .OnDelete(DeleteBehavior.Restrict);
+
             builder.HasOne(x => x.Offer)
                 .WithOne(x => x.Request)
                 .HasForeignKey<Offer>(x => x.RequestId) 
@@ -33,8 +34,12 @@ namespace LogiTrack.Infrastructure.SeedDb.Configurations
                 .HasForeignKey<Request>(x => x.DeliveryAddressId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+			builder.HasOne(x => x.StandartCargo)
+	            .WithMany()
+	            .HasForeignKey(x => x.StandartCargoId)
+	            .OnDelete(DeleteBehavior.Restrict);
 
-            var data = new SeedData();
+			var data = new SeedData();
             builder.HasData(new Request[] { data.Request1, data.Request2, data.Request3, data.Request4, data.Request5 });
         }
     }

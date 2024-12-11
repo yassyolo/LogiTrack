@@ -11,12 +11,6 @@ namespace LogisticsSystem.Infrastructure.Data.DataModels
         [Key]
         [Comment("Invoice identifier")]
         public int Id { get; set; }
-
-        [Comment("Delivery identifier")]
-        public int DeliveryId { get; set; }
-
-        [Comment("Delivery")]
-        [ForeignKey(nameof(DeliveryId))]
         public Delivery Delivery { get; set; } = null!;
 
         [Comment("Invoice number")]

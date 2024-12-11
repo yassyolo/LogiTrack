@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace LogiTrack.Infrastructure.Migrations
 {
-    public partial class ChangedDb : Migration
+    public partial class InitialMigrationToNewdb : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -83,6 +83,27 @@ namespace LogiTrack.Infrastructure.Migrations
                 comment: "Fuel Prices Entity");
 
             migrationBuilder.CreateTable(
+                name: "StandartCargos",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false, comment: "Standard cargo identifier")
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    TypeOfPallet = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true, comment: "Type of pallet"),
+                    NumberOfPallets = table.Column<int>(type: "int", nullable: true, comment: "Number of pallets"),
+                    PalletLength = table.Column<double>(type: "float", nullable: true, comment: "Pallet length"),
+                    PalletWidth = table.Column<double>(type: "float", nullable: true, comment: "Pallet width"),
+                    PalletHeight = table.Column<double>(type: "float", nullable: true, comment: "Pallet height"),
+                    PalletVolume = table.Column<double>(type: "float", nullable: true, comment: "Pallet volume"),
+                    WeightOfPallets = table.Column<double>(type: "float", nullable: true, comment: "Weight of pallets"),
+                    PalletsAreStackable = table.Column<bool>(type: "bit", nullable: true, comment: "Are the pallets stackable")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_StandartCargos", x => x.Id);
+                },
+                comment: "Standart Cargo Entity");
+
+            migrationBuilder.CreateTable(
                 name: "Vehicles",
                 columns: table => new
                 {
@@ -106,6 +127,8 @@ namespace LogiTrack.Infrastructure.Migrations
                     KilometersToChangeParts = table.Column<double>(type: "float", nullable: false, comment: "Kilometers to change parts"),
                     KilometersLeftToChangeParts = table.Column<double>(type: "float", nullable: false),
                     PurchasePrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false, comment: "Vehicle's purchase price"),
+                    EmissionFactor = table.Column<double>(type: "float", nullable: false, comment: "Emission factor (kg CO2 per liter)"),
+                    IsAvailable = table.Column<bool>(type: "bit", nullable: false),
                     ContantsExpenses = table.Column<decimal>(type: "decimal(18,2)", nullable: false, comment: "Vehicle's constant expences")
                 },
                 constraints: table =>
@@ -307,6 +330,29 @@ namespace LogiTrack.Infrastructure.Migrations
                 comment: "Driver Entity");
 
             migrationBuilder.CreateTable(
+                name: "Notifications",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Message = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Date = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    IsRead = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Notifications", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Notifications_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "PricesPerSize",
                 columns: table => new
                 {
@@ -316,11 +362,7 @@ namespace LogiTrack.Infrastructure.Migrations
                     QuotientForDomesticNotSharedTruck = table.Column<double>(type: "float", nullable: false, comment: "Quotient for domestic not shared truck"),
                     QuotientForDomesticSharedTruck = table.Column<double>(type: "float", nullable: false, comment: "Quotient for domestic shared truck"),
                     QuotientForInternationalNotSharedTruck = table.Column<double>(type: "float", nullable: false, comment: "Quotient for international not shared truck"),
-                    QuotientForInternationalSharedTruck = table.Column<double>(type: "float", nullable: false, comment: "Quotient for international shared truck"),
-                    DomesticPriceForNotSharedTruck = table.Column<decimal>(type: "decimal(18,2)", nullable: false, comment: "Domestic price for shared truck"),
-                    DomesticPriceForSharedTruck = table.Column<decimal>(type: "decimal(18,2)", nullable: false, comment: "Domestic price for shared truck"),
-                    InternationalPriceForNotSharedTruck = table.Column<decimal>(type: "decimal(18,2)", nullable: false, comment: "International price for shared truck"),
-                    InternationalPriceForSharedTruck = table.Column<decimal>(type: "decimal(18,2)", nullable: false, comment: "International price for shared truck")
+                    QuotientForInternationalSharedTruck = table.Column<double>(type: "float", nullable: false, comment: "Quotient for international shared truck")
                 },
                 constraints: table =>
                 {
@@ -333,6 +375,34 @@ namespace LogiTrack.Infrastructure.Migrations
                         onDelete: ReferentialAction.Restrict);
                 },
                 comment: "Prices per size entity");
+
+            migrationBuilder.CreateTable(
+                name: "Invoices",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false, comment: "Invoice identifier")
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    InvoiceNumber = table.Column<string>(type: "nvarchar(max)", nullable: false, comment: "Invoice number"),
+                    InvoiceDate = table.Column<DateTime>(type: "datetime2", nullable: false, comment: "Invoice date"),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false, comment: "Invoice description"),
+                    IsPaid = table.Column<bool>(type: "bit", nullable: false, comment: "Is invoice paid"),
+                    FileId = table.Column<string>(type: "nvarchar(max)", nullable: false, comment: "File identifier in Google drive"),
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PaidOnTime = table.Column<bool>(type: "bit", nullable: true),
+                    PaidDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    ClientCompanyId = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Invoices", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Invoices_ClientCompanies_ClientCompanyId",
+                        column: x => x.ClientCompanyId,
+                        principalTable: "ClientCompanies",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                },
+                comment: "Invoice Entity");
 
             migrationBuilder.CreateTable(
                 name: "Requests",
@@ -358,7 +428,7 @@ namespace LogiTrack.Infrastructure.Migrations
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false, comment: "Date of creation"),
                     Kilometers = table.Column<double>(type: "float", nullable: false),
                     RerefenceNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    StandartCargoId = table.Column<int>(type: "int", nullable: false, comment: "Standart cargo identifier"),
+                    StandartCargoId = table.Column<int>(type: "int", nullable: true, comment: "Standart cargo identifier"),
                     TotalWeight = table.Column<double>(type: "float", nullable: false),
                     TotalVolume = table.Column<double>(type: "float", nullable: false)
                 },
@@ -381,6 +451,12 @@ namespace LogiTrack.Infrastructure.Migrations
                         name: "FK_Requests_ClientCompanies_ClientCompanyId",
                         column: x => x.ClientCompanyId,
                         principalTable: "ClientCompanies",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Requests_StandartCargos_StandartCargoId",
+                        column: x => x.StandartCargoId,
+                        principalTable: "StandartCargos",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 },
@@ -446,34 +522,6 @@ namespace LogiTrack.Infrastructure.Migrations
                 comment: "Offer Entity");
 
             migrationBuilder.CreateTable(
-                name: "StandartCargos",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false, comment: "Standard cargo identifier")
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    RequestId = table.Column<int>(type: "int", nullable: false, comment: "Request identifier"),
-                    TypeOfPallet = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true, comment: "Type of pallet"),
-                    NumberOfPallets = table.Column<int>(type: "int", nullable: true, comment: "Number of pallets"),
-                    PalletLength = table.Column<double>(type: "float", nullable: true, comment: "Pallet length"),
-                    PalletWidth = table.Column<double>(type: "float", nullable: true, comment: "Pallet width"),
-                    PalletHeight = table.Column<double>(type: "float", nullable: true, comment: "Pallet height"),
-                    PalletVolume = table.Column<double>(type: "float", nullable: true, comment: "Pallet volume"),
-                    WeightOfPallets = table.Column<double>(type: "float", nullable: true, comment: "Weight of pallets"),
-                    PalletsAreStackable = table.Column<bool>(type: "bit", nullable: true, comment: "Are the pallets stackable")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_StandartCargos", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_StandartCargos_Requests_RequestId",
-                        column: x => x.RequestId,
-                        principalTable: "Requests",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                },
-                comment: "Standart Cargo Entity");
-
-            migrationBuilder.CreateTable(
                 name: "Deliveries",
                 columns: table => new
                 {
@@ -488,7 +536,9 @@ namespace LogiTrack.Infrastructure.Migrations
                     ReferenceNumber = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false, comment: "Delivery reference number"),
                     DeliveryStep = table.Column<int>(type: "int", nullable: false),
                     ActualDeliveryDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    InvoiceId = table.Column<int>(type: "int", nullable: true, comment: "Invoice identifier")
+                    InvoiceId = table.Column<int>(type: "int", nullable: true, comment: "Invoice identifier"),
+                    CarbonEmission = table.Column<double>(type: "float", nullable: false, comment: "Carbon emission blueprint (in kg CO2)"),
+                    SuggestedDate = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -497,6 +547,12 @@ namespace LogiTrack.Infrastructure.Migrations
                         name: "FK_Deliveries_Drivers_DriverId",
                         column: x => x.DriverId,
                         principalTable: "Drivers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Deliveries_Invoices_InvoiceId",
+                        column: x => x.InvoiceId,
+                        principalTable: "Invoices",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
@@ -513,6 +569,48 @@ namespace LogiTrack.Infrastructure.Migrations
                         onDelete: ReferentialAction.Restrict);
                 },
                 comment: "Delivery Entity");
+
+            migrationBuilder.CreateTable(
+                name: "ReservedForDeliveries",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    VehicleId = table.Column<int>(type: "int", nullable: false),
+                    OfferId = table.Column<int>(type: "int", nullable: false),
+                    RequestId = table.Column<int>(type: "int", nullable: false),
+                    DriverId = table.Column<int>(type: "int", nullable: false),
+                    Start = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    End = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ReservedForDeliveries", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ReservedForDeliveries_Drivers_DriverId",
+                        column: x => x.DriverId,
+                        principalTable: "Drivers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ReservedForDeliveries_Offers_OfferId",
+                        column: x => x.OfferId,
+                        principalTable: "Offers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ReservedForDeliveries_Requests_RequestId",
+                        column: x => x.RequestId,
+                        principalTable: "Requests",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ReservedForDeliveries_Vehicles_VehicleId",
+                        column: x => x.VehicleId,
+                        principalTable: "Vehicles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
 
             migrationBuilder.CreateTable(
                 name: "CashRegisters",
@@ -573,39 +671,6 @@ namespace LogiTrack.Infrastructure.Migrations
                 comment: "Delivery Tracking Entity");
 
             migrationBuilder.CreateTable(
-                name: "Invoices",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false, comment: "Invoice identifier"),
-                    DeliveryId = table.Column<int>(type: "int", nullable: false, comment: "Delivery identifier"),
-                    InvoiceNumber = table.Column<string>(type: "nvarchar(max)", nullable: false, comment: "Invoice number"),
-                    InvoiceDate = table.Column<DateTime>(type: "datetime2", nullable: false, comment: "Invoice date"),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false, comment: "Invoice description"),
-                    IsPaid = table.Column<bool>(type: "bit", nullable: false, comment: "Is invoice paid"),
-                    FileId = table.Column<string>(type: "nvarchar(max)", nullable: false, comment: "File identifier in Google drive"),
-                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    PaidOnTime = table.Column<bool>(type: "bit", nullable: true),
-                    ClientCompanyId = table.Column<int>(type: "int", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Invoices", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Invoices_ClientCompanies_ClientCompanyId",
-                        column: x => x.ClientCompanyId,
-                        principalTable: "ClientCompanies",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Invoices_Deliveries_Id",
-                        column: x => x.Id,
-                        principalTable: "Deliveries",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                },
-                comment: "Invoice Entity");
-
-            migrationBuilder.CreateTable(
                 name: "Ratings",
                 columns: table => new
                 {
@@ -651,11 +716,11 @@ namespace LogiTrack.Infrastructure.Migrations
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { "20ddc22c-ca6d-4feb-a688-0f31a430b5eb", "ac78000b-60aa-463f-9654-353f75d81a8c", "Accountant", "ACCOUNTANT" },
-                    { "27609f35-fbc8-4dc4-9d12-7ff2dd400327", "c57cf7f1-c6b8-457f-a355-a1dc6587da00", "Speditor", "SPEDITOR" },
-                    { "350868c0-bf0f-4f70-b4c9-155351bc6429", "5dd7fdc6-93f5-41c4-ac8c-a357a33b7fa4", "Driver", "DRIVER" },
-                    { "5d000e64-c056-419a-950f-1992bd1e910d", "ecbe2cd5-b7cf-46bd-8880-ce10bbb2329e", "ClientCompany", "CLIENTCOMPANY" },
-                    { "99027aaa-d346-4dd9-a467-15d74576c080", "37d6be99-e6b2-4127-8476-c8da397a7fb9", "LogisticsCompany", "LOGISTICSCOMPANY" }
+                    { "20ddc22c-ca6d-4feb-a688-0f31a430b5eb", "f0aca81a-4699-4ae4-a2ae-cf8de0b7cae8", "Accountant", "ACCOUNTANT" },
+                    { "27609f35-fbc8-4dc4-9d12-7ff2dd400327", "f87dcc9b-8303-4f5c-bd99-9cf1b825f6f9", "Speditor", "SPEDITOR" },
+                    { "350868c0-bf0f-4f70-b4c9-155351bc6429", "0b398f10-cb00-41cb-92e3-7a5e1a5a4f70", "Driver", "DRIVER" },
+                    { "5d000e64-c056-419a-950f-1992bd1e910d", "99b81efe-b16f-43c1-a6aa-037b92dec465", "ClientCompany", "CLIENTCOMPANY" },
+                    { "99027aaa-d346-4dd9-a467-15d74576c080", "7d51c5be-e406-4263-8702-5fa0fb453a12", "LogisticsCompany", "LOGISTICSCOMPANY" }
                 });
 
             migrationBuilder.InsertData(
@@ -663,12 +728,12 @@ namespace LogiTrack.Infrastructure.Migrations
                 columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "Email", "EmailConfirmed", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "TwoFactorEnabled", "UserName" },
                 values: new object[,]
                 {
-                    { "20450cff-816f-49c8-9546-1c603aec0301", 0, "c8abac24-cb1a-4f4c-a9f9-ed2dc86551c6", "clientcompany1@example.com", true, false, null, null, null, "AQAAAAEAACcQAAAAECE5tzr6QQFCTECzK2CQBKsUACbKJPkFZ7Oxt8TqgPPBM6ZsE6MMNsi6BIY7T5XkPQ==", "1234567890", false, "9d8ccfbe-73f3-4816-92d4-4dd14c890e4a", false, "clientcompany1" },
-                    { "2e8be95a-186e-403b-b4aa-3874750a3563", 0, "0b7631e5-b462-4600-b572-2b744e7de37a", "speditor@example.com", true, false, null, null, null, "AQAAAAEAACcQAAAAEB5QSA0/ejVlk3banMHVp3Abhb+tZziP3nmmcZbLq7GoWpTW1avTEiKy1fDH9hA56g==", null, false, "e85bc6b8-671e-4d10-951e-410c7b93ff95", false, "speditor" },
-                    { "38ba6810-2800-4ac8-b005-5c27e8248951", 0, "01457993-42f1-4426-ada5-2735146a7e6b", "secretary@example.com", true, false, null, null, null, "AQAAAAEAACcQAAAAED8KBSep0haSOHHU8CcJoGddXTAFavYL35RAeXRDuQ1SlhewB4SWc7bHRKOALT+baQ==", null, false, "54976d66-e475-48cf-ad4f-f4140edc5691", false, "secretary" },
-                    { "6bab54d5-5a88-4128-92d2-4d12ad0baa32", 0, "7c4c34a7-4567-49fc-9d7e-ad50fc601da5", "logistics@example.com", true, false, null, null, null, "AQAAAAEAACcQAAAAEBfXAL1EvtzZZTFvChFTxVKlTZ4hzZ47xyxeC8x8Wc33YkGNp/VQx8+6G7Ytak0q7g==", null, false, "f7051709-90ef-4ff5-9d37-861007ac5f26", false, "logistics" },
-                    { "driverUser1", 0, "37978fcd-5e0d-4d56-88fa-104fececac35", "driver1@example.com", true, false, null, "DRIVER1@EXAMPLE.COM", "DRIVER1@EXAMPLE.COM", "AQAAAAEAACcQAAAAENU3HpGtKbxseeO3mP3/NIK7tqq4xqYIzCN93Wl3J0rIS2SVHisvgq6l1dFiEd6wAw==", "1234567893", false, "2f8ce2b8-d2c7-4a55-8d05-4cd5563fcf3a", false, "driver1@example.com" },
-                    { "driverUser2", 0, "f9b4b31a-4ffa-4636-ac3b-197ff8acbcdd", "driver2@example.com", true, false, null, "DRIVER2@EXAMPLE.COM", "DRIVER2@EXAMPLE.COM", null, "0987654321", false, "b18047b0-5c84-4f15-a69c-4711baa5deae", false, "driver2@example.com" }
+                    { "20450cff-816f-49c8-9546-1c603aec0301", 0, "a230e7bd-32e1-4993-b664-8c150bc17b3b", "clientcompany1@example.com", true, false, null, null, null, "AQAAAAEAACcQAAAAEJt6kNEEKESvVkfy44T2kiCB+Z9embaWhnsMkE5luJD1ZVOtHPsLwbCyGkWSMUtoOA==", "1234567890", false, "5e805166-b4aa-450f-9102-a1f45037ce0c", false, "clientcompany1" },
+                    { "2e8be95a-186e-403b-b4aa-3874750a3563", 0, "6876ebaf-d135-46ca-a408-568469926c5f", "speditor@example.com", true, false, null, null, null, "AQAAAAEAACcQAAAAENO8Qct1jDq3ZR4yUZTMxZHsoHNGIxxiYP+u7FudUmonPYg/uQM9M+EB+2EiyV33Fg==", null, false, "93d905de-25e6-4606-b3a2-4c8bc298bcae", false, "speditor" },
+                    { "38ba6810-2800-4ac8-b005-5c27e8248951", 0, "9e0f5253-caf5-4960-a422-338eca0ede65", "secretary@example.com", true, false, null, null, null, "AQAAAAEAACcQAAAAEAKfzsyS7RdJ8jCxb5jYSPzdfW0EhMz26b6FliILsLS0lZEcLJFJ01Hhq+tBaQRaMA==", null, false, "79c5a8b3-35c8-4a31-bfbf-dcceb1addb40", false, "secretary" },
+                    { "6bab54d5-5a88-4128-92d2-4d12ad0baa32", 0, "e15711b2-64f7-4a97-ad5c-1c7afef66fc2", "logistics@example.com", true, false, null, null, null, "AQAAAAEAACcQAAAAEFul3r2Oy/JMNmO3dRBcP9v8SzHvTIPkXtMPR13P8wqSYYAdA6LRIje1V33Mc8Ojpw==", null, false, "13ba36f4-9ff7-47e3-a906-7912e7437625", false, "logistics" },
+                    { "driverUser1", 0, "5344217a-c12a-449f-914f-f1f21316dfef", "driver1@example.com", true, false, null, "DRIVER1@EXAMPLE.COM", "DRIVER1@EXAMPLE.COM", "AQAAAAEAACcQAAAAEKMBBnf+CRtJjhVndcTAn5kXYDqnNg+LDVjkIsNH7vQnYCTCFqjm3TMfB2E0E3KiNw==", "1234567893", false, "24660675-b293-437f-affd-bcb90ede95cc", false, "driver1@example.com" },
+                    { "driverUser2", 0, "6e1fe3f9-2916-4146-a072-c5953eacddfe", "driver2@example.com", true, false, null, "DRIVER2@EXAMPLE.COM", "DRIVER2@EXAMPLE.COM", null, "0987654321", false, "00079f60-8a63-4356-a208-44d7c2a78d1c", false, "driver2@example.com" }
                 });
 
             migrationBuilder.InsertData(
@@ -676,17 +741,37 @@ namespace LogiTrack.Infrastructure.Migrations
                 columns: new[] { "Id", "Date", "Price" },
                 values: new object[,]
                 {
-                    { 1, new DateTime(2024, 11, 19, 0, 22, 56, 309, DateTimeKind.Local).AddTicks(1356), 2.50m },
-                    { 2, new DateTime(2024, 11, 20, 0, 22, 56, 309, DateTimeKind.Local).AddTicks(1359), 2.60m }
+                    { 1, new DateTime(2024, 12, 6, 20, 11, 29, 383, DateTimeKind.Local).AddTicks(9429), 2.50m },
+                    { 2, new DateTime(2024, 12, 7, 20, 11, 29, 383, DateTimeKind.Local).AddTicks(9432), 2.60m }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Invoices",
+                columns: new[] { "Id", "ClientCompanyId", "Description", "FileId", "InvoiceDate", "InvoiceNumber", "IsPaid", "PaidDate", "PaidOnTime", "Status" },
+                values: new object[,]
+                {
+                    { 1, null, "Invoice for Delivery 1", "1hcVFpCA0Mh1txKh0KbCbDR5N_QAoTFLq", new DateTime(2024, 11, 29, 20, 11, 29, 293, DateTimeKind.Local).AddTicks(2083), "INV001", true, new DateTime(2024, 12, 4, 20, 11, 29, 293, DateTimeKind.Local).AddTicks(2078), true, "Paid" },
+                    { 2, null, "Invoice for Delivery 4", "1hcVFpCA0Mh1txKh0KbCbDR5N_QAoTFLq", new DateTime(2024, 12, 2, 20, 11, 29, 293, DateTimeKind.Local).AddTicks(2088), "INV004", false, null, false, "Paid" },
+                    { 3, null, "Invoice for Delivery 5", "1hcVFpCA0Mh1txKh0KbCbDR5N_QAoTFLq", new DateTime(2024, 12, 3, 20, 11, 29, 293, DateTimeKind.Local).AddTicks(2091), "INV005", true, null, false, "Overdue" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "StandartCargos",
+                columns: new[] { "Id", "NumberOfPallets", "PalletHeight", "PalletLength", "PalletVolume", "PalletWidth", "PalletsAreStackable", "TypeOfPallet", "WeightOfPallets" },
+                values: new object[,]
+                {
+                    { 1, 5, 100.0, 120.0, 0.95999999999999996, 80.0, true, "Euro", 500.0 },
+                    { 2, 3, 110.0, 130.0, 1.29, 90.0, false, "Industrial", 700.0 },
+                    { 3, 4, 100.0, 120.0, 0.95999999999999996, 80.0, true, "Standard", 450.0 }
                 });
 
             migrationBuilder.InsertData(
                 table: "Vehicles",
-                columns: new[] { "Id", "ArePalletsStackable", "ContantsExpenses", "EuroPalletCapacity", "FuelConsumptionPer100Km", "Height", "IndustrialPalletCapacity", "IsRefrigerated", "KilometersDriven", "KilometersLeftToChangeParts", "KilometersToChangeParts", "LastYearMaintenance", "Length", "MaxWeightCapacity", "PurchasePrice", "RegistrationNumber", "VehicleStatus", "VehicleType", "Volume", "Width" },
+                columns: new[] { "Id", "ArePalletsStackable", "ContantsExpenses", "EmissionFactor", "EuroPalletCapacity", "FuelConsumptionPer100Km", "Height", "IndustrialPalletCapacity", "IsAvailable", "IsRefrigerated", "KilometersDriven", "KilometersLeftToChangeParts", "KilometersToChangeParts", "LastYearMaintenance", "Length", "MaxWeightCapacity", "PurchasePrice", "RegistrationNumber", "VehicleStatus", "VehicleType", "Volume", "Width" },
                 values: new object[,]
                 {
-                    { 1, true, 5000.0m, 33, 12.5, 2.7999999999999998, 20, false, 150000.0, 50000.0, 0.0, new DateTime(2024, 8, 22, 0, 22, 56, 279, DateTimeKind.Local).AddTicks(8470), 12.0, 18000.0, 75000.0m, "ABC123", "Available", "Truck", 84.0, 2.5 },
-                    { 2, false, 2000.0m, 10, 8.0, 2.5, 8, false, 90000.0, 30000.0, 0.0, new DateTime(2024, 10, 22, 0, 22, 56, 279, DateTimeKind.Local).AddTicks(8479), 6.0, 3500.0, 25000.0m, "XYZ789", "Available", "Van", 30.0, 2.0 }
+                    { 1, true, 5000.0m, 2.6299999999999999, 33, 12.5, 2.7999999999999998, 20, false, false, 150000.0, 50000.0, 0.0, new DateTime(2024, 9, 9, 20, 11, 29, 358, DateTimeKind.Local).AddTicks(9393), 12.0, 18000.0, 75000.0m, "ABC123", "Available", "Truck", 84.0, 2.5 },
+                    { 2, false, 2000.0m, 2.6299999999999999, 10, 8.0, 2.5, 8, false, false, 90000.0, 30000.0, 0.0, new DateTime(2024, 11, 9, 20, 11, 29, 358, DateTimeKind.Local).AddTicks(9399), 6.0, 3500.0, 25000.0m, "XYZ789", "Available", "Van", 30.0, 2.0 }
                 });
 
             migrationBuilder.InsertData(
@@ -707,9 +792,9 @@ namespace LogiTrack.Infrastructure.Migrations
                 columns: new[] { "Id", "Date", "EventType", "Title", "UserId" },
                 values: new object[,]
                 {
-                    { 1, new DateTime(2024, 10, 22, 0, 22, 56, 318, DateTimeKind.Local).AddTicks(6604), "Paid", "Monthly Payment Due", "20450cff-816f-49c8-9546-1c603aec0301" },
-                    { 2, new DateTime(2024, 8, 22, 0, 22, 56, 318, DateTimeKind.Local).AddTicks(6608), "Paid", "Quarterly Review", "20450cff-816f-49c8-9546-1c603aec0301" },
-                    { 3, new DateTime(2024, 5, 22, 0, 22, 56, 318, DateTimeKind.Local).AddTicks(6610), "Delivered", "Annual Delivery Milestone", "20450cff-816f-49c8-9546-1c603aec0301" }
+                    { 1, new DateTime(2024, 11, 9, 20, 11, 29, 392, DateTimeKind.Local).AddTicks(7207), "Paid", "Monthly Payment Due", "20450cff-816f-49c8-9546-1c603aec0301" },
+                    { 2, new DateTime(2024, 9, 9, 20, 11, 29, 392, DateTimeKind.Local).AddTicks(7210), "Paid", "Quarterly Review", "20450cff-816f-49c8-9546-1c603aec0301" },
+                    { 3, new DateTime(2024, 6, 9, 20, 11, 29, 392, DateTimeKind.Local).AddTicks(7213), "Delivered", "Annual Delivery Milestone", "20450cff-816f-49c8-9546-1c603aec0301" }
                 });
 
             migrationBuilder.InsertData(
@@ -717,8 +802,8 @@ namespace LogiTrack.Infrastructure.Migrations
                 columns: new[] { "Id", "AddressId", "AlternativePhoneNumber", "ContactPerson", "CreatedAt", "Industry", "Name", "RegistrationNumber", "RegistrationStatus", "UserId" },
                 values: new object[,]
                 {
-                    { 1, 1, "1234567891", "John Doe", new DateTime(2024, 11, 2, 0, 22, 54, 466, DateTimeKind.Local).AddTicks(3694), "Manufacturing", "Client Company 1", "REG123456", "Approved", "20450cff-816f-49c8-9546-1c603aec0301" },
-                    { 2, 2, "9876543210", "Jane Smith", new DateTime(2024, 11, 12, 0, 22, 54, 466, DateTimeKind.Local).AddTicks(3749), "Fashion", "Client Company 2", "REG654321", "Pending", null }
+                    { 1, 1, "1234567891", "John Doe", new DateTime(2024, 11, 19, 20, 11, 29, 284, DateTimeKind.Local).AddTicks(4431), "Manufacturing", "Client Company 1", "REG123456", "Approved", "20450cff-816f-49c8-9546-1c603aec0301" },
+                    { 2, 2, "9876543210", "Jane Smith", new DateTime(2024, 11, 29, 20, 11, 29, 284, DateTimeKind.Local).AddTicks(4476), "Fashion", "Client Company 2", "REG654321", "Pending", null }
                 });
 
             migrationBuilder.InsertData(
@@ -726,17 +811,17 @@ namespace LogiTrack.Infrastructure.Migrations
                 columns: new[] { "Id", "Age", "IsAvailable", "LicenseExpiryDate", "LicenseNumber", "MonthsOfExperience", "Name", "Preferrences", "Salary", "UserId", "YearOfExperience" },
                 values: new object[,]
                 {
-                    { 1, 30, true, new DateTime(2025, 11, 22, 0, 22, 55, 447, DateTimeKind.Local).AddTicks(3999), "D12345678", 6, "John Doe", "No night shifts", 3000.0m, "driverUser1", 5 },
-                    { 2, 28, false, new DateTime(2025, 11, 22, 0, 22, 55, 447, DateTimeKind.Local).AddTicks(4012), "D87654321", 8, "Jane Smith", "Prefers city deliveries", 3200.0m, "driverUser2", 4 }
+                    { 1, 30, true, new DateTime(2025, 12, 9, 20, 11, 29, 339, DateTimeKind.Local).AddTicks(9368), "D12345678", 6, "John Doe", "No night shifts", 3000.0m, "driverUser1", 5 },
+                    { 2, 28, false, new DateTime(2025, 12, 9, 20, 11, 29, 339, DateTimeKind.Local).AddTicks(9373), "D87654321", 8, "Jane Smith", "Prefers city deliveries", 3200.0m, "driverUser2", 4 }
                 });
 
             migrationBuilder.InsertData(
                 table: "PricesPerSize",
-                columns: new[] { "Id", "DomesticPriceForNotSharedTruck", "DomesticPriceForSharedTruck", "InternationalPriceForNotSharedTruck", "InternationalPriceForSharedTruck", "QuotientForDomesticNotSharedTruck", "QuotientForDomesticSharedTruck", "QuotientForInternationalNotSharedTruck", "QuotientForInternationalSharedTruck", "VehicleId" },
+                columns: new[] { "Id", "QuotientForDomesticNotSharedTruck", "QuotientForDomesticSharedTruck", "QuotientForInternationalNotSharedTruck", "QuotientForInternationalSharedTruck", "VehicleId" },
                 values: new object[,]
                 {
-                    { 1, 1000.0m, 800.0m, 1500.0m, 1200.0m, 1.2, 0.90000000000000002, 1.5, 1.1000000000000001, 1 },
-                    { 2, 1100.0m, 850.0m, 1600.0m, 1300.0m, 1.3, 0.84999999999999998, 1.6000000000000001, 1.2, 2 }
+                    { 1, 1.2, 0.90000000000000002, 1.5, 1.1000000000000001, 1 },
+                    { 2, 1.3, 0.84999999999999998, 1.6000000000000001, 1.2, 2 }
                 });
 
             migrationBuilder.InsertData(
@@ -744,11 +829,11 @@ namespace LogiTrack.Infrastructure.Migrations
                 columns: new[] { "Id", "ApproximatePrice", "CalculatedPrice", "CargoType", "ClientCompanyId", "CreatedAt", "DeliveryAddressId", "ExpectedDeliveryDate", "IsRefrigerated", "Kilometers", "NumberOfNonStandartGoods", "OfferId", "PickupAddressId", "RerefenceNumber", "SharedTruck", "SpecialInstructions", "StandartCargoId", "Status", "TotalVolume", "TotalWeight", "Type", "TypeOfGoods" },
                 values: new object[,]
                 {
-                    { 1, 500m, 450m, "Standard", 1, new DateTime(2024, 11, 2, 0, 22, 55, 413, DateTimeKind.Local).AddTicks(6776), 4, new DateTime(2024, 11, 29, 0, 22, 55, 413, DateTimeKind.Local).AddTicks(6770), false, 500.0, null, null, 3, "R0001", false, "Handle with care", 0, "Pending", 12.0, 300.0, "Domestic", "Electronics" },
-                    { 2, 1200m, 1150m, "Standard", 1, new DateTime(2024, 11, 1, 0, 22, 55, 413, DateTimeKind.Local).AddTicks(6785), 6, new DateTime(2024, 12, 2, 0, 22, 55, 413, DateTimeKind.Local).AddTicks(6782), false, 1000.0, null, null, 5, "R0002", true, "Keep dry", 0, "Accepted", 20.0, 500.0, "International", "Furniture" },
-                    { 3, 2000m, 1900m, "Non-Standard", 1, new DateTime(2024, 10, 31, 0, 22, 55, 413, DateTimeKind.Local).AddTicks(6807), 8, new DateTime(2024, 11, 27, 0, 22, 55, 413, DateTimeKind.Local).AddTicks(6805), false, 2000.0, null, null, 7, "R0003", false, "Requires crane", 0, "Pending", 50.0, 2000.0, "Domestic", "Machinery" },
-                    { 4, 350m, 340m, "Standard", 1, new DateTime(2024, 10, 30, 0, 22, 55, 413, DateTimeKind.Local).AddTicks(6823), 10, new DateTime(2024, 11, 19, 0, 22, 55, 413, DateTimeKind.Local).AddTicks(6821), false, 500.0, null, null, 9, "R0004", true, "Do not compress", 0, "Pending", 8.0, 150.0, "Domestic", "Textiles" },
-                    { 5, 220m, 210m, "Standard", 1, new DateTime(2024, 10, 29, 0, 22, 55, 413, DateTimeKind.Local).AddTicks(6839), 12, new DateTime(2024, 11, 17, 0, 22, 55, 413, DateTimeKind.Local).AddTicks(6835), false, 1000.0, null, null, 11, "R0005", false, "Fragile binding", 0, "Pending", 1.8, 300.0, "International", "Books" }
+                    { 1, 500m, 450m, "Standard", 1, new DateTime(2024, 11, 19, 20, 11, 29, 322, DateTimeKind.Local).AddTicks(4834), 4, new DateTime(2024, 12, 16, 20, 11, 29, 322, DateTimeKind.Local).AddTicks(4830), false, 500.0, null, null, 3, "R0001", false, "Handle with care", 1, "Pending", 12.0, 300.0, "Domestic", "Electronics" },
+                    { 2, 1200m, 1150m, "Standard", 1, new DateTime(2024, 11, 18, 20, 11, 29, 322, DateTimeKind.Local).AddTicks(4844), 6, new DateTime(2024, 12, 19, 20, 11, 29, 322, DateTimeKind.Local).AddTicks(4842), false, 1000.0, null, null, 5, "R0002", true, "Keep dry", 2, "Accepted", 20.0, 500.0, "International", "Furniture" },
+                    { 3, 2000m, 1900m, "Non-Standard", 1, new DateTime(2024, 11, 17, 20, 11, 29, 322, DateTimeKind.Local).AddTicks(4851), 8, new DateTime(2024, 12, 14, 20, 11, 29, 322, DateTimeKind.Local).AddTicks(4848), false, 2000.0, null, null, 7, "R0003", false, "Requires crane", null, "Pending", 50.0, 2000.0, "Domestic", "Machinery" },
+                    { 4, 350m, 340m, "Standard", 1, new DateTime(2024, 11, 16, 20, 11, 29, 322, DateTimeKind.Local).AddTicks(4857), 10, new DateTime(2024, 12, 6, 20, 11, 29, 322, DateTimeKind.Local).AddTicks(4855), false, 500.0, null, null, 9, "R0004", true, "Do not compress", 3, "Pending", 8.0, 150.0, "Domestic", "Textiles" },
+                    { 5, 220m, 210m, "Non Standard", 1, new DateTime(2024, 11, 15, 20, 11, 29, 322, DateTimeKind.Local).AddTicks(4863), 12, new DateTime(2024, 12, 4, 20, 11, 29, 322, DateTimeKind.Local).AddTicks(4861), false, 1000.0, null, null, 11, "R0005", false, "Fragile binding", null, "Pending", 1.8, 300.0, "International", "Books" }
                 });
 
             migrationBuilder.InsertData(
@@ -767,33 +852,23 @@ namespace LogiTrack.Infrastructure.Migrations
                 columns: new[] { "Id", "ClientCompanyId", "DeliveryId", "FinalPrice", "Notes", "OfferDate", "OfferNumber", "OfferStatus", "RequestId" },
                 values: new object[,]
                 {
-                    { 1, null, null, 1200.0m, "Initial offer for Request 1", new DateTime(2024, 11, 7, 0, 22, 54, 488, DateTimeKind.Local).AddTicks(1861), "OFFER0001", "Pending", 1 },
-                    { 2, null, null, 1500.0m, "Offer accepted for Request 2", new DateTime(2024, 11, 6, 0, 22, 54, 488, DateTimeKind.Local).AddTicks(1865), "OFFER0002", "Approved", 2 },
-                    { 3, null, null, 1800.0m, "Offer approved for Request 3", new DateTime(2024, 11, 7, 0, 22, 54, 488, DateTimeKind.Local).AddTicks(1868), "OFFER0003", "Approved", 3 },
-                    { 4, null, null, 2100.0m, "Approved offer for Request 4", new DateTime(2024, 11, 10, 0, 22, 54, 488, DateTimeKind.Local).AddTicks(1942), "OFFER0004", "Approved", 4 },
-                    { 5, null, null, 2300.0m, "Finalized offer for Request 5", new DateTime(2024, 11, 9, 0, 22, 54, 488, DateTimeKind.Local).AddTicks(1946), "OFFER0005", "Accepted", 5 }
-                });
-
-            migrationBuilder.InsertData(
-                table: "StandartCargos",
-                columns: new[] { "Id", "NumberOfPallets", "PalletHeight", "PalletLength", "PalletVolume", "PalletWidth", "PalletsAreStackable", "RequestId", "TypeOfPallet", "WeightOfPallets" },
-                values: new object[,]
-                {
-                    { 1, 5, 100.0, 120.0, 0.95999999999999996, 80.0, true, 1, "Euro", 500.0 },
-                    { 2, 3, 110.0, 130.0, 1.29, 90.0, false, 2, "Industrial", 700.0 },
-                    { 3, 4, 100.0, 120.0, 0.95999999999999996, 80.0, true, 4, "Standard", 450.0 }
+                    { 1, null, null, 1200.0m, "Initial offer for Request 1", new DateTime(2024, 11, 24, 20, 11, 29, 301, DateTimeKind.Local).AddTicks(7198), "OFFER0001", "Pending", 1 },
+                    { 2, null, null, 1500.0m, "Offer accepted for Request 2", new DateTime(2024, 11, 23, 20, 11, 29, 301, DateTimeKind.Local).AddTicks(7204), "OFFER0002", "Approved", 2 },
+                    { 3, null, null, 1800.0m, "Offer approved for Request 3", new DateTime(2024, 11, 24, 20, 11, 29, 301, DateTimeKind.Local).AddTicks(7450), "OFFER0003", "Approved", 3 },
+                    { 4, null, null, 2100.0m, "Approved offer for Request 4", new DateTime(2024, 11, 27, 20, 11, 29, 301, DateTimeKind.Local).AddTicks(7454), "OFFER0004", "Approved", 4 },
+                    { 5, null, null, 2300.0m, "Finalized offer for Request 5", new DateTime(2024, 11, 26, 20, 11, 29, 301, DateTimeKind.Local).AddTicks(7457), "OFFER0005", "Accepted", 5 }
                 });
 
             migrationBuilder.InsertData(
                 table: "Deliveries",
-                columns: new[] { "Id", "ActualDeliveryDate", "DeliveryStep", "DriverId", "InvoiceId", "OfferId", "Profit", "ReferenceNumber", "Status", "TotalExpenses", "VehicleId" },
+                columns: new[] { "Id", "ActualDeliveryDate", "CarbonEmission", "DeliveryStep", "DriverId", "InvoiceId", "OfferId", "Profit", "ReferenceNumber", "Status", "SuggestedDate", "TotalExpenses", "VehicleId" },
                 values: new object[,]
                 {
-                    { 1, new DateTime(2024, 11, 21, 0, 22, 56, 270, DateTimeKind.Local).AddTicks(3672), 2, 1, null, 1, 750.00m, "DEL0001", "In Transit", 500.00m, 1 },
-                    { 2, new DateTime(2024, 11, 20, 0, 22, 56, 270, DateTimeKind.Local).AddTicks(3687), 1, 1, null, 2, 700.00m, "DEL0002", "Booked", 450.00m, 1 },
-                    { 3, new DateTime(2024, 11, 19, 0, 22, 56, 270, DateTimeKind.Local).AddTicks(3692), 4, 1, null, 3, 800.00m, "DEL0003", "Delivered", 600.00m, 1 },
-                    { 4, new DateTime(2024, 11, 18, 0, 22, 56, 270, DateTimeKind.Local).AddTicks(3697), 2, 1, null, 4, 780.00m, "DEL0004", "In Transit", 520.00m, 1 },
-                    { 5, new DateTime(2024, 11, 17, 0, 22, 56, 270, DateTimeKind.Local).AddTicks(3702), 3, 1, null, 5, 720.00m, "DEL0005", "Booked", 480.00m, 1 }
+                    { 1, new DateTime(2024, 12, 8, 20, 11, 29, 350, DateTimeKind.Local).AddTicks(2636), 38.700000000000003, 2, 1, 1, 1, 750.00m, "DEL0001", "In Transit", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 500.00m, 1 },
+                    { 2, new DateTime(2024, 12, 7, 20, 11, 29, 350, DateTimeKind.Local).AddTicks(2641), 40.0, 1, 1, null, 2, 700.00m, "DEL0002", "Booked", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 450.00m, 1 },
+                    { 3, new DateTime(2024, 12, 6, 20, 11, 29, 350, DateTimeKind.Local).AddTicks(2745), 35.0, 4, 1, null, 3, 800.00m, "DEL0003", "Delivered", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 600.00m, 1 },
+                    { 4, new DateTime(2024, 12, 5, 20, 11, 29, 350, DateTimeKind.Local).AddTicks(2750), 45.0, 2, 1, 3, 4, 780.00m, "DEL0004", "In Transit", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 520.00m, 1 },
+                    { 5, new DateTime(2024, 12, 4, 20, 11, 29, 350, DateTimeKind.Local).AddTicks(2753), 50.0, 3, 1, 2, 5, 720.00m, "DEL0005", "Booked", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 480.00m, 1 }
                 });
 
             migrationBuilder.InsertData(
@@ -801,12 +876,12 @@ namespace LogiTrack.Infrastructure.Migrations
                 columns: new[] { "Id", "Amount", "DateSubmitted", "DeliveryId", "Description", "FileId", "Type" },
                 values: new object[,]
                 {
-                    { 1, 100.00m, new DateTime(2024, 11, 17, 0, 22, 54, 456, DateTimeKind.Local).AddTicks(1061), 1, "Fuel Expense", "1hcVFpCA0Mh1txKh0KbCbDR5N_QAoTFLq", "Vehicle Expenses" },
-                    { 2, 50.00m, new DateTime(2024, 11, 18, 0, 22, 54, 456, DateTimeKind.Local).AddTicks(1065), 1, "Toll Fee", "1hcVFpCA0Mh1txKh0KbCbDR5N_QAoTFLq", "Vehicle Expenses" },
-                    { 3, 20.00m, new DateTime(2024, 11, 19, 0, 22, 54, 456, DateTimeKind.Local).AddTicks(1068), 2, "Driver Lunch", "1hcVFpCA0Mh1txKh0KbCbDR5N_QAoTFLq", "Driver Expenses" },
-                    { 4, 150.00m, new DateTime(2024, 11, 20, 0, 22, 54, 456, DateTimeKind.Local).AddTicks(1070), 3, "Repair Costs", "1hcVFpCA0Mh1txKh0KbCbDR5N_QAoTFLq", "Vehicle Expenses" },
-                    { 5, 80.00m, new DateTime(2024, 11, 21, 0, 22, 54, 456, DateTimeKind.Local).AddTicks(1073), 4, "Accommodation", "1hcVFpCA0Mh1txKh0KbCbDR5N_QAoTFLq", "Driver Expenses" },
-                    { 6, 40.00m, new DateTime(2024, 11, 22, 0, 22, 54, 456, DateTimeKind.Local).AddTicks(1075), 5, "Miscellaneous", "1hcVFpCA0Mh1txKh0KbCbDR5N_QAoTFLq", "Other Expenses" }
+                    { 1, 100.00m, new DateTime(2024, 12, 4, 20, 11, 29, 276, DateTimeKind.Local).AddTicks(4677), 1, "Fuel Expense", "1hcVFpCA0Mh1txKh0KbCbDR5N_QAoTFLq", "Vehicle Expenses" },
+                    { 2, 50.00m, new DateTime(2024, 12, 5, 20, 11, 29, 276, DateTimeKind.Local).AddTicks(4679), 1, "Toll Fee", "1hcVFpCA0Mh1txKh0KbCbDR5N_QAoTFLq", "Vehicle Expenses" },
+                    { 3, 20.00m, new DateTime(2024, 12, 6, 20, 11, 29, 276, DateTimeKind.Local).AddTicks(4681), 2, "Driver Lunch", "1hcVFpCA0Mh1txKh0KbCbDR5N_QAoTFLq", "Driver Expenses" },
+                    { 4, 150.00m, new DateTime(2024, 12, 7, 20, 11, 29, 276, DateTimeKind.Local).AddTicks(4683), 3, "Repair Costs", "1hcVFpCA0Mh1txKh0KbCbDR5N_QAoTFLq", "Vehicle Expenses" },
+                    { 5, 80.00m, new DateTime(2024, 12, 8, 20, 11, 29, 276, DateTimeKind.Local).AddTicks(4685), 4, "Accommodation", "1hcVFpCA0Mh1txKh0KbCbDR5N_QAoTFLq", "Driver Expenses" },
+                    { 6, 40.00m, new DateTime(2024, 12, 9, 20, 11, 29, 276, DateTimeKind.Local).AddTicks(4687), 5, "Miscellaneous", "1hcVFpCA0Mh1txKh0KbCbDR5N_QAoTFLq", "Other Expenses" }
                 });
 
             migrationBuilder.InsertData(
@@ -814,23 +889,11 @@ namespace LogiTrack.Infrastructure.Migrations
                 columns: new[] { "Id", "Address", "DeliveryId", "DriverId", "Latitude", "Longitude", "Notes", "StatusUpdate", "Timestamp" },
                 values: new object[,]
                 {
-                    { 1, "Sofia, Bulgaria", 1, 1, 42.697699999999998, 23.321899999999999, "Delivery completed successfully.", "Delivered", new DateTime(2024, 11, 17, 0, 22, 56, 289, DateTimeKind.Local).AddTicks(9393) },
-                    { 2, "Varna, Bulgaria", 2, 1, 43.214100000000002, 27.9147, "Delivery scheduled.", "Booked", new DateTime(2024, 11, 18, 0, 22, 56, 289, DateTimeKind.Local).AddTicks(9397) },
-                    { 3, "Plovdiv, Bulgaria", 3, 1, 42.135399999999997, 24.7453, "Delivered on time.", "Delivered", new DateTime(2024, 11, 19, 0, 22, 56, 289, DateTimeKind.Local).AddTicks(9401) },
-                    { 4, "Kardzhali, Bulgaria", 4, 1, 41.632100000000001, 25.379000000000001, "Awaiting driver assignment.", "Delivered", new DateTime(2024, 11, 20, 0, 22, 56, 289, DateTimeKind.Local).AddTicks(9403) },
-                    { 5, "Burgas, Bulgaria", 5, 1, 42.504800000000003, 27.462599999999998, "Package left with neighbor.", "Booked", new DateTime(2024, 11, 21, 0, 22, 56, 289, DateTimeKind.Local).AddTicks(9409) }
-                });
-
-            migrationBuilder.InsertData(
-                table: "Invoices",
-                columns: new[] { "Id", "ClientCompanyId", "DeliveryId", "Description", "FileId", "InvoiceDate", "InvoiceNumber", "IsPaid", "PaidOnTime", "Status" },
-                values: new object[,]
-                {
-                    { 1, null, 1, "Invoice for Delivery 1", "1hcVFpCA0Mh1txKh0KbCbDR5N_QAoTFLq", new DateTime(2024, 11, 12, 0, 22, 54, 478, DateTimeKind.Local).AddTicks(2765), "INV001", true, true, "Paid" },
-                    { 2, null, 2, "Invoice for Delivery 2", "1hcVFpCA0Mh1txKh0KbCbDR5N_QAoTFLq", new DateTime(2024, 11, 13, 0, 22, 54, 478, DateTimeKind.Local).AddTicks(2770), "INV002", false, null, "Pending" },
-                    { 3, null, 3, "Invoice for Delivery 3", "1hcVFpCA0Mh1txKh0KbCbDR5N_QAoTFLq", new DateTime(2024, 11, 14, 0, 22, 54, 478, DateTimeKind.Local).AddTicks(2773), "INV003", true, true, "Paid" },
-                    { 4, null, 4, "Invoice for Delivery 4", "1hcVFpCA0Mh1txKh0KbCbDR5N_QAoTFLq", new DateTime(2024, 11, 15, 0, 22, 54, 478, DateTimeKind.Local).AddTicks(2776), "INV004", false, false, "Paid" },
-                    { 5, null, 5, "Invoice for Delivery 5", "1hcVFpCA0Mh1txKh0KbCbDR5N_QAoTFLq", new DateTime(2024, 11, 16, 0, 22, 54, 478, DateTimeKind.Local).AddTicks(2779), "INV005", true, false, "Overdue" }
+                    { 1, "Sofia, Bulgaria", 1, 1, 42.697699999999998, 23.321899999999999, "Delivery completed successfully.", "Delivered", new DateTime(2024, 12, 4, 20, 11, 29, 367, DateTimeKind.Local).AddTicks(3377) },
+                    { 2, "Varna, Bulgaria", 2, 1, 43.214100000000002, 27.9147, "Delivery scheduled.", "Booked", new DateTime(2024, 12, 5, 20, 11, 29, 367, DateTimeKind.Local).AddTicks(3381) },
+                    { 3, "Plovdiv, Bulgaria", 3, 1, 42.135399999999997, 24.7453, "Delivered on time.", "Delivered", new DateTime(2024, 12, 6, 20, 11, 29, 367, DateTimeKind.Local).AddTicks(3384) },
+                    { 4, "Kardzhali, Bulgaria", 4, 1, 41.632100000000001, 25.379000000000001, "Awaiting driver assignment.", "Delivered", new DateTime(2024, 12, 7, 20, 11, 29, 367, DateTimeKind.Local).AddTicks(3387) },
+                    { 5, "Burgas, Bulgaria", 5, 1, 42.504800000000003, 27.462599999999998, "Package left with neighbor.", "Booked", new DateTime(2024, 12, 8, 20, 11, 29, 367, DateTimeKind.Local).AddTicks(3391) }
                 });
 
             migrationBuilder.CreateIndex(
@@ -896,6 +959,13 @@ namespace LogiTrack.Infrastructure.Migrations
                 filter: "[UserId] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Deliveries_InvoiceId",
+                table: "Deliveries",
+                column: "InvoiceId",
+                unique: true,
+                filter: "[InvoiceId] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Deliveries_OfferId",
                 table: "Deliveries",
                 column: "OfferId",
@@ -936,6 +1006,11 @@ namespace LogiTrack.Infrastructure.Migrations
                 name: "IX_NonStandardCargos_RequestId",
                 table: "NonStandardCargos",
                 column: "RequestId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Notifications_UserId",
+                table: "Notifications",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Offer_DeliveryId",
@@ -983,9 +1058,31 @@ namespace LogiTrack.Infrastructure.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_StandartCargos_RequestId",
-                table: "StandartCargos",
+                name: "IX_Requests_StandartCargoId",
+                table: "Requests",
+                column: "StandartCargoId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ReservedForDeliveries_DriverId",
+                table: "ReservedForDeliveries",
+                column: "DriverId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ReservedForDeliveries_OfferId",
+                table: "ReservedForDeliveries",
+                column: "OfferId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ReservedForDeliveries_RequestId",
+                table: "ReservedForDeliveries",
                 column: "RequestId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ReservedForDeliveries_VehicleId",
+                table: "ReservedForDeliveries",
+                column: "VehicleId",
                 unique: true);
         }
 
@@ -1019,10 +1116,10 @@ namespace LogiTrack.Infrastructure.Migrations
                 name: "FuelPrices");
 
             migrationBuilder.DropTable(
-                name: "Invoices");
+                name: "NonStandardCargos");
 
             migrationBuilder.DropTable(
-                name: "NonStandardCargos");
+                name: "Notifications");
 
             migrationBuilder.DropTable(
                 name: "PricesPerSize");
@@ -1031,7 +1128,7 @@ namespace LogiTrack.Infrastructure.Migrations
                 name: "Ratings");
 
             migrationBuilder.DropTable(
-                name: "StandartCargos");
+                name: "ReservedForDeliveries");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
@@ -1041,6 +1138,9 @@ namespace LogiTrack.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "Drivers");
+
+            migrationBuilder.DropTable(
+                name: "Invoices");
 
             migrationBuilder.DropTable(
                 name: "Offers");
@@ -1053,6 +1153,9 @@ namespace LogiTrack.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "ClientCompanies");
+
+            migrationBuilder.DropTable(
+                name: "StandartCargos");
 
             migrationBuilder.DropTable(
                 name: "Addresses");
