@@ -2,6 +2,8 @@
 using LogiTrack.Infrastructure;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.EntityFrameworkCore;
+using LogisticsSystem.Infrastructure.Data.DataModels;
 
 namespace LogiTrack.Core.Services
 {
@@ -18,95 +20,116 @@ namespace LogiTrack.Core.Services
         {
             while (!stoppingToken.IsCancellationRequested)
             {
-                await SendNotificationsAsync();
+				try
+				{
+					await SendNotificationsAsync(stoppingToken);
+				}
+				catch (Exception ex)
+				{
+				}
 
-                await Task.Delay(TimeSpan.FromDays(3), stoppingToken);
+				await Task.Delay(TimeSpan.FromDays(3), stoppingToken);
             }
         }
 
-        private async Task SendNotificationsAsync()
+        private async Task SendNotificationsAsync(CancellationToken cancellationToken)
         {
             using (var scope = _serviceScopeFactory.CreateScope())
             {
                 var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-                var logisticsUser = dbContext.Users.Where(x => x.UserName == "logistics").ToList();
-                var speditorUser = dbContext.Users.Where(x => x.UserName == "speditor").ToList();
+				var logisticsUser = await dbContext.Users.SingleOrDefaultAsync(x => x.UserName == "logistics", cancellationToken);
+                var speditorUser = await dbContext.Users.SingleOrDefaultAsync(x => x.UserName == "speditor", cancellationToken);
 
-                var drivers = dbContext.Drivers.Where(x => x.LicenseExpiryDate.AddDays(30) >= DateTime.Now).ToList(); 
-                var vehiclesForYearlyMaintenance = dbContext.Vehicles.Where(x => x.LastYearMaintenance.AddYears(1) >= DateTime.Now.AddDays(-30)).ToList();
-                var vehiclesForPartsChange = dbContext.Vehicles.Where(x => x.KilometersLeftToChangeParts <= 1000).ToList();
 
-                foreach (var driver in drivers)
-                {                   
-                    var notificationForDriver = new Notification
-                    {
-                        Title = "License Expiry",
-                        Message = $"Your license will expire on {driver.LicenseExpiryDate.ToString("dd-MM-yyyy")}",
-                        Date = DateTime.Now,
-                        UserId = driver.UserId
-                    };
-                    var notificationForLogistics = new Notification
-                    {
-                        Title = "License Expiry",
-                        Message = $"Driver {driver.Name} license will expire on {driver.LicenseExpiryDate.ToString("dd-MM-yyyy")}.",
-                        Date = DateTime.Now,
-                        UserId = logisticsUser[0].Id
-                    };
-                    var notificationForSpeditor = new Notification
-                    {
-                        Title = "License Expiry",
-                        Message = $"Driver {driver.Name} license will expire on {driver.LicenseExpiryDate.ToString("dd-MM-yyyy")}.",
-                        Date = DateTime.Now,
-                        UserId = speditorUser[0].Id
-                    };
-                    dbContext.Notifications.Add(notificationForSpeditor);
-                    dbContext.Notifications.Add(notificationForLogistics);
-                    dbContext.Notifications.Add(notificationForDriver);
-                }
+				var drivers = await dbContext.Drivers.Where(x => x.LicenseExpiryDate <= DateTime.Now.AddDays(30)).ToListAsync(cancellationToken);
+				var vehiclesForYearlyMaintenance = await dbContext.Vehicles.Where(x => x.LastYearMaintenance.AddYears(1) <= DateTime.Now.AddDays(30)).ToListAsync(cancellationToken); 
+                var vehiclesForPartsChange = await dbContext.Vehicles.Where(x => x.KilometersLeftToChangeParts <= 1000).ToListAsync(cancellationToken);
 
-                foreach (var vehicle in vehiclesForYearlyMaintenance)
-                {
-                    var notificationForLogistics = new Notification
-                    {
-                        Title = "License Expiry",
-                        Message = $"Vehicle with reg. No. {vehicle.RegistrationNumber} should go to yearly maintenance in {(vehicle.LastYearMaintenance.AddYears(1) - DateTime.Now).Days} days.",
-                        Date = DateTime.Now,
-                        UserId = logisticsUser[0].Id
-                    };
-                    var notificationForSpeditor = new Notification
-                    {
-                        Title = "License Expiry",
-                        Message = $"Vehicle with reg. No. {vehicle.RegistrationNumber} should go to yearly maintenance in {(vehicle.LastYearMaintenance.AddYears(1) - DateTime.Now).Days} days.",
-                        Date = DateTime.Now,
-                        UserId = speditorUser[0].Id
-                    };
-                    dbContext.Notifications.Add(notificationForSpeditor);
-                    dbContext.Notifications.Add(notificationForLogistics);
-                }
+				foreach (var driver in drivers)
+				{
+					AddDriverNotification(dbContext, driver, logisticsUser.Id, speditorUser.Id);
+				}
 
-                foreach(var vehicle in vehiclesForYearlyMaintenance)
-                {
-                    var notificationForLogistics = new Notification
-                    {
-                        Title = "License Expiry",
-                        Message = $"Vehicle with reg. No. {vehicle.RegistrationNumber} should have its parts changed in {vehicle.KilometersLeftToChangeParts} km.",
-                        Date = DateTime.Now,
-                        UserId = logisticsUser[0].Id
-                    };
-                    var notificationForSpeditor = new Notification
-                    {
-                        Title = "License Expiry",
-                        Message = $"Vehicle with reg. No. {vehicle.RegistrationNumber} should have its parts changed in {vehicle.KilometersLeftToChangeParts} km.",
-                        Date = DateTime.Now,
-                        UserId = speditorUser[0].Id
-                    };
-                    dbContext.Notifications.Add(notificationForSpeditor);
-                    dbContext.Notifications.Add(notificationForLogistics);
-                }
+				foreach (var vehicle in vehiclesForYearlyMaintenance)
+				{
+					AddVehicleMaintenanceNotification(dbContext, vehicle, logisticsUser.Id, speditorUser.Id);
+				}
 
-                await dbContext.SaveChangesAsync();
-            }
+				foreach (var vehicle in vehiclesForPartsChange)
+				{
+					AddVehiclePartsChangeNotification(dbContext, vehicle, logisticsUser.Id, speditorUser.Id);
+				}
+
+				await dbContext.SaveChangesAsync(cancellationToken);
+			}
         }
-    
-    }
+		private void AddDriverNotification(ApplicationDbContext dbContext, Driver driver, string logisticsUserId, string speditorUserId)
+		{
+			var driverNotification = new Notification
+			{
+				Title = "License Expiry",
+				Message = $"Your license will expire on {driver.LicenseExpiryDate:dd-MM-yyyy}.",
+				Date = DateTime.Now,
+				UserId = driver.UserId
+			};
+			var logisticsNotification = new Notification
+			{
+				Title = "License Expiry",
+				Message = $"Driver {driver.Name}'s license will expire on {driver.LicenseExpiryDate:dd-MM-yyyy}.",
+				Date = DateTime.Now,
+				UserId = logisticsUserId
+			};
+			var speditorNotification = new Notification
+			{
+				Title = "License Expiry",
+				Message = $"Driver {driver.Name}'s license will expire on {driver.LicenseExpiryDate:dd-MM-yyyy}.",
+				Date = DateTime.Now,
+				UserId = speditorUserId
+			};
+
+			dbContext.Notifications.AddRange(driverNotification, logisticsNotification, speditorNotification);
+		}
+
+		private void AddVehicleMaintenanceNotification(ApplicationDbContext dbContext, Vehicle vehicle, string logisticsUserId, string speditorUserId)
+		{
+			var maintenanceDaysLeft = (vehicle.LastYearMaintenance.AddYears(1) - DateTime.Now).Days;
+			var logisticsNotification = new Notification
+			{
+				Title = "Yearly Maintenance Due",
+				Message = $"Vehicle with reg. No. {vehicle.RegistrationNumber} requires yearly maintenance in {maintenanceDaysLeft} days.",
+				Date = DateTime.Now,
+				UserId = logisticsUserId
+			};
+			var speditorNotification = new Notification
+			{
+				Title = "Yearly Maintenance Due",
+				Message = $"Vehicle with reg. No. {vehicle.RegistrationNumber} requires yearly maintenance in {maintenanceDaysLeft} days.",
+				Date = DateTime.Now,
+				UserId = speditorUserId
+			};
+
+			dbContext.Notifications.AddRange(logisticsNotification, speditorNotification);
+		}
+
+		private void AddVehiclePartsChangeNotification(ApplicationDbContext dbContext, Vehicle vehicle, string logisticsUserId, string speditorUserId)
+		{
+			var logisticsNotification = new Notification
+			{
+				Title = "Parts Replacement Due",
+				Message = $"Vehicle with reg. No. {vehicle.RegistrationNumber} needs parts replaced in {vehicle.KilometersLeftToChangeParts} km.",
+				Date = DateTime.Now,
+				UserId = logisticsUserId
+			};
+			var speditorNotification = new Notification
+			{
+				Title = "Parts Replacement Due",
+				Message = $"Vehicle with reg. No. {vehicle.RegistrationNumber} needs parts replaced in {vehicle.KilometersLeftToChangeParts} km.",
+				Date = DateTime.Now,
+				UserId = speditorUserId
+			};
+
+			dbContext.Notifications.AddRange(logisticsNotification, speditorNotification);
+		}
+
+	}
 }

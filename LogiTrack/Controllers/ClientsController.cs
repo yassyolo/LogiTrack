@@ -1,7 +1,6 @@
 ﻿using LogiTrack.Core.Contracts;
 using LogiTrack.Core.ViewModels.Clients;
 using static LogiTrack.Core.Constants.MessageConstants.ErrorMessages;
-using static LogiTrack.Core.Constants.UserRolesConstants;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using LogiTrack.Core.Services;
@@ -13,7 +12,7 @@ using LogiTrack.Core.ViewModels.Delivery;
 
 namespace LogiTrack.Controllers
 {
-    public class ClientsController : Controller
+	public class ClientsController : Controller
     {
         private readonly UserManager<IdentityUser> userManager;
         private readonly IClientsService clientsService;
@@ -715,7 +714,5 @@ namespace LogiTrack.Controllers
             var model = await statisticsService.GetCargoRatiosForCompanyAsync(username);
             return Json(new { standardCount = model.Item1, nonStandardCount = model.Item2});
         }
-
-        //TODO: Add method for booking offer
     }
 }

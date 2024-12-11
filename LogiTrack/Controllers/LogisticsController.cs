@@ -312,14 +312,13 @@ namespace LogiTrack.Controllers
             return Json(new { totalRevenue = model });
         }
         
-        //TODO:Driverstats
         [HttpGet]
         public async Task<JsonResult> GetVehicleCostsDataForVehicle(int id)
         {
             var model = await statisticsService.GetVehicleCostsDataForVehicleAsync(id);
             return Json(new { totalCosts = model.Item1, numDeliveries = model.Item2 });
         }
-        
+        //ToDo:VehicleStats
         [HttpGet]
         public async Task<JsonResult> GetDistanceAndDeliveriesForVehicle(int id)
         {
@@ -374,19 +373,13 @@ namespace LogiTrack.Controllers
         [HttpGet]
         public async Task<IActionResult> RequestsRegister([FromQuery] FilterRequestsForLogisticsViewModel query)
         {
-            /*var companyUsername = User.GetUsername();
-            if (await clientsService.UserWithEmailExistsAsync(companyUsername) == false)
-            {
-                return BadRequest(ClientCompanyNotFoundErrorMessage);
-            }*/
-
-            var model = await requestService.GetRequestsForLogisticsAsync(query.StartDate, query.EndDate, query.IsApproved, query.SharedTruck, query.MinWeight, query.MaxWeight, query.MinPrice, query.MaxPrice, query.PickupAddress, query.DeliveryAddress);
+            var model = await requestService.GetRequestsForLogisticsBySearchTermAsync(query.SearchTerm);
             query.Requests = model;
-            model = await requestService.GetRequestsForLogisticsBySearchTermAsync(query.SearchTerm);
+            model = await requestService.GetRequestsForLogisticsAsync(query.StartDate, query.EndDate, query.IsApproved, query.SharedTruck, query.MinWeight, query.MaxWeight, query.MinPrice, query.MaxPrice, query.PickupAddress, query.DeliveryAddress);
             query.Requests = model;
+            
             return View(query);
         }
-
 
         [HttpGet]
         public async Task<IActionResult> DriversRegister([FromQuery] FilterDriversViewModel query)

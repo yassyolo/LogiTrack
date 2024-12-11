@@ -144,8 +144,8 @@ namespace LogiTrack.Core.Services
                 Name = x.Name,
                 RegisterNumber = x.RegistrationNumber,
                 Address = $"{x.Address.Street}, {x.Address.City}, {x.Address.County}",
-                //Email = x.User.Email,
-                //Phone = x.User != null ? x.User.PhoneNumber : string.Empty
+                Email = x.User.Email != null ? x.User.Email : string.Empty,
+                Phone = x.User != null ? x.User.PhoneNumber : string.Empty
             }).ToList();
         }
 

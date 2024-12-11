@@ -28,12 +28,12 @@ namespace LogiTrack.Core.Services
                 var response = await client.SendEmailAsync(emailMessage);
                 if (response.StatusCode != HttpStatusCode.OK)
                 {
-                    throw new Exception($"Email not sent. Status code: {response.StatusCode}");
+                    throw new Exception($"Status code: {response.StatusCode}");
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error sending email: {ex.Message}");
+                Console.WriteLine(ex.Message);
             }
         }
     }

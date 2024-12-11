@@ -1,12 +1,10 @@
 ﻿using LogisticsSystem.Infrastructure.Data.DataModels;
 using LogiTrack.Core.Constants;
 using LogiTrack.Core.Contracts;
-using LogiTrack.Core.ViewModels.CashRegister;
 using LogiTrack.Core.ViewModels.Clients;
 using LogiTrack.Core.ViewModels.Delivery;
 using LogiTrack.Core.ViewModels.Driver;
 using LogiTrack.Core.ViewModels.FuelPrice;
-using LogiTrack.Core.ViewModels.Invoice;
 using LogiTrack.Core.ViewModels.Offer;
 using LogiTrack.Core.ViewModels.Request;
 using LogiTrack.Core.ViewModels.Vehicle;
@@ -16,7 +14,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LogiTrack.Core.Services
 {
-    public class StatisticsService : IStatisticsService
+	public class StatisticsService : IStatisticsService
     {
         private readonly IRepository repository;
 

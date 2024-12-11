@@ -14,7 +14,7 @@ namespace LogiTrack.Core.Contracts
         Task<IEnumerable<RequestsForSearchViewModel>> GetRequestsForLogisticsAsync(DateTime? startDate= null, DateTime? endDate = null, bool isApproved = false, bool sharedTruck = false, double? minWeight = null, double? maxWeight = null, decimal? minPrice = null, decimal? maxPrice = null, string? pickupAddress = null, string? deliveryAddress = null);
         Task<IEnumerable<RequestsForSearchViewModel>> GetRequestsForLogisticsBySearchTermAsync(string? searchTerm);      
         Task<RequestViewModel?> GetRequestDetailsAsync(int id);
-        Task<List<RequestsDetailsForLogisticsViewModel>> GetPendingRequestsAsync(string sharedTruck = null, DateTime? startDate= null, DateTime? endDate = null, double? minWeight = null, double? maxWeight = null, double? minVolume = null, double? maxVolume = null, string? pickupAddress = null, string? deliveryAddress = null);
+        Task<List<RequestsDetailsForLogisticsViewModel>> GetPendingRequestsAsync(string? sharedTruck = null, DateTime? startDate= null, DateTime? endDate = null, double? minWeight = null, double? maxWeight = null, double? minVolume = null, double? maxVolume = null, string? pickupAddress = null, string? deliveryAddress = null);
         Task<PendingRequestDetailsViewModel?> GetPendingRequestDetailsAsync(int id);
     }
 }

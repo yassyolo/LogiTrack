@@ -26,14 +26,12 @@ namespace LogiTrack.Core.Services
 
         public async Task<int> GetVehicleIdByRegistrationNumberAsync(string registrationNumber)
         {
-            var vehicleId = await repository.AllReadonly<Vehicle>().Where(x => x.RegistrationNumber.Trim().ToLower() == registrationNumber.Trim().ToLower()).Select(x => x.Id).FirstOrDefaultAsync();
-            return vehicleId;
+            return await repository.AllReadonly<Vehicle>().Where(x => x.RegistrationNumber.Trim().ToLower() == registrationNumber.Trim().ToLower()).Select(x => x.Id).FirstOrDefaultAsync();
         }        
 
         public async Task<VehicleDetailsViewModel?> GetVehicleDetailsAsync(int id)
         {
-            var vehicle = await repository.AllReadonly<Vehicle>().FirstOrDefaultAsync(x => x.Id == id);
-            var deliveries = await repository.AllReadonly<Delivery>().Include(x => x.Offer).ThenInclude(x => x.Request).ThenInclude(x => x.DeliveryAddress).Include(x => x.Offer).ThenInclude(x => x.Request).ThenInclude(x => x.PickupAddress).Include(x => x.Invoice).Where(x => x.VehicleId == vehicle.Id).ToListAsync();
+            var deliveries = await repository.AllReadonly<Delivery>().Include(x => x.Offer).ThenInclude(x => x.Request).ThenInclude(x => x.DeliveryAddress).Include(x => x.Offer).ThenInclude(x => x.Request).ThenInclude(x => x.PickupAddress).Include(x => x.Invoice).Where(x => x.VehicleId == id).ToListAsync();
             var deliveriesCnt = deliveries.Count();
             var model = await repository.AllReadonly<Vehicle>().Where(x => x.Id == id)
                 .Select(x => new VehicleDetailsViewModel
@@ -61,15 +59,15 @@ namespace LogiTrack.Core.Services
                     ContantsExpenses = x.ContantsExpenses.ToString(),
                     
                 }).FirstOrDefaultAsync();
-            var pricesPerSize = await repository.AllReadonly<PricesPerSize>().FirstOrDefaultAsync(x => x.VehicleId == vehicle.Id);
+            var pricesPerSize = await repository.AllReadonly<PricesPerSize>().FirstOrDefaultAsync(x => x.VehicleId == id);
             model.QuotientForDomesticNotSharedTruck = pricesPerSize.QuotientForDomesticNotSharedTruck.ToString();
             model.QuotientForDomesticSharedTruck = pricesPerSize.QuotientForDomesticSharedTruck.ToString();
             model.QuotientForInternationalNotSharedTruck = pricesPerSize.QuotientForInternationalNotSharedTruck.ToString();
             model.QuotientForInternationalSharedTruck = pricesPerSize.QuotientForInternationalSharedTruck.ToString();
             model.DeliveriesLastMonth = deliveries.Where(x => x.Offer.Request.CreatedAt.Month > DateTime.Now.Month - 1 && x.Offer.Request.CreatedAt.Month < DateTime.Now.Month).Count();
             model.NotOnTimeDeliveries = deliveries.Where(x => x.ActualDeliveryDate > x.Offer.Request.ExpectedDeliveryDate).Count();
-            model.EmissionFactorFrAllDeliveries = await repository.AllReadonly<LogiTrack.Infrastructure.Data.DataModels.Delivery>().Where(x => x.VehicleId == vehicle.Id).SumAsync(x => x.CarbonEmission);
-            model.AdditionalCost = await repository.AllReadonly<LogiTrack.Infrastructure.Data.DataModels.CashRegister>().Where(x => x.Delivery.VehicleId == vehicle.Id).SumAsync(x => x.Amount);
+            model.EmissionFactorFrAllDeliveries = deliveries.Sum(x => x.CarbonEmission);
+            model.AdditionalCost = await repository.AllReadonly<LogiTrack.Infrastructure.Data.DataModels.CashRegister>().Where(x => x.Delivery.VehicleId == id).SumAsync(x => x.Amount);
 
             if (deliveriesCnt == 0)
             {
@@ -102,40 +100,43 @@ namespace LogiTrack.Core.Services
 
         public async Task<List<VehicleDetailsViewModel>> GetVehiclesAsync(bool refrigerated, string? registrationNumber = null, string? vehicleType = null, double? minWeightCapacity = null, double? maxWeightCapacity = null, double? minVolume = null, double? maxVolume = null, bool forMaintentance = false)
         {
-            var vehicles = await repository.AllReadonly<LogisticsSystem.Infrastructure.Data.DataModels.Vehicle>().ToListAsync();
+            var query = repository.AllReadonly<LogisticsSystem.Infrastructure.Data.DataModels.Vehicle>().AsQueryable();
             if (refrigerated)
             {
-                vehicles = vehicles.Where(x => x.IsRefrigerated == true).ToList();
+				query = query.Where(x => x.IsRefrigerated == true);
             }
             if (string.IsNullOrEmpty(registrationNumber) == false)
             {
-                vehicles = vehicles.Where(x => x.RegistrationNumber.ToLower().Contains(registrationNumber.ToLower())).ToList();
+				query = query.Where(x => x.RegistrationNumber.ToLower().Contains(registrationNumber.ToLower()));
             }
             if (string.IsNullOrEmpty(vehicleType) == false)
             {
-                vehicles = vehicles.Where(x => x.VehicleType.ToLower().Contains(vehicleType.ToLower())).ToList();
+				query = query.Where(x => x.VehicleType.ToLower().Contains(vehicleType.ToLower()));
             }
             if(forMaintentance)
             {
-                vehicles = vehicles.Where(x => x.LastYearMaintenance.AddMonths(1) >= DateTime.Now || x.KilometersLeftToChangeParts >= 500).ToList();
+				query = query.Where(x => x.LastYearMaintenance.AddMonths(1) >= DateTime.Now || x.KilometersLeftToChangeParts >= 500);
             }
             if (minWeightCapacity != null)
             {
-                vehicles = vehicles.Where(x => x.MaxWeightCapacity >= minWeightCapacity).ToList();
+				query = query.Where(x => x.MaxWeightCapacity >= minWeightCapacity);
             }
             if (maxWeightCapacity != null)
             {
-                vehicles = vehicles.Where(x => x.MaxWeightCapacity <= maxWeightCapacity).ToList();
+				query = query.Where(x => x.MaxWeightCapacity <= maxWeightCapacity);
             }
             if (minVolume != null)
             {
-                vehicles = vehicles.Where(x => x.Volume >= minVolume).ToList();
+				query = query.Where(x => x.Volume >= minVolume);
             }
             if (maxVolume != null)
             {
-                vehicles = vehicles.Where(x => x.Volume <= maxVolume).ToList();
+				query = query.Where(x => x.Volume <= maxVolume);
             }
-            return vehicles.Select(x => new VehicleDetailsViewModel
+
+            var vehicles = await query.ToListAsync();
+
+			return vehicles.Select(x => new VehicleDetailsViewModel
             {
                 Id = x.Id,
                 RegistrationNumber = x.RegistrationNumber,
@@ -154,20 +155,23 @@ namespace LogiTrack.Core.Services
 
         public async Task<List<VehicleDetailsViewModel>> GetVehiclesBySearchTermAsync(string? searchTerm)
         {
-            var vehicles = await repository.AllReadonly<LogisticsSystem.Infrastructure.Data.DataModels.Vehicle>().ToListAsync();
+            var query = repository.AllReadonly<LogisticsSystem.Infrastructure.Data.DataModels.Vehicle>().AsQueryable();
             if (string.IsNullOrEmpty(searchTerm) == false)
             {
-                vehicles = vehicles.Where(x => x.RegistrationNumber.ToLower().Contains(searchTerm.ToLower())
-                               || x.VehicleType.ToLower().Contains(searchTerm.ToLower())
-                               || x.MaxWeightCapacity.ToString().Contains(searchTerm.ToLower())
-                               || x.Volume.ToString().Contains(searchTerm.ToLower())
-                               || x.VehicleStatus.ToLower().Contains(searchTerm.ToLower())
+                var searchTermToLower = searchTerm.ToLower();
+				query = query.Where(x => x.RegistrationNumber.ToLower().Contains(searchTermToLower)
+                               || x.VehicleType.ToLower().Contains(searchTermToLower)
+                               || x.MaxWeightCapacity.ToString().Contains(searchTermToLower)
+                               || x.Volume.ToString().Contains(searchTermToLower)
+                               || x.VehicleStatus.ToLower().Contains(searchTermToLower)
                                || x.ContantsExpenses == decimal.Parse(searchTerm)
                                || x.FuelConsumptionPer100Km == double.Parse(searchTerm)
                                || x.EmissionFactor == double.Parse(searchTerm)
                                || x.Length.ToString().Contains(searchTerm)
                                || x.Width.ToString().Contains(searchTerm)
-                               || x.Height.ToString().Contains(searchTerm)).ToList();
+                               || x.Height.ToString().Contains(searchTerm));
+
+                var vehicles = await query.ToListAsync();
 
                 return vehicles.Select(x => new VehicleDetailsViewModel
                 {
@@ -213,17 +217,12 @@ namespace LogiTrack.Core.Services
                 LastYearMaintenance = model.LastYearMaintenance,
                 KilometersDriven = model.KilometersDriven,
                 KilometersToChangeParts = model.KilometersToChangeParts,
+                KilometersLeftToChangeParts = 0,
                 PurchasePrice = model.PurchasePrice,
                 ContantsExpenses = model.ContantsExpenses,
+                IsRefrigerated = model.IsRefrigerated,
             };
-            if (model.VehicleType == VehicleTypesConstants.Refrigerated)
-            {
-                vehicle.IsRefrigerated = true;
-            }
-            else
-            {
-                vehicle.IsRefrigerated = false;
-            }
+
             await repository.AddAsync(vehicle);
             await repository.SaveChangesAsync();
             var pricesPerSize = new PricesPerSize
@@ -258,7 +257,7 @@ namespace LogiTrack.Core.Services
                 KilometersToChangeParts = x.KilometersToChangeParts,
                 PurchasePrice = x.PurchasePrice,
                 ContantsExpenses = x.ContantsExpenses
-            }).FirstOrDefaultAsync();
+            }).SingleOrDefaultAsync();
         }
 
         public async Task EditVehicleAsync(int id, AddVehicleViewModel model)
@@ -281,14 +280,8 @@ namespace LogiTrack.Core.Services
             vehicle.KilometersToChangeParts = model.KilometersToChangeParts;
             vehicle.PurchasePrice = model.PurchasePrice;
             vehicle.ContantsExpenses = model.ContantsExpenses;
-            if (model.VehicleType == VehicleTypesConstants.Refrigerated)
-            {
-                vehicle.IsRefrigerated = true;
-            }
-            else
-            {
-                vehicle.IsRefrigerated = false;
-            }
+            vehicle.IsRefrigerated = model.VehicleType == VehicleTypesConstants.Refrigerated ? true : false;
+
             await repository.SaveChangesAsync();
         }
 
@@ -311,8 +304,6 @@ namespace LogiTrack.Core.Services
             pricesPerSize.QuotientForInternationalNotSharedTruck = model.QuotientForInternationalNotSharedTruck;
             pricesPerSize.QuotientForInternationalSharedTruck = model.QuotientForInternationalSharedTruck;
             await repository.SaveChangesAsync();
-        }
-
-        
+        }      
     }
 }

@@ -24,6 +24,7 @@ namespace LogiTrack.Core.Services
                     Title = x.Title,
                     Type = x.EventType,
                 }).ToListAsync();
+
             if (events.Count == 0)
             {
                 return new List<CalendarEventViewModel>();

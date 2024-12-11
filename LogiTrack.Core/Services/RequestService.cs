@@ -6,7 +6,9 @@ using LogiTrack.Core.ViewModels.Request;
 using LogiTrack.Infrastructure.Data.DataModels;
 using LogiTrack.Infrastructure.Repository;
 using Microsoft.EntityFrameworkCore;
+using Org.BouncyCastle.Asn1.Ocsp;
 using Org.BouncyCastle.Pqc.Crypto.Utilities;
+using System.Collections.Generic;
 using System.Linq.Expressions;
 using static iText.StyledXmlParser.Jsoup.Select.Evaluator;
 using static LogiTrack.Infrastructure.Data.DataConstants.DataModelConstants;
@@ -62,7 +64,7 @@ namespace LogiTrack.Core.Services
                 SpecialInstructions = model.SpecialInstructions,
                 IsRefrigerated = model.IsRefrigerated,
                 Status = StatusConstants.Pending,
-                CreatedAt = DateTime.Now,    
+                CreatedAt = DateTime.Now,
                 PickupAddressId = pickupAddress.Id,
                 DeliveryAddressId = deliveryAddress.Id,
                 Kilometers = CalculateDistance(model.PickupLatitude, model.PickupLongitude, model.DeliveryLatitude, model.DeliveryLongitude),
@@ -167,7 +169,7 @@ namespace LogiTrack.Core.Services
             {
                 requests = requests.Where(x => x.CreatedAt >= startDate).ToList();
             }
-            if( minPrice != null)
+            if (minPrice != null)
             {
                 requests = requests.Where(x => x.ApproximatePrice >= minPrice).ToList();
             }
@@ -175,9 +177,9 @@ namespace LogiTrack.Core.Services
             {
                 requests = requests.Where(x => x.ApproximatePrice <= maxPrice).ToList();
             }
-            if(minWeight != null)
-{
-                requests = requests.Where(x => x.TotalWeight  >= minWeight).ToList();
+            if (minWeight != null)
+            {
+                requests = requests.Where(x => x.TotalWeight >= minWeight).ToList();
             }
             if (maxWeight != null)
             {
@@ -204,12 +206,11 @@ namespace LogiTrack.Core.Services
                 ExpectedDeliveryDate = x.ExpectedDeliveryDate.ToString("dd-MM-yyyy"),
                 CreationDate = x.CreatedAt.ToString("dd-MM-yyyy"),
                 Approved = x.Status == StatusConstants.Approved,
-                NumberOfItems =  (x.StandartCargo?.NumberOfPallets ?? 0) + (x.NumberOfNonStandartGoods ?? 0).ToString(),
+                NumberOfItems = (x.StandartCargo?.NumberOfPallets ?? 0) + (x.NumberOfNonStandartGoods ?? 0).ToString(),
                 TotalWeight = x.TotalWeight.ToString("F2"),
-                TotalVolume = x.TotalVolume.ToString("F2"),       
+                TotalVolume = x.TotalVolume.ToString("F2"),
             });
         }
-
 
         public async Task<RequestViewModel?> GetRequestDetailsAsync(int id)
         {
@@ -219,7 +220,7 @@ namespace LogiTrack.Core.Services
                 .Include(x => x.NonStandardCargos)
                 .Include(x => x.PickupAddress)
                 .Include(x => x.DeliveryAddress)
-                .Include(x => x.Offer)  
+                .Include(x => x.Offer)
                 .Select(x => new RequestViewModel
                 {
                     Id = x.Id,
@@ -254,7 +255,7 @@ namespace LogiTrack.Core.Services
                 .FirstOrDefaultAsync();
             if (model != null)
             {
-                var offer = await repository.AllReadonly<LogisticsSystem.Infrastructure.Data.DataModels.Offer>().Where(x => x.RequestId == model.Id)  .Select(x => new { x.Id }) .FirstOrDefaultAsync();
+                var offer = await repository.AllReadonly<LogisticsSystem.Infrastructure.Data.DataModels.Offer>().Where(x => x.RequestId == model.Id).Select(x => new { x.Id }).FirstOrDefaultAsync();
 
                 if (offer != null)
                 {
@@ -264,7 +265,6 @@ namespace LogiTrack.Core.Services
 
             return model;
         }
-
 
         public async Task<IEnumerable<RequestsForSearchViewModel>> GetRequestsForCompanyBySearchTermAsync(string companyUsername, string? searchTerm)
         {
@@ -305,7 +305,7 @@ namespace LogiTrack.Core.Services
                     TotalVolume = x.TotalVolume.ToString("F2"),
                 });
             }
-           return new List<RequestsForSearchViewModel>();
+            return new List<RequestsForSearchViewModel>();
         }
 
         public async Task<bool> RequestWithIdExistsAsync(int id)
@@ -371,38 +371,10 @@ namespace LogiTrack.Core.Services
 
         public async Task<IEnumerable<RequestsForSearchViewModel>> GetRequestsForLogisticsAsync(DateTime? startDate = null, DateTime? endDate = null, bool isApproved = false, bool sharedTruck = false, double? minWeight = null, double? maxWeight = null, decimal? minPrice = null, decimal? maxPrice = null, string? pickupAddress = null, string? deliveryAddress = null)
         {
-            var requests = await repository.AllReadonly<LogisticsSystem.Infrastructure.Data.DataModels.Request>().Include(x => x.PickupAddress).Include(x => x.DeliveryAddress).ToListAsync();
+            var requests = await repository.AllReadonly<LogisticsSystem.Infrastructure.Data.DataModels.Request>().Include(x => x.ClientCompany).Include(x => x.PickupAddress).Include(x => x.DeliveryAddress).ToListAsync();
             if (startDate != null)
             {
                 requests = requests.Where(x => x.CreatedAt >= startDate).ToList();
-            }
-            if (endDate != null)
-            {
-                requests = requests.Where(x => x.CreatedAt <= endDate).ToList();
-            }
-            if(string.IsNullOrEmpty(deliveryAddress) == false)
-            {
-                requests = requests.Where(x => x.DeliveryAddress.City.ToLower().Contains(deliveryAddress.ToLower()) || x.DeliveryAddress.County.ToLower().Contains(deliveryAddress.ToLower()) || x.DeliveryAddress.Street.ToLower().Contains(deliveryAddress.ToLower())).ToList();
-            }
-            if (string.IsNullOrEmpty(pickupAddress) == false)
-            {
-                requests = requests.Where(x => x.PickupAddress.City.ToLower().Contains(pickupAddress.ToLower()) || x.PickupAddress.County.ToLower().Contains(pickupAddress.ToLower()) || x.PickupAddress.Street.ToLower().Contains(pickupAddress.ToLower())).ToList();
-            }
-            if (isApproved)
-            {
-                requests = requests.Where(x => x.Status == StatusConstants.Approved).ToList();
-            }
-            if (sharedTruck)
-            {
-                requests = requests.Where(x => x.SharedTruck).ToList();
-            }
-            if (minWeight != null)
-            {
-                requests = requests.Where(x => x.TotalWeight >= minWeight).ToList();
-            }
-            if (maxWeight != null)
-            {
-                requests = requests.Where(x => x.TotalWeight <= maxWeight).ToList();
             }
             if (minPrice != null)
             {
@@ -412,7 +384,27 @@ namespace LogiTrack.Core.Services
             {
                 requests = requests.Where(x => x.ApproximatePrice <= maxPrice).ToList();
             }
-            
+            if (minWeight != null)
+            {
+                requests = requests.Where(x => x.TotalWeight >= minWeight).ToList();
+            }
+            if (maxWeight != null)
+            {
+                requests = requests.Where(x => x.TotalWeight <= maxWeight).ToList();
+            }
+            if (endDate != null)
+            {
+                requests = requests.Where(x => x.CreatedAt <= endDate).ToList();
+            }
+            if (string.IsNullOrEmpty(deliveryAddress) == false)
+            {
+                requests = requests.Where(x => x.DeliveryAddress.City.ToLower().Contains(deliveryAddress.ToLower()) || x.DeliveryAddress.County.ToLower().Contains(deliveryAddress.ToLower()) || x.DeliveryAddress.Street.ToLower().Contains(deliveryAddress.ToLower())).ToList();
+            }
+            if (string.IsNullOrEmpty(pickupAddress) == false)
+            {
+                requests = requests.Where(x => x.PickupAddress.City.ToLower().Contains(pickupAddress.ToLower()) || x.PickupAddress.County.ToLower().Contains(pickupAddress.ToLower()) || x.PickupAddress.Street.ToLower().Contains(pickupAddress.ToLower())).ToList();
+            }
+
             return requests.Select(x => new RequestsForSearchViewModel
             {
                 Id = x.Id,
@@ -424,8 +416,8 @@ namespace LogiTrack.Core.Services
                 CreationDate = x.CreatedAt.ToString("dd-MM-yyyy"),
                 Approved = x.Status == StatusConstants.Approved,
                 NumberOfItems = (x.StandartCargo?.NumberOfPallets ?? 0) + (x.NumberOfNonStandartGoods ?? 0).ToString(),
-                TotalWeight = x.TotalWeight.ToString(),
-                TotalVolume = x.TotalVolume.ToString()
+                TotalWeight = x.TotalWeight.ToString("F2"),
+                TotalVolume = x.TotalVolume.ToString("F2"),
             });
         }
 
@@ -445,27 +437,30 @@ namespace LogiTrack.Core.Services
                 || x.TotalWeight >= double.Parse(searchTerm)
                 || x.ApproximatePrice <= decimal.Parse(searchTerm)
                 || x.ApproximatePrice <= decimal.Parse(searchTerm)).ToList();
-            }
 
-            return requests.Select(x => new RequestsForSearchViewModel
-            {
-                Id = x.Id,
-                ReferenceNumber = x.RerefenceNumber,
-                CompanyName = x.ClientCompany.Name,
-                PickupAddress = $"{x.PickupAddress.Street}, {x.PickupAddress.City}, {x.PickupAddress.County}",
-                DeliveryAddress = $"{x.DeliveryAddress.Street}, {x.DeliveryAddress.City}, {x.DeliveryAddress.County}",
-                ExpectedDeliveryDate = x.ExpectedDeliveryDate.ToString("dd-MM-yyyy"),
-                CreationDate = x.CreatedAt.ToString("dd-MM-yyyy"),
-                Approved = x.Status == StatusConstants.Approved,
-                NumberOfItems = (x.StandartCargo?.NumberOfPallets ?? 0) + (x.NumberOfNonStandartGoods ?? 0).ToString(),
-                TotalWeight = x.TotalWeight.ToString(),
-                TotalVolume = x.TotalVolume.ToString()
-            });
+                return requests.Select(x => new RequestsForSearchViewModel
+                {
+                    Id = x.Id,
+                    ReferenceNumber = x.RerefenceNumber,
+                    CompanyName = x.ClientCompany.Name,
+                    PickupAddress = $"{x.PickupAddress.Street}, {x.PickupAddress.City}, {x.PickupAddress.County}",
+                    DeliveryAddress = $"{x.DeliveryAddress.Street}, {x.DeliveryAddress.City}, {x.DeliveryAddress.County}",
+                    ExpectedDeliveryDate = x.ExpectedDeliveryDate.ToString("dd-MM-yyyy"),
+                    CreationDate = x.CreatedAt.ToString("dd-MM-yyyy"),
+                    Approved = x.Status == StatusConstants.Approved,
+                    NumberOfItems = (x.StandartCargo?.NumberOfPallets ?? 0) + (x.NumberOfNonStandartGoods ?? 0).ToString(),
+                    TotalWeight = x.TotalWeight.ToString(),
+                    TotalVolume = x.TotalVolume.ToString()
+                });
+            }
+            return new List<RequestsForSearchViewModel>();
+
+
         }
 
-        public async Task<List<RequestsDetailsForLogisticsViewModel>> GetPendingRequestsAsync(string sharedTruck = null, DateTime? startDate = null, DateTime? endDate = null, double? minWeight = null, double? maxWeight = null, double? minVolume = null, double? maxVolume = null, string? pickupAddress = null, string? deliveryAddress = null)
+        public async Task<List<RequestsDetailsForLogisticsViewModel>> GetPendingRequestsAsync(string? sharedTruck = null, DateTime? startDate = null, DateTime? endDate = null, double? minWeight = null, double? maxWeight = null, double? minVolume = null, double? maxVolume = null, string? pickupAddress = null, string? deliveryAddress = null)
         {
-            var requests = await repository.AllReadonly<LogisticsSystem.Infrastructure.Data.DataModels.Request>().Where(x => x.Status == "Pending").Include(x => x.PickupAddress).Include(x => x.DeliveryAddress).ToListAsync();
+            var requests = await repository.AllReadonly<LogisticsSystem.Infrastructure.Data.DataModels.Request>().Where(x => x.Status == "Pending").Include(x => x.StandartCargo).Include(x => x.PickupAddress).Include(x => x.DeliveryAddress).Include(x => x.ClientCompany).ThenInclude(x => x.User).ToListAsync();
             if (startDate != null)
             {
                 requests = requests.Where(x => x.CreatedAt >= startDate).ToList();
@@ -503,6 +498,7 @@ namespace LogiTrack.Core.Services
             {
                 requests = requests.Where(x => x.SharedTruck == true).ToList();
             }
+
             var model = requests
                .Select(x => new RequestsDetailsForLogisticsViewModel
                {
@@ -543,9 +539,9 @@ namespace LogiTrack.Core.Services
                         Weight = cargo.Weight
                     };
                     item.NonStandardCargo.Add(nonStandardCargo);
-                }               
+                }
             }
-            return model;
+            return model ?? new List<RequestsDetailsForLogisticsViewModel>();
         }
 
         public async Task<PendingRequestDetailsViewModel?> GetPendingRequestDetailsAsync(int id)
@@ -588,6 +584,7 @@ namespace LogiTrack.Core.Services
                     ApproximatePrice = x.ApproximatePrice.ToString("F2"),
                 }).FirstOrDefaultAsync();
             var suggestedStartDate = await GetSuggestedStartDateForNotSharedDelivery(id);
+
             model.NonStandardCargos = await repository.AllReadonly<Infrastructure.Data.DataModels.NonStandardCargo>().Where(x => x.RequestId == id)
                 .Select(x => new NonStandardCargosViewModel
                 {
@@ -598,64 +595,79 @@ namespace LogiTrack.Core.Services
                     Description = x.Description
                 }).ToListAsync();
 
-            var reservedDrivers = await repository.AllReadonly<ReservedForDelivery>().Where(x => x.Start >= suggestedStartDate && x.End <= request.ExpectedDeliveryDate).Select(x => x.DriverId).ToListAsync();
+            model.PossibleDrivers = await GetPossibleDriversForDelivery(id, suggestedStartDate);
+            model.PossibleVehicles = await GetPossibleVehiclesForDelivery(id, suggestedStartDate);
 
-            var possibleDrivers = await repository.AllReadonly<Infrastructure.Data.DataModels.Driver>()
-                .Where(x => !reservedDrivers.Contains(x.Id)).ToListAsync();
-
-            var driverStatistics = await repository.AllReadonly<Infrastructure.Data.DataModels.Driver>().Where(x => possibleDrivers.Select(p => p.Id).Contains(x.Id))
-                .GroupBy(x => x.Id)
-                .Select(x => new
-                {
-                    DriverId = x.Key,
-                    ReservedForDeliveries = x.Count(),
-                    DomesticDeliveriesThisYearCount = x.Count(d => d.Deliveries.Any(del => del.ActualDeliveryDate.Value.Year == DateTime.Now.Year && del.Offer.Request.Type == RequestTypeConstants.Domestic)),
-                    InternationalDeliveriesThisYearCount = x.Count(d => d.Deliveries.Any(del => del.ActualDeliveryDate.Value.Year == DateTime.Now.Year && del.Offer.Request.Type == RequestTypeConstants.International)),
-                    SuccessRate = x.Count(d => d.Deliveries.Any(del => del.ActualDeliveryDate <= del.Offer.Request.ExpectedDeliveryDate)),
-                    FittestDriver = x.OrderBy(x => x.Age)
-                })
-                .ToListAsync();
-            var licenseExpiring = possibleDrivers.OrderBy(x => x.LicenseExpiryDate).FirstOrDefault();
-            var experienced = possibleDrivers.OrderBy(x => x.YearOfExperience).FirstOrDefault();
-            var nearby = possibleDrivers.OrderBy(x => x.YearOfExperience).FirstOrDefault();
-
-            /*model.PossibleDrivers = possibleDrivers.Select(async driver =>
-            {
-                var driverViewModels = await Task.WhenAll(possibleDrivers.Select(async driver =>
-                {
-                    var statistics = driverStatistics.FirstOrDefault(x => x.DriverId == driver.Id);
-                    var currentlyDelivering = reservedDrivers.Contains(driver.Id);
-                    var currentDelivery = await repository.AllReadonly<Infrastructure.Data.DataModels.Delivery>()
-                        .Where(x => x.DriverId == driver.Id && x.ActualDeliveryDate == null)
-                        .FirstOrDefaultAsync();
-                    var latesDeliveryTracking = currentDelivery != null
-                        ? await repository.AllReadonly<Infrastructure.Data.DataModels.DeliveryTracking>()
-                            .Where(x => x.DeliveryId == currentDelivery.Id)
-                            .OrderByDescending(x => x.Timestamp)
-                            .FirstOrDefaultAsync()
-                        : null;
-
-                    var nearby = latesDeliveryTracking != null &&
-                        latesDeliveryTracking.Latitude == request.PickupAddress.Latitude &&
-                        latesDeliveryTracking.Longitude == request.PickupAddress.Longitude;
-
-                    return new PossibleDriversForDeliveryViewModel
-                    {
-                        Id = driver.Id,
-                        DriverName = driver.Name,
-                        DriverPhoneNumber = driver.User.PhoneNumber,
-                        ReservedDeliveriesCount = statistics?.ReservedForDeliveries ?? 0,
-                        InternationalDeliveriesThisYearCount = statistics?.InternationalDeliveriesThisYearCount ?? 0,
-                        DomesticsDeliveriesThisYearCount = statistics?.DomesticDeliveriesThisYearCount ?? 0,
-                        SuccessRate = statistics?.SuccessRate ?? 0,
-                        CurrentlyDelivering = currentlyDelivering,
-                    };
-                }));
-
-                model.PossibleDrivers = driverViewModels.ToList();
-            };*/
             return model;
         }
+
+        private async Task<List<PossibleVehiclesForDeliveryViewModel>> GetPossibleVehiclesForDelivery(int id, DateTime suggestedStartDate)
+        {
+            var request = await repository.AllReadonly<LogisticsSystem.Infrastructure.Data.DataModels.Request>().Where(x => x.Id == id).Include(x => x.PickupAddress).Include(x => x.DeliveryAddress).FirstOrDefaultAsync();
+            var reservedVehicles = await repository.AllReadonly<ReservedForDelivery>().Where(x => x.Start >= suggestedStartDate && x.End <= request.ExpectedDeliveryDate).Select(x => x.VehicleId).ToListAsync();
+
+            var possibleVehiclesByTime = await repository.AllReadonly<LogisticsSystem.Infrastructure.Data.DataModels.Vehicle>().Where(x => !reservedVehicles.Contains(x.Id)).Include(x => x.Deliveries).ToListAsync();
+            var possibleVehiclesByWeightAndVolume = possibleVehiclesByTime.Where(x => x.MaxWeightCapacity >= request.TotalWeight && x.Volume >= request.TotalVolume && x.IsRefrigerated == request.IsRefrigerated).ToList();
+
+            var standartCargo = await repository.AllReadonly<StandartCargo>().Where(x => x.Id == request.StandartCargoId).FirstOrDefaultAsync();
+            var nonstandartCargos = await repository.AllReadonly<NonStandardCargo>().Where(x => x.RequestId == id).ToListAsync();
+
+            foreach (var vehicle in possibleVehiclesByWeightAndVolume)
+            {
+                if (standartCargo != null)
+                {
+                    var palletType = standartCargo.TypeOfPallet;
+                    var parameter = Expression.Parameter(typeof(LogisticsSystem.Infrastructure.Data.DataModels.Vehicle), "x");
+                    var property = Expression.Property(parameter, palletType);
+                    var expression = Expression.Lambda<Func<LogisticsSystem.Infrastructure.Data.DataModels.Vehicle, bool>>(property, parameter);
+                   // var possibleVehicle = await repository.AllReadonly<LogisticsSystem.Infrastructure.Data.DataModels.Vehicle>().Where(x => x.expression).FirstOrDefaultAsync();
+                }
+            }
+
+
+
+
+            var driverViewModels = new List<PossibleDriversForDeliveryViewModel>();
+
+            /* foreach (var driver in possibleDrivers)
+             {
+                 var reservedDeliveriesCount = driver.Deliveries.Count(x => x.ActualDeliveryDate == null);
+                 var domesticDeliveriesThisYearCount = driver.Deliveries.Count(x => x.ActualDeliveryDate.HasValue && x.ActualDeliveryDate.Value.Year == DateTime.Now.Year && x.Offer.Request.Type == RequestTypeConstants.Domestic);
+                 var internationalDeliveriesThisYearCount = driver.Deliveries.Count(x => x.ActualDeliveryDate.HasValue && x.ActualDeliveryDate.Value.Year == DateTime.Now.Year && x.Offer.Request.Type == RequestTypeConstants.International);
+
+                 var successRate = driver.Deliveries.Count(d => d.ActualDeliveryDate <= d.Offer.Request.ExpectedDeliveryDate);
+                 double successRatePercentage = driver.Deliveries.Count() > 0 ? (successRate / (double)driver.Deliveries.Count()) * 100 : 0;
+
+                 var currentDelivery = await repository.AllReadonly<Infrastructure.Data.DataModels.Delivery>().Where(x => x.DriverId == driver.Id && x.ActualDeliveryDate == null).FirstOrDefaultAsync();
+
+                 var latestDeliveryTracking = currentDelivery != null ? await repository.AllReadonly<Infrastructure.Data.DataModels.DeliveryTracking>().Where(x => x.DeliveryId == currentDelivery.Id)
+                         .OrderByDescending(x => x.Timestamp)
+                         .FirstOrDefaultAsync() : null;
+
+                 bool isNearby = latestDeliveryTracking != null && latestDeliveryTracking.Latitude == request.PickupAddress.Latitude || latestDeliveryTracking.Longitude == request.PickupAddress.Longitude;
+
+                 driverViewModels.Add(new PossibleDriversForDeliveryViewModel
+                 {
+                     Id = driver.Id,
+                     DriverName = driver.Name,
+                     Age = driver.Age,
+                     DriverPhoneNumber = driver.User?.PhoneNumber,
+                     ReservedDeliveriesCount = reservedDeliveriesCount,
+                     InternationalDeliveriesThisYearCount = internationalDeliveriesThisYearCount,
+                     DomesticsDeliveriesThisYearCount = domesticDeliveriesThisYearCount,
+                     SuccessRate = successRatePercentage,
+                     CurrentlyDelivering = reservedDeliveriesCount > 0,
+                     LicenseExpiringSoon = licenseExpiringId == driver.Id,
+                     Experienced = experiencedId == driver.Id,
+                     Fit = fittestId == driver.Id,
+                     LowWorkload = driver.Deliveries.Count() < 10
+                 });
+             }
+
+             return driverViewModels;*/
+            return new List<PossibleVehiclesForDeliveryViewModel>();
+
+        } 
 
         private async Task<DateTime> GetSuggestedStartDateForNotSharedDelivery(int id)
         {
@@ -664,60 +676,138 @@ namespace LogiTrack.Core.Services
             string travelTimeResponse = await geocodingService.GetTravelTimeAsync(request.PickupAddress.Latitude.Value, request.PickupAddress.Longitude.Value, request.DeliveryAddress.Latitude.Value, request.DeliveryAddress.Longitude.Value);
             TimeSpan travelTime = TimeSpan.Parse(travelTimeResponse);
 
-            var nonStandartCargos = await repository.AllReadonly<Infrastructure.Data.DataModels.NonStandardCargo>().Where(x => x.RequestId == id).ToListAsync();
+            var travelAndRestTime = GetDrivingTimeAndDays(travelTime);
 
-            var palletCount = await repository.AllReadonly<Infrastructure.Data.DataModels.StandartCargo>().Where(x => x.Id == request.StandartCargoId).Select(x => x.NumberOfPallets).FirstOrDefaultAsync();
-            TimeSpan loadingTime = TimeSpan.Zero;
-            TimeSpan unloadingTime = TimeSpan.Zero;
+            var cargoLoadingUnloadingTime = await GetCargoLoadigAndUnloadingTime(id);
 
-            if (palletCount != null)
+            var totalBufferTime = await GetTotalBufferTime(id, travelTime, travelAndRestTime.drivingDays);
+
+            TimeSpan totalTimeRequired = travelTime + travelAndRestTime.totalRestTime + cargoLoadingUnloadingTime.Item1 + cargoLoadingUnloadingTime.Item2 + totalBufferTime;
+
+            DateTime currentTime = DateTime.Now;
+            DateTime workingDayStart = currentTime.Date.AddHours(6);
+            DateTime workingDayEnd = currentTime.Date.AddHours(20);
+
+            DateTime suggestedStartDate = currentTime - totalTimeRequired;
+
+            if (suggestedStartDate.TimeOfDay < workingDayStart.TimeOfDay)
             {
-                switch (palletCount)
-                {
-                    case 10:
-                        loadingTime = TimeSpan.FromHours(1);
-                        unloadingTime = TimeSpan.FromHours(1);
-                        break;
-                    case 20:
-                        loadingTime = TimeSpan.FromHours(2);
-                        unloadingTime = TimeSpan.FromHours(2);
-                        break;
-                    case >= 20:
-                        loadingTime = TimeSpan.FromHours(3);
-                        unloadingTime = TimeSpan.FromHours(3);
-                        break;
-                    default:
-                        loadingTime = TimeSpan.FromHours(1);
-                        unloadingTime = TimeSpan.FromHours(1);
-                        break;
-                }
+                suggestedStartDate = suggestedStartDate.AddDays(-1).Date.AddHours(18) - totalTimeRequired;
             }
-
-            foreach (var nonStandardCargo in nonStandartCargos)
-            {
-                if (nonStandardCargo.Weight == 200)
-                {
-                    loadingTime += TimeSpan.FromHours(2);
-                    unloadingTime += TimeSpan.FromHours(2); 
-                }
-                else if (nonStandardCargo.Weight >= 200)
-                {
-                    loadingTime += TimeSpan.FromHours(1); 
-                    unloadingTime += TimeSpan.FromHours(1); 
-                }
-            }
-
-            TimeSpan totalTimeRequired = travelTime + loadingTime + unloadingTime;
-
-            TimeSpan bufferTime = TimeSpan.FromMinutes(30);
-
-            totalTimeRequired += bufferTime * 2; 
-
-            var currentTime = DateTime.Now;
-
-            var suggestedStartDate = currentTime.Add(totalTimeRequired.Negate());
 
             return suggestedStartDate;
         }
-    }
+
+        private async Task<(TimeSpan, TimeSpan)> GetCargoLoadigAndUnloadingTime(int id)
+        {
+            var request = await repository.AllReadonly<LogisticsSystem.Infrastructure.Data.DataModels.Request>().Where(x => x.Id == id).Include(x => x.StandartCargo).FirstOrDefaultAsync();
+            var palletCount = await repository.AllReadonly<StandartCargo>().Where(x => x.Id == request.StandartCargoId).Select(x => x.NumberOfPallets).FirstOrDefaultAsync();
+            var nonStandardCargos = await repository.AllReadonly<NonStandardCargo>().Where(x => x.RequestId == id).ToListAsync();
+
+            TimeSpan loadingTime = TimeSpan.Zero;
+            TimeSpan unloadingTime = TimeSpan.Zero;
+
+            if (palletCount.HasValue && palletCount.Value > 0)
+            {
+                loadingTime += TimeSpan.FromMinutes(palletCount.Value * 7);
+                unloadingTime += TimeSpan.FromMinutes(palletCount.Value * 7);
+            }
+
+            foreach (var cargo in nonStandardCargos)
+            {
+                loadingTime += TimeSpan.FromMinutes(cargo.Weight / 1000 * 20);
+                unloadingTime += TimeSpan.FromMinutes(cargo.Weight / 1000 * 20);
+            }
+
+            return (loadingTime, unloadingTime);
+        }
+
+        private async Task<TimeSpan> GetTotalBufferTime(int id, TimeSpan travelTime, int deliveryDays)
+        {
+            TimeSpan bufferTime = TimeSpan.FromMinutes(30); 
+
+            TimeSpan additionalBuffer = travelTime.TotalHours > 6 ? TimeSpan.FromMinutes(60) : TimeSpan.Zero;
+
+            TimeSpan dailyBuffer = TimeSpan.FromMinutes(deliveryDays * 15); 
+
+            var nonStandardCargos = await repository.AllReadonly<NonStandardCargo>().Where(x => x.RequestId == id).CountAsync();
+            TimeSpan nonStandardCargoBuffer = nonStandardCargos > 0 ? TimeSpan.FromMinutes(30) : TimeSpan.Zero;
+
+           return bufferTime + additionalBuffer + dailyBuffer + nonStandardCargoBuffer;
+        }
+
+        private (TimeSpan totalDailyDrivingTime, int drivingDays, TimeSpan totalRestTime) GetDrivingTimeAndDays(TimeSpan travelTime)
+        {
+            const int maxDrivingHoursPerDay = 9; 
+            const int restBreakMinutes = 30; 
+            const int breakAfterHours = 3; 
+
+            double totalDrivingHours = travelTime.TotalHours;
+            int totalDrivingWithBreakSegments = (int)Math.Ceiling(totalDrivingHours / breakAfterHours);
+
+            int totalRestBreaks = totalDrivingWithBreakSegments - 1;
+
+            TimeSpan mandatoryRestTime = TimeSpan.FromMinutes(totalRestBreaks * restBreakMinutes);
+
+            TimeSpan totalDailyDrivingTime = TimeSpan.FromHours(maxDrivingHoursPerDay) + mandatoryRestTime;
+
+            int drivingDays = (int)Math.Ceiling(totalDrivingHours / maxDrivingHoursPerDay);
+
+            TimeSpan totalOvernightRest = TimeSpan.FromHours((drivingDays - 1) * 10);
+
+            TimeSpan totalRestTime = mandatoryRestTime + totalOvernightRest;
+
+            return (totalDailyDrivingTime, drivingDays, totalRestTime);
+        }
+
+        private async Task<List<PossibleDriversForDeliveryViewModel>> GetPossibleDriversForDelivery(int id, DateTime suggestedStartDate)
+        {
+            var request = await repository.AllReadonly<LogisticsSystem.Infrastructure.Data.DataModels.Request>().Where(x => x.Id == id).Include(x => x.PickupAddress).Include(x => x.DeliveryAddress).FirstOrDefaultAsync();
+            var reservedDrivers = await repository.AllReadonly<ReservedForDelivery>().Where(x => x.Start >= suggestedStartDate && x.End <= request.ExpectedDeliveryDate).Select(x => x.DriverId).ToListAsync();
+            var possibleDrivers = await repository.AllReadonly<Infrastructure.Data.DataModels.Driver>().Where(x => !reservedDrivers.Contains(x.Id)).Include(x => x.Deliveries).ToListAsync();
+
+            var licenseExpiringId = possibleDrivers.OrderBy(x => x.LicenseExpiryDate).FirstOrDefault()?.Id;
+            var experiencedId = possibleDrivers.OrderByDescending(x => x.YearOfExperience).FirstOrDefault()?.Id;
+            var fittestId = possibleDrivers.OrderBy(x => x.Age).FirstOrDefault()?.Id;
+
+            var driverViewModels = new List<PossibleDriversForDeliveryViewModel>();
+
+            foreach (var driver in possibleDrivers)
+            {
+                var reservedDeliveriesCount = driver.Deliveries.Count(x => x.ActualDeliveryDate == null);
+                var domesticDeliveriesThisYearCount = driver.Deliveries.Count(x => x.ActualDeliveryDate.HasValue &&x.ActualDeliveryDate.Value.Year == DateTime.Now.Year &&x.Offer.Request.Type == RequestTypeConstants.Domestic);
+                var internationalDeliveriesThisYearCount = driver.Deliveries.Count(x => x.ActualDeliveryDate.HasValue &&x.ActualDeliveryDate.Value.Year == DateTime.Now.Year &&x.Offer.Request.Type == RequestTypeConstants.International);
+
+                var successRate = driver.Deliveries.Count(d => d.ActualDeliveryDate <= d.Offer.Request.ExpectedDeliveryDate);
+                double successRatePercentage = driver.Deliveries.Count() > 0 ? (successRate / (double)driver.Deliveries.Count()) * 100 : 0;
+
+                var currentDelivery = await repository.AllReadonly<Infrastructure.Data.DataModels.Delivery>().Where(x => x.DriverId == driver.Id && x.ActualDeliveryDate == null).FirstOrDefaultAsync();
+
+                var latestDeliveryTracking = currentDelivery != null ? await repository.AllReadonly<Infrastructure.Data.DataModels.DeliveryTracking>().Where(x => x.DeliveryId == currentDelivery.Id)
+                        .OrderByDescending(x => x.Timestamp)
+                        .FirstOrDefaultAsync() : null;
+
+                bool isNearby = latestDeliveryTracking != null && latestDeliveryTracking.Latitude == request.PickupAddress.Latitude || latestDeliveryTracking.Longitude == request.PickupAddress.Longitude;
+
+                driverViewModels.Add(new PossibleDriversForDeliveryViewModel
+                {
+                    Id = driver.Id,
+                    DriverName = driver.Name,
+                    Age = driver.Age,
+                    DriverPhoneNumber = driver.User?.PhoneNumber,
+                    ReservedDeliveriesCount = reservedDeliveriesCount,
+                    InternationalDeliveriesThisYearCount = internationalDeliveriesThisYearCount,
+                    DomesticsDeliveriesThisYearCount = domesticDeliveriesThisYearCount,
+                    SuccessRate = successRatePercentage,
+                    CurrentlyDelivering = reservedDeliveriesCount > 0,
+                    LicenseExpiringSoon = licenseExpiringId == driver.Id,
+                    Experienced = experiencedId == driver.Id,
+                    Fit = fittestId == driver.Id,
+                    LowWorkload = driver.Deliveries.Count() < 10
+                });
+            }
+
+            return driverViewModels;
+        }
+    }  
 }

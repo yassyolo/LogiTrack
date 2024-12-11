@@ -64,111 +64,173 @@ namespace LogiTrack.Core.Services
                 }).SingleOrDefaultAsync();
         }
 
-        public async Task AddStatusForDeliveryAsync(int deliveryId, AddStatusViewModel model, string username, string address)
-        {
-            var driver = await repository.All<Infrastructure.Data.DataModels.Driver>().FirstOrDefaultAsync(x => x.User.UserName == username);
-            var delivery = await repository.All<Infrastructure.Data.DataModels.Delivery>().Include(x => x.Offer).ThenInclude(x => x.Request).ThenInclude(x => x.ClientCompany).ThenInclude(x => x.User).FirstOrDefaultAsync(x => x.Id == deliveryId && x.DriverId == driver.Id);
-            var deliveryTracking = new Infrastructure.Data.DataModels.DeliveryTracking
-            {
-                DeliveryId = deliveryId,
-                DriverId = driver.Id,
-                Notes = model.Notes,
-                Timestamp = DateTime.Now,
-                StatusUpdate = model.StatusUpdate,
-                Latitude = model.Latitude.Value,
-                Longitude = model.Longitude.Value,
-                Address = address
-            };
+		public async Task AddStatusForDeliveryAsync(int deliveryId, AddStatusViewModel model, string username, string address)
+		{
+			var driver = await repository.All<Infrastructure.Data.DataModels.Driver>().FirstOrDefaultAsync(x => x.User.UserName == username);
 
-            var calendarEvent = new Infrastructure.Data.DataModels.CalendarEvent
-            {
-                EventType = model.StatusUpdate,
-                Date = DateTime.Now,
-                UserId = delivery.Offer.Request.ClientCompany.User.Id,
-                Title = $"Status for {delivery.ReferenceNumber}: {model.StatusUpdate}"
-            };
-            switch (model.StatusUpdate)
-            {
-                case DeliveryTrackingStatusConstants.Collected:
-                    delivery.DeliveryStep = 2;
-                    break;
-                case DeliveryTrackingStatusConstants.InTransit:
-                    delivery.DeliveryStep = 3;
-                    break;
-                case DeliveryTrackingStatusConstants.Delivered:
-                    delivery.DeliveryStep = 4;
-                    await GenerateInvoiceAsync(delivery);
-                   
-                    var notification = new Notification
-                    {
-                        Message = $"Delivery {delivery.ReferenceNumber} has been delivered. Check it out now!",
-                        Title = "Delivery Delivered",
-                        UserId = delivery.Offer.Request.ClientCompany.User.Id,
-                        Date = DateTime.Now
-                    };
-                    await repository.AddAsync(notification);
-                    var logisticsUser = await repository.AllReadonly<IdentityUser>().FirstOrDefaultAsync(x => x.UserName == "logistics");
-                    var notificationForLogisticsUser = new Notification
-                    {
-                        Title = "Rating",
-                        Message = $"Delivery {delivery.ReferenceNumber} has been delivered. Check it out now!",
-                        UserId = logisticsUser.Id,
-                        IsRead = false
-                    };
-                    var calendarEventForLogistics = new Infrastructure.Data.DataModels.CalendarEvent
-                    {
-                        EventType = model.StatusUpdate,
-                        Date = DateTime.Now,
-                        UserId = logisticsUser.Id,
-                        Title = $"Status for {delivery.ReferenceNumber}: {model.StatusUpdate}"
-                    };
-                    await repository.AddAsync(notificationForLogisticsUser);
-                    var speditorUser = await repository.AllReadonly<IdentityUser>().FirstOrDefaultAsync(x => x.UserName == "speditor");
-                    var notificationForSpeditorUser = new Notification
-                    {
-                        Title = "Rating",
-                        Message = $"Delivery {delivery.ReferenceNumber} has been delivered. Check it out now!",
-                        UserId = logisticsUser.Id,
-                        IsRead = false
-                    };
-                    await repository.AddAsync(notificationForSpeditorUser);
-                    break;
-            }
-            await repository.AddAsync(calendarEvent);
-            await repository.AddAsync(deliveryTracking);
-            await repository.SaveChangesAsync();
-        }
+			var delivery = await repository.All<Infrastructure.Data.DataModels.Delivery>().Include(x => x.Offer).ThenInclude(x => x.Request).ThenInclude(x => x.ClientCompany).ThenInclude(x => x.User).FirstOrDefaultAsync(x => x.Id == deliveryId && x.DriverId == driver.Id);
 
-        public async Task GenerateInvoiceAsync(Delivery delivery)
+			var deliveryTracking = new Infrastructure.Data.DataModels.DeliveryTracking
+			{
+				DeliveryId = deliveryId,
+				DriverId = driver.Id,
+				Notes = model.Notes,
+				Timestamp = DateTime.Now,
+				StatusUpdate = model.StatusUpdate,
+				Latitude = model.Latitude.Value,
+				Longitude = model.Longitude.Value,
+				Address = address
+			};
+			await repository.AddAsync(deliveryTracking);
+
+			switch (model.StatusUpdate)
+			{
+				case DeliveryTrackingStatusConstants.Collected:
+					delivery.DeliveryStep = 2;
+                    delivery.Status = DeliveryStatusConstants.InProgress;
+					break;
+				case DeliveryTrackingStatusConstants.InTransit:
+					delivery.DeliveryStep = 3;
+					break;
+				case DeliveryTrackingStatusConstants.Delivered:
+					delivery.Status = DeliveryStatusConstants.Delivered;
+					delivery.DeliveryStep = 4;
+                    await repository.SaveChangesAsync();
+
+					await GenerateInvoiceAsync(delivery);
+
+					await NotifyDeliveryCompletedAsync(delivery);
+
+                    await CalculateVehicleKilometersAsync(delivery);
+					break;
+				default:
+					delivery.Status = DeliveryStatusConstants.InProgress;
+                    break;
+			}
+
+			var calendarEvent = new Infrastructure.Data.DataModels.CalendarEvent
+			{
+				EventType = model.StatusUpdate,
+				Date = DateTime.Now,
+				UserId = delivery.Offer.Request.ClientCompany.User.Id,
+				Title = $"Status for {delivery.ReferenceNumber}: {model.StatusUpdate}"
+			};
+			await repository.AddAsync(calendarEvent);
+
+			await repository.SaveChangesAsync();
+		}
+
+		private async Task CalculateVehicleKilometersAsync(Delivery delivery)
+		{
+			var vehicle = await repository.All<Vehicle>().FirstOrDefaultAsync(x => x.Id == delivery.VehicleId);
+
+			vehicle.KilometersDriven += delivery.Offer.Request.Kilometers;
+			vehicle.KilometersLeftToChangeParts = Math.Max(0, vehicle.KilometersLeftToChangeParts - delivery.Offer.Request.Kilometers);
+			await repository.SaveChangesAsync();
+		}
+
+		private async Task NotifyDeliveryCompletedAsync(Infrastructure.Data.DataModels.Delivery delivery)
+		{
+			var logisticsUser = await repository.AllReadonly<IdentityUser>().FirstOrDefaultAsync(x => x.UserName == "logistics");
+			var speditorUser = await repository.AllReadonly<IdentityUser>().FirstOrDefaultAsync(x => x.UserName == "speditor");
+
+			var clientNotification = new Notification
+			{
+				Message = $"Delivery {delivery.ReferenceNumber} has been delivered. Make sure to give us feedback!",
+				Title = $"Successful delivery: {delivery.ReferenceNumber}",
+				UserId = delivery.Offer.Request.ClientCompany.User.Id,
+				Date = DateTime.Now
+			};
+			await repository.AddAsync(clientNotification);
+
+			if (logisticsUser != null)
+			{
+				var logisticsNotification = new Notification
+				{
+					Title = $"Successful delivery: {delivery.ReferenceNumber}",
+					Message = $"Delivery {delivery.ReferenceNumber} has been delivered. Check it out now!",
+					UserId = logisticsUser.Id,
+					IsRead = false
+				};
+				await repository.AddAsync(logisticsNotification);
+
+				var logisticsCalendarEvent = new Infrastructure.Data.DataModels.CalendarEvent
+				{
+					EventType = DeliveryTrackingStatusConstants.Delivered,
+					Date = DateTime.Now,
+					UserId = logisticsUser.Id,
+					Title = $"Successful delivery: {delivery.ReferenceNumber}",
+
+				};
+				await repository.AddAsync(logisticsCalendarEvent);
+			}
+
+			if (speditorUser != null)
+			{
+				var speditorNotification = new Notification
+				{
+					Title = $"Successful delivery: {delivery.ReferenceNumber}",
+					Message = $"Delivery {delivery.ReferenceNumber} has been delivered. Check it out now!",
+					UserId = speditorUser.Id,
+					IsRead = false
+				};
+				await repository.AddAsync(speditorNotification);
+
+				var speditorCalendarEvent = new Infrastructure.Data.DataModels.CalendarEvent
+				{
+					EventType = DeliveryTrackingStatusConstants.Delivered,
+					Date = DateTime.Now,
+					UserId = speditorUser.Id,
+					Title = $"Successful delivery: {delivery.ReferenceNumber}",
+
+				};
+				await repository.AddAsync(speditorCalendarEvent);
+			}
+		}
+
+		public async Task GenerateInvoiceAsync(Delivery delivery)
         {
-            var offer = await repository.AllReadonly<Offer>()
-                .Include(o => o.Request)
-                .FirstOrDefaultAsync(o => o.Id == delivery.OfferId);
-            var invoice = new Invoice()
+			 delivery = await repository.AllReadonly<Delivery>().Include(d => d.Offer).ThenInclude(o => o.Request).ThenInclude(x => x.ClientCompany).ThenInclude(x => x.User).Include(d => d.Offer).ThenInclude(o => o.Request).ThenInclude(x => x.PickupAddress).Include(d => d.Offer)
+	.ThenInclude(o => o.Request)
+	.ThenInclude(x => x.DeliveryAddress)
+	.FirstOrDefaultAsync(d => d.Id == delivery.Id);
+			var invoice = new Invoice()
             {
                 Status = StatusConstants.Pending,
-                DeliveryId = delivery.Id,
                 Description = "Invoice for delivery " + delivery.ReferenceNumber,
                 InvoiceDate = DateTime.Now,
-                InvoiceNumber = $"INV{Guid.NewGuid().ToString()}",
+                InvoiceNumber = $"INV{Guid.NewGuid().ToString().Substring(0, 5)}",
             };
 
-            var invoiceToFile = new InvoiceCreationViewModel
+			await repository.AddAsync(invoice);
+			await repository.SaveChangesAsync();
+            delivery.InvoiceId = invoice.Id;
+			await repository.SaveChangesAsync();  
+
+
+			var invoiceToFile = new InvoiceCreationViewModel
             {
                 InvoiceNumber = invoice.InvoiceNumber,
-                ClientCompanyName = offer.Request.ClientCompany.Name,
+                ClientCompanyName = delivery.Offer.Request.ClientCompany.Name,
                 DeliveryReferenceNumber = delivery.ReferenceNumber,
                 DeliveryDate = delivery.ActualDeliveryDate ?? DateTime.Now,
                 DueDate = delivery.ActualDeliveryDate ?? DateTime.Now.AddDays(30),
-                Price = offer.FinalPrice,
-                PickupAddress = $"{offer.Request.PickupAddress.Street}, {offer.Request.PickupAddress.City}, {offer.Request.PickupAddress.County}",
-                DeliveryAddress = $"{offer.Request.DeliveryAddress.Street}, {offer.Request.DeliveryAddress.City}, {offer.Request.DeliveryAddress.County}"
+                Price = delivery.Offer.FinalPrice,
+                PickupAddress = $"{delivery.Offer.Request.PickupAddress.Street}, {delivery.Offer.Request.PickupAddress.City}, {delivery.Offer.Request.PickupAddress.County}",
+                DeliveryAddress = $"{delivery.Offer.Request.DeliveryAddress.Street}, {delivery.Offer.Request.DeliveryAddress.City}, {delivery.Offer.Request.DeliveryAddress.County}"
             };
 
-            var fileName = $"{invoice.InvoiceNumber}.pdf";
-            var filePath = Path.Combine("Invoices", fileName);
+			var fileName = $"{invoice.InvoiceNumber}.pdf";
+			var directoryPath = Path.Combine(Directory.GetCurrentDirectory(), "Invoices");
 
-            using (var stream = new MemoryStream())
+			if (!Directory.Exists(directoryPath))
+			{
+				Directory.CreateDirectory(directoryPath);
+			}
+
+			var filePath = Path.Combine(directoryPath, fileName);
+
+			using (var stream = new MemoryStream())
             {
                 var writer = new PdfWriter(filePath);
                 var pdf = new PdfDocument(writer);
@@ -234,9 +296,10 @@ namespace LogiTrack.Core.Services
                 document.Close();
             }
 
-            var googleDriveFileId = await googleDriveService.UploadFileAsync(filePath, "application/pdf");
+            var googleDriveFileId = await googleDriveService.UploadFileAsync(filePath, "application/pdf", "1NQvOkQ3JIsbe8RvY2f8zLViP4lRAc8uL");
 
-            //var fileId = 
+            invoice.FileId = googleDriveFileId;
+            await repository.SaveChangesAsync();
         }
 
         public async Task<List<DriverForLogisticsViewModel>> GetDriversAsync(string? name = null, string? licenseNumber = null, bool? isAvailable = null, decimal? minSalary = null, decimal? maxSalary = null)
@@ -324,7 +387,7 @@ namespace LogiTrack.Core.Services
 
         public async Task<DriverForLogisticsViewModel?> GetDriverDetailsForLogisticsAsync(int id)
         {
-            var deliveriesForDriver = await repository.AllReadonly<Infrastructure.Data.DataModels.Delivery>().Include(x => x.Offer).ThenInclude(x => x.Request).Where(x => x.DriverId == id).ToListAsync();
+            var deliveriesForDriver = await repository.AllReadonly<Infrastructure.Data.DataModels.Delivery>().Include(x => x.Invoice).Include(x => x.Offer).ThenInclude(x => x.Request).ThenInclude(x => x.DeliveryAddress).Include(x => x.Offer).ThenInclude(x => x.Request).ThenInclude(x => x.PickupAddress).Where(x => x.DriverId == id).ToListAsync();
             var model = await repository.AllReadonly<Infrastructure.Data.DataModels.Driver>().Include(x => x.User).Where(x => x.Id == id)
                 .Select(x => new DriverForLogisticsViewModel
                 {

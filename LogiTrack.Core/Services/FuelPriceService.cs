@@ -28,24 +28,27 @@ namespace LogiTrack.Core.Services
 
         public async Task<List<FuelPriceViewModel>> GetFuelPricesAsync(decimal? minPrice, decimal? maxPrice, string? startDate, string? endDate)
         {
-            var fuelPrices = await repository.AllReadonly<FuelPrice>().ToListAsync();
+            var query = repository.AllReadonly<FuelPrice>().AsQueryable();
             if (minPrice != null)
             {
-                fuelPrices = fuelPrices.Where(x => x.Price >= minPrice).ToList();
+				query = query.Where(x => x.Price >= minPrice);
             }
             if (maxPrice != null)
             {
-                fuelPrices = fuelPrices.Where(x => x.Price <= maxPrice).ToList();
+				query = query.Where(x => x.Price <= maxPrice);
             }
             if (string.IsNullOrEmpty(startDate) == false)
             {
-                fuelPrices = fuelPrices.Where(x => x.Date >= DateTime.Parse(startDate)).ToList();
+				query = query.Where(x => x.Date >= DateTime.Parse(startDate));
             }
             if (string.IsNullOrEmpty(endDate) == false)
             {
-                fuelPrices = fuelPrices.Where(x => x.Date <= DateTime.Parse(endDate)).ToList();
+				query = query.Where(x => x.Date <= DateTime.Parse(endDate));
             }
-            return fuelPrices.Select(x => new FuelPriceViewModel
+
+            var fuelPrices = await query.ToListAsync();
+
+			return fuelPrices.Select(x => new FuelPriceViewModel
             {
                 Id = x.Id,
                 Price = x.Price,

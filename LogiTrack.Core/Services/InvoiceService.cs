@@ -22,7 +22,9 @@ namespace LogiTrack.Core.Services
 
         public async Task<MarkAsPaidInvoiceViewModel?> GetInvoiceForPaymentAsync(int deliveryId)
         {
-            var model = await repository.AllReadonly<Invoice>().Where(x => x.DeliveryId == deliveryId)
+            var delivery = await repository.AllReadonly<Delivery>().Include(x => x.Offer).ThenInclude(x => x.Request)
+				.ThenInclude(x => x.ClientCompany).FirstOrDefaultAsync(x => x.Id == deliveryId);
+            var model = await repository.AllReadonly<Invoice>().Where(x => x.Id == delivery.InvoiceId)
                 .Select(x => new MarkAsPaidInvoiceViewModel
                 {
                     InvoiceId = x.Id,
@@ -79,8 +81,8 @@ namespace LogiTrack.Core.Services
 
             var invoicesToShow =  invoices.Select((x, index) => new InvoiceForDeliveryViewModel
             {
-                DeliveryId = x.DeliveryId,
-                PaymentDate = x.PaidDate.HasValue ? x.PaidDate.Value.ToString("dd-MM-yyyy") : string.Empty,
+				DeliveryId = x.Delivery != null ? x.Delivery.Id : 0,
+				PaymentDate = x.PaidDate.HasValue ? x.PaidDate.Value.ToString("dd-MM-yyyy") : string.Empty,
                 Number = x.InvoiceNumber,
                 Date = x.InvoiceDate.ToString("dd-MM-yyyy"),
                 IsPaid = x.IsPaid,
@@ -130,8 +132,8 @@ namespace LogiTrack.Core.Services
             var fileUrls = await Task.WhenAll(fileUrlTasks);
             var invoicesToShow = invoices.Select((x, index) => new InvoiceForDeliveryViewModel
             {
-                DeliveryId = x.DeliveryId,
-                PaymentDate = x.PaidDate.HasValue ? x.PaidDate.Value.ToString("dd-MM-yyyy") : string.Empty,
+				DeliveryId = x.Delivery != null ? x.Delivery.Id : 0,  
+				PaymentDate = x.PaidDate.HasValue ? x.PaidDate.Value.ToString("dd-MM-yyyy") : string.Empty,
                 Number = x.InvoiceNumber,
                 Date = x.InvoiceDate.ToString("dd-MM-yyyy"),
                 IsPaid = x.IsPaid,
@@ -191,7 +193,8 @@ namespace LogiTrack.Core.Services
             await repository.AddAsync(calendarEvent);
 
             await repository.SaveChangesAsync();
-            return invoice.DeliveryId;
-        }      
+            return invoice.Delivery.Id;  
+;
+		}      
     }
 }

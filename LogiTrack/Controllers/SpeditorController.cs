@@ -9,9 +9,7 @@ using static LogiTrack.Core.Helpers.RandomPasswordGenerator;
 using LogiTrack.Core.ViewModels.Vehicle;
 using LogiTrack.Core.ViewModels.FuelPrice;
 using LogiTrack.Core.ViewModels.Offer;
-using LogiTrack.Core.Services;
 using LogiTrack.Core.ViewModels.Request;
-using static iText.StyledXmlParser.Jsoup.Select.Evaluator;
 
 namespace LogiTrack.Controllers
 {
@@ -29,7 +27,7 @@ namespace LogiTrack.Controllers
         private IFuelPriceService fuelPriceService;
         private IRequestService requestService;
 
-        public SpeditorController(IVehicleService vehicleService, IClientsService clientsService, IUserService userService, IDeliveryService deliveryService, IDriverService driverService, UserManager<IdentityUser> userManager, IOfferService offerService, IStatisticsService statisticsService, IDashboardService dashboardService, IFuelPriceService fuelPriceService)
+        public SpeditorController(IVehicleService vehicleService, IClientsService clientsService, IUserService userService, IDeliveryService deliveryService, IDriverService driverService, UserManager<IdentityUser> userManager, IOfferService offerService, IStatisticsService statisticsService, IDashboardService dashboardService, IFuelPriceService fuelPriceService, IRequestService requestService)
         {
             this.vehicleService = vehicleService;
             this.clientsService = clientsService;
@@ -41,6 +39,7 @@ namespace LogiTrack.Controllers
             this.statisticsService = statisticsService;
             this.dashboardService = dashboardService;
             this.fuelPriceService = fuelPriceService;
+            this.requestService = requestService;
         }
 
         [HttpGet]
@@ -479,11 +478,16 @@ namespace LogiTrack.Controllers
         [HttpGet]
         public async Task<IActionResult> PendingRequests([FromQuery] AllPendingRequestsViewModel query)
         {
-            var model = await requestService.GetPendingRequestsAsync(query.SharedTruck, query.StartDate, query.EndDate, query.MinWeight, query.MaxWeight, query.MinVolume, query.MaxVolume, query.PickupAddress, query.DeliveryAddress);
+            var model = await requestService.GetPendingRequestsAsync(query.SharedTruck, query.StartDate,query.EndDate,query.MinWeight,query.MaxWeight,query.MinVolume,query.MaxVolume,query.PickupAddress,query.DeliveryAddress);
             query.Requests = model;
+            return View(query); 
+        }
+        [HttpGet]
+        public async Task<IActionResult> RequestsStatistics()
+        {
+            var model = await statisticsService.GetRequestStatisticsForLogisticsAsync();
             return View(model);
         }
-
         [HttpGet]
         public IActionResult SearchRequest()
         {
@@ -524,18 +528,14 @@ namespace LogiTrack.Controllers
         [HttpGet]
         public async Task<IActionResult> RequestsRegister([FromQuery] FilterRequestsForLogisticsViewModel query)
         {
-            /*var companyUsername = User.GetUsername();
-            if (await clientsService.UserWithEmailExistsAsync(companyUsername) == false)
-            {
-                return BadRequest(ClientCompanyNotFoundErrorMessage);
-            }*/
+            var model = await requestService.GetRequestsForLogisticsBySearchTermAsync(query.SearchTerm);
+            query.Requests = model;
+            model = await requestService.GetRequestsForLogisticsAsync(query.StartDate, query.EndDate, query.IsApproved, query.SharedTruck, query.MinWeight, query.MaxWeight, query.MinPrice, query.MaxPrice, query.PickupAddress, query.DeliveryAddress);
+            query.Requests = model;
 
-            var model = await requestService.GetRequestsForLogisticsAsync(query.StartDate, query.EndDate, query.IsApproved, query.SharedTruck, query.MinWeight, query.MaxWeight, query.MinPrice, query.MaxPrice, query.PickupAddress, query.DeliveryAddress);
-            query.Requests = model;
-            model = await requestService.GetRequestsForLogisticsBySearchTermAsync(query.SearchTerm);
-            query.Requests = model;
             return View(query);
         }
+
         [HttpGet]
         public async Task<IActionResult> PendingRequestDetails(int id)
         {

@@ -34,7 +34,7 @@ namespace LogiTrack.Core.Services
 
         public async Task<DeliveryForAccountantViewModel> GetDeliveryDetailsForAccountantAsync(int id)
         {
-            var delivery = await repository.AllReadonly<Infrastructure.Data.DataModels.Delivery>().Where(x => x.Id == id)
+            var model = await repository.AllReadonly<Infrastructure.Data.DataModels.Delivery>().Where(x => x.Id == id)
                  .Where(x => x.Id == id)
                 .Include(x => x.Vehicle)
                 .Include(x => x.Driver)
@@ -51,31 +51,31 @@ namespace LogiTrack.Core.Services
                 .Include(x => x.Offer)
                 .ThenInclude(x => x.Request)
                 .ThenInclude(x => x.StandartCargo)
+                .Include(x => x.Invoice)
+                .Select(x => new DeliveryForAccountantViewModel()
+                {
+					Id = x.Id,
+					ClientCompanyName = x.Offer.Request.ClientCompany.Name,
+					ClientAddress = $"{x.Offer.Request.ClientCompany.Address.City}, {x.Offer.Request.ClientCompany.Address.City}, {x.Offer.Request.ClientCompany.Address.Street}, {x.Offer.Request.ClientCompany.Address.PostalCode} ",
+					ClientEmail = x.Offer.Request.ClientCompany.User.Email,
+					ClientPhone = x.Offer.Request.ClientCompany.User.PhoneNumber,
+					PickupAddress = $"{x.Offer.Request.PickupAddress.Street}, {x.Offer.Request.PickupAddress.City}, {x.Offer.Request.PickupAddress.County}",
+					DeliveryAddress = $"{x.Offer.Request.DeliveryAddress.Street}, {x.Offer.Request.DeliveryAddress.City}, {x.Offer.Request.DeliveryAddress.County}",
+					Profit = x.Profit.ToString(),
+					ReferenceNumber = x.ReferenceNumber,
+					VehicleType = x.Vehicle.VehicleType,
+					RegistrationNumber = x.Vehicle.RegistrationNumber,
+					Age = x.Driver.Age.ToString(),
+					Name = x.Driver.Name,
+					Salary = x.Driver.Salary.ToString(),
+					YearOfExperience = x.Driver.YearOfExperience.ToString(),
+					MonthsOfExperience = x.Driver.MonthsOfExperience.ToString(),
+					DeliveryStep = x.DeliveryStep,
+					IsPaid = x.Invoice.IsPaid
+				})
                 .FirstOrDefaultAsync();
 
-            var model = new DeliveryForAccountantViewModel
-            {
-                Id = delivery.Id,
-                ClientCompanyName = delivery.Offer.Request.ClientCompany.Name,
-                ClientAddress = $"{delivery.Offer.Request.ClientCompany.Address.City}, {delivery.Offer.Request.ClientCompany.Address.City}, {delivery.Offer.Request.ClientCompany.Address.Street}, {delivery.Offer.Request.ClientCompany.Address.PostalCode} ",
-                ClientEmail = delivery.Offer.Request.ClientCompany.User.Email,
-                ClientPhone = delivery.Offer.Request.ClientCompany.User.PhoneNumber,
-                PickupAddress = $"{delivery.Offer.Request.PickupAddress.Street}, {delivery.Offer.Request.PickupAddress.City}, {delivery.Offer.Request.PickupAddress.County}",
-                DeliveryAddress = $"{delivery.Offer.Request.DeliveryAddress.Street}, {delivery.Offer.Request.DeliveryAddress.City}, {delivery.Offer.Request.DeliveryAddress.County}",
-                Profit = delivery.Profit.ToString(),
-                ReferenceNumber = delivery.ReferenceNumber,
-                VehicleType = delivery.Vehicle.VehicleType,
-                RegistrationNumber = delivery.Vehicle.RegistrationNumber,
-                Age = delivery.Driver.Age.ToString(),
-                Name = delivery.Driver.Name,
-                Salary = delivery.Driver.Salary.ToString(),
-                YearOfExperience = delivery.Driver.YearOfExperience.ToString(),
-                MonthsOfExperience = delivery.Driver.MonthsOfExperience.ToString(),
-                DeliveryStep = delivery.DeliveryStep,
-                IsPaid = await repository.AllReadonly<Invoice>().AnyAsync(x => x.DeliveryId == delivery.Id && x.IsPaid == true)
-            };
-
-            var cashRegisters = await repository.AllReadonly<Infrastructure.Data.DataModels.CashRegister>().Where(x => x.DeliveryId == delivery.Id).ToListAsync();
+            var cashRegisters = await repository.AllReadonly<Infrastructure.Data.DataModels.CashRegister>().Where(x => x.DeliveryId == id).ToListAsync();
 
             var fileIds = cashRegisters.Select(x => x.FileId).Distinct().ToList();
             var fileUrlTasks = fileIds.Select(x => googleDriveService.GetFileUrlAsync(x)).ToArray();
@@ -102,9 +102,11 @@ namespace LogiTrack.Core.Services
 
             return model;
         }
+
         private async Task<InvoiceForDeliveryViewModel> GetInvoiceForDelivery(int id)
         {
-            var invoice = await repository.AllReadonly<Invoice>().Where(x => x.DeliveryId == id)
+            var delivery = await repository.AllReadonly<Infrastructure.Data.DataModels.Delivery>().Where(x => x.Id == id).FirstOrDefaultAsync();
+            var invoice = await repository.AllReadonly<Invoice>().Where(x => x.Id == delivery.InvoiceId)
                 .Select(x => new InvoiceForDeliveryViewModel
                 {
                     IsPaid = x.IsPaid,
@@ -529,7 +531,7 @@ namespace LogiTrack.Core.Services
             model.NonStandardCargos = await GetNonStandartCargosForDelivery(id);
 
             model.Invoice = await GetInvoiceForDelivery(id);
-            var invoice = await repository.AllReadonly<Invoice>().FirstOrDefaultAsync(x => x.DeliveryId == id);
+            var invoice = await repository.AllReadonly<Invoice>().FirstOrDefaultAsync(x => x.Id == delivery.Id);
             model.DaysTillPayment = invoice.IsPaid ? "0" : (DateTime.Now - delivery.ActualDeliveryDate).GetValueOrDefault().Days.ToString();
 
             return model;
