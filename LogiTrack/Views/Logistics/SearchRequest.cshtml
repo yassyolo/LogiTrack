@@ -1,6 +1,6 @@
 ﻿@model LogiTrack.Core.ViewModels.Request.SearchRequestByReferenceNumberViewModel
 @{
-    ViewData["Title"] = "Add Cash Register";
+    ViewData["Title"] = "Search Request";
     Layout = "~/Views/Shared/_LogisticsLayout.cshtml";
 }
 
@@ -21,7 +21,7 @@
         </div>
     }
 
-    <form asp-action="SearchOffer" asp-controller="Clients" method="post">
+    <form asp-action="SearchRequest" asp-controller="Logistics" method="post">
         <div class="form-group">
             <label asp-for="ReferenceNumber"><b>Reference number</b></label>
             <input asp-for="ReferenceNumber" type="text" id="ReferenceNumber" class="form-control" placeholder="Please enter" />

@@ -139,7 +139,6 @@
             subMenu.classList.toggle("visible");
         }
 
-        // Close the dropdown and submenus if clicked outside
         window.onclick = function (event) {
             if (!event.target.matches('.profile-icon') && !event.target.matches('.menu-item')) {
                 const dropdowns = document.getElementsByClassName("profile-dropdown");

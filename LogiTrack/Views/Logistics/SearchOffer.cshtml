@@ -1,6 +1,6 @@
 ﻿@model LogiTrack.Core.ViewModels.Offer.SearchOfferByOfferNumberViewModel
 @{
-    ViewData["Title"] = "Add Cash Register";
+    ViewData["Title"] = "Search Offer";
     Layout = "~/Views/Shared/_LogisticsLayout.cshtml";
 }
 
@@ -21,14 +21,7 @@
         </div>
     }
 
-    @if (TempData["NotAuthorized"] != null)
-    {
-        <div class="alert alert-danger">
-            You are not authorized to view this offer!
-        </div>
-    }
-
-    <form asp-action="SearchOffer" asp-controller="Clients" method="post">
+    <form asp-action="SearchOffer" asp-controller="Logistics" method="post">
         <div class="form-group">
             <label asp-for="OfferNumber"><b>Offer number</b></label>
             <input asp-for="OfferNumber" type="text" id="ReferenceNumber" class="form-control" placeholder="Please enter" />

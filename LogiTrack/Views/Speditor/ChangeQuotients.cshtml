@@ -1,25 +1,47 @@
 ﻿@model LogiTrack.Core.ViewModels.Vehicle.ChangeQuotientsForVehicleViewModel
 @{
-    Layout = null;
+    ViewData["Title"] = "Change Quotients";
+    Layout = "~/Views/Shared/_SpeditorLayout.cshtml";
 }
 
-<!DOCTYPE html>
-<html lang="en">
+<div class="main-content">
+    <div class="search-item">
+        <div class="search-header">
+            <div class="search-icon">
+                <i class="fas fa-quote-right" style="color:#00aa87; font-size:30px;"></i>
+            </div>
+            <h2 class="search-title"><b>Change quotients for vehicle</b></h2>
+        </div>
+        <h3>Change quotients now!</h3>
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Driver Dashboard</title>
-    <link rel="stylesheet" href="~/css/site.css" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css">
+        <form method="post" asp-action="ChangeQuotients" asp-controller="Speditor">
+            <h4>Domestics</h4>
+            <div class="row">
+                <div class="form-group">
+                    <label asp-for="QuotientForDomesticNotSharedTruck"><b>Not shared</b></label>
+                    <input type="text" asp-for="QuotientForDomesticNotSharedTruck" class="form-control" placeholder="Please enter" />
+                </div>
+                <div class="form-group">
+                    <label asp-for="QuotientForDomesticSharedTruck"><b>Shared</b></label>
+                    <input type="text" asp-for="QuotientForDomesticSharedTruck" class="form-control" placeholder="Please enter" />
+                </div>
+            </div>
+            <h4>International</h4>
+            <div class="row">
+                <div class="form-group">
+                    <label asp-for="QuotientForInternationalNotSharedTruck"><b>Not shared</b></label>
+                    <input type="text" asp-for="QuotientForInternationalNotSharedTruck" class="form-control" placeholder="Please enter" />
+                </div>
+                <div class="form-group">
+                    <label asp-for="QuotientForInternationalSharedTruck"><b>Shared</b></label>
+                    <input type="text" asp-for="QuotientForInternationalSharedTruck" class="form-control" placeholder="Please enter" />
+                </div>
+            </div>
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css">
-    <script src="~/js/site.js"></script>
+            <button type="submit" class="btn-primary"><b>SUBMIT</b></button>
+        </form>
+    </div>
     <style>
-
         .row {
             display: flex;
             justify-content: space-between;
@@ -29,121 +51,4 @@
         .form-group {
             margin-bottom: 19px;
         }
-
-       
-        h4 {
-            color: #00aa87;
-            border-bottom: 15px;
-            margin-top: 0;
-        }
-
     </style>
-
-</head>
-
-<body>
-    <header class="header">
-        <div class="logo-name">
-            <div class="company-logo">
-                <img src="https://via.placeholder.com/50" alt="Company Logo">
-            </div>
-            <div class="company-name">LogiTrack</div>
-        </div>
-        <div class="profile-dropdown">
-            <button onclick="toggleDropdown()">
-                <i class="bi bi-person-circle"></i>
-                <span class="arrow">&#x25BC;</span>
-            </button>
-            <div class="profile-dropdown-menu" id="profileDropdown">
-                <a asp-action="CompanyDetails" asp-controller="Clients">Company details</a>
-                <a asp-action="ContactDetails" asp-controller="Clients">Contact details</a>
-                <a asp-action="Logout" asp-controller="Home">Logout</a>
-            </div>
-        </div>
-    </header>
-    <aside class="sidebar">
-        <ul>
-            <li><a asp-action="Dashboard" asp-controller="Clients"><i class="bi bi-house-door"></i> Dashboard</a></li>
-            <li>
-                <a asp-action="MyRequests" asp-controller="Clients"><i class="bi bi-clipboard-check"></i> Requests <span class="arrow">></span></a>
-                <div class="dropdown-menu">
-                    <ul>
-                        <li><a asp-action="MakeRequest" asp-controller="Clients"><i class="bi bi-plus-circle"></i> New</a></li>
-                        <li><a asp-action="MyRequests" asp-controller="Clients"><i class="bi bi-search"></i> Search</a></li>
-                        <li><a asp-action="RequestStatistics" asp-controller="Clients"><i class="bi bi-bar-chart"></i> Statistics</a></li>
-                    </ul>
-                </div>
-            </li>
-            <li>
-                <a asp-action="MyOffers" asp-controller="Clients"><i class="bi bi-file-earmark-text"></i> Offers <span class="arrow">></span></a>
-                <div class="dropdown-menu">
-                    <ul>
-                        <li><a asp-action="HaveOffer" asp-controller="Clients"><i class="bi bi-calendar-check"></i> Book</a></li>
-                        <li><a asp-action="MyOffers" asp-controller="Clients"><i class="bi bi-search"></i> Search</a></li>
-                        <li><a asp-action="OfferStatistics" asp-controller="Clients"><i class="bi bi-bar-chart"></i> Statistics</a></li>
-                    </ul>
-                </div>
-            </li>
-            <li>
-                <a asp-action="MyDeliveries" asp-controller="Clients"><i class="bi bi-truck"></i> Deliveries <span class="arrow">></span></a>
-                <div class="dropdown-menu">
-                    <ul>
-                        <li><a asp-action="SearchDelivery" asp-controller="Clients"><i class="bi bi-binoculars"></i> Track</a></li>
-                        <li><a asp-action="MyDeliveries" asp-controller="Clients"><i class="bi bi-search"></i> Search</a></li>
-                        <li><a asp-action="DeliveryStatistics" asp-controller="Clients"><i class="bi bi-bar-chart"></i> Statistics</a></li>
-                    </ul>
-                </div>
-            </li>
-            <li>
-                <a asp-action="MyInvoices" asp-controller="Clients"><i class="bi bi-receipt"></i> Invoices <span class="arrow">></span></a>
-                <div class="dropdown-menu">
-                    <ul>
-                        <li><a asp-action="MyInvoices" asp-controller="Clients"><i class="bi bi-search"></i> Search</a></li>
-                        <li><a asp-action="InvoicesStatistics" asp-controller="Clients"><i class="bi bi-bar-chart"></i> Statistics</a></li>
-                    </ul>
-                </div>
-            </li>
-        </ul>
-    </aside>
-    <div class="main-content">
-        <div class="search-item">
-            <div class="search-header">
-                <div class="search-icon">
-                    <i class="fas fa-quote-right" style="color:#00aa87; font-size:30px;"></i>
-                </div>
-                <h2 class="search-title"><b>Change quotients for vehicle</b></h2>
-            </div>
-            <h3>Change quotients now!</h3>
-
-            <form method="post" asp-action="ChangeQuotients" asp-controller="Speditor">
-                <h4>Domestics</h4>
-                <div class="row">
-                <div class="form-group">
-                    <label asp-for="QuotientForDomesticNotSharedTruck"><b>Not shared</b></label>
-                    <input type="text" asp-for="QuotientForDomesticNotSharedTruck" class="form-control" placeholder="Please enter" />
-                </div>
-                <div class="form-group">
-                    <label asp-for="QuotientForDomesticSharedTruck"><b>Shared</b></label>
-                    <input type="text" asp-for="QuotientForDomesticSharedTruck" class="form-control" placeholder="Please enter" />
-                </div>
-                </div>
-                <h4>International</h4>
-                <div class="row">
-                    <div class="form-group">
-                        <label asp-for="QuotientForInternationalNotSharedTruck"><b>Not shared</b></label>
-                        <input type="text" asp-for="QuotientForInternationalNotSharedTruck" class="form-control" placeholder="Please enter" />
-                    </div>
-                    <div class="form-group">
-                        <label asp-for="QuotientForInternationalSharedTruck"><b>Shared</b></label>
-                        <input type="text" asp-for="QuotientForInternationalSharedTruck" class="form-control" placeholder="Please enter" />
-                    </div>
-                </div>
-                             
-                <button type="submit" class="btn-primary"><b>SUBMIT</b></button>
-            </form>
-        </div>
-    </div>
-
-</body>
-
-</html>

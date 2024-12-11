@@ -115,27 +115,10 @@
 </div>
 
 
-<script>
-    document.querySelectorAll('.delivery-card').forEach(card => {
-        card.addEventListener('mouseenter', () => {
-            const metrics = card.querySelector('.delivery-metrics');
-            metrics.style.display = 'flex';
-            metrics.style.width = `${card.clientWidth}px`;
-        });
-
-        card.addEventListener('mouseleave', () => {
-            const metrics = card.querySelector('.delivery-metrics');
-            metrics.style.display = 'none';
-        });
-    });
-    document.addEventListener('DOMContentLoaded', function () {
-        flatpickr(".flatpickr", {
-            dateFormat: "Y-m-d",
-        });
-    });
-
-
-</script>
+@section Scripts {
+    <script src="~/js/flatpicker.js"></script>
+    <script src="~/js/cardHover.js"></script>
+}
 
 
 <style>

@@ -73,7 +73,7 @@
         <div class="diagram-header">
             <h3>Invoices</h3>
             <a asp-action="SearchInvoices" asp-controller="Accountant" class="see-all">See All</a>
-            <h4 class="due-amount" style="color: #00aa87;">Due amount:</h4>
+            <h4 class="due-amount" style="color: #00aa87; margin: 0;">Due amount:</h4>
             <p style="font-size:0.9rem; color: #707070;">@Model.DueAmountForDeliveries BGN</p>
         </div>
         <div class="invoice-header">
@@ -101,6 +101,7 @@
         align-items: center;
         margin-top: 10px;
         margin-bottom: 15px;
+        width: 89%;
     }
 
     .delivery-info {

@@ -329,7 +329,7 @@
             </div>
             <p class="search-description">Please enter your search criteria</p>
 
-            <form asp-action="MyRequests" asp-controller="Clients" method="get" class="search-form">
+            <form asp-action="PendingRequests" asp-controller="Speditor" method="get" class="search-form">
                 <div class="row">
                     <div class="form-group">
                         <label asp-for="PickupAddress"><b>Origin</b></label>
@@ -374,7 +374,7 @@
                 </div>
                 <div class="button-group">
                     <button type="submit" class="btn"><b>GO</b></button>
-                    <a asp-action="MyRequests" asp-action="Clients" type="reset" class="btn-clear"><b>CLEAR</b></a>
+                    <a asp-action="AllPendingRequestsViewModel" asp-action="Speditor" type="reset" class="btn-clear"><b>CLEAR</b></a>
                 </div>
             </form>
         </div>

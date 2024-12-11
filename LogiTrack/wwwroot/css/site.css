@@ -432,10 +432,10 @@ body {
     margin-right: 30px;
 }
 
-h4, .stat-text {
-    text-align: center;
-    color: #00aa87;
-}
+    .chart-container h4, .stat-text {
+        text-align: center;
+        color: #00aa87;
+    }
 
 .delay {
     display: flex;
@@ -548,13 +548,7 @@ input[type="text"], input[type="date"] {
         border-bottom-color: #00aa87;
     }
 
-.delivery {
-    display: flex;
-    gap: 70px;
-    align-items: center;
-    margin-top: 10px;
-    margin-bottom: 15px;
-}
+
 
 .delivery-info {
     display: flex;
@@ -779,4 +773,15 @@ input[type="text"], input[type="date"] {
     display: flex;
     gap: 20px;
     flex-direction: row;
+}
+
+
+h4 {
+    color: #00aa87;
+    border-bottom: 15px;
+    margin-top: 0;
+}
+
+p {
+    opacity: 80%;
 }

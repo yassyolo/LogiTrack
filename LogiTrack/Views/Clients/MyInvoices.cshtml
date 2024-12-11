@@ -97,13 +97,9 @@
 </div>
 
 
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        flatpickr(".flatpickr", {
-            dateFormat: "Y-m-d",
-        });
-    });
-</script>
+@section Scripts {
+    <script src="~/js/flatpicker.js"></script>
+}
 <style>
     .container {
         background-color: white;

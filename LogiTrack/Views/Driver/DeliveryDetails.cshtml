@@ -38,7 +38,7 @@
             </div>
         </div>
 
-        <div id="addressesSection" class="section d-none">
+        <div id="addressesSection" class="section">
             <div class="columns-container">
                 <div class="column">
                     <h4><b>Pickup Address</b></h4>
@@ -47,7 +47,11 @@
                     <p><strong>Country:</strong> @Model.PickupCountry</p>
                     <p><strong>Latitude:</strong> @Model.PickupLatitude</p>
                     <p><strong>Longitude:</strong> @Model.PickupLongitude</p>
-                    @*<div id="pickupMap" class="map"></div>*@
+                    @*<div id="pickupMap"
+                         class="map"
+                         data-latitude="@Model.PickupLatitude"
+                         data-longitude="@Model.PickupLongitude"></div>
+                    <p id="pickupAddress">Fetching address...</p>*@
                 </div>
 
                 <div class="column">
@@ -57,10 +61,15 @@
                     <p><strong>Country:</strong> @Model.DeliveryCountry</p>
                     <p><strong>Latitude:</strong> @Model.DeliveryLatitude</p>
                     <p><strong>Longitude:</strong> @Model.DeliveryLongitude</p>
-                    @*<div id="deliveryMap" class="map"></div>*@
+                    @*<div id="deliveryMap"
+                         class="map"
+                         data-latitude="@Model.DeliveryLatitude"
+                         data-longitude="@Model.DeliveryLongitude"></div>
+                    <p id="deliveryAddress">Fetching address...</p>*@
                 </div>
             </div>
         </div>
+
 
         <div id="metricsSection" class="section  d-none">
             <div class="metrics-header">
@@ -150,7 +159,10 @@
             <h4><b>Status</b></h4>
 
             <div class="button-steps">
-                <a asp-action="AddStatus" asp-controller="Driver" asp-route-id="@Model.Id" class="btn-primary">NEW STATUS +</a>
+                @if(Model.DeliveryStep < 4)
+                {
+                    <a asp-action="AddStatus" asp-controller="Driver" asp-route-id="@Model.Id" class="btn-primary">NEW STATUS +</a>
+                }
                 <div class="text-tracking-line">
                     <div class="tracking-line">
                         <div class="dot" style="background-color: @(Model.DeliveryStep >= 1 ? "#00aa87" : "gray")"></div>
@@ -231,101 +243,10 @@
         }
     });
 </script>
-<script>
-    async function getCurrentLocation() {
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(showPosition, showError);
-        } else {
-            document.getElementById('location').textContent = "Geolocation is not supported by this browser.";
-        }
-    }
-
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-            position => console.log("Latitude:", position.coords.latitude, "Longitude:", position.coords.longitude),
-            error => console.error("Error:", error)
-        );
-    } else {
-        console.error("Geolocation not supported by this browser.");
-    }
-
-    function showPosition(position) {
-        const lat = position.coords.latitude;
-        const long = position.coords.longitude;
-        fetchLocation(lat, long);
-    }
-
-    async function fetchLocation(lat, long) {
-        const apiKey = 'AIzaSyDfA3_DsCdEYZeSpUwLBSenw1Gyp1VGIp4';
-        const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${long}&key=${apiKey}`;
-
-        try {
-            const response = await fetch(url);
-            const data = await response.json();
-
-            if (data.results && data.results.length > 0) {
-                const address = data.results[0].formatted_address;
-                console.log(address);
-                document.getElementById('location').textContent = address;
-            } else {
-                document.getElementById('location').textContent = "Unable to retrieve location.";
-            }
-        } catch (error) {
-            console.error("Error fetching location:", error);
-            document.getElementById('location').textContent = "Error fetching location.";
-        }
-    }
-
-    function showError(error) {
-        switch (error.code) {
-            case error.PERMISSION_DENIED:
-                document.getElementById('location').textContent = "User denied the request for Geolocation.";
-                break;
-            case error.POSITION_UNAVAILABLE:
-                document.getElementById('location').textContent = "Location information is unavailable.";
-                break;
-            case error.TIMEOUT:
-                document.getElementById('location').textContent = "The request to get user location timed out.";
-                break;
-            case error.UNKNOWN_ERROR:
-                document.getElementById('location').textContent = "An unknown error occurred.";
-                break;
-        }
-    }
-
-    function initPickupMap() {
-        const pickupLatLng = { lat: @Model.PickupLatitude, lng: @Model.PickupLongitude };
-
-        const pickupMap = new google.maps.Map(document.getElementById("pickupMap"), {
-            zoom: 12,
-            center: pickupLatLng,
-        });
-
-        new google.maps.Marker({
-            position: pickupLatLng,
-            map: pickupMap,
-            title: "Pickup Location",
-        });
-    }
-
-    function initDeliveryMap() {
-        const deliveryLatLng = { lat: @Model.DeliveryLatitude, lng: @Model.DeliveryLongitude };
-
-        const deliveryMap = new google.maps.Map(document.getElementById("deliveryMap"), {
-            zoom: 12,
-            center: deliveryLatLng,
-        });
-
-        new google.maps.Marker({
-            position: deliveryLatLng,
-            map: deliveryMap,
-            title: "Delivery Location",
-        });
-    }
-
-    window.onload = getCurrentLocation;
-
-</script>
+@section Scripts {
+    <script src="~/js/map.js"></script>
+    <script src="~/js/currentPosition.js"></script>
+}
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
 <style>

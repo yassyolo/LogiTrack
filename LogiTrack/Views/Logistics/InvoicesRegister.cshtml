@@ -1,6 +1,6 @@
 ﻿@model LogiTrack.Core.ViewModels.Invoice.FilterInvoicesViewModel
 @{
-    ViewData["Title"] = "Add Cash Register";
+    ViewData["Title"] = "Invoices Register";
     Layout = "~/Views/Shared/_LogisticsLayout.cshtml";
 }
 
@@ -107,13 +107,9 @@
 </div>
     
 
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        flatpickr(".flatpickr", {
-            dateFormat: "Y-m-d",
-        });
-    });
-</script>
+@section Scripts {
+    <script src="~/js/flatpicker.js"></script>
+}
 
 <style>
     .container {
@@ -122,9 +118,7 @@
         box-shadow: 0 0 25px 1px #0000000f !important;
         width: 96.5%;
         margin: auto;
-    }
-
-    
+    }    
 
     .search-form {
         display: flex;
@@ -146,7 +140,6 @@
         .form-group:last-child {
             margin-right: 0;
         }
-
 
     input[type="text"],
     input[type="date"] {

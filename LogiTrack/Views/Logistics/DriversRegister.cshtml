@@ -41,13 +41,13 @@
         </div>
         <div class="button-group">
             <button type="submit" class="btn"><b>GO</b></button>
-            <a asp-action="VehiclesRegister" asp-action="Logistics" type="reset" class=" btn-clear"><b>CLEAR</b></a>
+            <a asp-action="DriversRegister" asp-action="Logistics" type="reset" class=" btn-clear"><b>CLEAR</b></a>
         </div>
     </form>
 </div>
 
 <div class="filtered-deliveries-container">
-    <form asp-action="VehiclesRegister" asp-controller="Logistics" method="get" class="quick-search-form">
+    <form asp-action="DriversRegister" asp-controller="Logistics" method="get" class="quick-search-form">
         <div class="form-group">
             <input type="text" id="keyword" asp-for="SearchTerm" placeholder="Enter keyword">
             <button type="submit">
@@ -175,9 +175,7 @@
 
         .delivery-metrics p {
             margin-left: 210px;
-        }
-
-    
+        }   
 </style>
 
 

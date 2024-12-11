@@ -72,7 +72,7 @@
                 <div class="dropdown-menu">
                     <ul>
                         <li><a asp-action="SearchDelivery" asp-controller="Clients"><i class="bi bi-binoculars"></i> Track</a></li>
-                        <li><a asp-action="MyDeliveries" asp-controller="Clients"><i class="bi bi-search"></i> Search</a></li>
+                        <li><a asp-action="MyDeliveries" asp-controller="Clients"><i class="bi bi-box"></i> Search</a></li>
                         <li><a asp-action="DeliveryStatistics" asp-controller="Clients"><i class="bi bi-bar-chart"></i> Statistics</a></li>
                     </ul>
                 </div>
@@ -91,6 +91,8 @@
     <main class="main-content">
         @RenderBody()
     </main>
+    @RenderSection("Scripts", required: false)
+
 </body>
 
 </html>

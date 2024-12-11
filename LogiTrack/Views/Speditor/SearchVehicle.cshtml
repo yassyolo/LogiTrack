@@ -1,243 +1,35 @@
 ﻿@model LogiTrack.Core.ViewModels.Vehicle.SearchVehicleByRegistrationNumberViewModel
-
 @{
-    Layout = null;
+    ViewData["Title"] = "Search Vehicle";
+    Layout = "~/Views/Shared/_SpeditorLayout.cshtml";
 }
 
-<!DOCTYPE html>
-<html lang="en">
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Custom Accountant Dashboard</title>
-    <link rel="stylesheet" href="~/css/site.css" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css">
-    <script src="~/js/site.js"></script>
-</head>
-
-<body>
-    <header class="header">
-        <div class="logo-name">
-            <div class="company-logo">
-                <img src="https://via.placeholder.com/50" alt="Company Logo">
-            </div>
-            <div class="company-name">LogiTrack</div>
+<div class="search-item">
+    <div class="search-header">
+        <div class="search-icon">
+            <i class="bi bi-search" style="font-size: 35px; color:#00aa87;"></i>
         </div>
-        <div class="profile-dropdown">
-            <button onclick="toggleDropdown()">
-                <i class="bi bi-person-circle"></i>
-                <span class="arrow">&#x25BC;</span>
-            </button>
-            <div class="profile-dropdown-menu" id="profileDropdown">
-                <a asp-action="Details" asp-controller="Driver">Personal details</a>
-                <a asp-action="LicenseDetails" asp-controller="Driver">License</a>
-                <a asp-action="Logout" asp-controller="Home">Logout</a>
-            </div>
-        </div>
-    </header>
-    <script>
-        async function fetchFuelPrice() {
-            try {
-                const response = await fetch('/Logistics/MaxAndTodayPriceRatio');
-                const data = await response.json();
-
-                const currentPrice = data.currentPrice || 0;
-                const maxPrice = data.maxPrice || 0;
-
-                const ctx = document.getElementById('fuelPriceBarChart').getContext('2d');
-                new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: ['Current Price', 'Max Price'],
-                        datasets: [{
-                            label: 'Fuel Price Comparison (BGN)',
-                            data: [currentPrice, maxPrice],
-                            backgroundColor: ['#00aa87', '#e74c3c'],
-                            borderColor: ['#2980b9', '#c0392b'],
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                title: {
-                                    display: true,
-                                    text: 'Price (BGN)'
-                                }
-                            }
-                        },
-                        plugins: {
-                            tooltip: {
-                                callbacks: {
-                                    label: function (tooltipItem) {
-                                        return `${tooltipItem.label}: ${tooltipItem.raw.toFixed(2)} BGN`;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                });
-            } catch (error) {
-                console.error('Error fetching fuel prices:', error);
-            }
-        }
-        <script>
-            async function fetchCurrentMonthFuelPrice() {
-                try {
-                    // Fetch the current month's fuel price data from the API
-                    const response = await fetch('/Logistics/GetFuelPriceForCurrentMonth'); // Replace with your actual endpoint
-                    const data = await response.json();
-
-                    const currentMonth = new Date().getMonth(); // Returns month index (0 = January, 1 = February, ..., 11 = December)
-                    const monthNames = [
-                        'January', 'February', 'March', 'April', 'May', 'June', 'July',
-                        'August', 'September', 'October', 'November', 'December'
-                    ];
-
-                    const currentMonthName = monthNames[currentMonth];
-                    const currentPrice = data[currentMonth] || 0;  // Get the fuel price for the current month, default to 0 if not available
-
-                    const ctx = document.getElementById('fuelPriceCurrentMonthChart').getContext('2d');
-                    new Chart(ctx, {
-                        type: 'bar',
-                        data: {
-                            labels: [currentMonthName], 
-                            datasets: [{
-                                label: 'Fuel Price (BGN)',
-                                data: [currentPrice], 
-                                backgroundColor: '#3498db',  
-                                borderColor: '#2980b9',      // Border color
-                                borderWidth: 1
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            scales: {
-                                y: {
-                                    beginAtZero: true,
-                                    title: {
-                                        display: true,
-                                        text: 'Price (BGN)'
-                                    }
-                                },
-                                x: {
-                                    title: {
-                                        display: true,
-                                        text: 'Month'
-                                    }
-                                }
-                            },
-                            plugins: {
-                                tooltip: {
-                                    callbacks: {
-                                        label: function (tooltipItem) {
-                                            return `${tooltipItem.label}: ${tooltipItem.raw.toFixed(2)} BGN`;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    });
-                } catch (error) {
-                    console.error('Error fetching current month fuel price:', error);
-                }
-            }
-        async function fetchFuelPricesForYear() {
-            try {
-                const response = await fetch('/Logistics/GetFuelPricesForYear'); // Adjust this endpoint as needed
-                const data = await response.json();
-
-                const months = Object.keys(data); // ["January", "February", ..., "December"]
-                const prices = Object.values(data); // [2.38, 2.45, 2.40, ...]
-
-                const ctx = document.getElementById('fuelPriceChart').getContext('2d');
-
-                new Chart(ctx, {
-                    type: 'line',  
-                    data: {
-                        labels: months, // Months as labels
-                        datasets: [{
-                            label: 'Fuel Price (BGN)',
-                            data: prices, // Fuel prices
-                            borderColor: '#3498db', // Line color
-                            backgroundColor: 'rgba(52, 152, 219, 0.2)', 
-                            fill: true,  // Fill under the line chart
-                            tension: 0.4 // Smooth the line
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        scales: {
-                            y: {
-                                beginAtZero: false, 
-                                title: {
-                                    display: true,
-                                    text: 'Price (BGN)'
-                                }
-                            },
-                            x: {
-                                title: {
-                                    display: true,
-                                    text: 'Month'
-                                }
-                            }
-                        },
-                        plugins: {
-                            tooltip: {
-                                callbacks: {
-                                    label: function (tooltipItem) {
-                                        return `${tooltipItem.label}: ${tooltipItem.raw.toFixed(2)} BGN`;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                });
-            } catch (error) {
-                console.error('Error fetching fuel prices for the year:', error);
-            }
-        }
-
-        // Fetch and display the fuel prices data
-        fetchFuelPricesForYear();
-        fetchCurrentMonthFuelPrice();
-
-        fetchFuelPrice();
-    </script>
-    <div class="main-content">
-        <div class="search-item">
-            <div class="search-header">
-                <div class="search-icon">
-                    <i class="bi bi-search" style="font-size: 35px; color:#00aa87;"></i>
-                </div>
-                <h2 class="search-title"><b>Search vehicle</b></h2>
-            </div>
-
-            <h3>Please enter vehicle's registration number</h3>
-
-            @if (TempData["NotFound"] != null)
-            {
-                <div class="alert alert-danger">
-                    Vehicle not found!
-                </div>
-            }
-
-            <form asp-action="SearchVehicle" asp-controller="Logistics" method="post">
-                <div class="form-group">
-                    <label asp-for="RegistrationNumber"><b>Registration number</b></label>
-                    <input asp-for="RegistrationNumber" type="text" id="ReferenceNumber" class="form-control" placeholder="Please enter" />
-                    <span asp-validation-for="RegistrationNumber" class="text-danger" id="ReferenceNumberError"></span>
-                </div>
-
-                <button type="submit" class="btn btn-primary"><b>SEARCH</b></button>
-            </form>
-        </div>
+        <h2 class="search-title"><b>Search vehicle</b></h2>
     </div>
 
-</body>
+    <h3>Please enter vehicle's registration number</h3>
 
-</html>
+    @if (TempData["NotFound"] != null)
+    {
+        <div class="alert alert-danger">
+            Vehicle not found!
+        </div>
+    }
+
+    <form asp-action="SearchVehicle" asp-controller="Speditor" method="post">
+        <div class="form-group">
+            <label asp-for="RegistrationNumber"><b>Registration number</b></label>
+            <input asp-for="RegistrationNumber" type="text" id="ReferenceNumber" class="form-control" placeholder="Please enter" />
+            <span asp-validation-for="RegistrationNumber" class="text-danger" id="ReferenceNumberError"></span>
+        </div>
+
+        <button type="submit" class="btn btn-primary"><b>SEARCH</b></button>
+    </form>
+</div>
+

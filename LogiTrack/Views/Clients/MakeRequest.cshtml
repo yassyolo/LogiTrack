@@ -199,12 +199,11 @@
     }
 
     document.addEventListener('DOMContentLoaded', toggleCargoFields);
-    document.addEventListener('DOMContentLoaded', function () {
-        flatpickr(".flatpickr", {
-            dateFormat: "Y-m-d",
-        });
-    });
+
 </script>
+@section Scripts {
+    <script src="~/js/flatpicker.js"></script>
+}
 <style>
     .row {
         display: flex;

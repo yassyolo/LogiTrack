@@ -1,11 +1,11 @@
 ﻿@model LogiTrack.Core.ViewModels.Clients.NewCompanyDetailsForLogisticsViewModel
 @{
-    ViewData["Title"] = "Add Cash Register";
+    ViewData["Title"] = "New Company Details";
     Layout = "~/Views/Shared/_LogisticsLayout.cshtml";
 }
 <div class="license-container">
     <div class="title-button">
-        <div class="license-title">Company details</div>
+        <div class="license-title" style="margin-top:7px;">New company details</div>
         <div class="btns">
             <a asp-action="RejectPendingRegistration" class="btn-clear" asp-controller="Logistics" asp-route-id="@Model.Id">REJECT</a>
             <a asp-action="ApprovePendingRegistration" class="btn" asp-controller="Logistics" asp-route-id="@Model.Id">APPROVE</a>
@@ -138,7 +138,9 @@
         color: white;
         border: none;
         border-radius: 3px;
-        padding: 10px 15px;
+        padding: 10px 10px;
+        width: 90px;
+        text-align: center;
         cursor: pointer;
         margin-left: 10px;
         box-shadow: 0 3px 1px -2px #0003, 0 2px 2px 0 #00000024, 0 1px 5px 0 #0000001f;

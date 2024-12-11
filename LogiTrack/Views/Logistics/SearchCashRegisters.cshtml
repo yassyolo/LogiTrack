@@ -1,6 +1,6 @@
 ﻿@model LogiTrack.Core.ViewModels.CashRegister.FilterCashRegistersViewModel
 @{
-    ViewData["Title"] = "Add Cash Register";
+    ViewData["Title"] = "Search Cash Registers";
     Layout = "~/Views/Shared/_LogisticsLayout.cshtml";
 }
 
@@ -108,13 +108,9 @@
         <p class="no-found">No cash registers found matching the search criteria.</p>
     }
 </div>
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        flatpickr(".flatpickr", {
-            dateFormat: "Y-m-d",
-        });
-    });
-</script>
+@section Scripts {
+    <script src="~/js/flatpicker.js"></script>
+}
 <style>
     .container {
         background-color: white;
@@ -122,8 +118,6 @@
         box-shadow: 0 0 25px 1px #0000000f !important;
         width: 96.5%;
     }
-
-    
 
     .search-form {
         display: flex;

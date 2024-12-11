@@ -1,6 +1,6 @@
 ﻿@model LogiTrack.Core.ViewModels.Vehicle.VehicleDetailsViewModel
 @{
-    ViewData["Title"] = "Add Cash Register";
+    ViewData["Title"] = "Vehicle Details";
     Layout = "~/Views/Shared/_LogisticsLayout.cshtml";
 }
 <div class="details-container">
@@ -247,11 +247,11 @@
                     <div class="first-row">
                         <div class="chart-container">
                             <h4>Delivery types ratio</h4>
-                            <canvas id="vehicleCostsChart" class="chart"></canvas>
+                            <canvas id="vehicleCostsChart" class="chart" data-model-id="@Model.Id"></canvas>
                         </div>
                         <div class="chart-container">
                             <h4>Distance</h4>
-                            <canvas id="distanceDeliveriesChart" class="chart"></canvas>
+                            <canvas id="distanceDeliveriesChart" class="chart" data-model-id="@Model.Id"></canvas>
                         </div>
                     </div>
                 </div>
@@ -290,145 +290,9 @@
         }
     });
 </script>
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        async function fetchVehicleCosts(vehicleId) {
-            try {
-                const response = await fetch(`/Logistics/GetVehicleCostsDataForVehicle/${vehicleId}`);
-                if (!response.ok) {
-                    throw new Error('Failed to fetch vehicle costs data.');
-                }
-
-                const data = await response.json();
-                console.log('Fetched vehicle costs data:', data);
-
-                const totalCosts = data.totalCosts || 0;
-                const numDeliveries = data.numDeliveries || 1;
-                const avgCostPerDelivery = totalCosts / numDeliveries;
-
-                const ctx = document.getElementById('vehicleCostsChart').getContext('2d');
-                new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: ['Total Costs', 'Average Cost per Delivery'],
-                        datasets: [{
-                            label: 'Vehicle Costs',
-                            data: [totalCosts, avgCostPerDelivery],
-                            backgroundColor: ['#00aa87', '#FF6384'],
-                            borderColor: ['#00aa87', '#FF6384'],
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                title: {
-                                    display: true,
-                                    text: 'Costs (in currency)'
-                                }
-                            }
-                        },
-                        plugins: {
-                            legend: {
-                                display: false
-                            },
-                            tooltip: {
-                                callbacks: {
-                                    label: function (tooltipItem) {
-                                        return `${tooltipItem.dataset.label}: ${tooltipItem.raw}`;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                });
-            } catch (error) {
-                console.error('Error fetching vehicle costs data:', error);
-            }
-        }
-
-        async function fetchDistanceAndDeliveriesData(vehicleId) {
-            try {
-                const response = await fetch(`/Logistics/GetDistanceAndDeliveriesForVehicle/${vehicleId}`);
-                if (!response.ok) {
-                    throw new Error('Failed to fetch distance and deliveries data.');
-                }
-
-                const data = await response.json();
-                console.log('Fetched distance and deliveries data:', data);
-
-                const labels = data.months || [];
-                const totalDistance = data.totalDistance || 0;
-                const totalDeliveries = data.totalDeliveries || 0;
-
-                const ctx = document.getElementById('distanceDeliveriesChart').getContext('2d');
-                new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: labels,
-                        datasets: [
-                            {
-                                label: 'Total Distance Travelled (km)',
-                                data: labels.map((_, index) => (index === 4 ? totalDistance : 0)),
-                                borderColor: '#00aa87',
-                                backgroundColor: '#00aa87',
-                                fill: true,
-                                tension: 0.4
-                            },
-                            {
-                                label: 'Total Deliveries',
-                                data: labels.map((_, index) => (index === 4 ? totalDeliveries : 0)),
-                                borderColor: '#FF6384',
-                                backgroundColor: '#FF6384',
-                                fill: true,
-                                tension: 0.4
-                            }
-                        ]
-                    },
-                    options: {
-                        responsive: true,
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                title: {
-                                    display: true,
-                                    text: 'Values'
-                                }
-                            },
-                            x: {
-                                title: {
-                                    display: true,
-                                    text: 'Months'
-                                }
-                            }
-                        },
-                        plugins: {
-                            legend: {
-                                display: true,
-                                position: 'top'
-                            },
-                            tooltip: {
-                                callbacks: {
-                                    label: function (tooltipItem) {
-                                        return `${tooltipItem.dataset.label}: ${tooltipItem.raw}`;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                });
-            } catch (error) {
-                console.error('Error fetching distance and deliveries data:', error);
-            }
-        }
-
-        const vehicleId = '@Model.Id';
-        fetchVehicleCosts(vehicleId);
-        fetchDistanceAndDeliveriesData(vehicleId);
-    });
-</script>
+@section Scripts {
+    <script src="~/js/vehicleDetails.js"></script>
+}
 <style>
     .details-container {
         width: 90%;
@@ -612,7 +476,6 @@
         justify-content: space-between;
         width: 80%;
     }
-
 </style>
 
 

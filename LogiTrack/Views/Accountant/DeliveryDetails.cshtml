@@ -91,8 +91,6 @@
                     </div>
                 </div>
             </div>
-
-
         </div>
 
         <div id="invoicesSection" class="section d-none invoices">
@@ -128,7 +126,10 @@
         <div id="cashRegistersSection" class="section d-none cash-registers">
             <div class="cash-register-title-button">
                 <h4><b>Cash registers</b></h4>
-                <a asp-action="AddCashRegister" asp-controller="Accountant" asp-route-id="@Model.Id" class="btn btn-primary">ADD +</a>
+                @if(Model.DeliveryStep == 4)
+                {
+                    <a asp-action="AddCashRegister" asp-controller="Accountant" asp-route-id="@Model.Id" class="btn btn-primary">ADD +</a>
+                }
             </div>
             <div class="table-header-row">
                 <p><b>Date</b></p>

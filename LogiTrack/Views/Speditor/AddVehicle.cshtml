@@ -1,308 +1,166 @@
 ﻿@model LogiTrack.Core.ViewModels.Vehicle.AddVehicleViewModel
 @{
-    Layout = null;
+    ViewData["Title"] = "Add Vehicle";
+    Layout = "~/Views/Shared/_SpeditorLayout.cshtml";
 }
 
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Driver Dashboard</title>
-    <link rel="stylesheet" href="~/css/site.css" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css">
-
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <script src="~/js/site.js"></script>
-    <style>
- 
-        .row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 20px;
-        }
-
-        .form-group {
-            margin-bottom: 19px;
-        }
-
-        input[type="text"] {
-            width: 25%;
-            border: none;
-            border-bottom: 1.4px solid grey;
-            padding: 8px 0;
-            margin-bottom: 15px;
-        }
-
-
-        .row input[type="text"] {
-            width: 75%;
-            border: none;
-            border-bottom: 1.4px solid grey;
-            padding: 8px 0;
-            margin-bottom: 15px;
-        }
-        h4 {
-            color: #00aa87;
-            border-bottom: 15px;
-            margin-top: 0;
-        }
-
-    </style>
-
-</head>
-
-<body>
-    <header class="header">
-        <div class="logo-name">
-            <div class="company-logo">
-                <img src="https://via.placeholder.com/50" alt="Company Logo">
-            </div>
-            <div class="company-name">LogiTrack</div>
+<div class="search-item">
+    <div class="search-header">
+        <div class="search-icon">
+            <i class="fas fa-paper-plane" style="color:#00aa87; font-size:30px;"></i>
         </div>
-        <div class="profile-dropdown">
-            <button onclick="toggleDropdown()">
-                <i class="bi bi-person-circle"></i>
-                <span class="arrow">&#x25BC;</span>
-            </button>
-            <div class="profile-dropdown-menu" id="profileDropdown">
-                <a asp-action="CompanyDetails" asp-controller="Clients">Company details</a>
-                <a asp-action="ContactDetails" asp-controller="Clients">Contact details</a>
-                <a asp-action="Logout" asp-controller="Home">Logout</a>
-            </div>
-        </div>
-    </header>
-    <aside class="sidebar">
-        <ul>
-            <li>
-                <a asp-action="Dashboard" asp-controller="Speditor">
-                    <i class="bi bi-house-door"></i> Dashboard
-                </a>
-            </li>
-            <li>
-                <a href="#">
-                    <i class="bi bi-people"></i> Clients <span class="arrow">></span>
-                </a>
-                <div class="dropdown-menu">
-                    <ul>
-                        <li><a asp-action="ClientsRegister" asp-controller="Speditor"><i class="bi bi-journal-text"></i> Clients register</a></li>
-                        <li><a asp-action="SearchCompany" asp-controller="Speditor"><i class="bi bi-search"></i> Search</a></li>
-                    </ul>
-                </div>
-            </li>
-            <li>
-                <a asp-action="FuelPricesRegister" asp-controller="Speditor">
-                    <i class="bi bi-droplet"></i> Fuel <span class="arrow">></span>
-                </a>
-                <div class="dropdown-menu">
-                    <ul>
-                        <li><a asp-action="AddFuelPrice" asp-controller="Speditor"><i class="bi bi-plus-circle"></i> Add</a></li>
-                        <li><a asp-action="FuelPricesRegister" asp-controller="Speditor"><i class="bi bi-card-list"></i> Fuel price register</a></li>
-                        <li> <a asp-action="FuelPricesStatistics" asp-controller="Speditor"><i class="bi bi-bar-chart-line"></i> Statistics</a></li>
-                    </ul>
-                </div>
-            </li>
-            <li>
-                <a asp-action="VehiclesRegister" asp-controller="Speditor">
-                    <i class="bi bi-truck"></i> Vehicles <span class="arrow">></span>
-                </a>
-                <div class="dropdown-menu">
-                    <ul>
-                        <li><a asp-action="SearchVehicle" asp-controller="Speditor"><i class="bi bi-search"></i> Search</a></li>
-                        <li><a asp-action="AddVehicle" asp-controller="Speditor"><i class="bi bi-plus-circle"></i> Add</a></li>
-                        <li><a asp-action="VehiclesRegister" asp-controller="Speditor"><i class="bi bi-list-task"></i> Vehicles Register</a></li>
-                        <li><a asp-action="VehicleStatistics" asp-controller="Speditor"><i class="bi bi-bar-chart"></i> Statistics</a></li>
-                    </ul>
-                </div>
-            </li>
-            <li>
-                <a asp-action="DriversRegister" asp-controller="Logistics">
-                    <i class="bi bi-person-badge"></i> Drivers <span class="arrow">></span>
-                </a>
-                <div class="dropdown-menu">
-                    <ul>
-                        <li><a asp-action="SearchDriver" asp-controller="Speditor"><i class="bi bi-search"></i> Search</a></li>
-                        <li><a asp-action="AddDriver" asp-controller="Speditor"><i class="bi bi-plus-circle"></i> Add</a></li>
-                        <li><a asp-action="DriversRegister" asp-controller="Speditor"><i class="bi bi-people-fill"></i> Drivers Register</a></li>
-                        <li><a asp-action="DriverStatistics" asp-controller="Speditor"><i class="bi bi-bar-chart-line"></i> Statistics</a></li>
-                    </ul>
-                </div>
-            </li>
-            <li>
-                <a asp-action="RequestsRegister" asp-controller="Speditor">
-                    <i class="bi bi-card-list"></i> Requests <span class="arrow">></span>
-                </a>
-                <div class="dropdown-menu">
-                    <ul>
-                        <li><a asp-action="GetPendingRequests" asp-controller="Speditor"><i class="bi bi-search"></i> New requests</a></li>
-                        <li><a asp-action="SearchRequest" asp-controller="Speditor"><i class="bi bi-search"></i> Search</a></li>
-                        <li><a asp-action="RequestsRegister" asp-controller="Speditor"><i class="bi bi-journal"></i> Requests Register</a></li>
-                        <li><a asp-action="RequestsStatistics" asp-controller="Speditor"><i class="bi bi-bar-chart"></i> Statistics</a></li>
-                    </ul>
-                </div>
-            </li>
-            <li>
-                <a asp-action="OffersRegister" asp-controller="Speditor">
-                    <i class="bi bi-file-earmark-text"></i> Offers <span class="arrow">></span>
-                </a>
-                <div class="dropdown-menu">
-                    <ul>
-                        <li><a asp-action="SearchOffer" asp-controller="Speditor"><i class="bi bi-search"></i> Search</a></li>
-                        <li><a asp-action="OffersRegister" asp-controller="Speditor"><i class="bi bi-journal-text"></i> Offers Register</a></li>
-                        <li><a asp-action="OfferStatistics" asp-controller="Speditor"><i class="bi bi-bar-chart"></i> Statistics</a></li>
-                    </ul>
-                </div>
-            </li>
-            <li>
-                <a asp-action="DeliveriesRegister" asp-controller="Speditor">
-                    <i class="bi bi-box-seam"></i> Deliveries <span class="arrow">></span>
-                </a>
-                <div class="dropdown-menu">
-                    <ul>
-                        <li><a asp-action="SearchDelivery" asp-controller="Speditor"><i class="bi bi-search"></i> Search</a></li>
-                        <li><a asp-action="DeliveriesRegister" asp-controller="Speditor"><i class="bi bi-journal"></i> Deliveries Register</a></li>
-                        <li><a asp-action="DeliveryStatistics" asp-controller="Speditor"><i class="bi bi-bar-chart"></i> Statistics</a></li>
-                    </ul>
-                </div>
-            </li>
-        </ul>
-    </aside>
-    <div class="main-content">
-        <div class="search-item">
-            <div class="search-header">
-                <div class="search-icon">
-                    <i class="fas fa-paper-plane" style="color:#00aa87; font-size:30px;"></i>
-                </div>
-                <h2 class="search-title"><b>New vehicle</b></h2>
-            </div>
-            <h3>Add your new vehicle now!</h3>
-
-            <form method="post" asp-action="AddVehicle" asp-controller="Speditor">
-                <h4>General details</h4>
-                <div class="form-group">
-                    <label asp-for="RegistrationNumber"><b>Registration number</b></label>
-                    <input type="text" asp-for="RegistrationNumber" class="form-control" placeholder="Please enter" />
-                </div>
-                <div class="form-group">
-                    <label asp-for="VehicleType"><b>Type</b></label>
-                    <input asp-for="VehicleType" list="cargoTypeOptions" placeholder="Please enter or select">
-                    <datalist id="cargoTypeOptions">
-                        <option value="Vehicle expenses"></option>
-                        <option value="Driver expenses"></option>
-                        <option value="Other expenses"></option>
-                    </datalist>
-                    <span asp-validation-for="VehicleType" class="validation-message"></span>
-                </div>
-                <div class="form-group">
-                    <label asp-for="FuelConsumptionPer100Km"><b>Fuel consumption per 100km</b></label>
-                    <input type="text" asp-for="FuelConsumptionPer100Km" class="form-control" placeholder="Please enter" />
-                </div>
-                <div class="form-group">
-                    <label asp-for="EmissionFactor"><b>Emission factor</b></label>
-                    <input type="text" asp-for="EmissionFactor" class="form-control" placeholder="Please enter" />
-                </div>
-
-                <h4>Metrics</h4>
-                <div class="row" style="width: 80%;">
-                    <div class="form-group">
-                        <label asp-for="Length"><b>Length (cm)</b></label>
-                        <input type="text" asp-for="Length" class="form-control" placeholder="Please enter" />
-                    </div>
-                    <div class="form-group">
-                        <label asp-for="Width"><b>Width (cm)</b></label>
-                        <input type="text" asp-for="Width" class="form-control" placeholder="Please enter" />
-                    </div>
-                    <div class="form-group">
-                    <label asp-for="Height"><b>Height (cm)</b></label>
-                    <input type="text" asp-for="Height" class="form-control" placeholder="Please enter" />
-                    </div>
-                </div>
-
-                <h4>Capacity</h4>
-                <div class="row">
-                    <div class="form-group">
-                        <label asp-for="EuroPalletCapacity"><b>Euro pallets count</b></label>
-                        <input type="text" asp-for="EuroPalletCapacity" class="form-control" placeholder="Please enter" />
-                    </div>
-                    <div class="form-group">
-                        <label asp-for="IndustrialPalletCapacity"><b>Industrial pallets count</b></label>
-                        <input type="text" asp-for="EuroPalletCapacity" class="form-control" placeholder="Please enter" />
-                    </div>
-                    <div class="form-group">
-                        <label asp-for="ArePalletsStackable"><b>Stackable pallets?</b></label>
-                        <input type="text" asp-for="ArePalletsStackable" class="form-control" placeholder="Please enter" />
-                    </div>
-                    <div class="form-group">
-                        <label asp-for="MaxWeightCapacity"><b>Weight capacity</b></label>
-                        <input type="text" asp-for="MaxWeightCapacity" class="form-control" placeholder="Please enter" />
-                    </div>
-                </div>
-                <h4>Maintenance</h4>
-                <div class="row" style="width: 80%;">
-                    <div class="form-group">
-                        <label asp-for="LastYearMaintenance"><b>Last year maintenance</b></label>
-                        <input type="text" asp-for="LastYearMaintenance" class="form-control" placeholder="Please enter" />
-                    </div>
-                    <div class="form-group">
-                        <label asp-for="KilometersToChangeParts"><b>How many kilometers should be driven to change parts</b></label>
-                        <input type="text" asp-for="KilometersLeftToChangeParts" class="form-control" placeholder="Please enter" />
-                    </div>
-                    <div class="form-group">
-                        <label asp-for="KilometersLeftToChangeParts"><b>KilometersLeftToChange parts</b></label>
-                        <input type="text" asp-for="KilometersLeftToChangeParts" class="form-control" placeholder="Please enter" />
-                    </div>
-                </div>
-                <h4>Kilometers</h4>
-
-                <div class="form-group">
-                    <label asp-for="KilometersDriven"><b>Kilometers</b></label>
-                    <input type="text" asp-for="KilometersDriven" class="form-control" placeholder="Please enter" />
-                </div>
-                <h4>Expenses</h4>
-                <div class="row" style="width: 50%;">
-                    <div class="form-group">
-                        <label asp-for="ContantsExpenses"><b>Constant expenses</b></label>
-                        <input type="text" asp-for="ContantsExpenses" class="form-control" placeholder="Please enter" />
-                    </div>
-                    <div class="form-group">
-                        <label asp-for="PurchasePrice"><b>Purchase price</b></label>
-                        <input type="text" asp-for="PurchasePrice" class="form-control" placeholder="Please enter" />
-                    </div>
-                </div>
-                <h4>Quotients</h4>
-                <div class="row">
-                    <div class="column" style="width: 80%;">
-                        <h4>Domestic</h4>
-                        <div class="form-group">
-                            <label asp-for="QuotientForDomesticNotSharedTruck"><b>Not shared</b></label>
-                            <input type="text" asp-for="QuotientForDomesticNotSharedTruck" class="form-control" placeholder="Please enter" />
-                        </div>
-                        <div class="form-group">
-                            <label asp-for="QuotientForDomesticSharedTruck"><b>Shared</b></label>
-                            <input type="text" asp-for="QuotientForDomesticSharedTruck" class="form-control" placeholder="Please enter" />
-                        </div>
-                        <div class="column">
-                            <h4>International</h4>
-                            <div class="form-group">
-                                <label asp-for="QuotientForInternationalNotSharedTruck"><b>Not shared</b></label>
-                                <input type="text" asp-for="QuotientForInternationalNotSharedTruck" class="form-control" placeholder="Please enter" />
-                            </div>
-                            <div class="form-group">
-                                <label asp-for="QuotientForInternationalSharedTruck"><b>Shared</b></label>
-                                <input type="text" asp-for="QuotientForInternationalSharedTruck" class="form-control" placeholder="Please enter" />
-                            </div>
-                        </div>
-                    </div>
-                    
-                </div>
-
-                <button type="submit" class="btn-primary"><b>SUBMIT</b></button>
-            </form>
-        </div>
+        <h2 class="search-title"><b>New vehicle</b></h2>
     </div>
+    <h3>Add your new vehicle now!</h3>
 
-</body>
+    <form method="post" asp-action="AddVehicle" asp-controller="Speditor">
+        <h4>General details</h4>
+        <div class="form-group">
+            <label asp-for="RegistrationNumber"><b>Registration number</b></label>
+            <input type="text" asp-for="RegistrationNumber" class="form-control" placeholder="Please enter" />
+        </div>
+        <div class="form-group">
+            <label asp-for="VehicleType"><b>Type</b></label>
+            <input asp-for="VehicleType" list="cargoTypeOptions" placeholder="Please enter or select">
+            <datalist id="cargoTypeOptions">
+                <option value="Vehicle expenses"></option>
+                <option value="Driver expenses"></option>
+                <option value="Other expenses"></option>
+            </datalist>
+            <span asp-validation-for="VehicleType" class="validation-message"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="FuelConsumptionPer100Km"><b>Fuel consumption per 100km</b></label>
+            <input type="text" asp-for="FuelConsumptionPer100Km" class="form-control" placeholder="Please enter" />
+        </div>
+        <div class="form-group">
+            <label asp-for="EmissionFactor"><b>Emission factor</b></label>
+            <input type="text" asp-for="EmissionFactor" class="form-control" placeholder="Please enter" />
+        </div>
 
-</html>
+        <h4>Metrics</h4>
+        <div class="row" style="width: 80%;">
+            <div class="form-group">
+                <label asp-for="Length"><b>Length (cm)</b></label>
+                <input type="text" asp-for="Length" class="form-control" placeholder="Please enter" />
+            </div>
+            <div class="form-group">
+                <label asp-for="Width"><b>Width (cm)</b></label>
+                <input type="text" asp-for="Width" class="form-control" placeholder="Please enter" />
+            </div>
+            <div class="form-group">
+                <label asp-for="Height"><b>Height (cm)</b></label>
+                <input type="text" asp-for="Height" class="form-control" placeholder="Please enter" />
+            </div>
+        </div>
+
+        <h4>Capacity</h4>
+        <div class="row">
+            <div class="form-group">
+                <label asp-for="EuroPalletCapacity"><b>Euro pallets count</b></label>
+                <input type="text" asp-for="EuroPalletCapacity" class="form-control" placeholder="Please enter" />
+            </div>
+            <div class="form-group">
+                <label asp-for="IndustrialPalletCapacity"><b>Industrial pallets count</b></label>
+                <input type="text" asp-for="EuroPalletCapacity" class="form-control" placeholder="Please enter" />
+            </div>
+            <div class="form-group">
+                <label asp-for="ArePalletsStackable"><b>Stackable pallets?</b></label>
+                <input type="text" asp-for="ArePalletsStackable" class="form-control" placeholder="Please enter" />
+            </div>
+            <div class="form-group">
+                <label asp-for="MaxWeightCapacity"><b>Weight capacity</b></label>
+                <input type="text" asp-for="MaxWeightCapacity" class="form-control" placeholder="Please enter" />
+            </div>
+        </div>
+        <h4>Maintenance</h4>
+        <div class="row" style="width: 80%;">
+            <div class="form-group">
+                <label asp-for="LastYearMaintenance"><b>Last year maintenance</b></label>
+                <input type="text" asp-for="LastYearMaintenance" class="form-control" placeholder="Please enter" />
+            </div>
+            <div class="form-group">
+                <label asp-for="KilometersToChangeParts"><b>How many kilometers should be driven to change parts</b></label>
+                <input type="text" asp-for="KilometersLeftToChangeParts" class="form-control" placeholder="Please enter" />
+            </div>
+            <div class="form-group">
+                <label asp-for="KilometersLeftToChangeParts"><b>KilometersLeftToChange parts</b></label>
+                <input type="text" asp-for="KilometersLeftToChangeParts" class="form-control" placeholder="Please enter" />
+            </div>
+        </div>
+        <h4>Kilometers</h4>
+
+        <div class="form-group">
+            <label asp-for="KilometersDriven"><b>Kilometers</b></label>
+            <input type="text" asp-for="KilometersDriven" class="form-control" placeholder="Please enter" />
+        </div>
+        <h4>Expenses</h4>
+        <div class="row" style="width: 50%;">
+            <div class="form-group">
+                <label asp-for="ContantsExpenses"><b>Constant expenses</b></label>
+                <input type="text" asp-for="ContantsExpenses" class="form-control" placeholder="Please enter" />
+            </div>
+            <div class="form-group">
+                <label asp-for="PurchasePrice"><b>Purchase price</b></label>
+                <input type="text" asp-for="PurchasePrice" class="form-control" placeholder="Please enter" />
+            </div>
+        </div>
+        <h4>Quotients</h4>
+        <div class="row">
+            <div class="column" style="width: 80%;">
+                <h4>Domestic</h4>
+                <div class="form-group">
+                    <label asp-for="QuotientForDomesticNotSharedTruck"><b>Not shared</b></label>
+                    <input type="text" asp-for="QuotientForDomesticNotSharedTruck" class="form-control" placeholder="Please enter" />
+                </div>
+                <div class="form-group">
+                    <label asp-for="QuotientForDomesticSharedTruck"><b>Shared</b></label>
+                    <input type="text" asp-for="QuotientForDomesticSharedTruck" class="form-control" placeholder="Please enter" />
+                </div>
+                <div class="column">
+                    <h4>International</h4>
+                    <div class="form-group">
+                        <label asp-for="QuotientForInternationalNotSharedTruck"><b>Not shared</b></label>
+                        <input type="text" asp-for="QuotientForInternationalNotSharedTruck" class="form-control" placeholder="Please enter" />
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="QuotientForInternationalSharedTruck"><b>Shared</b></label>
+                        <input type="text" asp-for="QuotientForInternationalSharedTruck" class="form-control" placeholder="Please enter" />
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <button type="submit" class="btn-primary"><b>SUBMIT</b></button>
+    </form>
+</div>
+<style>
+
+    .row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 20px;
+    }
+
+    .form-group {
+        margin-bottom: 19px;
+    }
+
+    input[type="text"] {
+        width: 25%;
+        border: none;
+        border-bottom: 1.4px solid grey;
+        padding: 8px 0;
+        margin-bottom: 15px;
+    }
+
+
+    .row input[type="text"] {
+        width: 75%;
+        border: none;
+        border-bottom: 1.4px solid grey;
+        padding: 8px 0;
+        margin-bottom: 15px;
+    }
+</style>

@@ -1,0 +1,59 @@
+﻿@model LogiTrack.Core.ViewModels.Offer.OfferStatisticsForClientViewModel
+@{
+    ViewData["Title"] = "Offer Statistics";
+    Layout = "~/Views/Shared/_SpeditorLayout.cshtml";
+}
+<div class="chart-container">
+    <div class="cards-container">
+        <div class="card" id="locationCard">
+            <div class="card-content">
+                <h3>Average weight</h3>
+                <p><b>@Model.AverageWeight KG</b></p>
+            </div>
+        </div>
+        <div class="card" id="locationCard">
+            <div class="card-content">
+                <h3>Average volume</h3>
+                <p><b>@Model.AverageVolume M3</b></p>
+            </div>
+        </div>
+        <div class="card" id="locationCard">
+            <div class="card-content">
+                <h3>Average price</h3>
+                <p><b>@Model.AveragePrice BGN</b></p>
+            </div>
+        </div>
+        <div class="card" id="locationCard">
+            <div class="card-content">
+                <h3>Total pallets</h3>
+                <p><b>@Model.TotalPallets</b></p>
+            </div>
+        </div>
+    </div>
+
+    <div class="first-row">
+        <div class="chart-container">
+            <h4>Offer acceptance rate</h4>
+            <canvas id="offerAcceptanceRateChart" class="chart"></canvas>
+        </div>
+        <div class="chart-container">
+            <h4>Differences in approximate prices and final prices</h4>
+            <div class="delay">
+                <canvas id="dualAxisChart" class="chart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="second-row">
+        <div class="chart-container">
+            <h4>Cargo type ratio</h4>
+            <canvas id="cargoRatioChart" class="chart"></canvas>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+

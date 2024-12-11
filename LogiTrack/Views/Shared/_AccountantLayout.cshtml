@@ -10,6 +10,9 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-gauge"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <script src="~/js/site.js"></script>
 </head>
@@ -44,7 +47,7 @@
                 </a>
                 <div class="dropdown-menu">
                     <ul>
-                        <li><a asp-action="SearchDeliveries" asp-controller="Accountant"><i class="bi bi-list"></i> All</a></li>
+                        <li><a asp-action="SearchDeliveries" asp-controller="Accountant"><i class="bi bi-box"></i> Deliveries register</a></li>
                         <li><a asp-action="SearchDelivery" asp-controller="Accountant"><i class="bi bi-search"></i> Search</a></li>
                     </ul>
                 </div>
@@ -55,7 +58,7 @@
                 </a>
                 <div class="dropdown-menu">
                     <ul>
-                        <li><a asp-action="SearchCashRegisters" asp-controller="Accountant"><i class="bi bi-list"></i> All</a></li>
+                        <li><a asp-action="SearchCashRegisters" asp-controller="Accountant"><i class="bi bi-list"></i> Search cash registers</a></li>
                         <li><a asp-action="CashRegistersStatistics" asp-controller="Accountant"><i class="bi bi-bar-chart"></i> Statistics</a></li>
                     </ul>
                 </div>
@@ -76,5 +79,7 @@
     <div class="main-content">
         @RenderBody()
     </div>
+    @RenderSection("Scripts", required: false)
+
 </body>
 </html>

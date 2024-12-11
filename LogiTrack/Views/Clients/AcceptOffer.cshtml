@@ -1,6 +1,6 @@
 ﻿@model LogiTrack.Core.ViewModels.Offer.AcceptOfferViewModel
 @{
-    ViewData["Title"] = "Add Status";
+    ViewData["Title"] = "Accept Offer";
     Layout = "~/Views/Shared/_ClientsLayout.cshtml";
 }
 
@@ -20,9 +20,5 @@
         <a asp-action="BookOffer" asp-controller="Clients" asp-route-id="@Model.OfferId" class="btn-clear"><b>CANCEL</b></a>
     </div>
 </div>
-<style>
-    p {
-        opacity: 80%;
-    }
-</style>
+
 

@@ -105,18 +105,10 @@
     }
 </div>
 
-
-<script>
-
-    document.addEventListener('DOMContentLoaded', function () {
-        flatpickr(".flatpickr", {
-            dateFormat: "Y-m-d",
-        });
-    });
-
-</script>
-<style>
-    
+@section Scripts {
+    <script src="~/js/flatpicker.js"></script>
+}
+<style>   
     .row {
         display: flex;
         flex-wrap: wrap;
@@ -131,7 +123,6 @@
         .form-group:last-child {
             margin-right: 0;
         }
-
 
     input[type="text"],
     input[type="date"] {
@@ -171,13 +162,10 @@
         position: relative;
         overflow: hidden;
     }
-
-        
+       
         .delivery-card:nth-child(even) {
             background-color: #F5F5F7;
-        }
-
-    
+        }    
 
     .delivery-metrics {
         display: none;
@@ -190,8 +178,7 @@
         .delivery-metrics p {
             margin-left: 210px;
         }
-
-    
+   
     .address {
         width: 140px;
         flex-wrap: wrap;

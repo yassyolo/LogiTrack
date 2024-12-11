@@ -1,6 +1,6 @@
 ﻿@model List<LogiTrack.Core.ViewModels.Clients.PendingRegistrationsViewModel>
 @{
-    ViewData["Title"] = "Add Cash Register";
+    ViewData["Title"] = "Pending Registrations";
     Layout = "~/Views/Shared/_LogisticsLayout.cshtml";
 }
 
@@ -30,7 +30,7 @@
                 <p><b>Created At:</b> @item.CreatedAt</p>
             </div>
             <div class="btn-div">
-                <a asp-action="NewCompanyDetails" asp-controller="Logistics" asp-route-id="@item.Id" class="btn">
+                <a asp-action="NewCompanyDetails" asp-controller="Logistics" asp-route-id="@item.Id" class="btn" style="text-decoration:none;">
                     <i class="bi bi-eye"></i> SEE
                 </a>
             </div>
