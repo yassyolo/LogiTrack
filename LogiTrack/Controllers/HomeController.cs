@@ -1,6 +1,6 @@
 ﻿using LogiTrack.Core.Contracts;
-using LogiTrack.Core.Services;
 using LogiTrack.Core.ViewModels.Home;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using static LogiTrack.Core.Constants.MessageConstants.ErrorMessages;
@@ -8,6 +8,7 @@ using static LogiTrack.Core.Constants.UserRolesConstants;
 
 namespace LogiTrack.Controllers
 {
+    [Authorize]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> logger;
@@ -28,6 +29,7 @@ namespace LogiTrack.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
         public IActionResult Login()
         {
             var model = new LoginViewModel();
@@ -36,6 +38,7 @@ namespace LogiTrack.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [AllowAnonymous]
         public async Task<IActionResult> Login(LoginViewModel model)
         {
             if (ModelState.IsValid == false)
@@ -43,7 +46,7 @@ namespace LogiTrack.Controllers
                 return View(model);
             }
 
-            var user = await homeService.GetUserByEmailAsync(model.Email);
+            var user = await homeService.GetUserByUsernameAsync(model.Email);
             if (user == null)
             {
                 ModelState.AddModelError(string.Empty, InvalidEmailErrorMessage);

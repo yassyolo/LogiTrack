@@ -542,5 +542,11 @@ namespace LogiTrack.Controllers
             var model = await requestService.GetPendingRequestDetailsAsync(id);
             return View(model);
         }
+        [HttpGet]
+        public async Task<IActionResult> OfferStatistics()
+        {
+            var model = await statisticsService.GetOfferStatisticsAsync();
+            return View(model);
+        }
     }
 }

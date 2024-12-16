@@ -4,9 +4,12 @@ using Microsoft.AspNetCore.Mvc;
 using LogiTrack.Core.ViewModels.Invoice;
 using LogiTrack.Core.ViewModels.CashRegister;
 using LogiTrack.Core.ViewModels.Delivery;
+using Microsoft.AspNetCore.Authorization;
+using LogiTrack.Core.Constants;
 
 namespace LogiTrack.Controllers
 {
+    [Authorize(Roles = UserRolesConstants.Accountant)]
     public class AccountantController : Controller
     {
         private readonly IVehicleService vehicleService;
