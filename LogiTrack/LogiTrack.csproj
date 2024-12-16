@@ -29,4 +29,9 @@
     <ProjectReference Include="..\LogiTrack.Core\LogiTrack.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\js\NewFolder1\" />
+    <Folder Include="wwwroot\js\NewFolder\" />
+  </ItemGroup>
+
 </Project>
