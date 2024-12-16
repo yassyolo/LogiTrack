@@ -215,25 +215,14 @@
             flex-direction: row;
             justify-content: space-between;
             width: 80%;
-        }
-
-        .legend {
-            font-family: Arial, sans-serif;
-            background: #f9f9f9;
-            padding: 10px;
-            border-radius: 5px;
-        }
-
-            .legend ul {
-                list-style: none;
-                padding: 0;
-            }
+        }       
 
         .legend-item {
+            margin-right: 10px;
             display: inline-block;
-            width: 15px;
-            height: 15px;
-            margin-right: 5px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
         }
 
         .green {
@@ -245,7 +234,7 @@
         }
 
         .blue {
-            background-color: blue;
+            background-color: crimson;
         }
 
         .purple {
@@ -261,13 +250,20 @@
         }
 
         .lightblue {
-            background-color: lightblue;
+            background-color: #00aa87;
         }
 
         .available-row{
             display: flex;
             flex-direction: row;
             justify-content: space-between;            
+        }
+
+        .legend{
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            float:right;
         }
     </style>
 
@@ -417,24 +413,29 @@
                 </div>
 
                 <div id="infoSection" class="section">
+                    
                     <div class="column">
-                        <h4><b>Client Information</b></h4>
+                        <h4><b>General information</b></h4>
+                        <p><strong>Created on:</strong> @Model.CreatedOn</p>
+                        <p><strong>Expected delivery date:</strong> @Model.ExpectedDeliveryDate</p>
+                    </div>
+                    <div class="divider-line"></div>
+                    <div class="column">
+                        <h4><b>Given price</b></h4>
+                        <p><strong>Approximate price given:</strong> @Model.ApproximatePrice BGN</p>
+                    </div>
+                    <div class="divider-line"></div>
+                    <div class="column">
+                        <h4><b>Client information</b></h4>
                         <p><strong>Company Name:</strong> @Model.ClientCompanyName</p>
                         <p><strong>Address:</strong> @Model.ClientAddress</p>
                         <p><strong>Phone:</strong> @Model.ClientPhone</p>
                         <p><strong>Email:</strong> @Model.ClientEmail</p>
                         <a asp-action="ClientDetails" asp-controller="Speditor" asp-route-id="@Model.ClientId" style="color:#00aa87;">See client</a>
                     </div>
-                    <div class="divider-line"></div>
-                    <div class="column">
-                        <h4><b>General Information</b></h4>
-                        <p><strong>Created on:</strong> @Model.CreatedOn</p>
-                        <p><strong>Expected delivery date:</strong> @Model.ExpectedDeliveryDate</p>
-                        <p><strong>Approximate price given:</strong> @Model.ApproximatePrice</p>
-                    </div>
                 </div>
 
-                <div id="addressesSection" class="section">
+                <div id="addressesSection" class="section d-none">
                     <div class="columns-container">
                         <div class="column">
                             <h4><b>Pickup Address</b></h4>
@@ -492,10 +493,10 @@
                         </div>
                         <div class="standart-metrics-info-row">
                             <p>@Model.NumberOfPallets</p>
-                            <p>@Model.PalletLength</p>
-                            <p>@Model.PalletWidth</p>
-                            <p>@Model.PalletHeight</p>
-                            <p>@Model.WeightOfPallets</p>
+                            <p>@Model.PalletLength cm</p>
+                            <p>@Model.PalletWidth cm</p>
+                            <p>@Model.PalletHeight cm</p>
+                            <p>@Model.WeightOfPallets kg</p>
                             <p>@Model.PalletsAreStackable</p>
                         </div>
                     }
@@ -513,11 +514,11 @@
                             <p><b>Description</b></p>
                         </div>
                         <div class="non-standart-metrics-info-row">
-                            <p>@item.Length</p>
-                            <p>@item.Width</p>
-                            <p>@item.Height</p>
-                            <p>@item.Weight</p>
-                            <p>@item.Description</p>
+                            <p>@item.Length cm</p>
+                            <p>@item.Width cm</p>
+                            <p>@item.Height cm</p>
+                            <p>@item.Weight cm</p>
+                            <p>@item.Description cm</p>
                         </div>
                     }
                     <div class="metrics">
@@ -533,62 +534,81 @@
                     </div>
                 </div>
 
-                <div id="driversSection" class="section">
-                    <h4><b>Available drivers</b></h4>
-                    <p><strong>Legend</strong></p>
-                    <ul>
-                        <li><span class="legend-item yellow"></span> License Expiring Soon</li>
-                        <li><span class="legend-item blue"></span> Experienced</li>
-                        <li><span class="legend-item purple"></span> Nearby</li>
-                        <li><span class="legend-item lightgreen"></span> Low Workload</li>
-                        <li><span class="legend-item lightblue"></span> Fit</li>
-                    </ul>
+                <div id="driversSection" class="section d-none">
+                    <div class="title-legend" style="display:flex; justify-content:space-between; width: 70%; flex-direction:row;">
+                        <h4><b>Available drivers</b></h4>
+                        <div class="legend">
+                            <h4><b>Legend</b></h4>
+                            <p style="margin:0;"><span class="legend-item yellow"></span> License expiring soon</p>
+                            <p style="margin:0;"><span class="legend-item blue"></span> Experienced</p>
+                            <p style="margin:0;"><span class="legend-item purple"></span> Nearby</p>
+                            <p style="margin:0;"><span class="legend-item lightgreen"></span> Low workload</p>
+                            <p style="margin:0;"><span class="legend-item lightblue"></span> Fit</p>
+                        </div>
+                    </div>
+                    
                     @foreach (var driver in Model.PossibleDrivers)
                     {
-                        <div class="available-row">
-                            <div class="column">
-                                <h4><b>General details</b></h4>
-                                <p><strong>Name:</strong> @driver.DriverName</p>
-                                <p><strong>Age:</strong> @driver.Age</p>
-                                <p><strong>Phone:</strong> @driver.DriverPhoneNumber</p>
-                            </div>
-                            <div class="column">
-                                <h4><b>Statistics</b></h4>
-                                <p><strong>Reserved for deliveries:</strong> @driver.ReservedDeliveriesCount</p>
-                                <p><strong>International/Domestic deliveries(this year):</strong> @driver.InternationalDeliveriesThisYearCount/ @driver.DomesticsDeliveriesThisYearCount</p>
-                                <p><strong>Currently on delivery:</strong> @driver.CurrentlyDelivering</p>
-                                <p><strong>Success rate:</strong> @driver.SuccessRate</p>
-                            </div>
-                            <div class="column">
-                                <h4><b>Optimal legend</b></h4>
-                                <ul>
-                                @if (driver.Experienced)
-                                {
-                                    <li><span class="legend-item blue"></span> </li>
-                                }
-                                    @if (driver.LicenseExpiringSoon)
+                        <div style="border: 1px solid #00aa87; border-radius: 2px; background-color: #fff; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+                            <div style="display: flex; flex-wrap: wrap; gap: 20px;">
+                                <div style="flex: 1; min-width: 250px;">
+                                    <h4 style=" margin-bottom: 10px; ">Info</h4>
+                                    <p style="margin: 5px 0; margin-top:10px;"><strong>Name:</strong> @driver.DriverName</p>
+                                    <p style="margin: 5px 0; margin-top:10px;"><strong>Age:</strong> @driver.Age</p>
+                                    <p style="margin: 5px 0; margin-top:10px;"><strong>Phone:</strong> @driver.DriverPhoneNumber</p>
+                                    <a asp-action="DriverDetails" asp-controller="Speditor" asp-route-id="@driver.Id" style="text-decoration:underline; color:#00aa87">See driver</a>
+                                </div>
+                                <div style="flex: 1; min-width: 250px;">
+                                    <h4 style=" margin-bottom: 10px;">Delivery statistics</h4>
+                                    <p style="margin: 5px 0; margin-top:10px;"><strong>Domestic(this year):</strong>  @driver.DomesticsDeliveriesThisYearCount</p>
+                                    <p style="margin: 5px 0; margin-top:10px;"><strong>International(this year):</strong> @driver.InternationalDeliveriesThisYearCount </p>
+                                    <p style="margin: 5px 0; margin-top:10px;"><strong>Kilometers(this year):</strong> @driver.KilometersDriven </p>
+
+                                    @if (driver.CurrentlyDelivering)
                                     {
-                                        <li><span class="legend-item yellow"></span></li>
+                                        <p style="margin: 5px 0; margin-top:10px;"><strong>Currently deliverying:</strong> Yes</p>
+
                                     }
-                                    @if (driver.Nearby)
+                                    else
                                     {
-                                        <li><span class="legend-item purple"></span> </li>
+                                        <p style="margin: 5px 0; margin-top:10px;"><strong>Currently deliverying:</strong> No</p>
+
                                     }
-                                    @if (driver.LowWorkload)
-                                    {
-                                        <li><span class="legend-item lightgreen"></span></li>
-                                    }
-                                    @if (driver.Fit)
-                                    {
-                                        <li><span class="legend-item lightblue"></span></li>
-                                    }
-                                </ul>
+                                    <p style="margin: 5px 0; margin-top:10px;"><strong>Reserved for:</strong> @driver.ReservedDeliveriesCount</p>
+                                    <p style="margin: 5px 0; margin-top:10px;"><strong>Success rate:</strong> @driver.SuccessRate%</p>
+                                </div>
+                                <div style="flex: 1; min-width: 250px;">
+                                    <h4 style="margin-bottom: 10px;">Legend</h4>
+                                    <ul style="list-style: none; padding: 0; margin: 0;">
+                                        @if (driver.Experienced)
+                                        {
+                                            <li style="margin: 5px 0;"><span class="legend-item blue"></span> </li>
+                                        }
+                                        @if (driver.LicenseExpiringSoon)
+                                        {
+                                            <li style="margin: 5px 0;"><span class="legend-item yellow"></span> </li>
+                                        }
+                                        @if (driver.Nearby)
+                                        {
+                                            <li style="margin: 5px 0;"><span class="legend-item purple"></span> </li>
+                                        }
+                                        @if (driver.LowWorkload)
+                                        {
+                                            <li style="margin: 5px 0;"><span class="legend-item lightgreen"></span> </li>
+                                        }
+                                        @if (driver.Fit)
+                                        {
+                                            <li style="margin: 5px 0;"><span class="legend-item lightblue"></span> </li>
+                                        }
+                                    </ul>
+                                </div>
                             </div>
                         </div>
                     }
+
                 </div>
 
-                <div id="vehicleSection" class="section">
+                <div id="vehicleSection" class="section d-none">
                     <h4><b>Available vehicles</b></h4>
                     <p><strong>Legend</strong></p>
                     <ul>
@@ -598,49 +618,121 @@
                         <li><span class="legend-item purple"></span> Ecological</li>
                         <li><span class="legend-item lightgreen"></span> Maintenance soon</li>
                     </ul>
-                    @foreach (var driver in Model.PossibleVehicles)
+                    @if(Model.RequiredVehicleCount == 1)
                     {
-                        <div class="available-row">
-                            <div class="column">
-                                <h4><b>General details</b></h4>
-                                <p><strong>Registration No:</strong> @driver.RegistrationNumber</p>
-                                <p><strong>Type:</strong> @driver.VehicleType</p>
-                                <p><strong>Fuel consumption per 100 km:</strong> @driver.FuelConsumptionPer100km</p>
-                                <p><strong>Type:</strong> @driver.EmissionFactor</p>
-                                <p><strong>Metrics:</strong> @driver.Length cm X @driver.Weight cm X @driver.Height cm @driver.Weight kg max</p>
+                        @foreach (var driver in Model.PossibleVehicles)
+                        {
+                            <div class="available-row">
+                                <div class="column">
+                                    <h4><b>General details</b></h4>
+                                    <p><strong>Registration No:</strong> @driver.RegistrationNumber</p>
+                                    <p><strong>Type:</strong> @driver.VehicleType</p>
+                                    <p><strong>Fuel consumption per 100 km:</strong> @driver.FuelConsumptionPer100km</p>
+                                    <p><strong>Type:</strong> @driver.EmissionFactor</p>
+                                    <p><strong>Metrics:</strong> @driver.Length cm X @driver.Weight cm X @driver.Height cm @driver.Weight kg max</p>
+                                </div>
+                                <div class="column">
+                                    <h4><b>Statistics</b></h4>
+                                    <p><strong>Deliveries(this year):</strong> @driver.DeliveriesThisYearCount</p>
+                                    <p><strong>Reserved for deliveries:</strong> @driver.ReservedDeliveriesCount</p>
+                                    <p><strong>Currently on delivery:</strong> @driver.CurrentlyDelivering</p>
+                                </div>
+                                <div class="column">
+                                    <h4><b>Optimal legend</b></h4>
+                                    <ul>
+                                        @if (driver.MostOptimal)
+                                        {
+                                            <li><span class="legend-item blue"></span> </li>
+                                        }
+                                        @if (driver.Cheapest)
+                                        {
+                                            <li><span class="legend-item yellow"></span></li>
+                                        }
+                                        @if (driver.MostEconomical)
+                                        {
+                                            <li><span class="legend-item purple"></span> </li>
+                                        }
+                                        @if (driver.MostEcological)
+                                        {
+                                            <li><span class="legend-item lightgreen"></span></li>
+                                        }
+                                        @if (driver.ClosestToMaintenance)
+                                        {
+                                            <li><span class="legend-item lightblue"></span></li>
+                                        }
+                                    </ul>
+                                </div>
                             </div>
-                            <div class="column">
-                                <h4><b>Statistics</b></h4>
-                                <p><strong>Deliveries(this year):</strong> @driver.DeliveriesThisYearCount</p>
-                                <p><strong>Reserved for deliveries:</strong> @driver.ReservedDeliveriesCount</p>
-                                <p><strong>Currently on delivery:</strong> @driver.CurrentlyDelivering</p>
+                        }
+                    }
+                    else
+                    {
+                        @foreach (var vehicle in Model.NeededVehiclePairs)
+                        {                        
+                            <div class="available-row" style="display:flex; flex-direction: row; justify-content:space-between;">
+                                <div class="vehicle-column" style="display:flex; flex-direction:column">
+                                <div class="vehicle-row">
+                                <div class="column">
+                                    <h4><b>Vehicle 1</b></h4>
+                                    <h4><b>General details</b></h4>
+                                    <p><strong>Registration No:</strong> @vehicle.Primary.RegistrationNumber</p>
+                                    <p><strong>Type:</strong> @vehicle.Primary.VehicleType</p>
+                                    <p><strong>Fuel consumption per 100 km:</strong> @vehicle.Primary.FuelConsumptionPer100km</p>
+                                    <p><strong>Type:</strong> @vehicle.Primary.EmissionFactor</p>
+                                    <p><strong>Metrics:</strong> @vehicle.Primary.Length cm X @vehicle.Primary.Weight cm X @vehicle.Primary.Height cm @vehicle.Primary.Weight kg max</p>
+                                </div>
+                                <div class="column">
+                                    <h4><b>Statistics</b></h4>
+                                    <p><strong>Deliveries(this year):</strong> @vehicle.Primary.DeliveriesThisYearCount</p>
+                                    <p><strong>Reserved for deliveries:</strong> @vehicle.Primary.ReservedDeliveriesCount</p>
+                                    <p><strong>Currently on delivery:</strong> @vehicle.Primary.CurrentlyDelivering</p>
+                                </div>
+                                </div>
+                                <div class="vehicle-row">
+                                    <div class="column">
+                                        <h4><b>Vehicle 2</b></h4>
+                                        <h4><b>General details</b></h4>
+                                        <p><strong>Registration No:</strong> @vehicle.Seconary.RegistrationNumber</p>
+                                        <p><strong>Type:</strong> @vehicle.Seconary.VehicleType</p>
+                                        <p><strong>Fuel consumption per 100 km:</strong> @vehicle.Seconary.FuelConsumptionPer100km</p>
+                                        <p><strong>Type:</strong> @vehicle.Seconary.EmissionFactor</p>
+                                        <p><strong>Metrics:</strong> @vehicle.Seconary.Length cm X @vehicle.Seconary.Weight cm X @vehicle.Seconary.Height cm @vehicle.Seconary.Weight kg max</p>
+                                    </div>
+                                    <div class="column">
+                                        <h4><b>Statistics</b></h4>
+                                        <p><strong>Deliveries(this year):</strong> @vehicle.Seconary.DeliveriesThisYearCount</p>
+                                        <p><strong>Reserved for deliveries:</strong> @vehicle.Seconary.ReservedDeliveriesCount</p>
+                                        <p><strong>Currently on delivery:</strong> @vehicle.Seconary.CurrentlyDelivering</p>
+                                    </div>
+                                </div>
+                                </div>
+                                <div class="column">
+                                    <h4><b>Optimal legend</b></h4>
+                                    <ul>
+                                        @if (vehicle.Legend.MostOptimal)
+                                        {
+                                            <li><span class="legend-item blue"></span> </li>
+                                        }
+                                        @if (vehicle.Legend.Cheapest)
+                                        {
+                                            <li><span class="legend-item yellow"></span></li>
+                                        }
+                                        @if (vehicle.Legend.MostEconomical)
+                                        {
+                                            <li><span class="legend-item purple"></span> </li>
+                                        }
+                                        @if (vehicle.Legend.MostEcological)
+                                        {
+                                            <li><span class="legend-item lightgreen"></span></li>
+                                        }
+                                        @if (vehicle.Legend.ClosestToMaintenance)
+                                        {
+                                            <li><span class="legend-item lightblue"></span></li>
+                                        }
+                                    </ul>
+                                </div>
                             </div>
-                            <div class="column">
-                                <h4><b>Optimal legend</b></h4>
-                                <ul>
-                                    @if (driver.MostOptimal)
-                                    {
-                                        <li><span class="legend-item blue"></span> </li>
-                                    }
-                                    @if (driver.Cheapest)
-                                    {
-                                        <li><span class="legend-item yellow"></span></li>
-                                    }
-                                    @if (driver.MostEconomical)
-                                    {
-                                        <li><span class="legend-item purple"></span> </li>
-                                    }
-                                    @if (driver.MostEcological)
-                                    {
-                                        <li><span class="legend-item lightgreen"></span></li>
-                                    }
-                                    @if (driver.ClosestToMaintenance)
-                                    {
-                                        <li><span class="legend-item lightblue"></span></li>
-                                    }
-                                </ul>
-                            </div>
-                        </div>
+                        }
                     }
                 </div>
 

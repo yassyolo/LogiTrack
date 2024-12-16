@@ -51,14 +51,16 @@
             <a asp-action="OffersRegister" asp-controller="Logistics" class="see-all">See All</a>
         </div>
         <div class="invoice-header">
+            <p><b>Ref No</b></p>
             <p><b>Addresses</b></p>
             <p><b>Amount</b></p>
             <p><b>Client</b></p>
         </div>
         @foreach (var item in Model.Last5BookedOffers)
         {
-            <a asp-action="DeliveryDetails" class="delivery" asp-controller="Logistics" asp-route-id="@item.Id" style="color:black;">
+            <div class="delivery">
                 <div class="delivery-info">
+                    <a asp-action="OfferDetails" asp-controller="Logistics" asp-route-id="@item.Id" style="text-decoration:none; color:black;" class="ref-num">@item.ReferenceNumber</a>
 
                     <img src="~/dashboard_books_dots.svg" alt="Road" class="road-icon">
                     <div class="addresses">
@@ -68,7 +70,7 @@
                 </div>
                 <p> @item.Price BGN</p>
                 <p>'@item.ClientName'</p>
-            </a>
+            </div>
         }
     </div>
     <div class="diagram">
@@ -76,7 +78,7 @@
             <h3>Track</h3>
             <a asp-action="DeliveriesRegister" asp-controller="Logistics" class="see-all">See All</a>
         </div>
-        <div class="invoice-header">
+        <div class="invoice-header" style="margin-bottom: 10px;">
             <p><b>Ref No</b></p>
             <p><b>Addresses</b></p>
             <p><b>Status</b></p>
@@ -86,8 +88,9 @@
         {
             <div class="delivery-tracking">
 
-                <a asp-action="DeliveryDetails" asp-controller="Logistics" asp-route-id="@item.Id" class="ref-num">
-                    @item.ReferenceNumber
+                <a asp-action="DeliveryDetails" asp-controller="Logistics" asp-route-id="@item.Id" class="ref-num" style="text-decoration:none; color:black;">
+                    <p>@item.ReferenceNumber</p>
+                </a>
                     <div class="delivery-info">
                         <a asp-action="DeliveryDetails" asp-controller="Logistics" asp-route-id="@item.Id"></a>
                         <img src="~/dashboard_books_dots.svg" alt="Road" class="road-icon">
@@ -96,7 +99,7 @@
                             <p class="delivery-address">@item.DeliveryAddress</p>
                         </div>
                     </div>
-                </a>
+                
 
                 <div class="tracking-line">
                     <div class="dot" style="background-color: @(item.DeliveryStep >= 1 ? "#00aa87" : "gray")"></div>
@@ -122,48 +125,47 @@
 }
 
 <style>
-    .invoice-header {
-        display: flex;
-        flex-direction: row;
-        width: 90%;
-        justify-content: space-between;
-    }
-
     .delivery {
         display: flex;
-        justify-content: space-between;
+        gap: 70px;
         align-items: center;
-        margin-top: 10px;
         margin-bottom: 15px;
+        width: 100%;
     }
-
     .delivery-info {
         display: flex;
         align-items: center;
         font-size: 0.85rem;
+        margin: 0;
+        width: 60%;
     }
 
         .delivery-info p {
             margin: 0;
         }
 
-    .delivery-tracking {
-        display: flex;
-        margin-top: 10px;
-        flex-direction: row;
-        margin-bottom: 15px;
+    .addresses {
+        font-size: 14px;
+        margin-left: 10px;
+        width: 90%;
     }
 
     .addresses {
-        margin-left: 10px;
         font-size: 14px;
-        width: 90%;
+    }   
+
+    .delivery-tracking {
+        width: 85%;
+        display: flex;
+        align-items: center;
+        flex-direction: row;
+        margin-bottom: 30px;
+        margin-top: 10px;
     }
 
     .road-icon {
         width: 35px;
         height: 35px;
-        margin: 0 10px;
     }
 
     .pickup-address,
@@ -175,21 +177,11 @@
         font-size: 0.85rem;
     }
 
-    .ref-num {
-        text-decoration: none;
-        color: black;
-        text-rendering: optimizelegibility;
-        font-size: 0.80rem;
-        margin-top: 10px;
-    }
-
     .tracking-line {
         display: flex;
         align-items: center;
-        margin-top: 10px;
         width: 20%;
-        margin-left: 20px;
-        margin-right: 20px;
+        margin-right: 30px;
     }
 
     .dot {

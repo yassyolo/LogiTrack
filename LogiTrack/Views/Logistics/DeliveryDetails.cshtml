@@ -1,6 +1,6 @@
 ﻿@model LogiTrack.Core.ViewModels.Delivery.DelliveryDetailsForLogisticsViewModel
 @{
-    ViewData["Title"] = "Add Cash Register";
+    ViewData["Title"] = "Delivery Details";
     Layout = "~/Views/Shared/_LogisticsLayout.cshtml";
 }
 
@@ -66,10 +66,10 @@
                     <p><b>Metrics:</b> @Model.VehicleLength cm X @Model.VehicleWidth cm X @Model.VehicleHeight cm</p>
                     <p><b>Weight capacity:</b> @Model.VehicleWeightCapacity KG</p>
                     <p><b>Fuel consumption:</b> @Model.FuelConsumptionPer100Km L/100KM</p>
-                    <a asp-action="VehicleDetails" asp-controller="Logistics" asp-route-id="@Model.VehicleId" style="color:#00aa87;">See vehicle</a>
+                    <a asp-action="VehicleDetails" asp-controller="Logistics" asp-route-id="@Model.VehicleId" style="color:#00aa87; ">See vehicle</a>
                 </div>
 
-                <div class="column">
+                <div class="column" style="margin-top: 20px;">
                     <div class="column">
                         <h4><b>Driver</b></h4>
                         <p><strong>Name:</strong> @Model.Name</p>
@@ -82,7 +82,7 @@
             </div>
         </div>
 
-        <div id="addressesSection" class="section">
+        <div id="addressesSection" class="section  d-none">
             <div class="columns-container">
                 <div class="column">
                     <h4><b>Pickup Address</b></h4>
@@ -140,10 +140,10 @@
                 </div>
                 <div class="standart-metrics-info-row">
                     <p>@Model.NumberOfPallets</p>
-                    <p>@Model.PalletLength</p>
-                    <p>@Model.PalletWidth</p>
-                    <p>@Model.PalletHeight</p>
-                    <p>@Model.WeightOfPallets</p>
+                    <p>@Model.PalletLength cm</p>
+                    <p>@Model.PalletWidth cm</p>
+                    <p>@Model.PalletHeight cm</p>
+                    <p>@Model.WeightOfPallets kg</p>
                     <p>@Model.PalletsAreStackable</p>
                 </div>
             }
@@ -161,10 +161,10 @@
                     <p><b>Description</b></p>
                 </div>
                 <div class="non-standart-metrics-info-row">
-                    <p>@item.Length</p>
-                    <p>@item.Width</p>
-                    <p>@item.Height</p>
-                    <p>@item.Weight</p>
+                    <p>@item.Length cm</p>
+                    <p>@item.Width cm</p>
+                    <p>@item.Height cm</p>
+                    <p>@item.Weight kg</p>
                     <p>@item.Description</p>
                 </div>
             }
@@ -293,7 +293,7 @@
                     <p>@cashRegister.DateSubmitted</p>
                     <p>@cashRegister.Description</p>
                     <p>@cashRegister.Type</p>
-                    <p>@cashRegister.Amount</p>
+                    <p>@cashRegister.Amount BGN</p>
                     <p>
                         <a href="@cashRegister.FileUrl" target="_blank" class="file-icon" title="View or Download File">
                             <i class="fas fa-file-download"></i> See
@@ -305,44 +305,12 @@
 
     </div>
 </div>
-   
+@section Scripts {
+    <script src="~/js/sectionShow.js"></script>
+}
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-    $(document).ready(function () {
-        $('#infoBtn').click(function () {
-            showSection('#infoSection');
-        });
-        $('#addressesBtn').click(function () {
-            showSection('#addressesSection');
-            initPickupMap();
-            initDeliveryMap();
-        });
-        $('#metricsBtn').click(function () {
-            showSection('#metricsSection');
-        });
-        $('#statusBtn').click(function () {
-            showSection('#statusSection');
-        });
-        $('#invoicesBtn').click(function () {
-            showSection('#invoicesSection');
-        });
-        $('#carbonBtn').click(function () {
-            showSection('#carbonSection');
-        });
-        $('#cashRegistersBtn').click(function () {
-            showSection('#cashRegistersSection');
-        });
-        $('#vehicleBtn').click(function () {
-            showSection('#vehicleSection');
-        });
-        function showSection(sectionId) {
-            $('.section').addClass('d-none');
-            $(sectionId).removeClass('d-none');
-        }
-    });
-</script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 
 <script>
     document.addEventListener("DOMContentLoaded", async function () {

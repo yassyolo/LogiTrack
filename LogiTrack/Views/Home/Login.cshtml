@@ -10,14 +10,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login Page</title>
+    <link rel="stylesheet" href="~/css/site.css" />
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        /* Base styling */
         body, html {
             margin: 0;
             padding: 0;
             height: 100%;
-            font-family: Arial, sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -108,8 +108,8 @@
             <h2>LogiTrack</h2>
             <h3>Login LogiTrack</h3>
             <form asp-action="Login" asp-controller="Home" method="post">
-                <label asp-for="Email">Email</label>
-                <input asp-for="Email" type="email" placeholder="Please enter" required>
+                <label asp-for="Email">Username</label>
+                <input asp-for="Email"  placeholder="Please enter" required>
                 <span asp-validation-for="Email"></span>
                 
                 <label asp-for="Password">Password</label>
@@ -121,13 +121,18 @@
 
                 <button type="submit">Login</button>
             </form>
-            <div class="no-account">Don't have an account? <a asp-action="Register" asp-controller="Clients">Register</a></div>
+            @if (User.IsInRole("ClientCompany"))
+            {
+                <div class="no-account">Don't have an account? <a asp-action="Register" asp-controller="Clients">Register</a></div>
+
+            }
         </div>
         <div class="video-container">
-            <video autoplay loop muted>
-                <source src="your-video-url.mp4" type="video/mp4">
-                Your browser does not support the video tag.
-            </video>
+            <video autoplay loop muted ">
+    <source src="https://cdn.pixabay.com/videvo/logistics-example.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+</video>
+
         </div>
     </div>
 

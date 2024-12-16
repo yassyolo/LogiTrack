@@ -54,7 +54,7 @@
             <h3>Offers</h3>
             <a asp-action="MyOffers" asp-controller="Clients" class="see-all">See All</a>
         </div>
-        <div class="invoice-header">
+        <div class="invoice-header" style="width: 85%;">
             <p><b>Ref No</b></p>
             <p><b>Addresses</b></p>
             <p><b>Amount</b></p>
@@ -81,12 +81,16 @@
             <h3>Track</h3>
             <a asp-action="MyDeliveries" asp-controller="Clients" class="see-all">See All</a>
         </div>
-
+        <div class="invoice-header" style="margin-bottom: 25px;">
+            <p><b>Ref No</b></p>
+            <p><b>Addresses</b></p>
+            <p><b>Status</b></p>
+        </div>
         @foreach (var item in Model.LastFiveDeliveries)
         {
             <div class="delivery-tracking">
 
-                <a asp-action="DeliveryDetails" asp-controller="Clients" asp-route-id="@item.Id" class="ref-num">@item.ReferenceNumber</a>
+                <a asp-action="DeliveryDetails" asp-controller="Clients" asp-route-id="@item.Id" class="ref-num" style="margin=0;">@item.ReferenceNumber</a>
 
                 <div class="delivery-info">
                     <a asp-action="DeliveryDetails" asp-controller="Driver"></a>
@@ -150,36 +154,39 @@
 @section Scripts {
     <script src="~/js/clientCalendar.js"></script>
 }
-<style>
+<style>  
+    .delivery-tracking {
+        width: 100%;
+        display: flex;
+        flex-direction: row;
+        margin-bottom: 40px;
+        margin-top: 10px;
+    }
+
     .delivery {
         display: flex;
-        justify-content: space-between;
+        gap: 70px;
         align-items: center;
         margin-top: 10px;
+        margin-bottom: 15px;
+        width: 89%;
     }
 
     .delivery-info {
         display: flex;
         align-items: center;
         font-size: 0.85rem;
+        margin: 0;
     }
 
         .delivery-info p {
             margin: 0;
         }
 
-    .delivery-tracking {
-        display: flex;
-        flex-direction: row;
-        margin-bottom: 25px;
-        margin-top: 10px;
-    }
-
     .addresses {
+        font-size: 14px;
         margin-left: 10px;
-        font-size: 0.85rem;
-        width: 75%;
-        flex-wrap: wrap;
+        width: 70%;
     }
 
     .pickup-address, .delivery-address {
@@ -193,7 +200,6 @@
     .road-icon {
         width: 30px;
         height: 30px;
-        margin: 0 10px;
     }
 
     .ref-num {
@@ -201,7 +207,6 @@
         color: black;
         text-rendering: optimizelegibility;
         font-size: 0.80rem;
-        margin-top: 10px;
     }
 
     .card-button-info {

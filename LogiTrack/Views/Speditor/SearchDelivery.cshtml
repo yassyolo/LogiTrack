@@ -4,7 +4,7 @@
     Layout = "~/Views/Shared/_SpeditorLayout.cshtml";
 }
 
-<div class="search-container">
+<div class="search-item">
     <div class="search-header">
         <div class="search-icon">
             <i class="bi bi-search" style="font-size: 35px; color:#00aa87;"></i>
@@ -21,7 +21,7 @@
         </div>
     }
 
-    <form asp-action="SearchDelivery" asp-controller="Logistics" method="post">
+    <form asp-action="SearchDelivery" asp-controller="Speditor" method="post">
         <div class="form-group">
             <label asp-for="ReferenceNumber"><b>Reference number</b></label>
             <input asp-for="ReferenceNumber" type="text" id="ReferenceNumber" class="form-control" placeholder="Please enter" />

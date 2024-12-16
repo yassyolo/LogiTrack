@@ -11,7 +11,7 @@
     </div>
     <p class="search-description">Please enter your search criteria</p>
 
-    <form asp-action="DeliveriesRegister" asp-controller="Logistics" method="get" class="search-form">
+    <form asp-action="DeliveriesRegister" asp-controller="Speditor" method="get" class="search-form">
         <div class="row">
             <div class="form-group">
                 <label asp-for="ReferenceNumber"><b>Ref No</b></label>
@@ -55,13 +55,13 @@
         </div>
         <div class="button-group">
             <button type="submit" class="btn"><b>GO</b></button>
-            <a asp-action="DeliveriesRegister" asp-action="Logistics" type="reset" class="btn-clear"><b>CLEAR</b></a>
+            <a asp-action="DeliveriesRegister" asp-action="Speditor" type="reset" class="btn-clear"><b>CLEAR</b></a>
         </div>
     </form>
 </div>
 
 <div class="filtered-deliveries-container">
-    <form asp-action="DeliveriesRegister" asp-controller="Logistics" method="get" class="quick-search-form">
+    <form asp-action="DeliveriesRegister" asp-controller="Speditor" method="get" class="quick-search-form">
         <div class="form-group">
             <input type="text" id="keyword" asp-for="SearchTerm" placeholder="Enter keyword">
             <button type="submit">

@@ -16,25 +16,41 @@
         <div class="button-tabs">
             <button class="tab-button" id="infoBtn">INFO</button>
             <button class="tab-button" id="vehicleBtn">VEHICLE/DRIVER</button>
-
             <button class="tab-button" id="addressesBtn">ADDRESSES</button>
             <button class="tab-button" id="metricsBtn">METRICS</button>
             <button class="tab-button" id="statusBtn">STATUS</button>
-            <button class="tab-button" id="invoicesBtn">INVOICE</button>
-            <button class="tab-button" id="cashRegistersBtn">CASH REGISTERS</button>
-
             <button class="tab-button" id="carbonBtn">CO2 EMISSION</button>
-
         </div>
 
         <div id="infoSection" class="section">
-            <div class="column">
-                <h4><b>Client Information</b></h4>
-                <p><strong>Company Name:</strong> @Model.ClientCompanyName</p>
-                <p><strong>Address:</strong> @Model.ClientAddress</p>
-                <p><strong>Phone:</strong> @Model.ClientPhone</p>
-                <p><strong>Email:</strong> @Model.ClientEmail</p>
-                <a asp-action="ClientDetails" asp-controller="Logistics" asp-route-id="@Model.ClientId" style="color:#00aa87;">See client</a>
+            <div class="row">
+                <div class="column">
+                    <h4><b>Client Information</b></h4>
+                    <p><strong>Company Name:</strong> @Model.ClientCompanyName</p>
+                    <p><strong>Address:</strong> @Model.ClientAddress</p>
+                    <p><strong>Phone:</strong> @Model.ClientPhone</p>
+                    <p><strong>Email:</strong> @Model.ClientEmail</p>
+                    <a asp-action="ClientDetails" asp-controller="Logistics" asp-route-id="@Model.ClientId" style="color:#00aa87;">See client</a>
+                </div>
+                <div class="column">
+                    <h4><b>Rating</b></h4>
+                    @if (Model.HasRated == true)
+                    {
+                        <p>
+                            <strong>Your Rating:</strong>
+                            <div class="star-rating">
+                                @for (int i = 1; i <= 5; i++)
+                                {
+                                    <label class="star @((i <= Model.RatingStars) ? "rated" : "")">★</label>
+                                }
+                            </div>
+                        </p>
+                        <p>
+                            <strong>Your comment:</strong>
+                            <span>@Model.Comment</span>
+                        </p>
+                    }
+                </div>
             </div>
         </div>
         <div id="vehicleSection" class="section d-none">
@@ -47,10 +63,10 @@
                     <p><b>Metrics:</b> @Model.VehicleLength cm X @Model.VehicleWidth cm X @Model.VehicleHeight cm</p>
                     <p><b>Weight capacity:</b> @Model.VehicleWeightCapacity KG</p>
                     <p><b>Fuel consumption:</b> @Model.FuelConsumptionPer100Km L/100KM</p>
-                    <a asp-action="VehicleDetails" asp-controller="Logistics" asp-route-id="@Model.VehicleId" style="color:#00aa87;">See vehicle</a>
+                    <a asp-action="VehicleDetails" asp-controller="Logistics" asp-route-id="@Model.VehicleId" style="color:#00aa87; ">See vehicle</a>
                 </div>
 
-                <div class="column">
+                <div class="column" style="margin-top: 20px;">
                     <div class="column">
                         <h4><b>Driver</b></h4>
                         <p><strong>Name:</strong> @Model.Name</p>
@@ -63,7 +79,7 @@
             </div>
         </div>
 
-        <div id="addressesSection" class="section">
+        <div id="addressesSection" class="section  d-none">
             <div class="columns-container">
                 <div class="column">
                     <h4><b>Pickup Address</b></h4>
@@ -72,11 +88,11 @@
                     <p><strong>Country:</strong> @Model.PickupCountry</p>
                     <p><strong>Latitude:</strong> @Model.PickupLatitude</p>
                     <p><strong>Longitude:</strong> @Model.PickupLongitude</p>
-                    <div id="pickupMap"
-                         class="map"
-                         data-latitude="@Model.PickupLatitude"
-                         data-longitude="@Model.PickupLongitude"></div>
-                    <p id="pickupAddress">Fetching address...</p>
+                    @*<div id="pickupMap"
+                    class="map"
+                    data-latitude="@Model.PickupLatitude"
+                    data-longitude="@Model.PickupLongitude"></div>
+                    <p id="pickupAddress">Fetching address...</p>*@
                 </div>
 
                 <div class="column">
@@ -86,11 +102,11 @@
                     <p><strong>Country:</strong> @Model.DeliveryCountry</p>
                     <p><strong>Latitude:</strong> @Model.DeliveryLatitude</p>
                     <p><strong>Longitude:</strong> @Model.DeliveryLongitude</p>
-                    <div id="deliveryMap"
-                         class="map"
-                         data-latitude="@Model.DeliveryLatitude"
-                         data-longitude="@Model.DeliveryLongitude"></div>
-                    <p id="deliveryAddress">Fetching address...</p>
+                    @*<div id="deliveryMap"
+                    class="map"
+                    data-latitude="@Model.DeliveryLatitude"
+                    data-longitude="@Model.DeliveryLongitude"></div>
+                    <p id="deliveryAddress">Fetching address...</p>*@
                 </div>
             </div>
         </div>
@@ -121,10 +137,10 @@
                 </div>
                 <div class="standart-metrics-info-row">
                     <p>@Model.NumberOfPallets</p>
-                    <p>@Model.PalletLength</p>
-                    <p>@Model.PalletWidth</p>
-                    <p>@Model.PalletHeight</p>
-                    <p>@Model.WeightOfPallets</p>
+                    <p>@Model.PalletLength cm</p>
+                    <p>@Model.PalletWidth cm</p>
+                    <p>@Model.PalletHeight cm</p>
+                    <p>@Model.WeightOfPallets kg</p>
                     <p>@Model.PalletsAreStackable</p>
                 </div>
             }
@@ -142,10 +158,10 @@
                     <p><b>Description</b></p>
                 </div>
                 <div class="non-standart-metrics-info-row">
-                    <p>@item.Length</p>
-                    <p>@item.Width</p>
-                    <p>@item.Height</p>
-                    <p>@item.Weight</p>
+                    <p>@item.Length cm</p>
+                    <p>@item.Width cm</p>
+                    <p>@item.Height cm</p>
+                    <p>@item.Weight kg</p>
                     <p>@item.Description</p>
                 </div>
             }
@@ -229,101 +245,20 @@
             </div>
         </div>
 
-        <div id="invoicesSection" class="section d-none invoices">
-            <h4><b>Invoices</b></h4>
-            <div class="table-header-row">
-                <p><b>Number</b></p>
-                <p><b>Date</b></p>
-                <p><b>Description</b></p>
-                <p><b>Status</b></p>
-                <p><b>File</b></p>
-            </div>
-            <div class="table-info-row">
-                <p>@Model.Invoice.Number</p>
-                <p>@Model.Invoice.Date</p>
-                <p>@Model.Invoice.Description</p>
-                <p>@Model.Invoice.IsPaid</p>
-                <p>
-                    <a href="@Model.Invoice.FileUrl" target="_blank" class="file-icon" title="View or Download File">
-                        <i class="fas fa-file-download"></i> See
-                    </a>
-                </p>
-            </div>
-        </div>
-
         <div id="carbonSection" class="section d-none invoices">
             <div class="emission-container">
                 <h4><b>CO2 emissions ratio</b></h4>
                 <canvas id="carbonPieChart" class="chart"></canvas>
             </div>
         </div>
-        <div id="cashRegistersSection" class="section d-none cash-registers">
-            <div class="cash-register-title-button">
-                <h4><b>Cash registers</b></h4>
-            </div>
-            <div class="table-header-row">
-                <p><b>Date</b></p>
-                <p><b>Description</b></p>
-                <p><b>Type</b></p>
-                <p><b>Amount</b></p>
-                <p><b>File</b></p>
-            </div>
-            @foreach (var cashRegister in Model.CashRegisters)
-            {
-                <div class="table-info-row">
-                    <p>@cashRegister.DateSubmitted</p>
-                    <p>@cashRegister.Description</p>
-                    <p>@cashRegister.Type</p>
-                    <p>@cashRegister.Amount</p>
-                    <p>
-                        <a href="@cashRegister.FileUrl" target="_blank" class="file-icon" title="View or Download File">
-                            <i class="fas fa-file-download"></i> See
-                        </a>
-                    </p>
-                </div>
-            }
-        </div>
-
     </div>
 </div>
-    </div>
+@section Scripts {
+    <script src="~/js/sectionShow.js"></script>
+}
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-    $(document).ready(function () {
-        $('#infoBtn').click(function () {
-            showSection('#infoSection');
-        });
-        $('#addressesBtn').click(function () {
-            showSection('#addressesSection');
-            initPickupMap();
-            initDeliveryMap();
-        });
-        $('#metricsBtn').click(function () {
-            showSection('#metricsSection');
-        });
-        $('#statusBtn').click(function () {
-            showSection('#statusSection');
-        });
-        $('#invoicesBtn').click(function () {
-            showSection('#invoicesSection');
-        });
-        $('#carbonBtn').click(function () {
-            showSection('#carbonSection');
-        });
-        $('#cashRegistersBtn').click(function () {
-            showSection('#cashRegistersSection');
-        });
-        $('#vehicleBtn').click(function () {
-            showSection('#vehicleSection');
-        });
-        function showSection(sectionId) {
-            $('.section').addClass('d-none');
-            $(sectionId).removeClass('d-none');
-        }
-    });
-</script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 
 <script>
     document.addEventListener("DOMContentLoaded", async function () {
@@ -683,18 +618,6 @@
         margin-bottom: 15px;
     }
 
-    .form-control {
-        width: 50%;
-        padding: 10px;
-        border: 1px solid #ccc;
-    }
-
-    label {
-        display: block;
-        font-size: 13px;
-        margin-bottom: 5px;
-        font-weight: 200;
-    }
 
     input[type="text"],
     input[type="date"] {
@@ -717,6 +640,16 @@
         justify-content: space-between;
         width: 80%;
     }
+
+    .star-rating {
+        display: flex;
+        gap: 5px;
+        font-size: 1.7em;
+        color: #00aa87;
+        width: 100%;
+    }
 </style>
+
+
 
 

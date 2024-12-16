@@ -18,7 +18,7 @@
             <button class="tab-button" id="statisticsBtn">STATISTICS</button>
         </div>
 
-        <div id="vehicleSection" class="section d-none">
+        <div id="infoSection" class="section d-none">
             <h4><b>Company details</b></h4>
             <div class="column-container">
                 <div class="column">
@@ -46,7 +46,7 @@
             </div>
         </div>
 
-        <div id="addressesSection" class="section d-none">
+        <div id="deliveriesSection" class="section d-none">
             <div class="cards-container">
                 <div class="card" id="locationCard">
                     <div class="card-content">
@@ -121,7 +121,7 @@
             </div>
         </div>
 
-        <div id="metricsSection" class="section  d-none">
+        <div id="statisticsSection" class="section  d-none">
             <div class="chart-container">
                 <div class="cards-container">
                     <div class="card" id="locationCard">
@@ -201,31 +201,13 @@
 </div>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-    $(document).ready(function () {
-        $('#infoBtn').click(function () {
-            showSection('#vehicleSection');
-        });
-        $('#deliveriesBtn').click(function () {
-            showSection('#addressesSection');
-        });
-        $('#statisticsBtn').click(function () {
-            showSection('#metricsSection');
-        });
-        $('#statusBtn').click(function () {
-            showSection('#statusSection');
-        });
 
-        function showSection(sectionId) {
-            $('.section').addClass('d-none');
-            $(sectionId).removeClass('d-none');
-        }
-    });
-</script>
+
 @section Scripts {
     <script src="~/js/clientDetailsStatistics.js"></script>
+    <script src="~/js/sectionShow.js"></script>
+
 }
 <style>
     .delivery-details-container {
