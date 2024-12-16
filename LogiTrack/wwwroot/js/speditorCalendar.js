@@ -1,9 +1,11 @@
 ﻿
     $(document).ready(function () {
         $.ajax({
-            url: '/Clients/GetCalendarEvents',
+            url: '/Logistics/GetCalendarEvents',
             type: 'GET',
             success: function (events) {
+                events = events || [];
+
                 var calendarEl = document.getElementById('calendar');
                 var calendar = new FullCalendar.Calendar(calendarEl, {
                     initialView: 'dayGridMonth',
@@ -33,12 +35,20 @@
                 });
 
                 calendar.render();
+
+                if (events.length === 0) {
+                    $('#event-details').html('<p>No events available for this calendar.</p>');
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error('Error fetching calendar events:', error);
+                $('#calendar').html('<p>Error loading calendar events. Please try again later.</p>');
             }
         });
 
     function getColor(type) {
-            switch (type) {
-                case 'Delivered':
+                switch (type) {
+                    case 'Delivered':
     return 'green';
     case 'Pickup':
     return 'blue';
@@ -46,7 +56,7 @@
     return '#00aa87';
     default:
     return 'gray';
+                }
             }
-        }
-    });
+        });
 
