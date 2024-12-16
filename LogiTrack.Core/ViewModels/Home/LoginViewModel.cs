@@ -6,7 +6,6 @@ namespace LogiTrack.Core.ViewModels.Home
     public class LoginViewModel
     {
         [Required(ErrorMessage = RequiredFieldErrorMessage)]
-        [EmailAddress(ErrorMessage = InvalidEmailErrorMessage)]
         public string Email { get; set; } = string.Empty;
 
         [Required(ErrorMessage = RequiredFieldErrorMessage)]

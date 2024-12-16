@@ -16,7 +16,7 @@
         public decimal CalculatedPrice { get; set; }
         public int ReservedDeliveriesCount { get; set; }
         public bool CurrentlyDelivering { get; set; }
-       public int DeliveriesThisYearCount { get; set; }
+        public int DeliveriesThisYearCount { get; set; }
         public bool Cheapest { get; set; }
         public bool MostEconomical { get; set; }
         public bool MostEcological { get; set; }

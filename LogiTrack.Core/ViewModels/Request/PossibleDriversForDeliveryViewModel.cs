@@ -6,6 +6,7 @@
         public string? DriverName { get; set; }
         public string? DriverPhoneNumber { get; set; }
         public int Age { get; set; }
+        public string KilometersDriven { get; set; } = string.Empty;
         public int ReservedDeliveriesCount { get; set; }
         public int InternationalDeliveriesThisYearCount { get; set; }
         public int DomesticsDeliveriesThisYearCount { get; set; }

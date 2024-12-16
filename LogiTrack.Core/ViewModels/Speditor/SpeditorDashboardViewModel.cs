@@ -12,6 +12,7 @@ namespace LogiTrack.Core.ViewModels.Speditor
         public int TotalOffers { get; set; }
         public int AvailableVehicles { get; set; }
         public int AvailableDrivers { get; set; }
+        public int PendingRequestsCount { get; set; }
         public decimal FuelPrice { get; set; } 
         public IEnumerable<RequestsForSearchViewModel> LastFiveNewRequests { get; set; } = new List<RequestsForSearchViewModel>();
         public IEnumerable<OfferForDashboardViewModel> LastFivePendingOffers { get; set; } = new List<OfferForDashboardViewModel>();
