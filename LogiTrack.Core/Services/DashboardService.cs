@@ -194,6 +194,7 @@ namespace LogiTrack.Core.Services
             var model = new SpeditorDashboardViewModel
             {
                 TotalRequests = await requestsQuery.CountAsync(),
+                PendingRequestsCount = await requestsQuery.CountAsync(x => x.Status == StatusConstants.Pending),
                 TotalOffers = await offersQuery.CountAsync(),
                 NewRequests = await requestsQuery.CountAsync(x => x.CreatedAt.Date <= DateTime.Now.Date.AddDays(-30)),
                 AcceptedOffers = await offersQuery.CountAsync(x => x.OfferStatus == StatusConstants.Approved),

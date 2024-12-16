@@ -13,11 +13,11 @@ namespace LogiTrack.Core.Services
         public HomeService(IRepository repository)
         {
             this.repository = repository;
-        }
+        }     
 
-        public async Task<IdentityUser?> GetUserByEmailAsync(string email)
+        public async Task<IdentityUser?> GetUserByUsernameAsync(string username)
         {
-            return await repository.AllReadonly<IdentityUser>().FirstOrDefaultAsync(x => x.Email == email);
+            return await repository.AllReadonly<IdentityUser>().FirstOrDefaultAsync(x => x.UserName == username);
         }
 
         public async Task MarkNotificationAsReadAsync(int id)

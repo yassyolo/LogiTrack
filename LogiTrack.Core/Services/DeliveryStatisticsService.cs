@@ -219,16 +219,16 @@ namespace LogiTrack.Core.Services
 
         public async Task<InvoiceStatisticsForClientViewModel?> GetInvoicesStatisticsForClientAsync(string username)
         {
-            var invoices = repository.AllReadonly<Invoice>().Include(x => x.Delivery).ThenInclude(x => x.Offer).ThenInclude(x => x.Request).ThenInclude(x => x.ClientCompany).Where(x => x.Delivery.Offer.Request.ClientCompany.User.UserName == username).AsQueryable();
+            var invoices = await repository.AllReadonly<Invoice>().Include(x => x.Delivery).ThenInclude(x => x.Offer).ThenInclude(x => x.Request).ThenInclude(x => x.ClientCompany).Where(x => x.Delivery.Offer.Request.ClientCompany.User.UserName == username).ToListAsync();
             return new InvoiceStatisticsForClientViewModel()
             {
-                PendingInvoices = await invoices.CountAsync(x => !x.IsPaid && x.InvoiceDate.AddDays(30) < DateTime.Now),
-                PaidInvoices = await invoices.CountAsync(x => x.IsPaid),
-                OverdueInvoices = await invoices.CountAsync(x => !x.IsPaid && x.InvoiceDate.AddDays(30) < DateTime.Now),
-                OverdueAmount =  await invoices.Where(x => !x.IsPaid && x.InvoiceDate.AddDays(30) < DateTime.Now).SumAsync(x => x.Delivery.Offer.FinalPrice),
-                PaidAmount = await invoices.Where(x => x.IsPaid).SumAsync(x => x.Delivery.Offer.FinalPrice),
-                PendingAmount = await invoices.Where(x => !x.IsPaid && x.InvoiceDate.AddDays(30) < DateTime.Now).SumAsync(x => x.Delivery.Offer.FinalPrice),
-                AveragePaymentTime = await invoices.Where(x => x.IsPaid && x.PaidDate.HasValue).AverageAsync(x => (x.PaidDate.Value - x.InvoiceDate).TotalDays)
+                PendingInvoices = invoices.Count(x => !x.IsPaid && x.InvoiceDate.AddDays(30) < DateTime.Now),
+                PaidInvoices =  invoices.Count(x => x.IsPaid),
+                OverdueInvoices =  invoices.Count(x => !x.IsPaid && x.InvoiceDate.AddDays(30) < DateTime.Now),
+                OverdueAmount =  invoices.Where(x => !x.IsPaid && x.InvoiceDate.AddDays(30) < DateTime.Now).Sum(x => x.Delivery.Offer.FinalPrice),
+                PaidAmount = invoices.Where(x => x.IsPaid).Sum(x => x.Delivery.Offer.FinalPrice),
+                PendingAmount = invoices.Where(x => !x.IsPaid && x.InvoiceDate.AddDays(30) < DateTime.Now).Sum(x => x.Delivery.Offer.FinalPrice),
+                AveragePaymentTime = invoices.Where(x => x.IsPaid && x.PaidDate.HasValue).Average(x => (x.PaidDate.Value - x.InvoiceDate).TotalDays)
             };
         }
 
@@ -322,11 +322,12 @@ namespace LogiTrack.Core.Services
 
         public async Task<Dictionary<string, int>> GetPopularDeliveryCitiesAsync()
         {
-            return await repository.AllReadonly<LogiTrack.Infrastructure.Data.DataModels.Delivery>().Include(x => x.Offer).ThenInclude(x => x.Request).ThenInclude(x => x.DeliveryAddress).Include(x => x.Offer).ThenInclude(x => x.Request).ThenInclude(x => x.PickupAddress)
-                .GroupBy(x => x.Offer.Request.DeliveryAddress.City)
+            var query = await repository.AllReadonly<LogiTrack.Infrastructure.Data.DataModels.Delivery>().Include(x => x.Offer).ThenInclude(x => x.Request).ThenInclude(x => x.DeliveryAddress).Include(x => x.Offer).ThenInclude(x => x.Request).ThenInclude(x => x.PickupAddress).ToListAsync();
+            var deliveries = query.GroupBy(x => x.Offer.Request.DeliveryAddress.City);
+            return deliveries
                 .OrderByDescending(x => x.Count())
                 .Take(5)
-                .ToDictionaryAsync(x => x.Key, x => x.Count());
+                .ToDictionary(x => x.Key, x => x.Count());
         }
 
         public async Task<(double, double)> GetCarbonEmissionsForCompanyAsync(string username, int id)
@@ -338,9 +339,8 @@ namespace LogiTrack.Core.Services
 
         public async Task<Dictionary<int, int>> GetDeliveryRatingsDistributionAsync()
         {
-            return await repository.AllReadonly<Rating>()
-                .GroupBy(x => x.RatingStars)
-                .ToDictionaryAsync(x => x.Key, x => x.Count());
+            var query = await repository.AllReadonly<Rating>().ToListAsync();
+            return query.GroupBy(x => x.RatingStars).ToDictionary(x => x.Key, x => x.Count());
         }
     }
 }

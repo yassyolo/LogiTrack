@@ -7,11 +7,13 @@ using LogiTrack.Infrastructure.Data.DataModels;
 using LogiTrack.Infrastructure.Repository;
 using Microsoft.EntityFrameworkCore;
 using Org.BouncyCastle.Asn1.Ocsp;
+using Org.BouncyCastle.Asn1.X509.Qualified;
 using Org.BouncyCastle.Pqc.Crypto.Utilities;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using static iText.StyledXmlParser.Jsoup.Select.Evaluator;
 using static LogiTrack.Infrastructure.Data.DataConstants.DataModelConstants;
+using Vehicle = LogisticsSystem.Infrastructure.Data.DataModels.Vehicle;
 
 namespace LogiTrack.Core.Services
 {
@@ -454,8 +456,6 @@ namespace LogiTrack.Core.Services
                 });
             }
             return new List<RequestsForSearchViewModel>();
-
-
         }
 
         public async Task<List<RequestsDetailsForLogisticsViewModel>> GetPendingRequestsAsync(string? sharedTruck = null, DateTime? startDate = null, DateTime? endDate = null, double? minWeight = null, double? maxWeight = null, double? minVolume = null, double? maxVolume = null, string? pickupAddress = null, string? deliveryAddress = null)
@@ -504,6 +504,7 @@ namespace LogiTrack.Core.Services
                {
                    Id = x.Id,
                    CargoType = x.CargoType,
+                   CompanyName = x.ClientCompany.Name,
                    NumberOfNonStandartGoods = x.NumberOfNonStandartGoods.ToString(),
                    TypeOfGoods = x.TypeOfGoods,
                    PickupAddress = $"{x.PickupAddress.Street}, {x.PickupAddress.City}, {x.PickupAddress.County}",
@@ -523,7 +524,6 @@ namespace LogiTrack.Core.Services
                    PalletsHeight = x.StandartCargo != null ? x.StandartCargo.PalletHeight.ToString() : string.Empty,
                    PalletsWidth = x.StandartCargo != null ? x.StandartCargo.PalletWidth.ToString() : string.Empty,
                    ReferenceNumber = x.RerefenceNumber,
-                   CompanyName = x.ClientCompany.Name,
                }).ToList();
             foreach (var item in model)
             {
@@ -596,85 +596,304 @@ namespace LogiTrack.Core.Services
                 }).ToListAsync();
 
             model.PossibleDrivers = await GetPossibleDriversForDelivery(id, suggestedStartDate);
-            model.PossibleVehicles = await GetPossibleVehiclesForDelivery(id, suggestedStartDate);
+            var possibleVehicles = await GetPossibleVehiclesForDelivery(id, suggestedStartDate);
+            if (possibleVehicles.Item1  is List<PossibleVehiclesForDeliveryViewModel> vehicles)
+            {
+                model.PossibleVehicles = vehicles;
+                model.RequiredVehicleCount = possibleVehicles.Item2;
+            }
+            else if (possibleVehicles.Item1 is List<(PossibleVehiclesForDeliveryViewModel Primary, PossibleVehiclesForDeliveryViewModel Secondary, VehiclePairsLegend Legend)> vehiclePairs)
+            {
+                model.NeededVehiclePairs = vehiclePairs; 
+                model.RequiredVehicleCount = possibleVehicles.Item2;
+            }
 
             return model;
         }
 
-        private async Task<List<PossibleVehiclesForDeliveryViewModel>> GetPossibleVehiclesForDelivery(int id, DateTime suggestedStartDate)
+        private async Task<(object, int)> GetPossibleVehiclesForDelivery(int id, DateTime suggestedStartDate)
         {
-            var request = await repository.AllReadonly<LogisticsSystem.Infrastructure.Data.DataModels.Request>().Where(x => x.Id == id).Include(x => x.PickupAddress).Include(x => x.DeliveryAddress).FirstOrDefaultAsync();
-            var reservedVehicles = await repository.AllReadonly<ReservedForDelivery>().Where(x => x.Start >= suggestedStartDate && x.End <= request.ExpectedDeliveryDate).Select(x => x.VehicleId).ToListAsync();
+            var modelToReturn = new List<PossibleVehiclesForDeliveryViewModel>();
+            var request = await repository.AllReadonly<LogisticsSystem.Infrastructure.Data.DataModels.Request>().Where(x => x.Id == id).FirstOrDefaultAsync();
 
-            var possibleVehiclesByTime = await repository.AllReadonly<LogisticsSystem.Infrastructure.Data.DataModels.Vehicle>().Where(x => !reservedVehicles.Contains(x.Id)).Include(x => x.Deliveries).ToListAsync();
-            var possibleVehiclesByWeightAndVolume = possibleVehiclesByTime.Where(x => x.MaxWeightCapacity >= request.TotalWeight && x.Volume >= request.TotalVolume && x.IsRefrigerated == request.IsRefrigerated).ToList();
+            var reservedVehicles = await repository.AllReadonly<ReservedForDelivery>().Where(x => x.Start >= suggestedStartDate && x.End <= request.ExpectedDeliveryDate).Select(x => x.VehicleId)
+                .ToListAsync();
 
-            var standartCargo = await repository.AllReadonly<StandartCargo>().Where(x => x.Id == request.StandartCargoId).FirstOrDefaultAsync();
-            var nonstandartCargos = await repository.AllReadonly<NonStandardCargo>().Where(x => x.RequestId == id).ToListAsync();
+            var possibleVehiclesByTime = await repository.AllReadonly<LogisticsSystem.Infrastructure.Data.DataModels.Vehicle>().Where(x => !reservedVehicles.Contains(x.Id)).Include(x => x.Deliveries)
+                .ToListAsync();
+            var requiredVehicleCount = 1;
 
-            foreach (var vehicle in possibleVehiclesByWeightAndVolume)
+            var pairsForBiggerRequest = await FindMostCompatibleVehiclesForBiggerRequestForNotSharedTruck(possibleVehiclesByTime, id);
+            if (pairsForBiggerRequest.RequiredVehicles == 1)
             {
-                if (standartCargo != null)
+                var compatiableVehicles = await FindMostCompatibleVehiclesForNotSharedTruck(possibleVehiclesByTime, id);
+                var cheapestId = compatiableVehicles.OrderByDescending(x => x.ContantsExpenses).ThenByDescending(x => x.FuelConsumptionPer100Km).ThenByDescending(x => x.PurchasePrice).FirstOrDefault()?.Id;
+                var economicalId = compatiableVehicles.OrderByDescending(x => x.FuelConsumptionPer100Km).FirstOrDefault()?.Id;
+                var ecologicalId = compatiableVehicles.OrderByDescending(x => x.EmissionFactor).FirstOrDefault()?.Id;
+                var closestToMaintenanceId = compatiableVehicles.OrderBy(x => x.KilometersLeftToChangeParts).ThenByDescending(x => x.LastYearMaintenance).FirstOrDefault()?.Id;
+                var mstOptimalId = compatiableVehicles.OrderByDescending(x => x.ContantsExpenses).ThenByDescending(x => x.FuelConsumptionPer100Km).ThenByDescending(x => x.EmissionFactor).FirstOrDefault()?.Id;
+
+                foreach (var vehicle in compatiableVehicles)
                 {
-                    var palletType = standartCargo.TypeOfPallet;
-                    var parameter = Expression.Parameter(typeof(LogisticsSystem.Infrastructure.Data.DataModels.Vehicle), "x");
-                    var property = Expression.Property(parameter, palletType);
-                    var expression = Expression.Lambda<Func<LogisticsSystem.Infrastructure.Data.DataModels.Vehicle, bool>>(property, parameter);
-                   // var possibleVehicle = await repository.AllReadonly<LogisticsSystem.Infrastructure.Data.DataModels.Vehicle>().Where(x => x.expression).FirstOrDefaultAsync();
+                    var deliveriesThisYear = await repository.AllReadonly<Infrastructure.Data.DataModels.Delivery>().Where(x => x.VehicleId == vehicle.Id && x.ActualDeliveryDate.Value.Year == DateTime.Now.Year).ToListAsync();
+                    var reservedForDelivery = await repository.AllReadonly<ReservedForDelivery>().Where(x => x.VehicleId == vehicle.Id).ToListAsync();
+                    var currentDeliveries = await repository.AllReadonly<Infrastructure.Data.DataModels.Delivery>().Where(x => x.VehicleId == vehicle.Id && x.DeliveryStep < 4).FirstOrDefaultAsync();
+                    bool currentlyDelivering = currentDeliveries != null;
+                    var vehicleModel = new PossibleVehiclesForDeliveryViewModel
+                    {
+                        Id = vehicle.Id,
+                        VehicleType = vehicle.VehicleType,
+                        RegistrationNumber = vehicle.RegistrationNumber,
+                        EmissionFactor = vehicle.EmissionFactor.ToString(),
+                        FuelConsumptionPer100km = vehicle.FuelConsumptionPer100Km.ToString(),
+                        Height = vehicle.Height.ToString(),
+                        Width = vehicle.Width.ToString(),
+                        Length = vehicle.Length.ToString(),
+                        Weight = vehicle.MaxWeightCapacity.ToString(),
+                        KilometersTillChangingParts = vehicle.KilometersLeftToChangeParts,
+                        Kilometers = vehicle.KilometersDriven,
+                        CalculatedPrice = await CalculatePriceForRequest(vehicle, id),
+                        ReservedDeliveriesCount = reservedForDelivery.Count(),
+                        CurrentlyDelivering = currentlyDelivering,
+                        DeliveriesThisYearCount = deliveriesThisYear.Count(),
+                        Cheapest = cheapestId == vehicle.Id,
+                        MostEconomical = economicalId == vehicle.Id,
+                        MostEcological = ecologicalId == vehicle.Id,
+                        ClosestToMaintenance = closestToMaintenanceId == vehicle.Id,
+                        MostOptimal = mstOptimalId == vehicle.Id
+                    };
+                    modelToReturn.Add(vehicleModel);
+                }
+            }
+          
+            return requiredVehicleCount == 1 ? (modelToReturn, 1) : (new List<PossibleVehiclesForDeliveryViewModel>(), requiredVehicleCount);
+        }
+
+        public async Task<List<Vehicle>> FindMostCompatibleVehiclesForNotSharedTruck(List<Vehicle> vehicles, int id)
+        {
+            var request = await repository.AllReadonly<LogisticsSystem.Infrastructure.Data.DataModels.Request>().Where(x => x.Id == id).FirstOrDefaultAsync();
+            var standartCargo = await repository.AllReadonly<StandartCargo>().Where(x => x.Id == request.StandartCargoId).FirstOrDefaultAsync();
+            var nonStandardCargos = await repository.AllReadonly<NonStandardCargo>().Where(x => x.RequestId == id).ToListAsync();
+
+            var compatibleVehicles = vehicles.Where(vehicle =>
+                    vehicle.MaxWeightCapacity >= request.TotalWeight &&
+                    vehicle.Volume >= request.TotalVolume &&
+                    vehicle.IsRefrigerated == request.IsRefrigerated).ToList();
+
+            if (!string.IsNullOrEmpty(standartCargo.TypeOfPallet))
+            {
+                compatibleVehicles = compatibleVehicles.Where(vehicle =>
+                    (standartCargo.TypeOfPallet == "Euro" && vehicle.EuroPalletCapacity >= standartCargo.NumberOfPallets) ||
+                    (standartCargo.TypeOfPallet == "Industrial" && vehicle.IndustrialPalletCapacity >= standartCargo.NumberOfPallets))
+                    .ToList();
+            }
+            else if (nonStandardCargos?.Count > 0)
+            {
+                compatibleVehicles = compatibleVehicles.Where(vehicle =>
+                {
+                    bool fitsAllCargo = request.NonStandardCargos.All(cargo =>
+                        cargo.Length <= vehicle.Length &&
+                        cargo.Width <= vehicle.Width &&
+                        cargo.Height <= vehicle.Height);
+                    return fitsAllCargo;
+                }).ToList();
+            }
+
+            var mostCompatibleVehicles = compatibleVehicles
+                .OrderBy(vehicle => vehicle.MaxWeightCapacity - request.TotalWeight) 
+                .ThenBy(vehicle => vehicle.Volume - request.TotalVolume) 
+                .ToList();
+
+            return mostCompatibleVehicles;
+        }
+
+        public async Task<(List<(Vehicle Primary, Vehicle? Secondary)>, int RequiredVehicles)> FindMostCompatibleVehiclesForBiggerRequestForNotSharedTruck(List<Vehicle> vehicles, int id)
+        {
+            var modelToReturn = new List<(PossibleVehiclesForDeliveryViewModel Primary, PossibleVehiclesForDeliveryViewModel Secondary, VehiclePairsLegend Legend)>();
+            var request = await repository.AllReadonly<LogisticsSystem.Infrastructure.Data.DataModels.Request>()
+                                          .Where(x => x.Id == id)
+                                          .FirstOrDefaultAsync();
+            var standartCargo = await repository.AllReadonly<StandartCargo>()
+                                                .Where(x => x.Id == request.StandartCargoId)
+                                                .FirstOrDefaultAsync();
+            var nonStandardCargos = await repository.AllReadonly<NonStandardCargo>()
+                                                    .Where(x => x.RequestId == id)
+                                                    .ToListAsync();
+
+            var compatibleVehicles = vehicles.Where(vehicle =>
+                vehicle.MaxWeightCapacity >= request.TotalWeight ||
+                vehicle.Volume >= request.TotalVolume &&
+                vehicle.IsRefrigerated == request.IsRefrigerated).ToList();
+            var requiredVehicles = 1;
+            int? cheapestPairId = 0;
+            int? economicalPairId = 0;
+            int? ecologicalPairId = 0;
+            int? closestToMaintenancePairId = 0;
+            int? mostOptimalPairId = 0;
+
+            if (!string.IsNullOrEmpty(standartCargo?.TypeOfPallet))
+            {
+                compatibleVehicles = compatibleVehicles.Where(vehicle =>
+                    (standartCargo.TypeOfPallet == "Euro" && vehicle.EuroPalletCapacity >= standartCargo.NumberOfPallets) ||
+                    (standartCargo.TypeOfPallet == "Industrial" && vehicle.IndustrialPalletCapacity >= standartCargo.NumberOfPallets))
+                    .ToList();
+            }
+            else if (nonStandardCargos?.Count > 0)
+            {
+                compatibleVehicles = compatibleVehicles.Where(vehicle =>
+                    request.NonStandardCargos.All(cargo =>
+                        cargo.Length <= vehicle.Length &&
+                        cargo.Width <= vehicle.Width &&
+                        cargo.Height <= vehicle.Height))
+                    .ToList();
+            }
+
+            var mostCompatibleVehicles = new List<(Vehicle Primary, Vehicle? Secondary)>();
+
+            compatibleVehicles = compatibleVehicles
+                .OrderBy(vehicle => vehicle.MaxWeightCapacity - request.TotalWeight)
+                .ThenBy(vehicle => vehicle.Volume - request.TotalVolume)
+                .ToList();
+
+            foreach (var primary in compatibleVehicles)
+            {
+                if (primary.MaxWeightCapacity >= request.TotalWeight && primary.Volume >= request.TotalVolume)
+                {
+                    mostCompatibleVehicles.Add((Primary: primary, Secondary: null));
+                }
+                else
+                {
+                    foreach (var secondary in compatibleVehicles.Where(v => v != primary))
+                    {
+                        if (primary.MaxWeightCapacity + secondary.MaxWeightCapacity >= request.TotalWeight &&
+                            primary.Volume + secondary.Volume >= request.TotalVolume)
+                        {
+                            requiredVehicles++;
+                            mostCompatibleVehicles.Add((Primary: primary, Secondary: secondary));
+                        }
+                    }
                 }
             }
 
+            foreach (var pair in mostCompatibleVehicles)
+            {
+                var cheapestPair = new[] { pair.Primary, pair.Secondary }
+                    .Where(x => x != null)  
+                    .OrderBy(x => x.ContantsExpenses + (decimal)x.FuelConsumptionPer100Km + x.PurchasePrice)
+                    .FirstOrDefault();
+                cheapestPairId = cheapestPair?.Id;
 
+                var economicalPair = new[] { pair.Primary, pair.Secondary }
+                    .Where(x => x != null)
+                    .OrderBy(x => x.FuelConsumptionPer100Km)
+                    .FirstOrDefault();
+                economicalPairId = economicalPair?.Id;
 
+                var ecologicalPair = new[] { pair.Primary, pair.Secondary }
+                    .Where(x => x != null)
+                    .OrderBy(x => x.EmissionFactor)
+                    .FirstOrDefault();
+                ecologicalPairId = ecologicalPair?.Id;
 
-            var driverViewModels = new List<PossibleDriversForDeliveryViewModel>();
+                var closestToMaintenancePair = new[] { pair.Primary, pair.Secondary }
+                    .Where(x => x != null)
+                    .OrderBy(x => x.KilometersLeftToChangeParts)
+                    .ThenByDescending(x => x.LastYearMaintenance)
+                    .FirstOrDefault();
+                closestToMaintenancePairId = closestToMaintenancePair?.Id;
 
-            /* foreach (var driver in possibleDrivers)
-             {
-                 var reservedDeliveriesCount = driver.Deliveries.Count(x => x.ActualDeliveryDate == null);
-                 var domesticDeliveriesThisYearCount = driver.Deliveries.Count(x => x.ActualDeliveryDate.HasValue && x.ActualDeliveryDate.Value.Year == DateTime.Now.Year && x.Offer.Request.Type == RequestTypeConstants.Domestic);
-                 var internationalDeliveriesThisYearCount = driver.Deliveries.Count(x => x.ActualDeliveryDate.HasValue && x.ActualDeliveryDate.Value.Year == DateTime.Now.Year && x.Offer.Request.Type == RequestTypeConstants.International);
+                var mostOptimalPair = new[] { pair.Primary, pair.Secondary }
+                    .Where(x => x != null)
+                    .OrderByDescending(x => x.ContantsExpenses + (decimal)x.FuelConsumptionPer100Km)
+                    .ThenByDescending(x => x.EmissionFactor)
+                    .FirstOrDefault();
+                mostOptimalPairId = mostOptimalPair?.Id;
+            }
+            foreach (var pair in mostCompatibleVehicles)
+            {
+                var deliveriesThisYearForVehicle1 = await repository.AllReadonly<Infrastructure.Data.DataModels.Delivery>().Where(x => x.VehicleId == pair.Primary.Id && x.ActualDeliveryDate.Value.Year == DateTime.Now.Year).ToListAsync();
+                var reservedForDeliveryForVehicle1 = await repository.AllReadonly<ReservedForDelivery>().Where(x => x.VehicleId == pair.Primary.Id).ToListAsync();
+                var currentDeliveriesForVehicle1 = await repository.AllReadonly<Infrastructure.Data.DataModels.Delivery>().Where(x => x.VehicleId == pair.Primary.Id && x.DeliveryStep < 4).FirstOrDefaultAsync();
+                bool currentlyDelivering = currentDeliveriesForVehicle1 != null;
+                var possibleVehicle1 = new PossibleVehiclesForDeliveryViewModel()
+                {
+                        Id = pair.Primary.Id,
+                        VehicleType = pair.Primary.VehicleType,
+                        RegistrationNumber = pair.Primary.RegistrationNumber,
+                        EmissionFactor = pair.Primary.EmissionFactor.ToString(),
+                        FuelConsumptionPer100km = pair.Primary.FuelConsumptionPer100Km.ToString(),
+                        Height = pair.Primary.Height.ToString(),
+                        Width = pair.Primary.Width.ToString(),
+                        Length = pair.Primary.Length.ToString(),
+                        Weight = pair.Primary.MaxWeightCapacity.ToString(),
+                        KilometersTillChangingParts = pair.Primary.KilometersLeftToChangeParts,
+                        Kilometers = pair.Primary.KilometersDriven,
+                        CalculatedPrice = await CalculatePriceForRequest(pair.Primary, id),
+                        ReservedDeliveriesCount = reservedForDeliveryForVehicle1.Count(),
+                        CurrentlyDelivering = currentlyDelivering,
+                        DeliveriesThisYearCount = deliveriesThisYearForVehicle1.Count(),
+                };
+                var deliveriesThisYearForVehicle2 = await repository.AllReadonly<Infrastructure.Data.DataModels.Delivery>().Where(x => x.VehicleId == pair.Secondary.Id && x.ActualDeliveryDate.Value.Year == DateTime.Now.Year).ToListAsync();
+                var reservedForDeliveryForVehicle2 = await repository.AllReadonly<ReservedForDelivery>().Where(x => x.VehicleId == pair.Secondary.Id).ToListAsync();
+                var currentDeliveriesForVehicle2 = await repository.AllReadonly<Infrastructure.Data.DataModels.Delivery>().Where(x => x.VehicleId == pair.Secondary.Id && x.DeliveryStep < 4).FirstOrDefaultAsync();
+                bool currentlyDeliveringForVehicle2 = currentDeliveriesForVehicle1 != null;
+                var possibleVehicle2 = new PossibleVehiclesForDeliveryViewModel()
+                {
+                    Id = pair.Secondary.Id,
+                    VehicleType = pair.Secondary.VehicleType,
+                    RegistrationNumber = pair.Secondary.RegistrationNumber,
+                    EmissionFactor = pair.Secondary.EmissionFactor.ToString(),
+                    FuelConsumptionPer100km = pair.Secondary.FuelConsumptionPer100Km.ToString(),
+                    Height = pair.Secondary.Height.ToString(),
+                    Width = pair.Secondary.Width.ToString(),
+                    Length = pair.Secondary.Length.ToString(),
+                    Weight = pair.Secondary.MaxWeightCapacity.ToString(),
+                    KilometersTillChangingParts = pair.Secondary.KilometersLeftToChangeParts,
+                    Kilometers = pair.Secondary.KilometersDriven,
+                    CalculatedPrice = await CalculatePriceForRequest(pair.Secondary, id),
+                    ReservedDeliveriesCount = reservedForDeliveryForVehicle2.Count(),
+                    CurrentlyDelivering = currentlyDeliveringForVehicle2,
+                    DeliveriesThisYearCount = deliveriesThisYearForVehicle2.Count(),
+                };
+                var vehiclePairsLegend = new VehiclePairsLegend()
+                {
+                    Cheapest = cheapestPairId == pair.Primary.Id || cheapestPairId == pair.Secondary.Id,
+                    MostEconomical = economicalPairId == pair.Primary.Id || economicalPairId == pair.Secondary.Id,
+                    MostEcological = ecologicalPairId == pair.Primary.Id || ecologicalPairId == pair.Secondary.Id,
+                    ClosestToMaintenance = closestToMaintenancePairId == pair.Primary.Id || closestToMaintenancePairId == pair.Secondary.Id,
+                    MostOptimal = mostOptimalPairId == pair.Primary.Id || mostOptimalPairId == pair.Secondary.Id                   
+                };
 
-                 var successRate = driver.Deliveries.Count(d => d.ActualDeliveryDate <= d.Offer.Request.ExpectedDeliveryDate);
-                 double successRatePercentage = driver.Deliveries.Count() > 0 ? (successRate / (double)driver.Deliveries.Count()) * 100 : 0;
+                modelToReturn.Add((possibleVehicle1, possibleVehicle2, vehiclePairsLegend));
+               
+            }
 
-                 var currentDelivery = await repository.AllReadonly<Infrastructure.Data.DataModels.Delivery>().Where(x => x.DriverId == driver.Id && x.ActualDeliveryDate == null).FirstOrDefaultAsync();
+            return (mostCompatibleVehicles, requiredVehicles);
+        }
 
-                 var latestDeliveryTracking = currentDelivery != null ? await repository.AllReadonly<Infrastructure.Data.DataModels.DeliveryTracking>().Where(x => x.DeliveryId == currentDelivery.Id)
-                         .OrderByDescending(x => x.Timestamp)
-                         .FirstOrDefaultAsync() : null;
-
-                 bool isNearby = latestDeliveryTracking != null && latestDeliveryTracking.Latitude == request.PickupAddress.Latitude || latestDeliveryTracking.Longitude == request.PickupAddress.Longitude;
-
-                 driverViewModels.Add(new PossibleDriversForDeliveryViewModel
-                 {
-                     Id = driver.Id,
-                     DriverName = driver.Name,
-                     Age = driver.Age,
-                     DriverPhoneNumber = driver.User?.PhoneNumber,
-                     ReservedDeliveriesCount = reservedDeliveriesCount,
-                     InternationalDeliveriesThisYearCount = internationalDeliveriesThisYearCount,
-                     DomesticsDeliveriesThisYearCount = domesticDeliveriesThisYearCount,
-                     SuccessRate = successRatePercentage,
-                     CurrentlyDelivering = reservedDeliveriesCount > 0,
-                     LicenseExpiringSoon = licenseExpiringId == driver.Id,
-                     Experienced = experiencedId == driver.Id,
-                     Fit = fittestId == driver.Id,
-                     LowWorkload = driver.Deliveries.Count() < 10
-                 });
-             }
-
-             return driverViewModels;*/
-            return new List<PossibleVehiclesForDeliveryViewModel>();
-
-        } 
+        private async Task<decimal> CalculatePriceForRequest(LogisticsSystem.Infrastructure.Data.DataModels.Vehicle vehicle, int id)
+        {
+            var request = await repository.AllReadonly<LogisticsSystem.Infrastructure.Data.DataModels.Request>().Where(x => x.Id == id).FirstOrDefaultAsync();
+            var fuelConsumption = (request.Kilometers / 100) * vehicle.FuelConsumptionPer100Km;
+            var fuelPrice = await repository.AllReadonly<Infrastructure.Data.DataModels.FuelPrice>().OrderByDescending(x => x.Date).FirstOrDefaultAsync();
+            var fuelCost = (decimal)fuelConsumption * fuelPrice.Price;
+            var requestType = request.Type;
+            var shared = request.SharedTruck ? "SharedTruck" : "NotSharedTruck";
+            var quotient = $"QuotientFor{requestType}{shared}";
+            var expression = Expression.Parameter(typeof(PricesPerSize), "x");
+            var property = Expression.Property(expression, quotient);
+            var lambda = Expression.Lambda<Func<PricesPerSize, double>>(property, expression);
+            var pricesPerSize = await repository.AllReadonly<PricesPerSize>().Where(x => x.VehicleId == vehicle.Id).Select(lambda).FirstOrDefaultAsync(); ;
+            var calculatedPrice = (decimal)(pricesPerSize * request.Kilometers) + (vehicle.ContantsExpenses + fuelCost);
+            return calculatedPrice + calculatedPrice * (decimal)0.20;
+        }
 
         private async Task<DateTime> GetSuggestedStartDateForNotSharedDelivery(int id)
         {
             var request = await repository.AllReadonly<LogisticsSystem.Infrastructure.Data.DataModels.Request>().Where(x => x.Id == id).Include(x => x.StandartCargo).Include(x => x.PickupAddress).Include(x => x.DeliveryAddress).FirstOrDefaultAsync();
 
             string travelTimeResponse = await geocodingService.GetTravelTimeAsync(request.PickupAddress.Latitude.Value, request.PickupAddress.Longitude.Value, request.DeliveryAddress.Latitude.Value, request.DeliveryAddress.Longitude.Value);
-            TimeSpan travelTime = TimeSpan.Parse(travelTimeResponse);
+            TimeSpan travelTime = ParseGoogleDuration(travelTimeResponse);
 
             var travelAndRestTime = GetDrivingTimeAndDays(travelTime);
 
@@ -696,6 +915,34 @@ namespace LogiTrack.Core.Services
             }
 
             return suggestedStartDate;
+        }
+
+        private TimeSpan ParseGoogleDuration(string duration)
+        {
+            TimeSpan result = TimeSpan.Zero;
+
+            var parts = duration.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+
+            for (int i = 0; i < parts.Length; i += 2)
+            {
+                if (i + 1 >= parts.Length)
+                    break;
+
+                if (int.TryParse(parts[i], out int value))
+                {
+                    string unit = parts[i + 1].ToLower();
+                    if (unit.StartsWith("day"))
+                        result = result.Add(TimeSpan.FromDays(value));
+                    else if (unit.StartsWith("hour"))
+                        result = result.Add(TimeSpan.FromHours(value));
+                    else if (unit.StartsWith("minute"))
+                        result = result.Add(TimeSpan.FromMinutes(value));
+                    else if (unit.StartsWith("second"))
+                        result = result.Add(TimeSpan.FromSeconds(value));
+                }
+            }
+
+            return result;
         }
 
         private async Task<(TimeSpan, TimeSpan)> GetCargoLoadigAndUnloadingTime(int id)
@@ -724,23 +971,23 @@ namespace LogiTrack.Core.Services
 
         private async Task<TimeSpan> GetTotalBufferTime(int id, TimeSpan travelTime, int deliveryDays)
         {
-            TimeSpan bufferTime = TimeSpan.FromMinutes(30); 
+            TimeSpan bufferTime = TimeSpan.FromMinutes(30);
 
             TimeSpan additionalBuffer = travelTime.TotalHours > 6 ? TimeSpan.FromMinutes(60) : TimeSpan.Zero;
 
-            TimeSpan dailyBuffer = TimeSpan.FromMinutes(deliveryDays * 15); 
+            TimeSpan dailyBuffer = TimeSpan.FromMinutes(deliveryDays * 15);
 
             var nonStandardCargos = await repository.AllReadonly<NonStandardCargo>().Where(x => x.RequestId == id).CountAsync();
             TimeSpan nonStandardCargoBuffer = nonStandardCargos > 0 ? TimeSpan.FromMinutes(30) : TimeSpan.Zero;
 
-           return bufferTime + additionalBuffer + dailyBuffer + nonStandardCargoBuffer;
+            return bufferTime + additionalBuffer + dailyBuffer + nonStandardCargoBuffer;
         }
 
         private (TimeSpan totalDailyDrivingTime, int drivingDays, TimeSpan totalRestTime) GetDrivingTimeAndDays(TimeSpan travelTime)
         {
-            const int maxDrivingHoursPerDay = 9; 
-            const int restBreakMinutes = 30; 
-            const int breakAfterHours = 3; 
+            const int maxDrivingHoursPerDay = 9;
+            const int restBreakMinutes = 30;
+            const int breakAfterHours = 3;
 
             double totalDrivingHours = travelTime.TotalHours;
             int totalDrivingWithBreakSegments = (int)Math.Ceiling(totalDrivingHours / breakAfterHours);
@@ -774,12 +1021,12 @@ namespace LogiTrack.Core.Services
 
             foreach (var driver in possibleDrivers)
             {
-                var reservedDeliveriesCount = driver.Deliveries.Count(x => x.ActualDeliveryDate == null);
-                var domesticDeliveriesThisYearCount = driver.Deliveries.Count(x => x.ActualDeliveryDate.HasValue &&x.ActualDeliveryDate.Value.Year == DateTime.Now.Year &&x.Offer.Request.Type == RequestTypeConstants.Domestic);
-                var internationalDeliveriesThisYearCount = driver.Deliveries.Count(x => x.ActualDeliveryDate.HasValue &&x.ActualDeliveryDate.Value.Year == DateTime.Now.Year &&x.Offer.Request.Type == RequestTypeConstants.International);
-
-                var successRate = driver.Deliveries.Count(d => d.ActualDeliveryDate <= d.Offer.Request.ExpectedDeliveryDate);
-                double successRatePercentage = driver.Deliveries.Count() > 0 ? (successRate / (double)driver.Deliveries.Count()) * 100 : 0;
+                var deliveriesWithDriver = await repository.AllReadonly<Infrastructure.Data.DataModels.Delivery>().Include(x => x.Offer).ThenInclude(x => x.Request).Where(x => x.DriverId == driver.Id).ToListAsync();
+                var reservedDeliveriesCount = deliveriesWithDriver.Count(x => x.ActualDeliveryDate == null);
+                var domesticDeliveriesThisYearCount = deliveriesWithDriver.Count(x => x.ActualDeliveryDate.HasValue && x.ActualDeliveryDate.Value.Year == DateTime.Now.Year && x.Offer.Request.Type == RequestTypeConstants.Domestic);
+                var internationalDeliveriesThisYearCount = deliveriesWithDriver.Count(x => x.ActualDeliveryDate.HasValue && x.ActualDeliveryDate.Value.Year == DateTime.Now.Year && x.Offer.Request.Type == RequestTypeConstants.International);
+                var successRate = deliveriesWithDriver.Count(d => d.ActualDeliveryDate <= d.Offer.Request.ExpectedDeliveryDate);
+                double successRatePercentage = deliveriesWithDriver.Count() > 0 ? (successRate / (double)driver.Deliveries.Count()) * 100 : 0;
 
                 var currentDelivery = await repository.AllReadonly<Infrastructure.Data.DataModels.Delivery>().Where(x => x.DriverId == driver.Id && x.ActualDeliveryDate == null).FirstOrDefaultAsync();
 
@@ -787,12 +1034,14 @@ namespace LogiTrack.Core.Services
                         .OrderByDescending(x => x.Timestamp)
                         .FirstOrDefaultAsync() : null;
 
-                bool isNearby = latestDeliveryTracking != null && latestDeliveryTracking.Latitude == request.PickupAddress.Latitude || latestDeliveryTracking.Longitude == request.PickupAddress.Longitude;
-
+                bool isNearby = latestDeliveryTracking != null &&
+                    (latestDeliveryTracking.Latitude == request.PickupAddress.Latitude ||
+                     latestDeliveryTracking.Longitude == request.PickupAddress.Longitude);
                 driverViewModels.Add(new PossibleDriversForDeliveryViewModel
                 {
                     Id = driver.Id,
                     DriverName = driver.Name,
+                    KilometersDriven = deliveriesWithDriver.Sum(x => x.Offer.Request.Kilometers).ToString(),
                     Age = driver.Age,
                     DriverPhoneNumber = driver.User?.PhoneNumber,
                     ReservedDeliveriesCount = reservedDeliveriesCount,
@@ -803,11 +1052,11 @@ namespace LogiTrack.Core.Services
                     LicenseExpiringSoon = licenseExpiringId == driver.Id,
                     Experienced = experiencedId == driver.Id,
                     Fit = fittestId == driver.Id,
-                    LowWorkload = driver.Deliveries.Count() < 10
+                    LowWorkload = deliveriesWithDriver.Count() < 10
                 });
             }
 
             return driverViewModels;
         }
-    }  
+    }
 }

@@ -598,9 +598,10 @@ namespace LogiTrack.Core.Services
         public async Task<FuelPricesStatisticsViewModel?> GetFuelPricesStatisticsAsync()
         {
             var fuelPrices = await repository.AllReadonly<FuelPrice>().ToListAsync();
+            var todayPrice = fuelPrices.FirstOrDefault(x => x.Date.Date == DateTime.Now.Date)?.Price ?? 0;
             return new FuelPricesStatisticsViewModel
             {
-                TodayPrice = fuelPrices.Where(x => x.Date == DateTime.Now).ToString(),
+                TodayPrice = fuelPrices.FirstOrDefault(x => x.Date.Date == DateTime.Now.Date)?.Price.ToString() ?? "0",
                 AveragePrice = fuelPrices.Average(x => x.Price).ToString(),
                 MaxPrice = fuelPrices.Max(x => x.Price).ToString(),
                 MinPrice = fuelPrices.Min(x => x.Price).ToString(),
