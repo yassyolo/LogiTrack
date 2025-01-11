@@ -1,4 +1,6 @@
-﻿using System.Net.Http.Json;
+﻿using Microsoft.EntityFrameworkCore.Metadata;
+using Newtonsoft.Json.Linq;
+using System.Net.Http.Json;
 using System.Text.Json.Serialization;
 
 namespace LogiTrack.Core.Services
@@ -6,11 +8,36 @@ namespace LogiTrack.Core.Services
     public class GeocodingService
     {
         private readonly HttpClient httpClient;
-        private readonly string googleMapsApiKey = "test";
+        private readonly string googleMapsApiKey = "AIzaSyBsBMQei2VoOA_NoDJdMY-MwRNhT3PMnKM";
+        private const string apiKey = "AIzaSyBvWvbU5vFfS0qmdqEsA_ijjj2JBrm1FCI";
+        private const string distanceMatrixUrl = "https://maps.googleapis.com/maps/api/distancematrix/json";
 
         public GeocodingService(HttpClient httpClient)
         {
             this.httpClient = httpClient;
+        }
+
+
+        public async Task<string> GetTravelTimeAsync(double pickupLat, double pickupLng, double deliveryLat, double deliveryLng)
+        {
+            using (HttpClient client = new HttpClient())
+            {
+                var url = $"{distanceMatrixUrl}?origins={pickupLat},{pickupLng}&destinations={deliveryLat},{deliveryLng}&key={apiKey}";
+                HttpResponseMessage response = await client.GetAsync(url);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    string content = await response.Content.ReadAsStringAsync();
+                    JObject jsonResponse = JObject.Parse(content);
+
+                    var duration = jsonResponse["rows"][0]["elements"][0]["duration"]["text"].ToString();
+                    return duration;
+                }
+                else
+                {
+                    return "Error retrieving data";
+                }
+            }
         }
 
         public async Task<(double Latitude, double Longtitude)?> GetCoordinates(string address)

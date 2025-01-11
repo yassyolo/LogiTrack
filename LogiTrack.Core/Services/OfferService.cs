@@ -119,7 +119,6 @@ namespace LogiTrack.Core.Services
                     FinalPrice = x.FinalPrice.ToString(),
                     OfferDate = x.OfferDate.ToString("dd-MM-yyyy"),
                     OfferStatus = x.OfferStatus,
-                    Notes = x.Notes,
                 }).FirstOrDefaultAsync();
 
             model.DeliveryId = await repository.AllReadonly<Delivery>().Where(x => x.OfferId == id).Select(x => x.Id).FirstOrDefaultAsync();

@@ -46,16 +46,22 @@
             </div>
             <div class="company-name">LogiTrack</div>
         </div>
+        <div class="left-header">
+        <div class="notifications">
+                <a asp-action="Notifications" asp-controller="Home" style="color:white; text-decoration: none; font-size: 20px;">
+                    <i  style="color:white;"class="bi bi-bell"></i>
+                </a>
+			<span id="notificationsCount"></span>
+        </div>
         <div class="profile-dropdown">
             <button onclick="toggleDropdown()">
                 <i class="bi bi-person-circle"></i>
                 <span class="arrow">&#x25BC;</span>
             </button>
             <div class="profile-dropdown-menu" id="profileDropdown">
-                <a asp-action="CompanyDetails" asp-controller="Clients">Company details</a>
-                <a asp-action="ContactDetails" asp-controller="Clients">Contact details</a>
                 <a asp-action="Logout" asp-controller="Home">Logout</a>
             </div>
+        </div>
         </div>
     </header>
     <aside class="sidebar">
@@ -158,6 +164,26 @@
         @RenderBody()
     </div>
     @RenderSection("Scripts", required: false)
+    <script>
+        window.onload = function () {
+            const notificationsCount = document.getElementById('notificationsCount');
+
+            function getNotificationsCount() {
+                fetch('/Home/GetNotificationsCount')
+                    .then(response => response.json())
+                    .then(data => {
+                        if (notificationsCount) {
+                            notificationsCount.innerText = data;
+                        }
+                    })
+                    .catch(error => console.log("Error fetching notifications count:", error));
+
+                console.log(notificationsCount);
+            }
+
+            getNotificationsCount();
+        };
+    </script>
 
 </body>
 

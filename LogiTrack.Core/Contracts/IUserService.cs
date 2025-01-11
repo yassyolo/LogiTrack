@@ -15,5 +15,7 @@ namespace LogiTrack.Core.Contracts
         Task<bool> UserWithPhoneNumberExistsAsync(string phoneNumber);
         Task<List<NotificationViewModel>?> GetNotificationsForUserAsync(string username);
         Task<bool> NotificationWithIdExistsForUserAsync(int id, string username);
+        Task<IdentityUser> GetClientUserByRequestIdAsync(int requestId);
+        Task<bool> UserWithUsernameExistsAsync(string username);
     }
 }

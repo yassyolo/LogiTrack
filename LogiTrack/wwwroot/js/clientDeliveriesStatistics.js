@@ -128,9 +128,10 @@
         console.error('Error fetching delivery success rate:', error);
         }
     }
-    window.onload = async function () {
+    document.addEventListener('DOMContentLoaded', async function () {
+        console.log('DOM fully loaded and parsed');
         await fetchDeliverySuccessRate();
-    await fetchMonthlyDeliveries();
-    await fetchDeliveryCounts();
-    };
+        await fetchMonthlyDeliveries();
+        await fetchDeliveryCounts();
+    });
 

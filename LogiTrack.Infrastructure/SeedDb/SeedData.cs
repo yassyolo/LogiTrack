@@ -1,7 +1,6 @@
 ﻿using LogisticsSystem.Infrastructure.Data.DataModels;
 using LogiTrack.Infrastructure.Data.DataModels;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 
 namespace LogiTrack.Infrastructure.SeedDb
 {
@@ -172,14 +171,12 @@ namespace LogiTrack.Infrastructure.SeedDb
             DriverUser1 = new IdentityUser
             {
                 Id = "driverUser1", 
-                UserName = "driver1@example.com",
-                NormalizedUserName = "DRIVER1@EXAMPLE.COM",
+                UserName = "driver",
                 Email = "driver1@example.com",
-                NormalizedEmail = "DRIVER1@EXAMPLE.COM",
                 PhoneNumber = "1234567893",
                 EmailConfirmed = true
             };
-            DriverUser1.PasswordHash = hasher.HashPassword(DriverUser1, "driver1");
+            DriverUser1.PasswordHash = hasher.HashPassword(DriverUser1, "driver");
             DriverUser2 = new IdentityUser
             {
                 Id = "driverUser2",
@@ -190,7 +187,7 @@ namespace LogiTrack.Infrastructure.SeedDb
                 NormalizedEmail = "DRIVER2@EXAMPLE.COM",
                 EmailConfirmed = true,
             };
-            DriverUser1.PasswordHash = hasher.HashPassword(DriverUser1, "driver2");
+            DriverUser2.PasswordHash = hasher.HashPassword(DriverUser2, "driver2");
         }
         private void SeedRoles()
         {
@@ -221,6 +218,7 @@ namespace LogiTrack.Infrastructure.SeedDb
                 Name = "Speditor",
                 NormalizedName = "SPEDITOR"
             };
+
             DriverRole = new IdentityRole
             {
                 Id = "350868c0-bf0f-4f70-b4c9-155351bc6429",
@@ -256,13 +254,13 @@ namespace LogiTrack.Infrastructure.SeedDb
 
             Driver1UserRole = new IdentityUserRole<string>
             {
-                UserId = "driverUser1",
-                RoleId = "350868c0-bf0f-4f70-b4c9-155351bc6429"
+                UserId = DriverUser1.Id,
+                RoleId = DriverRole.Id
             };
             Driver2UserRole = new IdentityUserRole<string>
             {
-                UserId = "driverUser2",
-                RoleId = "350868c0-bf0f-4f70-b4c9-155351bc6429"
+                UserId = DriverUser2.Id,
+                RoleId = DriverRole.Id
             };
         }
         private void SeedAddresses()
@@ -300,7 +298,7 @@ namespace LogiTrack.Infrastructure.SeedDb
             {
                 Id = 2,
                 Name = "Client Company 2",
-                UserId = ClientCompany2User.Id,
+               // UserId = ClientCompany2User.Id,
                 RegistrationStatus = "Pending",
                 ContactPerson = "Jane Smith",
                 AlternativePhoneNumber = "9876543210",
@@ -533,7 +531,6 @@ namespace LogiTrack.Infrastructure.SeedDb
                 OfferStatus = "Pending",
                 OfferDate = DateTime.Now.AddDays(-15),
                 OfferNumber = "OFFER0001",
-                Notes = "Initial offer for Request 1",
             };
             Offer2 = new Offer
             {
@@ -543,7 +540,6 @@ namespace LogiTrack.Infrastructure.SeedDb
                 OfferStatus = "Approved",
                 OfferNumber = "OFFER0002",
                 OfferDate = DateTime.Now.AddDays(-16),
-                Notes = "Offer accepted for Request 2",
             };
             Offer3 = new Offer
             {
@@ -553,7 +549,6 @@ namespace LogiTrack.Infrastructure.SeedDb
                 OfferStatus = "Approved",
                 OfferDate = DateTime.Now.AddDays(-15),
                 OfferNumber = "OFFER0003",
-                Notes = "Offer approved for Request 3",
                 DeliveryId = null
             };
             Offer4 = new Offer
@@ -564,8 +559,6 @@ namespace LogiTrack.Infrastructure.SeedDb
                 OfferNumber = "OFFER0004",
                 OfferStatus = "Approved",
                 OfferDate = DateTime.Now.AddDays(-12),
-                Notes = "Approved offer for Request 4",
-
             };
             Offer5 = new Offer
             {
@@ -575,8 +568,6 @@ namespace LogiTrack.Infrastructure.SeedDb
                 FinalPrice = 2300.0m,
                 OfferStatus = "Accepted",
                 OfferDate = DateTime.Now.AddDays(-13),
-                Notes = "Finalized offer for Request 5",
-
             };
         }
         private void SeedDrivers()

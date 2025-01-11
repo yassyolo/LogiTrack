@@ -1,5 +1,6 @@
 ﻿using LogiTrack.Core.Contracts;
 using LogiTrack.Core.ViewModels.Home;
+using LogiTrack.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -52,14 +53,16 @@ namespace LogiTrack.Controllers
                 ModelState.AddModelError(string.Empty, InvalidEmailErrorMessage);
                 return View(model);
             }
+
             var passwordCheck = await userManager.CheckPasswordAsync(user, model.Password);
             if (passwordCheck == false)
             {
                 ModelState.AddModelError(string.Empty, InvalidLoginAttemptErrorMessage);
                 return View(model);
             }
-            var result = await signInManager.PasswordSignInAsync(user, model.Password, false, false);
-            if (result.Succeeded == false)
+            
+            var result2 = await signInManager.PasswordSignInAsync(user, model.Password, false, false);
+            if (result2.Succeeded == false)
             {
                 ModelState.AddModelError(string.Empty, InvalidLoginAttemptErrorMessage);
                 return View(model);
@@ -89,19 +92,23 @@ namespace LogiTrack.Controllers
             return View(model);
         }
 
-        [HttpPost]
         public async Task<IActionResult> Logout()
         {
             await signInManager.SignOutAsync();
             return RedirectToAction(nameof(Login));
         }
-
+        public async Task<JsonResult> GetNotificationsCount()
+        {
+            var username = User.GetUsername();
+            var data = await userService.GetNotificationsForUserAsync(username);
+            var result = data.Count();
+            return Json(result);
+        }
         [HttpGet]
         public async Task<IActionResult> Notifications()
         {
-            //var username = User.GetUsername();
-            var username = "logistics";
-            if (await userService.LogisticsUserWithUsernameExistsAsync(username) == false)
+            var username = User.GetUsername();
+            if (await userService.UserWithUsernameExistsAsync(username) == false)
             {
                 return BadRequest("Not found");
             }
@@ -112,13 +119,12 @@ namespace LogiTrack.Controllers
         [HttpPost]
         public async Task<IActionResult> MarkAsRead(int id)
         {
-            //var username = User.GetUsername();
-            var username = "logistics";
-            if (await userService.LogisticsUserWithUsernameExistsAsync(username) == false)
+            var username = User.GetUsername();
+            if (await userService.UserWithUsernameExistsAsync(username) == false)
             {
                 return BadRequest("Not found");
             }
-            if(await userService.NotificationWithIdExistsForUserAsync(id, username) == false)
+            if (await userService.NotificationWithIdExistsForUserAsync(id, username) == false)
             {
                 return Unauthorized();
             }

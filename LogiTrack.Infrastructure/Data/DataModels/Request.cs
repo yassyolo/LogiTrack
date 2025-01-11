@@ -95,7 +95,12 @@ namespace LogisticsSystem.Infrastructure.Data.DataModels
         [Comment("Date of creation")]
         public DateTime CreatedAt { get; set; }
 
+        [Comment("Kilometers")]
+        [Required]
         public double Kilometers { get; set; }
+
+        [Comment("Reference number")]
+        [Required]
 
         public string RerefenceNumber { get; set; } = string.Empty;
 
@@ -108,7 +113,10 @@ namespace LogisticsSystem.Infrastructure.Data.DataModels
         [ForeignKey(nameof(StandartCargoId))]
         public StandartCargo? StandartCargo { get; set; }
 
+        [Comment("Total weight of the cargo")]
         public double TotalWeight { get; set; }
+
+        [Comment("Total volume of the cargo")]
         public double TotalVolume { get; set; }
     }
 }

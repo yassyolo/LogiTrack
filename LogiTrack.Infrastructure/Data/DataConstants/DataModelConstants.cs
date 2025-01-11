@@ -145,6 +145,8 @@
             public const double LatitudeMinValue = -90.0;
             public const double LongitudeMaxValue = 180.0;
             public const double LongitudeMinValue = -180.0;
+            public const int AddressMaxLength = 200;
+            public const int AddressMinLength = 0;
         }
 
         public static class PricePerSize

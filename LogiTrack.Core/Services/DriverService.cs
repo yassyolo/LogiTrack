@@ -150,7 +150,8 @@ namespace LogiTrack.Core.Services
 					Title = $"Successful delivery: {delivery.ReferenceNumber}",
 					Message = $"Delivery {delivery.ReferenceNumber} has been delivered. Check it out now!",
 					UserId = logisticsUser.Id,
-					IsRead = false
+                    Date = DateTime.Now,
+                    IsRead = false
 				};
 				await repository.AddAsync(logisticsNotification);
 
@@ -172,7 +173,9 @@ namespace LogiTrack.Core.Services
 					Title = $"Successful delivery: {delivery.ReferenceNumber}",
 					Message = $"Delivery {delivery.ReferenceNumber} has been delivered. Check it out now!",
 					UserId = speditorUser.Id,
-					IsRead = false
+                    Date = DateTime.Now,
+
+                    IsRead = false
 				};
 				await repository.AddAsync(speditorNotification);
 

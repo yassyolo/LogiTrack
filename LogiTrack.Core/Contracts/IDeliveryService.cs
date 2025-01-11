@@ -19,6 +19,7 @@ namespace LogiTrack.Core.Contracts
         Task<List<DeliveryForClientsDeliveriesViewModel>?> GetDeliveriesForClientBySearchtermAsync(string username, string? searchTerm = null);
         Task<DelliveryDetailsForLogisticsViewModel?> GetDeliveryDetailsForLogisticsAsync(int id);
         Task<List<DeliveryForClientsDeliveriesViewModel>> GetDeliveriesForLogisticsBySearchtermAsync(string? searchTerm = null);
-        Task<List<DeliveryForClientsDeliveriesViewModel>> GetDeliveriesForLogisticsAsync(string? referenceNumber = null, DateTime? endDate = null, DateTime? startDate = null, decimal? minPrice = null, decimal? maxPrice = null, bool? isDelivered = null, bool? isPaid = null, string? pickupAddress = null, string? deliveryAddress = null);
+        Task<List<DeliveryForClientsDeliveriesViewModel>> GetDeliveriesForLogisticsAsync(bool isDelivered, bool isPaid, string? referenceNumber = null, DateTime? endDate = null, DateTime? startDate = null, decimal? minPrice = null, decimal? maxPrice = null, string? pickupAddress = null, string? deliveryAddress = null);
+        Task ReserveDeliveryAsync(int driverId, int vehicleId, int requestId, DateTime startDate);
     }
 }

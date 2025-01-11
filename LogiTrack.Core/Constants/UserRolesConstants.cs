@@ -6,6 +6,6 @@
         public const string Driver = "Driver";
         public const string ClientCompany = "ClientCompany";
         public const string Speditor = "Speditor";
-        public const string Logistics = "Logistics";
+        public const string Logistics = "LogisticsCompany";
     }
 }

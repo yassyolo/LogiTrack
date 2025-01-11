@@ -50,11 +50,7 @@
             </div>
             <div class="form-group">
                 <label asp-for="SharedTruck"><b>Shared truck</b></label>
-                <input asp-for="SharedTruck" placeholder="Please select" list="palletTypeOptions" class="form-control" onchange="toggleCargoFields()" />
-                <datalist id="palletTypeOptions">
-                    <option value="Shared"></option>
-                    <option value="Not shared"></option>
-                </datalist>
+                <input asp-for="SharedTruck" placeholder="Please select" type="checkbox" class="form-control" />
             </div>
         </div>
         <div class="button-group">
@@ -76,6 +72,10 @@
                             <i class="fas fa-paper-plane" style="color:#00aa87; font-size:30px; margin-left:10px;"></i>
                         </div>
                         <h3><b>@request.ReferenceNumber</b></h3>
+                        @*if(request.SharedTruck == true && request.PairRequestNumber != null && request.GivenOffer == false)
+						{
+                            <h3 style="margin-left: 30px;"><b>Pair request with: @request.PairRequestNumber</b></h3>
+						}*@
                     </div>
                     <div class="card-contents">
                         <div class="request-details-column">
@@ -189,6 +189,32 @@
 
                             <a asp-action="PendingRequestDetails" asp-controller="Speditor" asp-route-id="@request.Id" class="btn-clear" style="margin-top:10px;"><i class="bi bi-eye" style="color:#00aa87;"></i> SEE</a>
                         </div>
+                        @if (request.GivenOffer)
+                        {
+                            <div class="request-details-column">
+                                <div class="header-image-div">
+                                    <div class="header-image">
+                                        <i class="bi bi-file-earmark-bar-graph" style="font-size: 2rem; color: #00aa87; margin-right: 10px;"></i>
+                                    </div>
+                                    <h5><b>Offer</b></h5>
+                                </div>
+                                <div class="title-details">
+                                    <h5 class="title">Offer No:</h5>
+                                    <p>@request.OfferNumber</p>
+                                </div>
+                                <div class="title-details">
+                                    <h5 class="title">Created on:</h5>
+                                    <p>@request.OfferDate</p>
+                                </div>
+
+                                <div class="title-details" style="margin-bottom:20px;">
+                                    <h5 class="title">Final price:</h5>
+                                    <p>@request.FinalPrice BGN</p>
+                                </div>
+
+                                <a asp-action="OfferDetails" asp-controller="Speditor" asp-route-id="@request.OfferId" class="btn-clear" style="margin-top:10px;">See offer</a>
+                            </div>
+                        }
                     </div>
                 </div>
 

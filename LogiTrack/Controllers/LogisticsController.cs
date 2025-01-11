@@ -92,6 +92,7 @@ namespace LogiTrack.Controllers
             var model = await clientsService.GetNewCompanyDetailsForLogisticsAsync(id);
             return View(model);
         }     
+
         public async Task<IActionResult> ApprovePendingRegistration(int id)
         {
             if (await clientsService.CompanyWithIdExistsAsync(id) == false)
@@ -130,7 +131,14 @@ namespace LogiTrack.Controllers
             await clientsService.RejectPendingRegistrationForCompanyWithIdAsync(id);
                       
             return RedirectToAction(nameof(GetPendingRegistrations));
-        }       
+        }
+
+        [HttpGet]
+        public async Task<JsonResult> GetProfitAndLossData(int id)
+        {
+            var model = await requestService.GetProfitAndLossForDeliveryAsync(id);
+            return Json(new { profit = model.Item1, loss = model.Item2 });
+        }
 
         [HttpGet]
         public async Task<IActionResult> ClientsRegister([FromQuery] FilterClientsViewModel query)
@@ -318,7 +326,7 @@ namespace LogiTrack.Controllers
             var model = await statisticsService.GetVehicleCostsDataForVehicleAsync(id);
             return Json(new { totalCosts = model.Item1, numDeliveries = model.Item2 });
         }
-        //ToDo:VehicleStats
+
         [HttpGet]
         public async Task<JsonResult> GetDistanceAndDeliveriesForVehicle(int id)
         {
@@ -375,7 +383,7 @@ namespace LogiTrack.Controllers
         {
             var model = await requestService.GetRequestsForLogisticsBySearchTermAsync(query.SearchTerm);
             query.Requests = model;
-            model = await requestService.GetRequestsForLogisticsAsync(query.StartDate, query.EndDate, query.IsApproved, query.SharedTruck, query.MinWeight, query.MaxWeight, query.MinPrice, query.MaxPrice, query.PickupAddress, query.DeliveryAddress);
+            model = await requestService.GetRequestsForLogisticsAsync(query.IsApproved, query.SharedTruck, query.StartDate, query.EndDate, query.MinWeight, query.MaxWeight, query.MinPrice, query.MaxPrice, query.PickupAddress, query.DeliveryAddress);
             query.Requests = model;
             
             return View(query);
@@ -614,7 +622,7 @@ namespace LogiTrack.Controllers
         {
             var model = await deliveryService.GetDeliveriesForLogisticsBySearchtermAsync(query.SearchTerm);
             query.Deliveries = model;
-            model = await deliveryService.GetDeliveriesForLogisticsAsync(query.ReferenceNumber, query.EndDate, query.StartDate, query.MinPrice, query.MaxPrice, query.IsDelivered, query.IsPaid, query.PickupAddress, query.DeliveryAddress);
+            model = await deliveryService.GetDeliveriesForLogisticsAsync(query.IsDelivered, query.IsPaid, query.ReferenceNumber, query.EndDate, query.StartDate, query.MinPrice, query.MaxPrice, query.PickupAddress, query.DeliveryAddress);
             query.Deliveries = model;
 
             return View(query);

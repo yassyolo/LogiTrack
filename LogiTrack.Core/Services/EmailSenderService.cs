@@ -20,20 +20,21 @@ namespace LogiTrack.Core.Services
         {
             try
             {
-                var client = new SendGridClient(_apiKey);
-                var from = new EmailAddress("no-reply@logitrack.com", "LogiTrack");
-                var to = new EmailAddress(toEmail);
-                var emailMessage = MailHelper.CreateSingleEmail(from, to, subject, message, message);
+                var from = new EmailAddress("yoana.yotova03@gmail.com", "LogiTrack");
 
+                var replyTo = new EmailAddress("yoana.yotova03@gmail.com");
+
+                var to = new EmailAddress(toEmail);
+
+                var emailMessage = MailHelper.CreateSingleEmail(from, to, subject, message, message);
+                emailMessage.ReplyTo = replyTo; 
+
+                var client = new SendGridClient(_apiKey);
                 var response = await client.SendEmailAsync(emailMessage);
-                if (response.StatusCode != HttpStatusCode.OK)
-                {
-                    throw new Exception($"Status code: {response.StatusCode}");
-                }
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                Console.WriteLine($"Error sending email: {ex.Message}");
             }
         }
     }

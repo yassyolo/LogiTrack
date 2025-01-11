@@ -10,6 +10,8 @@ using LogiTrack.Core.ViewModels.Vehicle;
 using LogiTrack.Core.ViewModels.FuelPrice;
 using LogiTrack.Core.ViewModels.Offer;
 using LogiTrack.Core.ViewModels.Request;
+using Google.Apis.Drive.v3.Data;
+using LogiTrack.Core.Services;
 
 namespace LogiTrack.Controllers
 {
@@ -26,8 +28,9 @@ namespace LogiTrack.Controllers
         private readonly IDashboardService dashboardService;
         private IFuelPriceService fuelPriceService;
         private IRequestService requestService;
+        private IEmailSenderService emailSenderService;
 
-        public SpeditorController(IVehicleService vehicleService, IClientsService clientsService, IUserService userService, IDeliveryService deliveryService, IDriverService driverService, UserManager<IdentityUser> userManager, IOfferService offerService, IStatisticsService statisticsService, IDashboardService dashboardService, IFuelPriceService fuelPriceService, IRequestService requestService)
+        public SpeditorController(IVehicleService vehicleService, IClientsService clientsService, IUserService userService, IDeliveryService deliveryService, IDriverService driverService, UserManager<IdentityUser> userManager, IOfferService offerService, IStatisticsService statisticsService, IDashboardService dashboardService, IFuelPriceService fuelPriceService, IRequestService requestService, IEmailSenderService emailSenderService)
         {
             this.vehicleService = vehicleService;
             this.clientsService = clientsService;
@@ -40,6 +43,7 @@ namespace LogiTrack.Controllers
             this.dashboardService = dashboardService;
             this.fuelPriceService = fuelPriceService;
             this.requestService = requestService;
+            this.emailSenderService = emailSenderService;
         }
 
         [HttpGet]
@@ -169,7 +173,7 @@ namespace LogiTrack.Controllers
         {
             var model = await deliveryService.GetDeliveriesForLogisticsBySearchtermAsync(query.SearchTerm);
             query.Deliveries = model;
-            model = await deliveryService.GetDeliveriesForLogisticsAsync(query.ReferenceNumber, query.EndDate, query.StartDate, query.MinPrice, query.MaxPrice, query.IsDelivered, query.IsPaid, query.PickupAddress, query.DeliveryAddress);
+            model = await deliveryService.GetDeliveriesForLogisticsAsync(query.IsDelivered, query.IsPaid,query.ReferenceNumber, query.EndDate, query.StartDate, query.MinPrice, query.MaxPrice, query.PickupAddress, query.DeliveryAddress);
             query.Deliveries = model;
 
             return View(query);
@@ -530,7 +534,7 @@ namespace LogiTrack.Controllers
         {
             var model = await requestService.GetRequestsForLogisticsBySearchTermAsync(query.SearchTerm);
             query.Requests = model;
-            model = await requestService.GetRequestsForLogisticsAsync(query.StartDate, query.EndDate, query.IsApproved, query.SharedTruck, query.MinWeight, query.MaxWeight, query.MinPrice, query.MaxPrice, query.PickupAddress, query.DeliveryAddress);
+            model = await requestService.GetRequestsForLogisticsAsync(query.IsApproved, query.SharedTruck, query.StartDate, query.EndDate, query.MinWeight, query.MaxWeight, query.MinPrice, query.MaxPrice, query.PickupAddress, query.DeliveryAddress);
             query.Requests = model;
 
             return View(query);
@@ -547,6 +551,38 @@ namespace LogiTrack.Controllers
         {
             var model = await statisticsService.GetOfferStatisticsAsync();
             return View(model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> MakeOffer([FromBody] OfferRequest request)
+        {
+            if (await driverService.DriverWithIdExistsAsync(request.DriverId) == false)
+            {
+                return BadRequest("Driver not found");
+            }
+            if (await vehicleService.VehicleWithIdExistsAsync(request.VehicleId) == false)
+            {
+                return BadRequest("Vehicle not found");
+            }
+            if (await requestService.RequestWithIdExistsAsync(request.RequestId) == false)
+            {
+                return BadRequest("Request not found");
+            }
+            await deliveryService.ReserveDeliveryAsync(request.DriverId, request.VehicleId, request.RequestId, request.StartDate);
+            var (offerNumber, requestNumber) = await requestService.MakeOfferAsync(request.RequestId, request.Price);
+            var user = await userService.GetClientUserByRequestIdAsync(request.RequestId);
+            var emailBody = $"<h1>Offer for request No:{requestNumber}</h1><p>You just got an offer! Check it out on our platform with number {offerNumber}! </p>";
+            await emailSenderService.SendEmailAsync(user.Email, "Email Confirmation", emailBody);
+            return RedirectToAction(nameof(PendingRequestDetails), new { request.RequestId });
+        }
+
+        public class OfferRequest
+        {
+            public int DriverId { get; set; }
+            public int VehicleId { get; set; }
+            public int RequestId { get; set; }
+            public DateTime StartDate { get; set; }
+            public decimal Price { get; set; }
         }
     }
 }

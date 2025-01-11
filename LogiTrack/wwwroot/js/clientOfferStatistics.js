@@ -109,7 +109,7 @@
         }
     }
 
-    window.onload = async function () {
+document.addEventListener('DOMContentLoaded', async function() {
         try {
         await fetchAndRenderOfferAcceptanceBarChart("/Clients/GetOffersAcceptanceRate", "offerAcceptanceRateChart");
 
@@ -185,4 +185,4 @@
         } catch (error) {
         console.error("Error during chart initialization:", error);
         }
-    };
+});

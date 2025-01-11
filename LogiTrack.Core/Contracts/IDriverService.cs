@@ -20,5 +20,6 @@ namespace LogiTrack.Core.Contracts
         Task AddDriverAsync(AddDriverViewModel model, string id);
         Task<AddDriverViewModel?> GetDriverForEditAsync(int id);
         Task EditDriverAsync(int id, AddDriverViewModel model);
+        
     }
 }

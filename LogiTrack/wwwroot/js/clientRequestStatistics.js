@@ -143,8 +143,8 @@
         }
     }
 
-    window.onload = async function () {
+    document.addEventListener('DOMContentLoaded', async function () {
         await fetchRequestStatusDistribution();
     await fetchAverageResponseTime();
     await renderHeatMap();
-    };
+    });

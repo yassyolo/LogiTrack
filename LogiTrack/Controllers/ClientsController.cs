@@ -9,6 +9,7 @@ using LogiTrack.Core.ViewModels.Invoice;
 using LogiTrack.Core.ViewModels.Offer;
 using LogiTrack.Core.ViewModels.Request;
 using LogiTrack.Core.ViewModels.Delivery;
+using LogiTrack.Extensions;
 
 namespace LogiTrack.Controllers
 {
@@ -46,24 +47,21 @@ namespace LogiTrack.Controllers
         [HttpGet]
         public async Task<IActionResult> Dashboard()
         {
-            /*var username = User.GetUsername();
-            if (await clientsService.UserWithEmailExistsAsync(username) == false)
+            var username = User.GetUsername();
+            if (await userService.UserWithUsernameExistsAsync(username) == false)
             {
                 return BadRequest(ClientCompanyNotFoundErrorMessage);
-            }*/
-            var model = await dashboardService.GetClientCompanyDashboardAsync("clientcompany1");
+            }
+            var model = await dashboardService.GetClientCompanyDashboardAsync(username);
             return View(model);
         }
 
         [HttpGet]
         public async Task<JsonResult> GetCalendarEvents()
         {
-            /*var username = User.GetUsername();
-            if (await clientsService.UserWithEmailExistsAsync(username) == false)
-            {
-                return BadRequest(ClientCompanyNotFoundErrorMessage);
-            }*/
-            var model = await eventService.GetUserEventsAsync("clientcompany1");
+            var username = User.GetUsername();
+
+            var model = await eventService.GetUserEventsAsync(username);
             return Json(model);
         }
 
@@ -146,27 +144,27 @@ namespace LogiTrack.Controllers
             model.PickupLatitude = pickupCoordinates.Value.Latitude;
             model.PickupLongitude = pickupCoordinates.Value.Longtitude;
 
-            /*var username = User.GetUsername();
-             if (await clientsService.UserWithEmailExistsAsync(username) == false)
-             {
-                 return BadRequest(ClientCompanyNotFoundErrorMessage);
-             }*/
+            var username = User.GetUsername();
+            if (await userService.UserWithUsernameExistsAsync(username) == false)
+            {
+                return BadRequest(ClientCompanyNotFoundErrorMessage);
+            }
 
-             await requestService.MakeRequestAsync(model, "clientcompany1");
+            await requestService.MakeRequestAsync(model, "clientcompany1");
              return RedirectToAction(nameof(MyRequests));           
         }
 
         [HttpGet]
         public async Task<IActionResult> MyRequests([FromQuery] FilterRequestsViewModel query)
         {
-            /*var companyUsername = User.GetUsername();
-            if (await clientsService.UserWithEmailExistsAsync(companyUsername) == false)
+            var username = User.GetUsername();
+            if (await userService.UserWithUsernameExistsAsync(username) == false)
             {
                 return BadRequest(ClientCompanyNotFoundErrorMessage);
-            }*/
-            var model = await requestService.GetRequestsForCompanyBySearchTermAsync("clientcompany1", query.SearchTerm);
+            }
+            var model = await requestService.GetRequestsForCompanyBySearchTermAsync(username, query.SearchTerm);
             query.Requests = model;
-            model = await requestService.GetRequestsForCompanyAsync("clientcompany1", query.StartDate, query.EndDate, query.PickupAddress, query.DeliveryAddress, query.IsApproved, query.MinPrice, query.MaxPrice, query.MinWeight, query.MaxWeight);
+            model = await requestService.GetRequestsForCompanyAsync(username, query.StartDate, query.EndDate, query.PickupAddress, query.DeliveryAddress, query.IsApproved, query.MinPrice, query.MaxPrice, query.MinWeight, query.MaxWeight);
             query.Requests = model;
             
             return View(query);
@@ -180,12 +178,11 @@ namespace LogiTrack.Controllers
                 return BadRequest(RequestNotFoundErrorMessage);
             }
 
-            //var companyUsername = User.GetUsername();
-            var username = "clientcompany1";
-            /*if (await clientsService.UserWithEmailExistsAsync(username) == false)
+            var username = User.GetUsername();
+            if (await userService.UserWithUsernameExistsAsync(username) == false)
             {
                 return BadRequest(ClientCompanyNotFoundErrorMessage);
-            }*/
+            }
 
             if (await requestService.RequestWithCompanyExistsAsync(id, username) == false)
             {
@@ -218,12 +215,12 @@ namespace LogiTrack.Controllers
                 return View(model);
             }
 
-            //var companyUsername = User.GetUsername();
-            var username = "clientcompany1";
-            /*if (await clientsService.UserWithEmailExistsAsync(username) == false)
+            var username = User.GetUsername();
+            if (await userService.UserWithUsernameExistsAsync(username) == false)
             {
                 return BadRequest(ClientCompanyNotFoundErrorMessage);
-            }*/
+            }
+
             if (await offerService.OfferWithCompanyExistsAsync(offerId, username) == false)
             {
                 TempData["NotAuthorized"] = "Company does not have this offer.";
@@ -314,12 +311,11 @@ namespace LogiTrack.Controllers
         [HttpGet]
         public async Task<IActionResult> CompanyDetails()
         {
-            //var companyUsername = User.GetUsername();
-            var username = "clientcompany1";
-            /*if (await clientsService.UserWithEmailExistsAsync(username) == false)
+            var username = User.GetUsername();
+            if (await userService.UserWithUsernameExistsAsync(username) == false)
             {
                 return BadRequest(ClientCompanyNotFoundErrorMessage);
-            }*/
+            }
             var model = await clientsService.GetCompanyDetailsAsync(username);
             return View(model);
         }
@@ -327,12 +323,11 @@ namespace LogiTrack.Controllers
         [HttpGet]
         public async Task<IActionResult> ContactDetails()
         {
-            //var companyUsername = User.GetUsername();
-            var username = "clientcompany1";
-            /*if (await clientsService.UserWithEmailExistsAsync(username) == false)
+            var username = User.GetUsername();
+            if (await userService.UserWithUsernameExistsAsync(username) == false)
             {
                 return BadRequest(ClientCompanyNotFoundErrorMessage);
-            }*/
+            }
             var model = await clientsService.GetCompanyContactDetailsAsync(username);
             return View(model);
         }
@@ -340,12 +335,11 @@ namespace LogiTrack.Controllers
         [HttpGet]
         public async Task<IActionResult> MyOffers([FromQuery] FilterOffersViewModel query)
         {
-            //var companyUsername = User.GetUsername();
-            var username = "clientcompany1";
-            /*if (await clientsService.UserWithEmailExistsAsync(username) == false)
+            var username = User.GetUsername();
+            if (await userService.UserWithUsernameExistsAsync(username) == false)
             {
                 return BadRequest(ClientCompanyNotFoundErrorMessage);
-            }*/
+            }
             var model = await offerService.GetOffersForCompanyBySearchTermAsync(username, query.SearchTerm);
             query.Offers = model;
             model = await offerService.GetOffersForCompanyAsync(username, query.DeliveryAddress, query.PickupAddress, query.StartDate, query.EndDate, query.MinPrice, query.MaxPrice, query.IsApproved, query.MinWeight, query.MaxWeight);
@@ -356,12 +350,11 @@ namespace LogiTrack.Controllers
         [HttpGet]
         public async Task<IActionResult> BookOffer(int id)
         {
-            //var companyUsername = User.GetUsername();
-            var username = "clientcompany1";
-            /*if (await clientsService.UserWithEmailExistsAsync(username) == false)
+            var username = User.GetUsername();
+            if (await userService.UserWithUsernameExistsAsync(username) == false)
             {
                 return BadRequest(ClientCompanyNotFoundErrorMessage);
-            }*/
+            }
             if (await offerService.OfferWithIdExistsAsync(id) == false)
             {
                 return BadRequest(OfferNotFoundErrorMessage);
@@ -390,12 +383,11 @@ namespace LogiTrack.Controllers
             {
                 return View(model);
             }
-            //var companyUsername = User.GetUsername();
-            var username = "clientcompany1";
-            /*if (await clientsService.UserWithEmailExistsAsync(username) == false)
+            var username = User.GetUsername();
+            if (await userService.UserWithUsernameExistsAsync(username) == false)
             {
                 return BadRequest(ClientCompanyNotFoundErrorMessage);
-            }*/
+            }
 
             var deliveryId = await deliveryService.GetDeliveryByReferenceNumberAsync(model.ReferenceNumber);
             if (deliveryId == default)
@@ -431,12 +423,11 @@ namespace LogiTrack.Controllers
             {
                 return BadRequest(DeliveryNotFoundErrorMessage);
             }
-            //var companyUsername = User.GetUsername();
-            var username = "clientcompany1";
-            /*if (await clientsService.UserWithEmailExistsAsync(username) == false)
-             *{
-             *  return BadRequest(ClientCompanyNotFoundErrorMessage);
-             }*/
+            var username = User.GetUsername();
+            if (await userService.UserWithUsernameExistsAsync(username) == false)
+            {
+                return BadRequest(ClientCompanyNotFoundErrorMessage);
+            }
             if (await deliveryService.DeliveryWithCompanyExistsAsync(id, username) == false)
             {
                 return Unauthorized(CompanyDoesNotHaveDeliveryErrorMessage);
@@ -449,12 +440,12 @@ namespace LogiTrack.Controllers
         [HttpGet]
         public async Task<IActionResult> MyDeliveries([FromQuery] ClientsDeliveriesViewModel query)
         {
-            //var companyUsername = User.GetUsername();
-            var username = "clientcompany1";
-            /*if (await clientsService.UserWithEmailExistsAsync(username) == false)
-             *{
-             *  return BadRequest(ClientCompanyNotFoundErrorMessage);
-             }*/
+            var username = User.GetUsername();
+            if (await userService.UserWithUsernameExistsAsync(username) == false)
+            {
+                return BadRequest(ClientCompanyNotFoundErrorMessage);
+            }
+
             var model = await deliveryService.GetDeliveriesForClientBySearchtermAsync(username, query.SearchTerm);
             query.Deliveries = model;
             model = await deliveryService.GetDeliveriesForClientAsync(username, query.ReferenceNumber, query.EndDate, query.StartDate, query.MinPrice, query.MaxPrice, query.IsDelivered, query.IsPaid);
@@ -466,12 +457,11 @@ namespace LogiTrack.Controllers
         [HttpGet]
         public async Task<IActionResult> MyInvoices([FromQuery] ClientsInvoicesViewModel query)
         {
-            //var companyUsername = User.GetUsername();
-            var username = "clientcompany1";
-            /*if (await clientsService.UserWithEmailExistsAsync(username) == false)
-             *{
-             *  return BadRequest(ClientCompanyNotFoundErrorMessage);
-             }*/
+            var username = User.GetUsername();
+            if (await userService.UserWithUsernameExistsAsync(username) == false)
+            {
+                return BadRequest(ClientCompanyNotFoundErrorMessage);
+            }
             try
             {
                 var model = await invoiceService.GetInvoicesForCompanyAsync(username, query.DeliveryReferenceNumber, query.StartDate, query.EndDate, query.MinPrice, query.MaxPrice, query.IsPaid);
@@ -488,12 +478,11 @@ namespace LogiTrack.Controllers
         [HttpGet]
         public async Task<IActionResult> DeliveryStatistics()
         {
-            //var companyUsername = User.GetUsername();
-            var username = "clientcompany1";
-            /*if (await clientsService.UserWithEmailExistsAsync(username) == false)
-             *{
-             *  return BadRequest(ClientCompanyNotFoundErrorMessage);
-             }*/
+            var username = User.GetUsername();
+            if (await userService.UserWithUsernameExistsAsync(username) == false)
+            {
+               return BadRequest(ClientCompanyNotFoundErrorMessage);
+            }
             var model = await statisticsService.GetDeliveryStatisticsForCompanyAsync(username);
             return View(model);
         }
@@ -501,12 +490,7 @@ namespace LogiTrack.Controllers
         [HttpGet]
         public async Task<JsonResult> GetDeliveryTypes()
         {
-            //var companyUsername = User.GetUsername();
-            var username = "clientcompany1";
-            /*if (await clientsService.UserWithEmailExistsAsync(username) == false)
-             *{
-             *  return BadRequest(ClientCompanyNotFoundErrorMessage);
-             }*/
+            var username = User.GetUsername();
             var model = await deliveryStatisticsService.GetDestinationTypesForCompanyAsync(username);
             return Json(new { Domestic = model.domesticDeliveries, International = model.internationalDeliveries});
         }
@@ -514,12 +498,8 @@ namespace LogiTrack.Controllers
         [HttpGet]
         public async Task<JsonResult> GetDeliveryCounts()
         {
-            //var companyUsername = User.GetUsername();
-            var username = "clientcompany1";
-            /*if (await clientsService.UserWithEmailExistsAsync(username) == false)
-             *{
-             *  return BadRequest(ClientCompanyNotFoundErrorMessage);
-             }*/
+            var username = User.GetUsername();
+
             var model = await deliveryStatisticsService.GetDeliveriesCountForCompanyAsync(username);
             return Json(new {months = model.Item1, deliveries = model.Item2});
         }
@@ -527,12 +507,8 @@ namespace LogiTrack.Controllers
         [HttpGet]
         public async Task<JsonResult> GetDeliveryTimes()
         {
-            //var companyUsername = User.GetUsername();
-            var username = "clientcompany1";
-            /*if (await clientsService.UserWithEmailExistsAsync(username) == false)
-             *{
-             *  return BadRequest(ClientCompanyNotFoundErrorMessage);
-             }*/
+            var username = User.GetUsername();
+
             var model = await deliveryStatisticsService.GetDeliveryTimesForCompanyAsync(username);
             return Json(new { successRate = model.successRate, averageDelay = model.averageDelay });
         }
@@ -540,12 +516,11 @@ namespace LogiTrack.Controllers
         [HttpGet]
         public async Task<IActionResult> RequestStatistics()
         {
-            //var companyUsername = User.GetUsername();
-            var username = "clientcompany1";
-            /*if (await clientsService.UserWithEmailExistsAsync(username) == false)
-             *{
-             *  return BadRequest(ClientCompanyNotFoundErrorMessage);
-             }*/
+            var username = User.GetUsername();
+            if (await userService.UserWithUsernameExistsAsync(username) == false)
+            {
+                return BadRequest(ClientCompanyNotFoundErrorMessage);
+            }
             var model = await statisticsService.GetRequestStatisticsForCompanyAsync(username);
             return View(model);
         }
@@ -553,12 +528,8 @@ namespace LogiTrack.Controllers
         [HttpGet]
         public async Task<JsonResult> GetRequestStatusDistribution()
         {
-            //var companyUsername = User.GetUsername();
-            var username = "clientcompany1";
-            /*if (await clientsService.UserWithEmailExistsAsync(username) == false)
-             *{
-             *  return BadRequest(ClientCompanyNotFoundErrorMessage);
-             }*/
+            var username = User.GetUsername();
+
             var model = await statisticsService.GetRequestStatusDistributionForCompanyAsync(username);
             return Json(new { statusCounts = model });
         }
@@ -566,12 +537,8 @@ namespace LogiTrack.Controllers
         [HttpGet]
         public async Task<JsonResult> GetAverageResponseTime()
         {
-            //var companyUsername = User.GetUsername();
-            var username = "clientcompany1";
-            /*if (await clientsService.UserWithEmailExistsAsync(username) == false)
-             *{
-             *  return BadRequest(ClientCompanyNotFoundErrorMessage);
-             }*/
+            var username = User.GetUsername();
+
             var model = await statisticsService.GetAverageResponseTimeForClientRequestsAsync(username);
 
             return Json(new { averageResponseTime = model});
@@ -580,12 +547,8 @@ namespace LogiTrack.Controllers
         [HttpGet]
         public async Task<JsonResult> GetMonthlyRequestPatterns()
         {
-            //var companyUsername = User.GetUsername();
-            var username = "clientcompany1";
-            /*if (await clientsService.UserWithEmailExistsAsync(username) == false)
-             *{
-             *  return BadRequest(ClientCompanyNotFoundErrorMessage);
-             }*/
+            var username = User.GetUsername();
+
             var model = await statisticsService.GetMonthlyRequestPattersForClientRequestsAsync(username);
 
             return Json(new {data = model});
@@ -594,12 +557,11 @@ namespace LogiTrack.Controllers
         [HttpGet]
         public async Task<IActionResult> InvoicesStatistics()
         {
-            //var companyUsername = User.GetUsername();
-            var username = "clientcompany1";
-            /*if (await clientsService.UserWithEmailExistsAsync(username) == false)
-             *{
-             *  return BadRequest(ClientCompanyNotFoundErrorMessage);
-             }*/
+            var username = User.GetUsername();
+            if (await userService.UserWithUsernameExistsAsync(username) == false)
+            {
+                return BadRequest(ClientCompanyNotFoundErrorMessage);
+            }
             var model = await deliveryStatisticsService.GetInvoicesStatisticsForClientAsync(username);
             return View(model);
         }
@@ -607,12 +569,8 @@ namespace LogiTrack.Controllers
         [HttpGet]
         public async Task<JsonResult> GetInvoicesStatusDistribution()
         {
-            //var companyUsername = User.GetUsername();
-            var username = "clientcompany1";
-            /*if (await clientsService.UserWithEmailExistsAsync(username) == false)
-             *{
-             *  return BadRequest(ClientCompanyNotFoundErrorMessage);
-             }*/
+            var username = User.GetUsername();
+
             var model = await deliveryStatisticsService.GetInvoicesStatusDistributionAsync(username);
             return Json(new { statusCounts = model });
         }
@@ -620,12 +578,8 @@ namespace LogiTrack.Controllers
         [HttpGet]
         public async Task<JsonResult> GetTotalSpending()
         {
-            //var companyUsername = User.GetUsername();
-            var username = "clientcompany1";
-            /*if (await clientsService.UserWithEmailExistsAsync(username) == false)
-             *{
-             *  return BadRequest(ClientCompanyNotFoundErrorMessage);
-             }*/
+            var username = User.GetUsername();
+
             var totalSpent = await deliveryStatisticsService.GetTotalSpendingForCompanyAsync(username);
             return Json(new { totalSpent = totalSpent });
         }
@@ -633,12 +587,8 @@ namespace LogiTrack.Controllers
         [HttpGet]
         public async Task<JsonResult> GetRequestPriceDifferences()
         {
-            //var companyUsername = User.GetUsername();
-            var username = "clientcompany1";
-            /*if (await clientsService.UserWithEmailExistsAsync(username) == false)
-             *{
-             *  return BadRequest(ClientCompanyNotFoundErrorMessage);
-             }*/
+            var username = User.GetUsername();
+
             var model = await statisticsService.GetRequestPriceDifferenceForDeliveriesAsync(username);
             var result = model.Select(item => new
             {
@@ -653,12 +603,8 @@ namespace LogiTrack.Controllers
         [HttpGet]
         public async Task<JsonResult> GetCarbonEmission(int id)
         {
-            //var companyUsername = User.GetUsername();
-            var username = "clientcompany1";
-            /*if (await clientsService.UserWithEmailExistsAsync(username) == false)
-             *{
-             *  return BadRequest(ClientCompanyNotFoundErrorMessage);
-             }*/
+            var username = User.GetUsername();
+
             var model = await deliveryStatisticsService.GetCarbonEmissionsForCompanyAsync(username, id);
             return Json(new { specificDeliveryEmission = model.Item1, totalEmissions = model.Item2 });
         }
@@ -666,12 +612,11 @@ namespace LogiTrack.Controllers
         [HttpGet]
         public async Task<IActionResult> OfferStatistics()
         {
-            //var companyUsername = User.GetUsername();
-            var username = "clientcompany1";
-            /*if (await clientsService.UserWithEmailExistsAsync(username) == false)
-             *{
-             *  return BadRequest(ClientCompanyNotFoundErrorMessage);
-             }*/
+            var username = User.GetUsername();
+            if (await userService.UserWithUsernameExistsAsync(username) == false)
+            {
+                return BadRequest(ClientCompanyNotFoundErrorMessage);
+            }
             var model = await statisticsService.GetOfferStatisticsForCompanyAsync(username);
             return View(model);
         }
@@ -679,12 +624,8 @@ namespace LogiTrack.Controllers
         [HttpGet]
         public async Task<JsonResult> GetOffersAcceptanceRate()
         {
-            //var companyUsername = User.GetUsername();
-            var username = "clientcompany1";
-            /*if (await clientsService.UserWithEmailExistsAsync(username) == false)
-             *{
-             *  return BadRequest(ClientCompanyNotFoundErrorMessage);
-             }*/
+            var username = User.GetUsername();
+
             var model = await statisticsService.GetOffersAcceptanceRateForCompanyAsync(username);
             return Json(new { accepted = model.Item1, rejected = model.Item2 });
         }
@@ -692,12 +633,8 @@ namespace LogiTrack.Controllers
         [HttpGet]
         public async Task<JsonResult> GetDifferencesInOfferPrices()
         {
-            //var companyUsername = User.GetUsername();
-            var username = "clientcompany1";
-            /*if (await clientsService.UserWithEmailExistsAsync(username) == false)
-             *{
-             *  return BadRequest(ClientCompanyNotFoundErrorMessage);
-             }*/
+            var username = User.GetUsername();
+
             var model = await statisticsService.GetDifferencesInOfferPricesForCompanyAsync(username);
             return Json(new { offers = model.Item1, clientPrices = model.Item2, companyPrices = model.Item3 });
         }        
@@ -705,12 +642,8 @@ namespace LogiTrack.Controllers
         [HttpGet]
         public async Task<JsonResult> GetCargoRatios()
         {
-            //var companyUsername = User.GetUsername();
-            var username = "clientcompany1";
-            /*if (await clientsService.UserWithEmailExistsAsync(username) == false)
-             *{
-             *  return BadRequest(ClientCompanyNotFoundErrorMessage);
-             }*/
+            var username = User.GetUsername();
+
             var model = await statisticsService.GetCargoRatiosForCompanyAsync(username);
             return Json(new { standardCount = model.Item1, nonStandardCount = model.Item2});
         }

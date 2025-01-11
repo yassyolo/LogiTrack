@@ -23,6 +23,11 @@ namespace LogiTrack.Core.Services
             return await repository.AllReadonly<IdentityUser>().AnyAsync(x => x.UserName == username);
         }
 
+        public async Task<bool> UserWithUsernameExistsAsync(string username)
+        {
+            return await repository.AllReadonly<IdentityUser>().AnyAsync(x => x.UserName == username);
+        }
+
         public async Task<IdentityUser> ApprovePendingRegistrationForCompanyWithIdAsync(int id)
         {
             var company = await repository.All<LogisticsSystem.Infrastructure.Data.DataModels.ClientCompany>().Include(x => x.User).FirstOrDefaultAsync(x => x.Id == id);
@@ -102,6 +107,11 @@ namespace LogiTrack.Core.Services
         public async Task<bool> NotificationWithIdExistsForUserAsync(int id, string username)
         {
             return await repository.AllReadonly<Notification>().AnyAsync(x => x.Id == id && x.User.UserName == username);
+        }
+
+        public async Task<IdentityUser> GetClientUserByRequestIdAsync(int requestId)
+        {
+            return await repository.AllReadonly<LogisticsSystem.Infrastructure.Data.DataModels.Request>().Include(x => x.ClientCompany).ThenInclude(x => x.User).Where(x => x.Id == requestId).Select(x => x.ClientCompany.User).FirstOrDefaultAsync();
         }
     }
 }

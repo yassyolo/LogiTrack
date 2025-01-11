@@ -73,6 +73,8 @@ namespace LogiTrack.Infrastructure.Data.DataModels
         [Range(0, double.MaxValue)]
         public double CarbonEmission { get; set; }
 
+        [Comment("Suggested date for delivery")]       
+
         public DateTime SuggestedDate { get; set; }        
     }
 }

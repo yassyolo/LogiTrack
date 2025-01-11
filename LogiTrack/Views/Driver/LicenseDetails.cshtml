@@ -15,7 +15,7 @@
         </div>
         <div class="license-row">
             <span><b>Expiry Date</b></span>
-            <span>@Model.LicenseExpiryDate.ToShortDateString()</span>
+            <span>@Model.LicenseExpiryDate.ToString("dd-MM-yyyy")</span>
         </div>
 
         @if (TempData["LicenseExpired"] != null)

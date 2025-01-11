@@ -6,7 +6,7 @@ namespace LogiTrack.Extensions
     {
         public static string GetUsername(this ClaimsPrincipal claimsPrincipal)
         {
-            return claimsPrincipal.FindFirstValue(ClaimTypes.NameIdentifier);
+            return claimsPrincipal.FindFirstValue(ClaimTypes.Name);
         }
         public static string GetEmail(this ClaimsPrincipal claimsPrincipal)
         {

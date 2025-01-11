@@ -6,9 +6,8 @@ using static LogiTrack.Infrastructure.Data.DataConstants.DataModelConstants.Deli
 namespace LogiTrack.Infrastructure.Data.DataModels
 {
     [Comment("Delivery Tracking Entity")]
-    public class DeliveryTracking
-    {
-        //TODO: Add status for delivery
+    public class DeliveryTracking { 
+
         [Key]
         public int Id { get; set; }
 
@@ -48,6 +47,10 @@ namespace LogiTrack.Infrastructure.Data.DataModels
         [Required]
         [Range(LongitudeMinValue, LongitudeMaxValue)]
         public double Longitude { get; set; }
+
+        [Comment("Address")]
+        [StringLength(AddressMaxLength)]
+        [Required]
 
         public string Address { get; set; } = string.Empty;
     }

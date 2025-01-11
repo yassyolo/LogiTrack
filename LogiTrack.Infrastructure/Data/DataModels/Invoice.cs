@@ -30,8 +30,14 @@ namespace LogisticsSystem.Infrastructure.Data.DataModels
 
         [Comment("File identifier in Google drive")]
         public string FileId { get; set; } = string.Empty;
+
+        [Comment("Invoice status")]
         public string Status { get; set; } = string.Empty;
+
+        [Comment("Is invoice paid on time")]
         public bool? PaidOnTime { get; set; }
+
+        [Comment("Invoice paid date")]
         public DateTime? PaidDate { get; set; }
     }
 }

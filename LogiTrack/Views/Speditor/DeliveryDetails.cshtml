@@ -51,8 +51,16 @@
                         </p>
                     }
                 </div>
+                <div class="column">
+                    <h4><b>Profit / Loss</b></h4>
+                    <div class="chart-container">
+
+                        <canvas id="profitLossChart" class="chart"></canvas>
+                    </div>
+                </div>
             </div>
         </div>
+
         <div id="vehicleSection" class="section d-none">
             <div class="columns-container">
                 <div class="column">
@@ -253,61 +261,94 @@
         </div>
     </div>
 </div>
+
+<script src="~/js/map.js"></script>
+<script src="~/js/sectionShow.js"></script>
+
 @section Scripts {
-    <script src="~/js/sectionShow.js"></script>
-}
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", async function () {
+            try {
+                const response = await fetch('/Logistics/GetProfitAndLossData/@Model.Id');
+                const data = await response.json();
 
+                renderProfitLossChart(data.profit, data.loss);
 
-<script>
-    document.addEventListener("DOMContentLoaded", async function () {
-        try {
-            const response = await fetch('/Clients/GetCarbonEmission/@Model.Id');
-            const data = await response.json();
+            } catch (error) {
+                console.error("Error fetching profit and loss data:", error);
+            }
+        });
 
-            const specificDeliveryEmission = data.specificDeliveryEmission;
-            const totalEmissions = data.totalEmissions;
+        function renderProfitLossChart(profit, loss) {
+            const ctx = document.getElementById('profitLossChart').getContext('2d');
 
-            renderCarbonPieChart(specificDeliveryEmission, totalEmissions);
-        } catch (error) {
-            console.error("Error fetching carbon emission data:", error);
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Profit', 'Loss'],
+                    datasets: [{
+                        label: 'Amount',
+                        data: [profit, loss],
+                        backgroundColor: ['#4CAF50', '#F44336'],
+                        borderColor: ['#388E3C', '#D32F2F'],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
         }
-    });
+        document.addEventListener("DOMContentLoaded", async function () {
+            try {
+                const response = await fetch('/Clients/GetCarbonEmission/@Model.Id');
+                const data = await response.json();
 
-    function renderCarbonPieChart(specific, total) {
-        const ctx = document.getElementById('carbonPieChart').getContext('2d');
+                const specificDeliveryEmission = data.specificDeliveryEmission;
+                const totalEmissions = data.totalEmissions;
 
-        new Chart(ctx, {
-            type: 'pie',
-            data: {
-                labels: ['Specific Delivery', 'All Other Deliveries'],
-                datasets: [{
-                    label: 'Carbon Emission (kg)',
-                    data: [specific, total - specific],
-                    backgroundColor: ['#FF6384', '#E0E0E0'],
-                    hoverOffset: 4
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    tooltip: {
-                        callbacks: {
-                            label: function (context) {
-                                return `${context.label}: ${context.raw} kg`;
+                renderCarbonPieChart(specificDeliveryEmission, totalEmissions);
+            } catch (error) {
+                console.error("Error fetching carbon emission data:", error);
+            }
+        });
+
+        function renderCarbonPieChart(specific, total) {
+            const ctx = document.getElementById('carbonPieChart').getContext('2d');
+
+            new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: ['Specific Delivery', 'All Other Deliveries'],
+                    datasets: [{
+                        label: 'Carbon Emission (kg)',
+                        data: [specific, total - specific],
+                        backgroundColor: ['#FF6384', '#E0E0E0'],
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function (context) {
+                                    return `${context.label}: ${context.raw} kg`;
+                                }
                             }
                         }
                     }
                 }
-            }
-        });
-    }
-    
-</script>
-@section Scripts {
-    <script src="~/js/map.js"></script>
+            });
+        }
+    </script>
 }
+
 <style>
     .delivery-details-container {
         width: 100%;

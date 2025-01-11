@@ -38,6 +38,9 @@ $(document).ready(function () {
     $('#priceBtn').click(function () {
         showSection('#priceSection');
     });
+    $('#profitBtn').click(function () {
+        showSection('#profitSection');
+    });
     function showSection(sectionId) {
         $('.section').addClass('d-none');
         $(sectionId).removeClass('d-none');

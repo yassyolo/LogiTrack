@@ -136,8 +136,9 @@ namespace LogiTrack.Core.Services
             {
                 query = query.Where(x => x.RegistrationNumber.ToLower() == (registrationNumber.ToLower()));
             }
-
+            
             var clients = await query.ToListAsync();
+
             return clients.Select(x => new ClientsForClientregisterViewModel
             {
                 Id = x.Id,

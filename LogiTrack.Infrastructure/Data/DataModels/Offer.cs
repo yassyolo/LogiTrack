@@ -34,16 +34,15 @@ namespace LogisticsSystem.Infrastructure.Data.DataModels
         [Required]
         public DateTime OfferDate { get; set; }
 
-        [Comment("Notes for the offer")]
-        [StringLength(NotesMaxLength)]
-        public string? Notes { get; set; }
-
         [Comment("Delivery identifier")]
         public int? DeliveryId { get; set; }
 
         [Comment("Delivery")]
         [ForeignKey(nameof(DeliveryId))]
         public Delivery? Delivery { get; set; } = null;
+
+        [Comment("Offer number")]
+        [Required]
 
         public string OfferNumber { get; set; } = string.Empty;
     }

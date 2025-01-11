@@ -566,6 +566,7 @@ namespace LogiTrack.Core.Services
                 Title = "Rating",
                 Message = $"You have received a rating for delivery with reference number {delivery.ReferenceNumber}  - {rating.RatingStars} / 5.",
                 UserId = logisticsUser.Id,
+                Date = DateTime.Now,
                 IsRead = false
             };
             var notificationForCompany = new Notification
@@ -573,6 +574,7 @@ namespace LogiTrack.Core.Services
                 Title = "Rating",
                 Message = $"You have left a rating for delivery with reference number {delivery.ReferenceNumber} - {rating.RatingStars} / 5.",
                 UserId = delivery.Offer.Request.ClientCompany.UserId,
+                Date = DateTime.Now,
                 IsRead = false
             };
 
@@ -890,7 +892,7 @@ namespace LogiTrack.Core.Services
             return new List<DeliveryForClientsDeliveriesViewModel>();
         }
 
-        public async Task<List<DeliveryForClientsDeliveriesViewModel>> GetDeliveriesForLogisticsAsync(string? referenceNumber = null, DateTime? endDate = null, DateTime? startDate = null, decimal? minPrice = null, decimal? maxPrice = null, bool? isDelivered = null, bool? isPaid = null, string? pickupAddress = null, string? deliveryAddress = null)
+        public async Task<List<DeliveryForClientsDeliveriesViewModel>> GetDeliveriesForLogisticsAsync(bool isDelivered, bool isPaid, string? referenceNumber = null, DateTime? endDate = null, DateTime? startDate = null, decimal? minPrice = null, decimal? maxPrice = null, string? pickupAddress = null, string? deliveryAddress = null)
         {
             var deliveries = await repository.AllReadonly<Infrastructure.Data.DataModels.Delivery>()
                 .Include(x => x.Vehicle)
@@ -906,11 +908,11 @@ namespace LogiTrack.Core.Services
                 .ThenInclude(x => x.DeliveryAddress)
                 .Include(x => x.Invoice)
                 .ToListAsync();
-            if (isDelivered != null)
+            if (isDelivered)
             {
                 deliveries = deliveries.Where(x => x.DeliveryStep == 4).ToList();
             }
-            if (isPaid != null)
+            if (isPaid)
             {
                 deliveries = deliveries.Where(x => x.Invoice.IsPaid == true).ToList();
             }
@@ -958,6 +960,23 @@ namespace LogiTrack.Core.Services
                 ActualDeliveryDate = x.ActualDeliveryDate.GetValueOrDefault().ToString("dd-MM-yyyy")
             }).ToList();
             return model;
+        }
+
+        //ToDo: calculate enddate
+        public async Task ReserveDeliveryAsync(int driverId, int vehicleId, int requestId, DateTime startDate)
+        {
+            var reservedDelivery = new ReservedForDelivery
+            {
+                DriverId = driverId,
+                VehicleId = vehicleId,
+                RequestId = requestId,
+                Start = startDate,
+                End = startDate,
+                OfferId = await repository.AllReadonly<Offer>().Where(x => x.RequestId == requestId).Select(x => x.Id).FirstOrDefaultAsync()
+            };
+
+            await repository.AddAsync(reservedDelivery);
+            await repository.SaveChangesAsync();
         }
     }
 }

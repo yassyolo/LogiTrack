@@ -5,11 +5,18 @@ namespace LogiTrack.Core.ViewModels.Request
 {
     public class PendingRequestDetailsViewModel
     {
+        public int Id { get; set; }
+        public bool GivenOffer { get; set; }
+        public string? OfferNumber { get; set; }
+        public string? OfferDate { get; set; }
+        public string? FinalPrice { get; set; }
+        public int? OfferId { get; set; }
+        public bool Reserved { get; set; }
         public string ReferenceNumber { get; set; } = string.Empty;
         public string ClientAddress { get; set; } = string.Empty;
         public string ClientPhone { get; set; } = string.Empty;
         public string ClientEmail { get; set; } = string.Empty;
-        public string SuggestedStartDate { get; set; } = string.Empty;
+        public DateTime SuggestedStartDate { get; set; } 
         public int NeededVehiclesCount { get; set; }
         public List<(PossibleVehiclesForDeliveryViewModel Primary, PossibleVehiclesForDeliveryViewModel Seconary, VehiclePairsLegend Legend)> NeededVehiclePairs { get; set; } = new List<(PossibleVehiclesForDeliveryViewModel Primary, PossibleVehiclesForDeliveryViewModel Seconary, VehiclePairsLegend Legend)>();
         public int ClientId { get; set; }

@@ -10,7 +10,7 @@
         public double? MaxWeight { get; set; }
         public double? MinVolume { get; set; }
         public double? MaxVolume { get; set; }
-        public string? SharedTruck { get; set; } 
+        public bool SharedTruck { get; set; } 
         public List<RequestsDetailsForLogisticsViewModel> Requests { get; set; } =  new List<RequestsDetailsForLogisticsViewModel>();
     }
 }

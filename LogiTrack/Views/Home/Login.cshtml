@@ -22,7 +22,6 @@
             justify-content: center;
             align-items: center;
         }
-
        
         .login-form-container h2 {
             margin-bottom: 240px;
@@ -32,6 +31,7 @@
             font-size: 18px;
             color: #666;
         }
+
         form {
             width: 100%;
             display: flex;
@@ -62,10 +62,11 @@
             position: relative;
         }
         .password-toggle {
+            margin-left: 10px;
             position: absolute;
             top: 50%;
             right: 10px;
-            transform: translateY(-50%);
+            transform: translateY(-70%);
             cursor: pointer;
             color: #888;
         }
@@ -113,7 +114,7 @@
                 <span asp-validation-for="Email"></span>
                 
                 <label asp-for="Password">Password</label>
-                <div class="password-container">
+                <div class="password-container" style="width:30%;">
                     <input asp-for="Password" type="password" placeholder="Please enter" required>
                     <i class="fas fa-eye password-toggle"></i>
                 </div>
@@ -121,11 +122,7 @@
 
                 <button type="submit">Login</button>
             </form>
-            @if (User.IsInRole("ClientCompany"))
-            {
                 <div class="no-account">Don't have an account? <a asp-action="Register" asp-controller="Clients">Register</a></div>
-
-            }
         </div>
         <div class="video-container">
             <video autoplay loop muted ">

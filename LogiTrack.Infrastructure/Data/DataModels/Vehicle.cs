@@ -12,6 +12,8 @@ namespace LogisticsSystem.Infrastructure.Data.DataModels
         [Comment("Vehicle identifier")]
         public int Id { get; set; }
 
+        [Required]
+        [Comment("Is vehicle refrigerated")]
         public bool IsRefrigerated { get; set; }
 
         [Required]
